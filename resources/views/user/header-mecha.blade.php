@@ -1,8 +1,5 @@
 @php
-    $walletAddressFull = $data['userdetails']->walletaddress ?? (Session::get('user.walletaddress') ?? (Auth::user()->walletaddress ?? ''));
-    $userUuidFull = $data['userdetails']->uuid ?? (Session::get('user.uuid') ?? (Auth::user()->uuid ?? '0x4D4a'));
-    $userRankVal = $data['userdetails']->userstate ?? (Session::get('user.userstate') ?? 2);
-    $rankLabel = $userRankVal > 0 ? 'V'.$userRankVal : 'V2';
+    $caiLivePrice = \App\ProfileStore::where('id', 1)->value('price') ?? 1.25;
 @endphp
 
 <div class="hud-header-container">
@@ -19,42 +16,20 @@
             </a>
         </div>
 
-        <!-- Center: Winged Rank Shield -->
-        <div class="header-center-rank">
-            <div class="rank-top-txt">RANK</div>
-            <div class="rank-shield-composite">
-                <!-- Left 3D Wings -->
-                <div class="rank-wing-left">
-                    <div class="wing-bar wb1"></div>
-                    <div class="wing-bar wb2"></div>
-                    <div class="wing-bar wb3"></div>
-                </div>
-                <!-- Shield Core -->
-                <div class="rank-shield-core">
-                    <span class="rank-v2-val">{{ $rankLabel }}</span>
-                </div>
-                <!-- Right 3D Wings -->
-                <div class="rank-wing-right">
-                    <div class="wing-bar wb1"></div>
-                    <div class="wing-bar wb2"></div>
-                    <div class="wing-bar wb3"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: Wallet Pill -->
+        <!-- Right: Live Token Price Capsule -->
         <div class="header-right">
-            <div class="wallet-capsule" title="{{ $walletAddressFull }}">
-                <i class="fas fa-wallet wallet-icon"></i>
-                <span>
-                    @if(!empty($walletAddressFull))
-                        {{ substr($walletAddressFull, 0, 6) }}...{{ substr($walletAddressFull, -4) }}
-                    @else
-                        {{ substr($userUuidFull, 0, 6) }}...1e15
-                    @endif
-                </span>
-                <i class="fas fa-chevron-down wallet-arrow"></i>
+            <div class="header-live-price-capsule" title="Real-Time CAI Valuation">
+                <div class="price-pulse-indicator">
+                    <span class="live-dot-ping"></span>
+                    <span class="live-dot-solid"></span>
+                </div>
+                <div class="price-content-block">
+                    <span class="price-crypto-label">CAI</span>
+                    <span class="price-crypto-val">${{ number_format((float)$caiLivePrice, 2) }}</span>
+                </div>
+                <span class="price-growth-chip"><i class="fas fa-arrow-trend-up"></i> +4.2%</span>
             </div>
         </div>
     </header>
 </div>
+

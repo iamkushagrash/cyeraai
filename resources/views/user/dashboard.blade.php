@@ -228,69 +228,7 @@
         </div>
 
         <!-- ============================================================
-             3. DYNAMIC CAPPING PROGRESS CARD (EXACT MECHA HUD MATCH)
-             ============================================================ -->
-        <div class="hud-capping-wrap">
-            <div class="hud-capping-card">
-                <!-- Exact Mecha Chamfer Frame SVG -->
-                <svg class="capping-frame-svg" viewBox="0 0 400 135" preserveAspectRatio="none">
-                    <!-- Base Mecha Chamfer Body (Deep Obsidian Black Interior + Glowing Gold Border) -->
-                    <path d="M 16,2 L 384,2 L 398,16 L 398,55 L 395,60 L 395,75 L 398,80 L 398,119 L 384,133 L 16,133 L 2,119 L 2,80 L 5,75 L 5,60 L 2,55 L 2,16 Z"
-                          fill="#070A12" stroke="#F5A623" stroke-width="1.6"/>
-
-                    <!-- Inner Inset Contour Line -->
-                    <path d="M 18,6 L 382,6 L 394,18 L 394,117 L 382,129 L 18,129 L 6,117 L 6,18 Z"
-                          fill="none" stroke="#F5A623" stroke-width="0.75" opacity="0.32"/>
-
-                    <!-- 4 Corner Accent Brackets -->
-                    <path d="M 2,24 L 2,16 L 16,2 L 24,2" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
-                    <path d="M 376,2 L 384,2 L 398,16 L 398,24" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
-                    <path d="M 398,111 L 398,119 L 384,133 L 376,133" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
-                    <path d="M 24,133 L 16,133 L 2,119 L 2,111" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
-
-                    <!-- Corner Rivets -->
-                    <circle cx="12" cy="12" r="1.2" fill="#F5A623" opacity="0.75"/>
-                    <circle cx="388" cy="12" r="1.2" fill="#F5A623" opacity="0.75"/>
-                    <circle cx="388" cy="123" r="1.2" fill="#F5A623" opacity="0.75"/>
-                    <circle cx="12" cy="123" r="1.2" fill="#F5A623" opacity="0.75"/>
-                </svg>
-
-                <div class="capping-card-content">
-                    <!-- Header Row -->
-                    <div class="capping-head-row">
-                        <div class="capping-title-txt">
-                            DYNAMIC CAPPING PROGRESS <i class="fas fa-circle-info" title="Dynamic Capping Limit"></i>
-                        </div>
-                        <div class="capping-tier-pill">
-                            TIER: {{ $tierLabel }}
-                        </div>
-                    </div>
-
-                    <!-- Track & Percentage -->
-                    <div class="capping-track-container">
-                        <div class="capping-track-bar">
-                            <div class="capping-track-fill" id="cappingTrackFill" style="width: 0%;" data-target="{{ min($filledPct, 100) }}"></div>
-                        </div>
-                        <div class="capping-pct-txt" id="cappingPctTxt">0%</div>
-                    </div>
-
-                    <!-- Meta Row -->
-                    <div class="capping-meta-row">
-                        <span><strong id="cappingEarnedTxt" data-target="{{ $totalIncomeUsdt }}">$0</strong> <span class="cap-meta-lbl">Earned</span></span>
-                        <span><strong>${{ number_format($maxCapping, 0) }}</strong> <span class="cap-meta-lbl">Max Cap</span></span>
-                    </div>
-
-                    <!-- Warning Banner -->
-                    <div class="capping-warning-banner">
-                        <i class="fas fa-triangle-exclamation"></i>
-                        <span>You are approaching your cap limit. Re-Topup to renew your earning cap.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================================
-             4. QUICK ACTIONS (4 GRID — 100% DITTO MECHA HUD TILES)
+             3. QUICK ACTIONS (4 GRID — 100% DITTO MECHA HUD TILES)
              ============================================================ -->
         <div class="quick-actions">
             <!-- 1. INVEST (Gold / Amber) -->
@@ -478,6 +416,68 @@
                     </div>
                 </div>
             </a>
+        </div>
+
+        <!-- ============================================================
+             4. DYNAMIC CAPPING PROGRESS CARD (EXACT MECHA HUD MATCH)
+             ============================================================ -->
+        <div class="hud-capping-wrap">
+            <div class="hud-capping-card">
+                <!-- Exact Mecha Chamfer Frame SVG -->
+                <svg class="capping-frame-svg" viewBox="0 0 400 135" preserveAspectRatio="none">
+                    <!-- Base Mecha Chamfer Body (Deep Obsidian Black Interior + Glowing Gold Border) -->
+                    <path d="M 16,2 L 384,2 L 398,16 L 398,55 L 395,60 L 395,75 L 398,80 L 398,119 L 384,133 L 16,133 L 2,119 L 2,80 L 5,75 L 5,60 L 2,55 L 2,16 Z"
+                          fill="#070A12" stroke="#F5A623" stroke-width="1.6"/>
+
+                    <!-- Inner Inset Contour Line -->
+                    <path d="M 18,6 L 382,6 L 394,18 L 394,117 L 382,129 L 18,129 L 6,117 L 6,18 Z"
+                          fill="none" stroke="#F5A623" stroke-width="0.75" opacity="0.32"/>
+
+                    <!-- 4 Corner Accent Brackets -->
+                    <path d="M 2,24 L 2,16 L 16,2 L 24,2" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M 376,2 L 384,2 L 398,16 L 398,24" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M 398,111 L 398,119 L 384,133 L 376,133" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M 24,133 L 16,133 L 2,119 L 2,111" fill="none" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/>
+
+                    <!-- Corner Rivets -->
+                    <circle cx="12" cy="12" r="1.2" fill="#F5A623" opacity="0.75"/>
+                    <circle cx="388" cy="12" r="1.2" fill="#F5A623" opacity="0.75"/>
+                    <circle cx="388" cy="123" r="1.2" fill="#F5A623" opacity="0.75"/>
+                    <circle cx="12" cy="123" r="1.2" fill="#F5A623" opacity="0.75"/>
+                </svg>
+
+                <div class="capping-card-content">
+                    <!-- Header Row -->
+                    <div class="capping-head-row">
+                        <div class="capping-title-txt">
+                            DYNAMIC CAPPING PROGRESS <i class="fas fa-circle-info" title="Dynamic Capping Limit"></i>
+                        </div>
+                        <div class="capping-tier-pill">
+                            TIER: {{ $tierLabel }}
+                        </div>
+                    </div>
+
+                    <!-- Track & Percentage -->
+                    <div class="capping-track-container">
+                        <div class="capping-track-bar">
+                            <div class="capping-track-fill" id="cappingTrackFill" style="width: 0%;" data-target="{{ min($filledPct, 100) }}"></div>
+                        </div>
+                        <div class="capping-pct-txt" id="cappingPctTxt">0%</div>
+                    </div>
+
+                    <!-- Meta Row -->
+                    <div class="capping-meta-row">
+                        <span><strong id="cappingEarnedTxt" data-target="{{ $totalIncomeUsdt }}">$0</strong> <span class="cap-meta-lbl">Earned</span></span>
+                        <span><strong>${{ number_format($maxCapping, 0) }}</strong> <span class="cap-meta-lbl">Max Cap</span></span>
+                    </div>
+
+                    <!-- Warning Banner -->
+                    <div class="capping-warning-banner">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span>You are approaching your cap limit. Re-Topup to renew your earning cap.</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ============================================================
