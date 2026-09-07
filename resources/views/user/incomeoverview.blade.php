@@ -15,6 +15,21 @@
     $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome;
     $totalWithdraw = !empty($data['totalwithdraw']->amount) ? round((float)$data['totalwithdraw']->amount, 2) : 0.00;
     $remainingCap = !is_null($data['userDetail']->remainingCapping()) ? round((float)$data['userDetail']->remainingCapping(), 2) : 0.00;
+
+    $clubBiz = $data['userDetail']->clubBusiness();
+    $achievedClub = !empty($clubBiz['achieved']) ? $clubBiz['achieved'] : null;
+    $nextClub = !empty($clubBiz['next']) ? $clubBiz['next'] : null;
+    $nextClubMin = !empty($nextClub->business_min) ? (float)$nextClub->business_min : 1000.0;
+    $clubFirst = (float)($clubBiz['first'] ?? 0);
+    $clubRest = (float)($clubBiz['rest'] ?? 0);
+
+    $lifetimeBiz = $data['userDetail']->lifetimeAchievementBusiness();
+    $achievedLifetime = (!empty($lifetimeBiz['achieved']) && method_exists($lifetimeBiz['achieved'], 'last') && !is_null($lifetimeBiz['achieved']->last())) ? $lifetimeBiz['achieved']->last() : null;
+    $nextLifetime = !empty($lifetimeBiz['next']) ? $lifetimeBiz['next'] : null;
+    $nextLifetimeMin = !empty($nextLifetime->business_min) ? (float)$nextLifetime->business_min : 5000.0;
+    $lifetimeFirst = (float)($lifetimeBiz['first'] ?? 0);
+    $lifetimeSecond = (float)($lifetimeBiz['second'] ?? 0);
+    $lifetimeRest = (float)($lifetimeBiz['rest'] ?? 0);
 @endphp
 
 <!-- Income Streams Grid -->
@@ -147,17 +162,17 @@
             <div>
                 <h2 class="mecha-card-title">CLUB REWARD QUALIFICATION</h2>
                 <div class="mecha-card-subtitle">
-                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ !is_null($data['userDetail']->clubBusiness()['achieved']) ? $data['userDetail']->clubBusiness()['achieved']->clubname . ' ($' . round($data['userDetail']->clubBusiness()['achieved']->business_min) . ')' : 'Not Achieved' }}</span>
+                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ !is_null($achievedClub) ? $achievedClub->clubname . ' ($' . round($achievedClub->business_min) . ')' : 'Not Achieved' }}</span>
                 </div>
             </div>
         </div>
-        <span class="mecha-card-badge">NEXT: {{ $data['userDetail']->clubBusiness()['next']->clubname ?? 'Diamond' }}</span>
+        <span class="mecha-card-badge">NEXT: {{ !is_null($nextClub) ? $nextClub->clubname : 'Diamond' }}</span>
     </div>
 
     <!-- Power Leg Progress -->
     <div style="margin-top: 10px;">
         <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 5px;">
-            <span style="color: #FFE082;">POWER LEG (${{ number_format($data['userDetail']->clubBusiness()['first'], 2) }})</span>
+            <span style="color: #FFE082;">POWER LEG (${{ number_format($clubFirst, 2) }})</span>
             <span id="goldLabel" style="color: #FFD700;">0%</span>
         </div>
         <div style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.25);">
@@ -168,7 +183,7 @@
     <!-- Other Legs Progress -->
     <div style="margin-top: 14px;">
         <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 5px;">
-            <span style="color: #00E5FF;">OTHER LEGS (${{ number_format($data['userDetail']->clubBusiness()['rest'], 2) }})</span>
+            <span style="color: #00E5FF;">OTHER LEGS (${{ number_format($clubRest, 2) }})</span>
             <span id="blueLabel" style="color: #00E5FF;">0%</span>
         </div>
         <div style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 229, 255, 0.25);">
@@ -185,7 +200,7 @@
             <div>
                 <h2 class="mecha-card-title">LIFETIME REWARD LEG ANALYSIS</h2>
                 <div class="mecha-card-subtitle">
-                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ (!is_null($data['userDetail']->lifetimeAchievementBusiness()['achieved']) && !is_null($data['userDetail']->lifetimeAchievementBusiness()['achieved']->last())) ? $data['userDetail']->lifetimeAchievementBusiness()['achieved']->last()->rewardname : 'None' }}</span>
+                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ !is_null($achievedLifetime) ? $achievedLifetime->rewardname : 'None' }}</span>
                 </div>
             </div>
         </div>
@@ -197,17 +212,17 @@
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0;">
         <div class="stat-mini-box" style="padding: 8px 4px;">
             <div class="stat-mini-lbl" style="color: #00FF88;">POWER LEG</div>
-            <div class="stat-mini-val" style="color: #00FF88;">${{ number_format($data['userDetail']->lifetimeAchievementBusiness()['first'], 2) }}</div>
+            <div class="stat-mini-val" style="color: #00FF88;">${{ number_format($lifetimeFirst, 2) }}</div>
             <div class="stat-mini-sub">40% Target</div>
         </div>
         <div class="stat-mini-box" style="padding: 8px 4px;">
             <div class="stat-mini-lbl" style="color: #FFD700;">SECOND LEG</div>
-            <div class="stat-mini-val" style="color: #FFD700;">${{ number_format($data['userDetail']->lifetimeAchievementBusiness()['second'], 2) }}</div>
+            <div class="stat-mini-val" style="color: #FFD700;">${{ number_format($lifetimeSecond, 2) }}</div>
             <div class="stat-mini-sub">30% Target</div>
         </div>
         <div class="stat-mini-box" style="padding: 8px 4px;">
             <div class="stat-mini-lbl" style="color: #00E5FF;">REST LEGS</div>
-            <div class="stat-mini-val" style="color: #00E5FF;">${{ number_format($data['userDetail']->lifetimeAchievementBusiness()['rest'], 2) }}</div>
+            <div class="stat-mini-val" style="color: #00E5FF;">${{ number_format($lifetimeRest, 2) }}</div>
             <div class="stat-mini-sub">30% Target</div>
         </div>
     </div>
@@ -276,12 +291,12 @@
     });
 
     // Club Rewards Progress Calculations
-    const total1 = {{ (float)(!is_null($data['userDetail']->clubBusiness()['next']->business_min) ? $data['userDetail']->clubBusiness()['next']->business_min : 1000) }};
-    const current1 = {{ (float)$data['userDetail']->clubBusiness()['first'] }};
-    const current2 = {{ (float)$data['userDetail']->clubBusiness()['rest'] }};
+    const total1 = {{ $nextClubMin }};
+    const current1 = {{ $clubFirst }};
+    const current2 = {{ $clubRest }};
 
-    const percent1 = Math.min(100, Math.max(0, (current1 / (total1 * 0.4)) * 100));
-    const percent2 = Math.min(100, Math.max(0, (current2 / (total1 * 0.6)) * 100));
+    const percent1 = total1 > 0 ? Math.min(100, Math.max(0, (current1 / (total1 * 0.4)) * 100)) : 0;
+    const percent2 = total1 > 0 ? Math.min(100, Math.max(0, (current2 / (total1 * 0.6)) * 100)) : 0;
 
     document.getElementById('goldProgressFill').style.width = percent1.toFixed(1) + '%';
     document.getElementById('goldLabel').textContent = percent1.toFixed(1) + '%';
@@ -289,14 +304,14 @@
     document.getElementById('blueLabel').textContent = percent2.toFixed(1) + '%';
 
     // Lifetime Rewards Calculations
-    const totalLifetime = {{ (float)(!is_null($data['userDetail']->lifetimeAchievementBusiness()['next']->business_min) ? $data['userDetail']->lifetimeAchievementBusiness()['next']->business_min : 5000) }};
-    const current11 = {{ (float)$data['userDetail']->lifetimeAchievementBusiness()['first'] }};
-    const current22 = {{ (float)$data['userDetail']->lifetimeAchievementBusiness()['second'] }};
-    const current33 = {{ (float)$data['userDetail']->lifetimeAchievementBusiness()['rest'] }};
+    const totalLifetime = {{ $nextLifetimeMin }};
+    const current11 = {{ $lifetimeFirst }};
+    const current22 = {{ $lifetimeSecond }};
+    const current33 = {{ $lifetimeRest }};
 
-    const p11 = Math.min(100, Math.max(0, (current11 / (totalLifetime * 0.4)) * 100));
-    const p22 = Math.min(100, Math.max(0, (current22 / (totalLifetime * 0.3)) * 100));
-    const p33 = Math.min(100, Math.max(0, (current33 / (totalLifetime * 0.3)) * 100));
+    const p11 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current11 / (totalLifetime * 0.4)) * 100)) : 0;
+    const p22 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current22 / (totalLifetime * 0.3)) * 100)) : 0;
+    const p33 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current33 / (totalLifetime * 0.3)) * 100)) : 0;
 
     document.getElementById('goldProgressFill1').style.width = p11.toFixed(1) + '%';
     document.getElementById('goldLabel1').textContent = p11.toFixed(1) + '%';

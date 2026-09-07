@@ -310,6 +310,22 @@
                     <i class="fas fa-arrow-right nav-link-arr"></i>
                 </a>
             </div>
+
+            <!-- Logout Button -->
+            <div class="mecha-nav-item" style="margin-top: 6px;">
+                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="mecha-nav-link" style="border-color: rgba(255, 82, 82, 0.35); background: rgba(255, 82, 82, 0.05);">
+                    <div class="nav-link-left-grp">
+                        <div class="nav-ico-orb" style="background: rgba(255, 82, 82, 0.15); border-color: rgba(255, 82, 82, 0.5); color: #FF5252;">
+                            <i class="fas fa-right-from-bracket"></i>
+                        </div>
+                        <div class="nav-txt-stack">
+                            <span class="nav-link-txt" style="color: #FF5252; font-weight: 800;">Logout</span>
+                            <span class="nav-sub-txt" style="color: rgba(255, 82, 82, 0.7);">Terminate Session</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-power-off" style="color: #FF5252; font-size: 13px; filter: drop-shadow(0 0 4px rgba(255, 82, 82, 0.6));"></i>
+                </a>
+            </div>
         </div>
 
         <!-- 3. Support Banner Card -->

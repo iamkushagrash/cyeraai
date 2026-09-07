@@ -26,7 +26,7 @@
     </a>
 
     <!-- 3. CENTER CAI COIN BUTTON -->
-    <a href="{{ url('/User/ClaimCAI') }}" class="hud-center-lion-btn" title="Claim CAI">
+    <a href="{{ url('/User/Stake') }}" class="hud-center-lion-btn" title="Stake / CAI">
         <div class="nav-lion-corona">
             <div class="nav-lion-ring">
                 <img src="{{ asset('images/cai-token-coin.png') }}" alt="CYERA AI">

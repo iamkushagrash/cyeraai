@@ -218,7 +218,7 @@
                             <span class="lbl-claim-title">CLAIMABLE CAI</span>
                             <div class="val-claim-num">{{ number_format($claimableCai, 2) }} CAI</div>
                             <div class="sub-claim-usd">≈ ${{ number_format($claimableUsdVal, 2) }}</div>
-                            <a href="{{ url('/User/ClaimCAI') }}" class="btn-solid-gold-claim">
+                            <a href="{{ url('/User/Stake') }}" class="btn-solid-gold-claim">
                                 <i class="fas fa-bolt"></i> CLAIM CAI
                             </a>
                         </div>
@@ -390,7 +390,7 @@
             </a>
 
             <!-- 3. INVITE (Neon Purple) -->
-            <a href="{{ url('/User/Referral') }}" class="action-card invite" id="btn-invite">
+            <a href="{{ url('/User/NewRegistration') }}" class="action-card invite" id="btn-invite">
                 <!-- Exact Mecha Frame SVG with Clean Dark Interior & Glowing Border -->
                 <svg class="card-frame-svg" viewBox="0 0 100 118" preserveAspectRatio="none">
                     <!-- Base Mecha Chamfer Body (Pitch Dark Inside, Glowing Colored Border) -->
@@ -431,7 +431,7 @@
                 <div class="action-content">
                     <h3>INVITE</h3>
                     <div class="action-sub-row">
-                        <span class="action-sub-txt">Copy Link</span>
+                        <span class="action-sub-txt">Register User</span>
                         <span class="action-arrow">→</span>
                     </div>
                 </div>
@@ -486,7 +486,7 @@
                 <div class="action-content">
                     <h3>REFERRAL</h3>
                     <div class="action-sub-row">
-                        <span class="action-sub-txt">QR Code</span>
+                        <span class="action-sub-txt">Copy Link</span>
                         <span class="action-arrow">→</span>
                     </div>
                 </div>
@@ -506,7 +506,7 @@
 
         <div class="income-2x2-grid">
             <!-- 1. Daily Staking ROI (Gold) -->
-            <div class="income-hud-card inc-gold" onclick="window.location.href='{{ url('/User/IncomeStaking') }}'">
+            <div class="income-hud-card inc-gold" onclick="window.location.href='{{ url('/User/StakingReward') }}'">
                 <!-- Mecha Frame SVG -->
                 <svg class="income-frame-svg" viewBox="0 0 200 130" preserveAspectRatio="none">
                     <path d="M 14,2 L 186,2 L 198,14 L 198,52 L 195,57 L 195,73 L 198,78 L 198,116 L 186,128 L 14,128 L 2,116 L 2,78 L 5,73 L 5,57 L 2,52 L 2,14 Z"
@@ -570,7 +570,7 @@
             </div>
 
             <!-- 2. Direct Referral Bonus (Green) -->
-            <div class="income-hud-card inc-green" onclick="window.location.href='{{ url('/User/IncomeDirect') }}'">
+            <div class="income-hud-card inc-green" onclick="window.location.href='{{ url('/User/DirectBonus') }}'">
                 <!-- Mecha Frame SVG -->
                 <svg class="income-frame-svg" viewBox="0 0 200 130" preserveAspectRatio="none">
                     <path d="M 14,2 L 186,2 L 198,14 L 198,52 L 195,57 L 195,73 L 198,78 L 198,116 L 186,128 L 14,128 L 2,116 L 2,78 L 5,73 L 5,57 L 2,52 L 2,14 Z"
@@ -631,7 +631,7 @@
             </div>
 
             <!-- 3. 15-Level Unilevel Income (Cyan) -->
-            <div class="income-hud-card inc-cyan" onclick="window.location.href='{{ url('/User/IncomeLevel') }}'">
+            <div class="income-hud-card inc-cyan" onclick="window.location.href='{{ url('/User/StakingReferralReward') }}'">
                 <!-- Mecha Frame SVG -->
                 <svg class="income-frame-svg" viewBox="0 0 200 130" preserveAspectRatio="none">
                     <path d="M 14,2 L 186,2 L 198,14 L 198,52 L 195,57 L 195,73 L 198,78 L 198,116 L 186,128 L 14,128 L 2,116 L 2,78 L 5,73 L 5,57 L 2,52 L 2,14 Z"
@@ -693,7 +693,7 @@
             </div>
 
             <!-- 4. Club & Pool Income (Purple) -->
-            <div class="income-hud-card inc-purple" onclick="window.location.href='{{ url('/User/IncomeClub') }}'">
+            <div class="income-hud-card inc-purple" onclick="window.location.href='{{ url('/User/ClubReward') }}'">
                 <!-- Mecha Frame SVG -->
                 <svg class="income-frame-svg" viewBox="0 0 200 130" preserveAspectRatio="none">
                     <path d="M 14,2 L 186,2 L 198,14 L 198,52 L 195,57 L 195,73 L 198,78 L 198,116 L 186,128 L 14,128 L 2,116 L 2,78 L 5,73 L 5,57 L 2,52 L 2,14 Z"
@@ -762,13 +762,13 @@
              ============================================================ -->
         <div class="section-bar-header" style="margin-top:4px;">
             <div class="sec-title-txt">TEAM &amp; LEG VOLUME STATUS</div>
-            <a href="{{ url('/User/TeamTotal') }}" class="btn-mecha-pill">VIEW TEAM</a>
+            <a href="{{ url('/User/AllTeam') }}" class="btn-mecha-pill">VIEW TEAM</a>
         </div>
 
         <div class="team-section-wrap">
             <div class="team-4col-grid">
                 <!-- 1. Directs (Gold) -->
-                <div class="team-stat-tile team-gold" onclick="window.location.href='{{ url('/User/TeamDirect') }}'">
+                <div class="team-stat-tile team-gold" onclick="window.location.href='{{ url('/User/DirectTeam') }}'">
                     <svg class="team-frame-svg" viewBox="0 0 100 85" preserveAspectRatio="none">
                         <path d="M 10,2 L 90,2 L 98,10 L 98,40 L 95,43 L 95,52 L 98,55 L 98,75 L 90,83 L 10,83 L 2,75 L 2,55 L 5,52 L 5,43 L 2,40 L 2,10 Z"
                               fill="#070A12" stroke="#FFA000" stroke-width="1.6"/>
@@ -797,7 +797,7 @@
                 </div>
 
                 <!-- 2. Total Team (Cyan) -->
-                <div class="team-stat-tile team-cyan" onclick="window.location.href='{{ url('/User/TeamTotal') }}'">
+                <div class="team-stat-tile team-cyan" onclick="window.location.href='{{ url('/User/AllTeam') }}'">
                     <svg class="team-frame-svg" viewBox="0 0 100 85" preserveAspectRatio="none">
                         <path d="M 10,2 L 90,2 L 98,10 L 98,40 L 95,43 L 95,52 L 98,55 L 98,75 L 90,83 L 10,83 L 2,75 L 2,55 L 5,52 L 5,43 L 2,40 L 2,10 Z"
                               fill="#070A12" stroke="#00D2FF" stroke-width="1.6"/>
@@ -829,7 +829,7 @@
                 </div>
 
                 <!-- 3. Power Leg Volume (Gold/Lightning) -->
-                <div class="team-stat-tile team-gold">
+                <div class="team-stat-tile team-gold" onclick="window.location.href='{{ url('/User/TeamSummary') }}'" style="cursor: pointer;">
                     <svg class="team-frame-svg" viewBox="0 0 100 85" preserveAspectRatio="none">
                         <path d="M 10,2 L 90,2 L 98,10 L 98,40 L 95,43 L 95,52 L 98,55 L 98,75 L 90,83 L 10,83 L 2,75 L 2,55 L 5,52 L 5,43 L 2,40 L 2,10 Z"
                               fill="#070A12" stroke="#FFA000" stroke-width="1.6"/>
@@ -856,7 +856,7 @@
                 </div>
 
                 <!-- 4. Other Legs Volume (Purple) -->
-                <div class="team-stat-tile team-purple">
+                <div class="team-stat-tile team-purple" onclick="window.location.href='{{ url('/User/TeamSummary') }}'" style="cursor: pointer;">
                     <svg class="team-frame-svg" viewBox="0 0 100 85" preserveAspectRatio="none">
                         <path d="M 10,2 L 90,2 L 98,10 L 98,40 L 95,43 L 95,52 L 98,55 L 98,75 L 90,83 L 10,83 L 2,75 L 2,55 L 5,52 L 5,43 L 2,40 L 2,10 Z"
                               fill="#070A12" stroke="#B34BFE" stroke-width="1.6"/>
@@ -891,7 +891,7 @@
              ============================================================ -->
         <div class="section-bar-header" style="margin-top:6px;">
             <div class="sec-title-txt">RECENT ACTIVITY</div>
-            <a href="{{ url('/User/DirectProfit') }}" class="btn-mecha-pill">VIEW ALL</a>
+            <a href="{{ url('/User/StakingTxnHistory') }}" class="btn-mecha-pill">VIEW ALL</a>
         </div>
 
         <div class="recent-act-wrap">
@@ -1031,8 +1031,16 @@
     });
 
     function showReferralQR() {
-        const refLink = "{{ url('/register/'.Session::get('user.uuid')) }}";
-        alert('Referral Link:\n' + refLink + '\n\n(QR Code modal coming soon!)');
+        const refLink = "{{ url('/register/'.(Session::get('user.uuid') ?? '')) }}";
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(refLink).then(() => {
+                alert("Referral Link Copied to Clipboard!\n\n" + refLink);
+            }).catch(() => {
+                prompt("Copy your referral link:", refLink);
+            });
+        } else {
+            prompt("Copy your referral link:", refLink);
+        }
     }
 
     /* ============================================================
