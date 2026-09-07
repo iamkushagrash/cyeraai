@@ -184,6 +184,10 @@
                     <i class="fas fa-chevron-down nav-caret"></i>
                 </div>
                 <div class="mecha-submenu">
+                    <a href="{{ url('/User/Referral') }}" class="mecha-sub-link {{ request()->is('User/Referral') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Invite &amp; QR Hub</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
                     <a href="{{ url('/User/NewRegistration') }}" class="mecha-sub-link {{ request()->is('User/NewRegistration') ? 'active' : '' }}">
                         <div class="sub-left-txt"><span class="sub-dot"></span> New Registration</div>
                         <i class="fas fa-arrow-right sub-arr"></i>

@@ -145,7 +145,14 @@ class AssetDetailController extends Controller
 
 
 
-    //User
+    //User Referral & Invite Page
+    public function userReferralPage(){
+        $user = \App\UserDetails::where('id', \Session::get('user.id'))->first();
+        $totalDirects = \App\UserDetails::where('sponsorid', \Session::get('user.uuid'))->count();
+        $activeDirects = \App\UserDetails::where('sponsorid', \Session::get('user.uuid'))->where('userstatus', 1)->count();
+        return view('user.referral')->with('user', $user)->with('totalDirects', $totalDirects)->with('activeDirects', $activeDirects);
+    }
+
     public function userNewRegistrationPage(){
         /*$user=\App\UserDetails::where('id',\Session::get('user.id'))->first();
         if($user->userstatus!=1){

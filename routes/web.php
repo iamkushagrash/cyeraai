@@ -332,9 +332,10 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     Route::get('/User/Treeview', 'ArbitrageController@getTreeView');
     Route::get('/User/Treeview/children/{parentId}','ArbitrageController@getTreeChildren')->name('user.tree.children');
 
-    //New Registration
+    //New Registration & Referral
     Route::get('/User/NewRegistration', 'AssetDetailController@userNewRegistrationPage');
     Route::post('/User/NewRegistration', 'AssetDetailController@userNewRegistration');
+    Route::get('/User/Referral', 'AssetDetailController@userReferralPage');
     Route::get('/getSponsorNew/{sponsorid}','AssetDetailController@getSponsor');
 
 

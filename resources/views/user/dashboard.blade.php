@@ -215,11 +215,11 @@
 
                         <!-- Embedded Mini Claim Box -->
                         <div class="box-mini-claim">
-                            <span class="lbl-claim-title">CLAIMABLE CAI</span>
+                            <span class="lbl-claim-title">CLAIMABLE ROI / CAI</span>
                             <div class="val-claim-num">{{ number_format($claimableCai, 2) }} CAI</div>
                             <div class="sub-claim-usd">≈ ${{ number_format($claimableUsdVal, 2) }}</div>
                             <a href="{{ url('/User/Stake') }}" class="btn-solid-gold-claim">
-                                <i class="fas fa-bolt"></i> CLAIM CAI
+                                <i class="fas fa-bolt"></i> CLAIM ROI
                             </a>
                         </div>
                     </div>
@@ -438,7 +438,7 @@
             </a>
 
             <!-- 4. REFERRAL (Neon Cyan) -->
-            <div class="action-card referral" id="btn-referral" onclick="showReferralQR()">
+            <a href="{{ url('/User/Referral') }}" class="action-card referral" id="btn-referral">
                 <!-- Exact Mecha Frame SVG with Clean Dark Interior & Glowing Border -->
                 <svg class="card-frame-svg" viewBox="0 0 100 118" preserveAspectRatio="none">
                     <!-- Base Mecha Chamfer Body (Pitch Dark Inside, Glowing Colored Border) -->
@@ -486,11 +486,11 @@
                 <div class="action-content">
                     <h3>REFERRAL</h3>
                     <div class="action-sub-row">
-                        <span class="action-sub-txt">Copy Link</span>
+                        <span class="action-sub-txt">Hub &amp; QR</span>
                         <span class="action-arrow">→</span>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- ============================================================
@@ -555,15 +555,16 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Meta Row -->
-                    <div class="income-bottom-meta">
+                    <!-- Bottom Meta Row with Claim ROI Button -->
+                    <div class="income-bottom-meta" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="meta-sub-col">
                             <span class="meta-lbl">Today Earned</span>
                             <span class="meta-val">${{ number_format(\App\CpsIncome::where('userid',$uid)->whereDate('created_at', today())->sum('amt_usdt'), 2) }}</span>
                         </div>
-                        <div class="meta-sub-col">
-                            <span class="meta-lbl">Remaining</span>
-                            <span class="meta-val">${{ number_format(\App\CpsIncome::where('userid',$uid)->where('status',0)->sum('remaining_usdt'), 2) }}</span>
+                        <div class="meta-sub-col" style="text-align: right;">
+                            <a href="{{ url('/User/Stake') }}" onclick="event.stopPropagation();" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-size: 8.5px; font-weight: 900; border-radius: 5px; text-decoration: none; box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); letter-spacing: 0.3px;">
+                                <i class="fas fa-bolt"></i> CLAIM ROI
+                            </a>
                         </div>
                     </div>
                 </div>
