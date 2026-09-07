@@ -390,7 +390,7 @@
             </a>
 
             <!-- 3. INVITE (Neon Purple) -->
-            <a href="{{ url('/User/NewRegistration') }}" class="action-card invite" id="btn-invite">
+            <a href="{{ url('/User/Referral') }}" class="action-card invite" id="btn-invite">
                 <!-- Exact Mecha Frame SVG with Clean Dark Interior & Glowing Border -->
                 <svg class="card-frame-svg" viewBox="0 0 100 118" preserveAspectRatio="none">
                     <!-- Base Mecha Chamfer Body (Pitch Dark Inside, Glowing Colored Border) -->
@@ -431,14 +431,14 @@
                 <div class="action-content">
                     <h3>INVITE</h3>
                     <div class="action-sub-row">
-                        <span class="action-sub-txt">Register User</span>
+                        <span class="action-sub-txt">Share &amp; QR</span>
                         <span class="action-arrow">→</span>
                     </div>
                 </div>
             </a>
 
-            <!-- 4. REFERRAL (Neon Cyan) -->
-            <a href="{{ url('/User/Referral') }}" class="action-card referral" id="btn-referral">
+            <!-- 4. CLAIM ROI (Neon Cyan / Electric Energy) -->
+            <a href="{{ url('/User/Stake') }}" class="action-card claim-roi" id="btn-claim-roi">
                 <!-- Exact Mecha Frame SVG with Clean Dark Interior & Glowing Border -->
                 <svg class="card-frame-svg" viewBox="0 0 100 118" preserveAspectRatio="none">
                     <!-- Base Mecha Chamfer Body (Pitch Dark Inside, Glowing Colored Border) -->
@@ -464,29 +464,16 @@
 
                 <div class="action-icon">
                     <svg viewBox="0 0 40 40" class="mecha-svg-icon" fill="none">
-                        <!-- Top Left Finder -->
-                        <rect x="7" y="7" width="10" height="10" rx="2" stroke="#00D2FF" stroke-width="1.8" fill="none"/>
-                        <rect x="10" y="10" width="4" height="4" rx="0.8" fill="#00D2FF"/>
-                        <!-- Top Right Finder -->
-                        <rect x="23" y="7" width="10" height="10" rx="2" stroke="#00D2FF" stroke-width="1.8" fill="none"/>
-                        <rect x="26" y="10" width="4" height="4" rx="0.8" fill="#00D2FF"/>
-                        <!-- Bottom Left Finder -->
-                        <rect x="7" y="23" width="10" height="10" rx="2" stroke="#00D2FF" stroke-width="1.8" fill="none"/>
-                        <rect x="10" y="26" width="4" height="4" rx="0.8" fill="#00D2FF"/>
-                        <!-- Matrix Data Modules -->
-                        <rect x="23" y="23" width="4" height="4" rx="0.5" fill="#00D2FF"/>
-                        <rect x="29" y="23" width="4" height="2" rx="0.5" fill="#00D2FF"/>
-                        <rect x="23" y="29" width="3" height="4" rx="0.5" fill="#00D2FF"/>
-                        <rect x="28" y="27" width="5" height="6" rx="0.5" fill="#00D2FF"/>
-                        <rect x="19" y="10" width="2" height="4" rx="0.5" fill="#00D2FF"/>
-                        <rect x="19" y="16" width="2" height="8" rx="0.5" fill="#00D2FF"/>
-                        <rect x="10" y="19" width="7" height="2" rx="0.5" fill="#00D2FF"/>
+                        <!-- Glowing Lightning Bolt & Energy Orb -->
+                        <circle cx="20" cy="20" r="14" fill="rgba(0, 210, 255, 0.12)" stroke="#00D2FF" stroke-width="1.2" stroke-dasharray="3 2"/>
+                        <path d="M22 6L11 21H19L17 34L30 17H21L24 6H22Z" fill="#00D2FF" stroke="#E0F7FF" stroke-width="0.8"/>
+                        <circle cx="21" cy="20" r="2.5" fill="#FFFFFF" opacity="0.9"/>
                     </svg>
                 </div>
                 <div class="action-content">
-                    <h3>REFERRAL</h3>
+                    <h3>CLAIM ROI</h3>
                     <div class="action-sub-row">
-                        <span class="action-sub-txt">Hub &amp; QR</span>
+                        <span class="action-sub-txt">Claim Yield</span>
                         <span class="action-arrow">→</span>
                     </div>
                 </div>

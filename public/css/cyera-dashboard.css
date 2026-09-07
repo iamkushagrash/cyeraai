@@ -1179,7 +1179,8 @@ body {
     --neon-sub: #E9D5FF;
 }
 
-.action-card.referral {
+.action-card.referral,
+.action-card.claim-roi {
     --neon: #00D2FF;
     --neon-glow: rgba(0, 210, 255, 0.45);
     --neon-sub: #BAE6FD;
@@ -1231,7 +1232,8 @@ body {
     animation-delay: 1.2s;
 }
 
-.action-card.referral .action-icon {
+.action-card.referral .action-icon,
+.action-card.claim-roi .action-icon {
     animation-delay: 1.8s;
 }
 
