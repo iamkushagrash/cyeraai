@@ -40,18 +40,6 @@
                     <div class="mecha-brand-title">CYERA AI</div>
                     <div class="mecha-brand-subtitle">— CAI ECOSYSTEM —</div>
 
-                    <!-- Rank & Capping Tier Badges Row -->
-                    <div class="mecha-user-quick-rank">
-                        <div class="rank-tag-badge">
-                            <span class="lbl">RANK</span>
-                            <span class="val">V2</span>
-                        </div>
-                        <div class="tier-tag-badge">
-                            <span class="lbl">CAPPING TIER</span>
-                            <span class="val">5X</span>
-                        </div>
-                    </div>
-
                     <!-- Connected Wallet Capsule -->
                     <div class="header-wallet-capsule">
                         <div class="hwc-left">
@@ -66,49 +54,39 @@
                         </div>
                         <div class="hwc-right">
                             <span class="mecha-live-dot"></span>
-                            <span>CONNECTED</span>
-                            <i class="fas fa-chevron-right"></i>
+                            <span>ONLINE</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: 4 Mini Stat Boxes Grid -->
-            <div class="header-4stat-grid">
+            <!-- Bottom Row: 3 Mini Stat Boxes Grid -->
+            <div class="header-3stat-grid">
                 <div class="stat-mini-box">
                     <div class="stat-mini-hdr">
                         <span class="stat-mini-icon-circle"><i class="fas fa-coins"></i></span>
-                        <span class="stat-mini-lbl">TOTAL PORTFOLIO</span>
+                        <span class="stat-mini-lbl">PORTFOLIO</span>
                     </div>
                     <div class="stat-mini-val">$1,250.00</div>
-                    <div class="stat-mini-sub">$</div>
+                    <div class="stat-mini-sub" style="color: #FFD700;">USDT</div>
                 </div>
 
                 <div class="stat-mini-box">
                     <div class="stat-mini-hdr">
                         <span class="stat-mini-icon-circle"><i class="fas fa-bolt"></i></span>
-                        <span class="stat-mini-lbl">CLAIMABLE CAI</span>
+                        <span class="stat-mini-lbl">CLAIMABLE</span>
                     </div>
                     <div class="stat-mini-val">45.50 CAI</div>
-                    <div class="stat-mini-sub">≈ $56.87</div>
+                    <div class="stat-mini-sub" style="color: #00FF88;">≈ $56.87</div>
                 </div>
 
                 <div class="stat-mini-box">
                     <div class="stat-mini-hdr">
                         <span class="stat-mini-icon-circle"><i class="fas fa-chart-pie"></i></span>
-                        <span class="stat-mini-lbl">TOTAL EARNED</span>
+                        <span class="stat-mini-lbl">EARNED</span>
                     </div>
                     <div class="stat-mini-val">$1,480.00</div>
-                    <div class="stat-mini-sub">$</div>
-                </div>
-
-                <div class="stat-mini-box">
-                    <div class="stat-mini-hdr">
-                        <span class="stat-mini-icon-circle"><i class="fas fa-calendar-check"></i></span>
-                        <span class="stat-mini-lbl">JOINED</span>
-                    </div>
-                    <div class="stat-mini-val">26 APR 2025</div>
-                    <div class="stat-mini-sub">12:45 PM</div>
+                    <div class="stat-mini-sub" style="color: #00E5FF;">Total Profit</div>
                 </div>
             </div>
         </div>
