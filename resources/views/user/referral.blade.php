@@ -62,18 +62,18 @@
             </div>
         </div>
 
-        <!-- Referral Link Input Group -->
-        <div class="mecha-form-group" style="margin-top: 6px;">
+        <!-- Cyber Referral URL Copy Container -->
+        <div class="mecha-form-group" style="margin-top: 10px; margin-bottom: 18px;">
             <label class="mecha-form-label">
-                <span>Unique Registration URL</span>
-                <span class="label-sub" style="color: #00FF88;">Ready to Share</span>
+                <span><i class="fas fa-link" style="color: #FFD700; margin-right: 5px;"></i> UNIQUE REGISTRATION URL</span>
+                <span class="label-sub" style="color: #00FF88;"><i class="fas fa-circle-check" style="font-size: 8px;"></i> Ready to Share</span>
             </label>
-            <div style="display: flex; gap: 8px;">
-                <div class="mecha-input-wrap" style="flex: 1;">
-                    <i class="fas fa-link mecha-input-icon"></i>
-                    <input type="text" id="refLinkInput" class="mecha-input-control" value="{{ $referralLink }}" readonly style="font-size: 11px; color: #00FF88; font-family: monospace;">
+            <div class="mecha-ref-copy-box">
+                <div class="ref-icon-cell">
+                    <i class="fas fa-link"></i>
                 </div>
-                <button type="button" id="btnCopyRef" onclick="copyReferralLink()" class="mecha-btn-gold" style="height: 44px; padding: 0 18px; font-size: 11px; flex-shrink: 0;">
+                <input type="text" id="refLinkInput" class="ref-url-input" value="{{ $referralLink }}" readonly spellcheck="false">
+                <button type="button" id="btnCopyRef" onclick="copyReferralLink()" class="ref-copy-btn">
                     <i class="fas fa-copy"></i> <span id="copyBtnTxt">COPY</span>
                 </button>
             </div>
@@ -114,10 +114,8 @@
 
         <!-- Direct Action: Register Downline Manually -->
         <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 215, 0, 0.15); display: flex; flex-direction: column; gap: 8px;">
-            <a href="{{ url('/User/NewRegistration') }}" style="text-decoration: none;">
-                <button type="button" class="mecha-btn-secondary" style="width: 100%; height: 44px; font-size: 11px;">
-                    <i class="fas fa-user-plus" style="margin-right: 6px; color: #B34BFE;"></i> REGISTER DOWNLINE PARTNER DIRECTLY
-                </button>
+            <a href="{{ url('/User/NewRegistration') }}" class="mecha-btn-secondary" style="height: 44px; font-size: 11px;">
+                <i class="fas fa-user-plus" style="color: #B34BFE;"></i> REGISTER DOWNLINE PARTNER DIRECTLY
             </a>
         </div>
     </div>
