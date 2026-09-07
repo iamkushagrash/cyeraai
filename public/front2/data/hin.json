@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "home": "मुखपृष्ठ",
+    "about": "हमारे बारे में",
+    "features": "विशेषताएं",
+    "products": "हमारे उत्पाद",
+    "docs": "प्रलेखन",
+    "help": "सहायता",
+    "publications": "Publications"
+  },
+  "button": {
+    "getStarted": "आएँ शुरू करें",
+    "learnMore": "और अधिक जानें",
+    "login": "लॉग इन",
+    "exploreCyera AI": "मेटा वेल्थ",
+    "metaConsole": "मेटा कंसोल",
+    "mconnectButton": "एम-कनेक्ट डाउनलोड करें"
+  },
+  "footer": {
+    "footerDecription": "मेटा वेल्थ 7 यूनिक ऐप्स को पावर देने वाले स्केलेबल, सिक्योर और इनोवेटिव ब्लॉकचेन सॉल्यूशंस के साथ डिसेंट्रलाइज़्ड फाइनेंस का भविष्य बना रहा है।",
+    "footerMail": "support@cyera.ai",
+    "footerAddress": "6 Raffles Quay, #14-06, Singapore - 048580",
+    "footerLinkTitle": "त्वरित सम्पक",
+    "footerCopyright": "© 2026 मेटा वेल्थ। सभी अधिकार सुरक्षित हैं।",
+    "mconnectTitle": "एक गेटवे। अनंत मेटा अनुभव",
+    "mconnectDescription": "एक सिंगल गेटवे जो सभी मेटा एप्लिकेशन को बिना किसी रुकावट के जोड़ता है।"
+  }
+}

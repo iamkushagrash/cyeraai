@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Request for Conversion</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <!-- Chart.js for charts -->
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <link href="{{asset('ctassets/css/scriptui.css')}}" rel="stylesheet">
+      <style>
+         .deposit-container {
+         width: 100%;
+         max-width: 600px;
+         margin: 0 auto;
+         }
+         .deposit-header {
+         text-align: center;
+         margin-bottom: 30px;
+         }
+         .deposit-title {
+         font-family: 'Segoe UI', sans-serif;
+         font-size: 2.2rem;
+         font-weight: 900;
+         margin-bottom: 10px;
+         background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
+         -webkit-background-clip: text;
+         background-clip: text;
+         color: transparent;
+         letter-spacing: 1px;
+         text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+         }
+         .deposit-subtitle {
+         color: var(--text-muted);
+         font-size: 1rem;
+         }
+         .deposit-card {
+         background: var(--card-bg);
+         backdrop-filter: blur(10px);
+         border-radius: 16px;
+         border: 1px solid var(--glass-border);
+         box-shadow: 
+         0 20px 40px rgba(0, 0, 0, 0.6),
+         0 0 0 1px rgba(0, 212, 255, 0.1),
+         inset 0 1px 0 rgba(255, 255, 255, 0.05);
+         overflow: hidden;
+         position: relative;
+         }
+         .deposit-content {
+         padding: 30px;
+         }
+         .warning-banner {
+         background: linear-gradient(135deg, rgba(255, 167, 38, 0.1), rgba(255, 167, 38, 0.05));
+         border: 1px solid rgba(255, 167, 38, 0.3);
+         border-radius: 10px;
+         padding: 20px;
+         margin-bottom: 25px;
+         display: flex;
+         align-items: flex-start;
+         gap: 15px;
+         }
+         .warning-icon {
+         color: var(--warning);
+         font-size: 1.5rem;
+         flex-shrink: 0;
+         }
+         .warning-text {
+         color: var(--text-color);
+         font-size: 0.95rem;
+         line-height: 1.6;
+         }
+         .warning-text strong {
+         color: var(--warning);
+         }
+         .form-group {
+         margin-bottom: 25px;
+         }
+         .form-label {
+         display: block;
+         margin-bottom: 10px;
+         color: var(--text-color);
+         font-weight: 500;
+         font-size: 0.95rem;
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         }
+         .form-label span {
+         color: var(--accent-green);
+         margin-left: 3px;
+         }
+         .form-label i {
+         color: var(--primary-blue);
+         font-size: 0.95rem;
+         }
+         .input-group {
+         position: relative;
+         display: flex;
+         align-items: center;
+         }
+         .input-icon {
+         position: absolute;
+         left: 16px;
+         color: var(--primary-blue);
+         font-size: 1.1rem;
+         z-index: 2;
+         }
+         .form-input {
+         width: 100%;
+         padding: 16px 16px 16px 50px;
+         background: rgba(0, 0, 0, 0.4);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         border-radius: 10px;
+         color: var(--text-color);
+         font-size: 1rem;
+         transition: all 0.3s ease;
+         letter-spacing: 0.5px;
+         }
+         .form-input:focus {
+         outline: none;
+         border-color: var(--accent-green);
+         background: rgba(0, 0, 0, 0.5);
+         box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+         }
+         .form-input::placeholder {
+         color: rgba(255, 255, 255, 0.3);
+         }
+         .currency-select {
+         width: 100%;
+         padding: 16px 16px 16px 50px;
+         background: rgba(0, 0, 0, 0.4);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         border-radius: 10px;
+         color: var(--text-color);
+         font-size: 1rem;
+         transition: all 0.3s ease;
+         appearance: none;
+         background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300D4FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+         background-repeat: no-repeat;
+         background-position: right 16px center;
+         background-size: 16px;
+         }
+         .currency-select:focus {
+         outline: none;
+         border-color: var(--accent-green);
+         background: rgba(0, 0, 0, 0.5);
+         box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+         }
+         .payment-info {
+         background: rgba(0, 102, 255, 0.05);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         border-radius: 10px;
+         padding: 25px;
+         margin-top: 20px;
+         }
+         .payment-info-title {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         margin-bottom: 15px;
+         color: var(--primary-blue);
+         font-size: 1.1rem;
+         }
+         .payment-info-title i {
+         font-size: 1.2rem;
+         }
+         .payment-details {
+         color: var(--text-muted);
+         font-size: 0.95rem;
+         line-height: 1.6;
+         }
+         .payment-address {
+         background: rgba(0, 0, 0, 0.3);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         border-radius: 8px;
+         padding: 12px;
+         margin: 15px 0;
+         font-size: 0.9rem;
+         word-break: break-all;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         }
+         .payment-address span {
+         flex: 1;
+         margin-right: 10px;
+         }
+         .qr-code-container {
+         text-align: center;
+         margin: 20px 0;
+         }
+         .qr-code-placeholder {
+         width: 200px;
+         height: 200px;
+         background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(0, 102, 255, 0.1));
+         margin: 0 auto 15px;
+         border-radius: 10px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         color: var(--primary-blue);
+         font-size: 3rem;
+         border: 2px dashed var(--primary-blue);
+         }
+         .transaction-status {
+         padding: 25px;
+         text-align: center;
+         }
+         .status-icon {
+         width: 80px;
+         height: 80px;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         margin: 0 auto 20px;
+         font-size: 2.5rem;
+         }
+         .status-icon.success {
+         background: rgba(0, 255, 157, 0.1);
+         color: var(--success);
+         border: 2px solid rgba(0, 255, 157, 0.3);
+         }
+         .status-icon.pending {
+         background: rgba(255, 167, 38, 0.1);
+         color: var(--warning);
+         border: 2px solid rgba(255, 167, 38, 0.3);
+         }
+         .status-title {
+         font-size: 1.5rem;
+         margin-bottom: 10px;
+         color: var(--text-color);
+         }
+         .status-text {
+         color: var(--text-muted);
+         font-size: 0.95rem;
+         line-height: 1.6;
+         max-width: 400px;
+         margin: 0 auto;
+         }
+         .transaction-id {
+         background: rgba(0, 0, 0, 0.3);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         border-radius: 8px;
+         padding: 12px;
+         margin: 20px auto;
+         font-size: 0.9rem;
+         display: inline-block;
+         }
+         .form-actions {
+         padding: 30px;
+         background: rgba(0, 0, 0, 0.2);
+         border-top: 1px solid rgba(0, 212, 255, 0.1);
+         display: flex;
+         justify-content: space-between;
+         gap: 20px;
+         }
+         .btn {
+         padding: 16px 32px;
+         border: none;
+         border-radius: 10px;
+         font-size: 1.1rem;
+         font-weight: 600;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         gap: 12px;
+         letter-spacing: 0.5px;
+         min-width: 160px;
+         }
+         .btn-primary {
+         background: linear-gradient(135deg, var(--primary-blue), var(--accent-green));
+         color: var(--dark-bg);
+         box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+         }
+         .btn-primary:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 12px 25px rgba(0, 102, 255, 0.5);
+         }
+         .btn-primary:disabled {
+         opacity: 0.6;
+         cursor: not-allowed;
+         transform: none;
+         }
+         .btn-secondary {
+         background: rgba(255, 255, 255, 0.05);
+         color: var(--text-color);
+         border: 1px solid rgba(0, 212, 255, 0.2);
+         }
+         .btn-secondary:hover {
+         background: rgba(255, 255, 255, 0.1);
+         border-color: var(--primary-blue);
+         }
+         .btn-icon {
+         font-size: 1.2rem;
+         }
+         .message {
+         padding: 16px;
+         border-radius: 10px;
+         margin-bottom: 25px;
+         text-align: center;
+         font-weight: 500;
+         display: none;
+         animation: messageSlide 0.4s ease forwards;
+         border: 1px solid transparent;
+         }
+         @keyframes messageSlide {
+         from { opacity: 0; transform: translateY(-10px); }
+         to { opacity: 1; transform: translateY(0); }
+         }
+         .message.success {
+         background: rgba(0, 255, 157, 0.1);
+         border-color: rgba(0, 255, 157, 0.2);
+         color: var(--success);
+         }
+         .message.error {
+         background: rgba(255, 77, 125, 0.1);
+         border-color: rgba(255, 77, 125, 0.2);
+         color: var(--danger);
+         }
+         .message.info {
+         background: rgba(0, 212, 255, 0.1);
+         border-color: rgba(0, 212, 255, 0.2);
+         color: var(--info);
+         }
+         /* Animations */
+         @keyframes pulse {
+         0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7); }
+         70% { box-shadow: 0 0 0 12px rgba(0, 212, 255, 0); }
+         100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+         }
+         .pulse-animation {
+         animation: pulse 2s infinite;
+         }
+         /* Web3 Glow Effects */
+         .glow-effect {
+         position: relative;
+         overflow: hidden;
+         }
+         .glow-effect::before {
+         content: '';
+         position: absolute;
+         top: -2px;
+         left: -2px;
+         right: -2px;
+         bottom: -2px;
+         background: linear-gradient(45deg, var(--primary-blue), var(--accent-purple), var(--secondary-blue), var(--accent-green));
+         z-index: -1;
+         border-radius: inherit;
+         opacity: 0;
+         transition: opacity 0.4s ease;
+         filter: blur(10px);
+         }
+         .glow-effect:hover::before {
+         opacity: 0.6;
+         }
+         /* Floating Crypto Icons Animation */
+         .crypto-icons {
+         position: fixed;
+         width: 100%;
+         height: 100%;
+         pointer-events: none;
+         z-index: -1;
+         overflow: hidden;
+         }
+         .crypto-icon {
+         position: absolute;
+         font-size: 1.5rem;
+         opacity: 0.1;
+         animation: floatIcon 20s infinite linear;
+         color: var(--primary-blue);
+         }
+         @keyframes floatIcon {
+         0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
+         100% { transform: translateY(-100px) translateX(calc(100vw - 100px)) rotate(360deg); }
+         }
+         /* Neon Border Animation */
+         @keyframes neonGlow {
+         0% { background-position: 0 0; }
+         50% { background-position: 400% 0; }
+         100% { background-position: 0 0; }
+         }
+         .neon-border:hover::after {
+         opacity: 0.5;
+         }
+         /* Footer */
+         .footer {
+         text-align: center;
+         padding: 20px;
+         color: var(--text-muted);
+         font-size: 0.85rem;
+         border-top: 1px solid rgba(0, 212, 255, 0.2);
+         margin-top: 30px;
+         background: rgba(5, 10, 20, 0.5);
+         border-radius: 10px;
+         }
+         /* Responsive Design */
+         @media (max-width: 1200px) {
+         .investment-section {
+         grid-template-columns: 1fr;
+         }
+         }
+         @media (max-width: 992px) {
+         .sidebar {
+         transform: translateX(-100%);
+         width: 280px;
+         }
+         .sidebar.active {
+         transform: translateX(0);
+         }
+         .main-content {
+         margin-left: 0;
+         padding: 15px;
+         }
+         .menu-toggle {
+         display: flex;
+         }
+         .deposit-title {
+         font-size: 1.9rem;
+         }
+         .deposit-content {
+         padding: 25px;
+         }
+         .form-actions {
+         flex-direction: column;
+         }
+         .btn {
+         width: 100%;
+         }
+         }
+         @media (max-width: 768px) {
+         .dashboard-grid {
+         grid-template-columns: repeat(2, 1fr);
+         }
+         .top-bar {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 15px;
+         }
+         .wallet-info {
+         width: 100%;
+         justify-content: space-between;
+         flex-wrap: wrap;
+         }
+         .investment-amount {
+         font-size: 1.8rem;
+         }
+         .page-title {
+         font-size: 1.4rem;
+         }
+         .charts-section {
+         grid-template-columns: 1fr;
+         }
+         .quick-actions {
+         grid-template-columns: repeat(2, 1fr);
+         }
+         }
+         @media (max-width: 576px) {
+         .dashboard-grid {
+         grid-template-columns: 1fr;
+         }
+         .wallet-info {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 10px;
+         }
+         .referral-link {
+         flex-direction: column;
+         }
+         .referral-input {
+         border-radius: 8px 8px 0 0;
+         margin-bottom: -1px;
+         }
+         .copy-btn {
+         border-radius: 0 0 8px 8px;
+         padding: 12px;
+         }
+         .charts-section {
+         grid-template-columns: 1fr;
+         }
+         .quick-actions {
+         grid-template-columns: 1fr;
+         }
+         .deposit-title {
+         font-size: 1.7rem;
+         }
+         .deposit-content {
+         padding: 20px;
+         }
+         .form-input,
+         .currency-select {
+         padding: 14px 14px 14px 45px;
+         font-size: 0.95rem;
+         }
+         .input-icon {
+         left: 14px;
+         font-size: 1rem;
+         }
+         .payment-address {
+         flex-direction: column;
+         gap: 10px;
+         text-align: center;
+         }
+         .copy-btn {
+         width: 100%;
+         margin-left: 0;
+         }
+         .btn {
+         padding: 14px 20px;
+         font-size: 1rem;
+         }
+         }
+         @media (max-width: 400px) {
+         .deposit-title {
+         font-size: 1.5rem;
+         }
+         .deposit-subtitle {
+         font-size: 0.9rem;
+         }
+         .warning-banner {
+         flex-direction: column;
+         align-items: center;
+         text-align: center;
+         }
+         .qr-code-placeholder {
+         width: 180px;
+         height: 180px;
+         }
+         }
+
+         .invalid-feedback {
+                        display: block;
+                        margin-top: 6px;
+                        color: #FF4D7D;
+                        font-size: 0.85rem;
+                        font-family: 'Courier New', monospace;
+                        animation: messageSlide 0.3s ease forwards;
+                    }
+
+                    .form-input.is-invalid {
+                        border-color: #FF4D7D !important;
+                        box-shadow: 0 0 0 2px rgba(255, 77, 125, 0.2);
+                    }
+        /* Custom Form Select (Dropdown) */
+                    .form-select {
+                        width: 100%;
+                        padding: 16px 16px 16px 50px;
+                        background-color: rgba(0, 0, 0, 0.4);
+                        border: 1px solid rgba(0, 212, 255, 0.25);
+                        border-radius: 10px;
+                        color: var(--text-color);
+                        font-size: 1rem;
+                        letter-spacing: 0.5px;
+                        transition: all 0.3s ease;
+                        appearance: none;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+
+                        /* Dropdown Arrow */
+                        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300D4FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                        background-repeat: no-repeat;
+                        background-position: right 16px center;
+                        background-size: 16px;
+                    }
+
+                    /* Focus State */
+                    .form-select:focus {
+                        outline: none;
+                        border-color: var(--accent-green);
+                        background-color: rgba(0, 0, 0, 0.55);
+                        box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.25);
+                        color: #ffffff;
+                    }
+
+                    /* Dropdown Options */
+                    .form-select option {
+                        background: #050a14;
+                        color: #ffffff;
+                        padding: 10px;
+                    }
+
+                    /* Disabled */
+                    .form-select:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+
+    /* ===== PURE CSS MODAL FIX ===== */
+                    .modal {
+                        position: fixed;
+                        inset: 0;
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(5, 10, 20, 0.75);
+                        z-index: 99999;
+                    }
+
+                    /* Show Modal */
+                    .modal.show {
+                        display: flex;
+                    }
+
+                    /* Modal Dialog */
+                    .modal-dialog {
+                        max-width: 420px;
+                        width: 100%;
+                        margin: 0 15px;
+                    }
+
+                    /* Modal Content */
+                    .modal-content {
+                        background: #050a14;
+                        border-radius: 14px;
+                        border: 1px solid rgba(0, 212, 255, 0.3);
+                        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+                        color: #fff;
+                        animation: modalPop 0.35s ease;
+                    }
+
+                    /* Modal content scrollable on small screens */
+                  .modal-content {
+                      max-height: 90vh; /* Prevent overflow */
+                      overflow-y: auto; /* Scroll if content too big */
+                  }
+
+                    /* Header */
+                    .modal-header {
+                        padding: 16px 20px;
+                        border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .modal-title {
+                        font-size: 1.2rem;
+                        font-weight: 600;
+                    }
+
+                    .btn-close {
+                        background: none;
+                        border: none;
+                        color: #fff;
+                        font-size: 1.4rem;
+                        cursor: pointer;
+                        opacity: 0.6;
+                    }
+                    .btn-close:hover {
+                        opacity: 1;
+                    }
+
+                    /* Body */
+                    .modal-body {
+                        padding: 20px;
+                        font-size: 0.95rem;
+                        line-height: 1.6;
+                    }
+
+                    /* Footer */
+                    .modal-footer {
+                        padding: 16px 20px;
+                        border-top: 1px solid rgba(0, 212, 255, 0.15);
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 10px;
+                    }
+
+                    /* Buttons inside modal */
+                    .modal .btn {
+                        padding: 10px 18px;
+                        font-size: 0.95rem;
+                        border-radius: 8px;
+                    }
+
+                    /* Animation */
+                    @keyframes modalPop {
+                        from {
+                            transform: scale(0.9) translateY(20px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: scale(1) translateY(0);
+                            opacity: 1;
+                        }
+                    }
+
+                    /* ===== MODAL BUTTON FIX ===== */
+
+                /* Modal footer alignment */
+                .modal-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                /* Reset global btn effect inside modal */
+                .modal .btn {
+                    all: unset;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 12px 22px;
+                    border-radius: 8px;
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: all 0.25s ease;
+                }
+
+                /* Primary modal button */
+                .modal .btn-outline-theme,
+                .modal .btn-primary {
+                    background: linear-gradient(135deg, var(--primary-blue), var(--accent-green));
+                    color: #000;
+                    border: none;
+                    box-shadow: 0 6px 18px rgba(0, 212, 255, 0.35);
+                }
+
+                /* Hover */
+                .modal .btn-outline-theme:hover,
+                .modal .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.55);
+                }
+
+                /* Active */
+                .modal .btn-outline-theme:active {
+                    transform: scale(0.96);
+                }
+
+                /* Button focus fix */
+                .modal .btn:focus {
+                    outline: none;
+                }
+
+                /* Mobile fix */
+                @media (max-width: 480px) {
+                    .modal-footer {
+                        justify-content: center;
+                    }
+                    .modal .btn {
+                        width: 100%;
+                    }
+                }
+/* FIX CLOSE BUTTON VISIBILITY */
+.modal .btn-close {
+    all: unset;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.modal .btn-close::before {
+    content: "×";
+    line-height: 1;
+}
+
+.modal .btn-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: rotate(90deg);
+}
+
+
+/* Mobile-specific adjustments */
+@media (max-width: 480px) {
+    .modal-dialog {
+        margin: 0 10px; /* Smaller margin on very small screens */
+    }
+
+    .modal-content {
+        max-width: 95%; /* Take almost full width */
+        padding: 15px;   /* Add internal padding */
+    }
+
+    .modal-footer {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .modal .btn {
+        width: 100%; /* Buttons full width */
+    }
+
+    .modal-body {
+        padding: 15px 10px; /* Reduce padding for small screens */
+        font-size: 0.9rem;
+    }
+}
+
+
+      </style>
+   </head>
+   <body>
+      <!-- Premium Animated Background -->
+      <div class="bg-animation" id="particles"></div>
+      <div class="grid-lines"></div>
+      <div class="energy-wave"></div>
+      <div class="crypto-icons" id="cryptoIcons"></div>
+      <div class="container">
+         <!-- Sidebar -->
+         @include('ui.sidebaruser')
+         <!-- Sidebar -->
+         <!-- Main Content -->
+         <div class="main-content">
+            @include('ui.topbaruser')
+            <!-- Enter code here -->
+            <div class="deposit-container">
+               <!-- Deposit Header -->
+               @php
+                $caiBalance = floor($user->remainingIncome());
+                $usdtBalance = $caiBalance * 0.12;
+                @endphp
+               <div class="deposit-header">
+                  <h1 class="deposit-title">REQUEST FOR WITHDRAW</h1>
+                  <p class="deposit-subtitle">Available Balance : {{ $caiBalance }} $</p>
+               </div>
+               <!-- Status Messages -->
+               <div id="messageContainer"></div>
+               @foreach($errors as $error)
+                    <div class="message success" style="display:block;">
+                     Alert! {{$error->message()}}
+                  </div>
+                @endforeach
+               @if (session('success'))
+                  <div class="message success" style="display:block;">
+                     {{ session('success') }}
+                  </div>
+               @endif
+               @if (session('warning'))
+                  <div class="message error" style="display:block;">
+                     {{ session('warning') }}
+                   </div>
+               @endif
+               <!-- Deposit Card -->
+               <div class="deposit-card">
+                <?php $n=1; $m=0; $msg='';?>
+                                    <?php $t=0; $b=0; $k=0; ?>
+                                    @if(!is_null($user->assetDetail()))
+                                        @if(($detail->usdt_withdrawal_status==1 && !is_null($user->assetDetail()->usdttrc20addr)) /*||($detail->usdt_withdrawal_status==0 )*/)
+                                            <?php $t=1; ?>
+                                        @else
+                                            <?php $t=0; $msg=$msg." TRC20 ";?>
+                                        @endif{{-- {{$t.' '.$detail->usdt_withdrawal_status.' '.$user->assetDetail()->first()->usdttrc20addr}}<br> --}}
+                                        @if(($detail->usdtbep20_withdrawal_status==1 && !is_null($user->assetDetail()->usdtbep20addr    )) /*|| ($detail->usdtbep20_withdrawal_status==0 )*/)
+                                            <?php $b=1; ?>{{-- {{'hello bep'}} --}}
+                                        @else
+                                            <?php $b=0; $msg=$msg." USDT BEP20 ";?>
+                                        @endif{{-- {{$b.' '.$detail->usdtbep20_withdrawal_status.' '.$user->assetDetail()->first()->usdtbep20addr}}<br> --}}
+                                        @if(($detail->bank_withdrawal_status==1 && !is_null($user->assetDetail()->accountno)) /*|| ($detail->sftc_withdrawal_status==0 && !is_null($user->assetDetail()->first()->bep20addr))*/)
+                                            <?php $k=1; ?>{{-- {{'hellokto'}} --}}
+                                        @else
+                                            <?php $k=0; $msg=$msg." Bank Account ";?>
+                                        @endif{{-- {{$k.' '.$detail->bank_withdrawal_status.' '.$user->assetDetail()->first()->accountno}}<br> --}}
+                                    @else
+                                        <?php $n=0; ?>
+                                    @endif {{-- {{($t || $b || $k)}} --}}
+                                    @if($t || $b || $k)
+                  <form id="withdrawForm" method="POST">
+                  @csrf
+                  <input type="hidden" name="honeypotu" value="{{\Session::get('logtime')}}">
+                  <!-- Deposit Content -->
+                  <div class="deposit-content">
+                        <div class="form-group">
+                           <label class="form-label">
+                           <i class="fas fa-dollar"></i>
+                           Amount($) <span>*</span>
+                           </label>
+                           <div class="input-group">
+                              <i class="fas fa-dollar input-icon"></i>
+                              <input type="number" class="form-input @error('amountusdt') is-invalid @enderror" id="amountusdt" name="amountusdt" min ="10" placeholder="0" max="{{floor($user->remainingIncome())}}" step="0.01" @if(!is_null($remaining)) value="{{$remaining->amountusdt}}" disabled @endif required>
+                           </div>
+                           @error('amountusdt')
+                                <small class="invalid-feedback">
+                                  {{ $message }}
+                                </small>
+                           @enderror
+                        </div>
+                        <div class="form-group">
+                           <label class="form-label">
+                           <i class="fas fa-money-bill"></i>
+                           Currency <span>*</span>
+                           </label>
+                           <div class="input-group">
+                              <i class="fas fa-money-bill input-icon"></i>
+                              <select type="button" class="form-select" id="selltype" name="currency">
+                                @if($detail->usdt_withdrawal_status==1 && !is_null($user->assetDetail()->usdttrc20addr))
+                                    <option value="usdt">USDT TRC20</option>
+                                <?php $m=$m||1; ?>@endif
+                                @if($detail->usdtbep20_withdrawal_status==1 && !is_null($user->assetDetail()->usdtbep20addr ))
+                                    <option value="usdtbep20">USDT BEP20</option>
+                                <?php $m=$m||1; ?>@endif                            
+                                </select>
+                           </div>
+                           @error('currency')
+                                <small class="invalid-feedback">
+                                  {{ $message }}
+                                </small>
+                           @enderror
+                        </div>
+                        <div class="form-group">
+                           <label class="form-label">
+                           <i class="fas fa-key"></i>
+                           Wallet Address</label>
+                           <label class="form-label" id="withdrawaladdress" style="font-size: .755rem; word-break: break-all; overflow-wrap: break-word;white-space: normal;">{{$user->assetDetail()->usdttrc20addr}}</label>
+                           
+                        </div>
+                        @if(!is_null($remaining))
+                        <div class="form-group">
+                           <label class="form-label">
+                           <i class="fas fa-pin"></i>
+                           OTP <span>*</span>
+                           </label>
+                           <div class="input-group">
+                              <i class="fas fa-pin input-icon"></i>
+                              <input type="number" class="form-input @error('otp') is-invalid @enderror" id="otp" name="otp" placeholder="One Time Password" required>
+                           </div>
+                           @error('otp')
+                                <small class="invalid-feedback">
+                                  {{ $message }}
+                                </small>
+                           @enderror
+                        </div>
+                        @endif
+
+                        <div class="form-group">
+                           <label class="form-label">* Minimum Request Amount : $ 10 (Amount should be multiple of 10$)</label>                           
+                        </div>
+                        
+                        
+                  </div>
+                  <!-- Form Actions -->
+                  <div class="form-actions">
+                    @if(ceil($user->remainingIncome())>=10)
+                     <button type="submit" class="btn btn-primary">
+                        <!--  onclick="this.disabled=true;this.value='Processing, please wait...';this.form.submit();" -->
+                     <i class="fas fa-lock btn-icon"></i>
+                     Submit
+                     </button>
+                        @if(!is_null($remaining))
+                            <a href="/User/resendWithdrawOtp" style="text-decoration: none;"><button type="button" class="btn btn-secondary" id="backBtn">Resend OTP</button></a>
+                        @endif
+                     @endif
+                     <a href="/User/Dashboard" style="text-decoration: none;"><button type="button" class="btn btn-secondary" id="backBtn">
+                     <i class="fas fa-arrow-left btn-icon"></i>
+                     BACK TO DASHBOARD
+                     </button></a>
+                  </div>
+                  </form>
+                  @else
+                  <div class="deposit-content">
+                    <div class="form-group">
+                        <label class="form-label">Please Update Wallet Address</label>
+                    </div>
+                  </div>
+                  @endif
+
+               </div>
+            </div>
+            <div class="footer">
+               <p>© 2025 Cyera AI. All rights reserved.</p>
+            </div>
+         </div>
+      </div>
+
+<div class="modal" id="myModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body"><p>Dear All Key Leaders and Associates,</p>
+        <p>
+          We are excited to announce that we have made our 
+          <strong>MetaSwap</strong>  live on <strong>CyeraWallet</strong>.
+        </p>
+        <p>
+          <strong>Starting today, all your withdrawals will be processed in CyeraWallet only.</strong>
+        </p>
+        <p>
+          It is a humble request to all of you to download CyeraWallet from our <strong>Console</strong> or from the link given below and place your withdrawal request from there.
+        </p>
+        <p><button class="btn btn-outline-theme" onclick="location.href='https://console.cyera.ai/';">Download CyeraWallet</button></p>
+        <p>
+          We appreciate your understanding and cooperation as Cyera AI World continues to upgrade for a smoother and more transparent experience.
+        </p>
+        <p>
+          Thank you for your support!<br>
+          🌐 <strong>Cyera AI World Administration</strong> 💥💥💥🙏
+        </p>
+      </div>
+      <!-- <div class="modal-footer">
+        
+      </div> -->
+    </div>
+  </div>
+</div>
+
+      <script src="{{asset('ctassets/js/scriptui.js')}}"></script>
+      <script>
+
+         
+         // Initialize everything when page loads
+         window.addEventListener('DOMContentLoaded', () => {
+           createParticles();
+           createCryptoIcons();
+           initCharts();
+           
+           // Add subtle animation to deposit card on load
+           const depositCard = document.querySelector('.deposit-card');
+           if (depositCard) {
+               depositCard.style.opacity = '0';
+               depositCard.style.transform = 'translateY(30px) scale(0.95)';
+               
+               setTimeout(() => {
+                   depositCard.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                   depositCard.style.opacity = '1';
+                   depositCard.style.transform = 'translateY(0) scale(1)';
+               }, 300);
+           }
+           
+           // Show initial message
+           setTimeout(() => {
+               showMessage('Welcome to Cyera AI', 'info');
+           }, 1000);
+           
+           // Add ripple animation to CSS
+           const style = document.createElement('style');
+           style.textContent = `
+               @keyframes ripple {
+                   to {
+                       transform: scale(4);
+                       opacity: 0;
+                   }
+               }
+               @keyframes sparkle {
+                   0% { transform: scale(0); opacity: 0; }
+                   50% { transform: scale(1); opacity: 1; }
+                   100% { transform: scale(0); opacity: 0; }
+               }
+           `;
+           document.head.appendChild(style);
+         });
+         
+         // Close sidebar when clicking outside on mobile
+         document.addEventListener('click', function(event) {
+           const sidebar = document.getElementById('sidebar');
+           const menuToggle = document.getElementById('menuToggle');
+           
+           if (window.innerWidth <= 992 && 
+               sidebar.classList.contains('active') && 
+               !sidebar.contains(event.target) && 
+               !menuToggle.contains(event.target)) {
+               sidebar.classList.remove('active');
+           }
+         });
+      </script>
+
+      <script src="{{asset('assets/js/jquery-1.11.2.min.js')}}"></script>
+      <script type="text/javascript">
+        $(document).ready(function(){
+            $('#currency').change();
+            $('#selltype').change();
+        });
+
+        $("#selltype").on('change',function(){
+            @if(!is_null($user->assetDetail()))
+            @if($detail->usdt_withdrawal_status==1 && !is_null($user->assetDetail()->usdttrc20addr))
+            if($("#selltype").val()=='usdt'){
+                $("#withdrawaladdress").html('{{$user->assetDetail()->usdttrc20addr}}');
+            }@endif  @if($detail->usdtbep20_withdrawal_status==1 && !is_null($user->assetDetail()->usdtbep20addr)) if($("#selltype").val()=='usdtbep20'){
+                $("#withdrawaladdress").html('{{$user->assetDetail()->usdtbep20addr}}');
+            } @endif @if($detail->bank_withdrawal_status==1 && !is_null($user->assetDetail()->accountno)) if($("#selltype").val()=='bank'){
+                $("#withdrawaladdress").html('{{$user->assetDetail()->accountname}}({{$user->assetDetail()->accountno}})');
+            } @endif
+            @endif
+        });
+
+
+        /*$("#amount").on('blur',function(){
+            $("#amountusdt").val(Number.parseFloat($("#amount").val()*{{$detail->price}}).toFixed(6));
+        });
+        $("#amountusdt").on('blur',function(){
+            $("#amount").val(Number.parseFloat($("#amountusdt").val()/{{$detail->price}}).toFixed(6));
+        });*/
+        
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById('myModal');
+        //modal.classList.add('show');
+      });
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById('myModal');
+
+    // Show modal
+    //modal.classList.add('show');
+    //document.body.style.overflow = 'hidden'; // Prevent background scroll
+
+    // Close modal function
+    const closeModal = () => {
+        modal.classList.remove('show');
+        document.body.style.overflow = ''; // Restore scroll
+    };
+
+    // Close on outside click
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // Close on close button
+    const closeBtn = modal.querySelector('.btn-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Close on ESC key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === "Escape") closeModal();
+    });
+});
+
+</script>
+
+
+<script>
+$(document).ready(function () {
+
+    $('#withdrawForm').on('submit', function (e) {
+        e.preventDefault(); // Page reload stop
+
+        let form = $(this);
+        let formData = new FormData(this);
+
+        // Disable button
+        let submitBtn = form.find('button[type=submit]');
+        submitBtn.prop('disabled', true).text('Processing...');
+
+        // Clear old messages
+        $('#messageContainer').html('');
+
+        $.ajax({
+            //url: form.attr('action'),
+            url: '/User/WithdrawRequest',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            },
+            success: function (response) {
+
+                if (response.success) {
+                    $('#messageContainer').html(`
+                        <div class="message success" style="display:block;">
+                            ${response.message}
+                        </div>
+                    `);
+
+                    // Optional: reset form
+                    // form[0].reset();
+                } else {
+                    $('#messageContainer').html(`
+                        <div class="message error" style="display:block;">
+                            ${response.message}
+                        </div>
+                    `);
+                }
+
+                submitBtn.prop('disabled', false).text('Submit');
+            },
+            error: function (xhr) {
+
+                submitBtn.prop('disabled', false).text('Submit');
+
+                if (1==1/*xhr.status === 422*/) {
+                  console.log(response.message);
+                    let errors = response.message;
+                    let errorHtml = '';
+
+                    $.each(errors, function (key, value) {
+                        errorHtml += `<div class="message error" style="display:block;">${value[0]}</div>`;
+                    });
+
+                    $('#messageContainer').html(errorHtml);
+                } else {
+                    $('#messageContainer').html(`
+                        <div class="message error" style="display:block;">
+                            Something went wrong. Please try again.
+                        </div>
+                    `);
+                }
+            }
+        });
+    });
+
+});
+</script>
+
+
+   </body>
+</html>

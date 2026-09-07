@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "home": "ಮುಖಪುಟ",
+    "about": "ಮೆಟಾವೆಲ್ತ್ ಬಗ್ಗೆ",
+    "features": "ವೈಶಿಷ್ಟ್ಯಗಳು",
+    "products": "ನಮ್ಮ ಉತ್ಪನ್ನಗಳು",
+    "docs": "ದಾಖಲೆಗಳು",
+    "help": "ಸಹಾಯ",
+    "publications": "Publications"
+  },
+  "button": {
+    "getStarted": "ಖಾತೆ ತೆರೆಯಿರಿ",
+    "learnMore": "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
+    "login": "ಲಾಗಿನ್ ಮಾಡಿ",
+    "exploreCyera AI": "ಮೆಟಾವೆಲ್ತ್ ಅನ್ವೇಷಿಸಿ",
+    "metaConsole": "ಮೆಟಾ ಕನ್ಸೋಲ್",
+    "mconnectButton": "ಎಂ-ಕನೆಕ್ಟ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ"
+  },
+  "footer": {
+    "footerDecription": "ಮೆಟಾ ವೆಲ್ತ್ 7 ಅನನ್ಯ ಅಪ್ಲಿಕೇಶನ್‌ಗಳಿಗೆ ಶಕ್ತಿ ತುಂಬುವ ಸ್ಕೇಲೆಬಲ್, ಸುರಕ್ಷಿತ ಮತ್ತು ನವೀನ ಬ್ಲಾಕ್‌ಚೈನ್ ಪರಿಹಾರಗಳೊಂದಿಗೆ ವಿಕೇಂದ್ರೀಕೃತ ಹಣಕಾಸಿನ ಭವಿಷ್ಯವನ್ನು ನಿರ್ಮಿಸುತ್ತಿದೆ.",
+    "footerMail": "support@cyera.ai",
+    "footerAddress": "6 Raffles Quay, #14-06, Singapore - 048580",
+    "footerLinkTitle": "ತ್ವರಿತ ಲಿಂಕ್‌ಗಳು",
+    "footerCopyright": "© 2026 ಮೆಟಾ ವೆಲ್ತ್. ಎಲ್ಲ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.",
+    "mconnectTitle": "ಒಂದು ದ್ವಾರ. ಅನಂತ ಮೆಟಾ ಅನುಭವಗಳು",
+    "mconnectDescription": "ಎಲ್ಲಾ ಮೆಟಾ ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ಸರಾಗವಾಗಿ ಸಂಪರ್ಕಿಸುವ ಒಂದೇ ಗೇಟ್‌ವೇ"
+  }
+}

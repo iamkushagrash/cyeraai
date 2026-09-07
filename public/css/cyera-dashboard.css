@@ -1,0 +1,4118 @@
+/* ============================================================
+   CYERA AI — PREMIUM MECHA-CYBERPUNK SCI-FI HUD
+   Font: Inter | Style: Dark Gunmetal & Hyper-Realistic Gold
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --bg-main: #020204;
+    --bg-app: #040508;
+    --bg-card: #06080E;
+    --bg-card-inner: #030406;
+
+    --gold-pure: #FFD700;
+    --gold-main: #F5A623;
+    --gold-light: #FFE082;
+    --gold-bright: #FFF3C4;
+    --gold-border: #E5A823;
+    --gold-glow: rgba(245, 166, 35, 0.25);
+
+    --green-neon: #00FF88;
+    --text-white: #FFFFFF;
+    --text-muted: #8E99A8;
+
+    --app-max-width: 460px;
+    --bottom-nav-h: 76px;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: 'Inter', sans-serif !important;
+    background: #020204;
+    color: var(--text-white);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   LIVE CYBER VIDEO BACKGROUND LAYERS & CANVAS (HIGH VISIBILITY)
+   ============================================================ */
+.cyber-video-bg-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245, 166, 35, 0.18) 0%, rgba(3, 4, 8, 1) 75%);
+}
+
+#cyberMatrixCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    opacity: 1;
+    pointer-events: none;
+}
+
+/* Fluid Plasma Nebula Orbs in Background */
+.cyber-nebula-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.75;
+    mix-blend-mode: screen;
+}
+
+.cyber-nebula-orb.orb-1 {
+    top: -5%;
+    left: 15%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.35) 0%, rgba(245, 166, 35, 0.18) 45%, transparent 70%);
+    animation: orbDrift1 32s ease-in-out infinite alternate;
+}
+
+.cyber-nebula-orb.orb-2 {
+    top: 40%;
+    right: -10%;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.22) 0%, rgba(0, 210, 255, 0.12) 50%, transparent 70%);
+    animation: orbDrift2 40s ease-in-out infinite alternate;
+}
+
+.cyber-nebula-orb.orb-3 {
+    bottom: -10%;
+    left: -5%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(179, 75, 254, 0.22) 0%, rgba(245, 166, 35, 0.16) 50%, transparent 70%);
+    animation: orbDrift3 36s ease-in-out infinite alternate;
+}
+
+@keyframes orbDrift1 {
+    0% {
+        transform: translate(0, 0) scale(0.95);
+    }
+
+    50% {
+        transform: translate(60px, 70px) scale(1.18);
+    }
+
+    100% {
+        transform: translate(-40px, 30px) scale(1.0);
+    }
+}
+
+@keyframes orbDrift2 {
+    0% {
+        transform: translate(0, 0) scale(1.1);
+    }
+
+    50% {
+        transform: translate(-70px, -50px) scale(0.92);
+    }
+
+    100% {
+        transform: translate(30px, 50px) scale(1.08);
+    }
+}
+
+@keyframes orbDrift3 {
+    0% {
+        transform: translate(0, 0) scale(0.95);
+    }
+
+    50% {
+        transform: translate(50px, -60px) scale(1.15);
+    }
+
+    100% {
+        transform: translate(-30px, 20px) scale(0.92);
+    }
+}
+
+/* Subtle 3D Perspective Digital Cyber Grid Scanline */
+.cyber-grid-scan-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background:
+        linear-gradient(rgba(245, 166, 35, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245, 166, 35, 0.06) 1px, transparent 1px);
+    background-size: 36px 36px;
+    opacity: 0.75;
+    mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 95%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 95%);
+}
+
+/* Master Wrapper - Centered Mobile Frame */
+.master-app-wrap {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+}
+
+.hud-app-shell {
+    width: 100%;
+    max-width: var(--app-max-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: transparent !important;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.98), 0 0 20px rgba(245, 166, 35, 0.08);
+    border-left: 1px solid rgba(229, 168, 35, 0.15);
+    border-right: 1px solid rgba(229, 168, 35, 0.15);
+    padding-bottom: var(--bottom-nav-h);
+}
+
+.hud-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px 0 16px;
+    scrollbar-width: none;
+}
+
+.hud-scroll-area::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================================
+   1. TOP HEADER (EXACT MECHA CAPSULE)
+   ============================================================ */
+.hud-header-container {
+    padding: 8px 8px 4px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3, 4, 6, 0.98);
+    backdrop-filter: blur(16px);
+}
+
+.exact-mecha-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, #0A0D12 0%, #040609 100%);
+    border: 1.5px solid var(--gold-border);
+    border-radius: 14px;
+    padding: 6px 10px;
+    position: relative;
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(229, 168, 35, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.btn-hamburger {
+    width: 30px;
+    height: 30px;
+    background: #06080E;
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3.5px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.btn-hamburger span {
+    width: 12px;
+    height: 2px;
+    background: #FFE082;
+    border-radius: 2px;
+}
+
+.brand-main-logo {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    max-width: 130px;
+}
+
+.brand-main-logo img {
+    height: 100%;
+    max-height: 28px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.35));
+}
+
+.brand-logo-shield {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #FFD700;
+    box-shadow: 0 0 8px rgba(245, 166, 35, 0.3);
+    background: #000;
+    flex-shrink: 0;
+}
+
+.brand-logo-shield img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.brand-text-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+    font-style: italic;
+}
+
+.brand-sub {
+    font-size: 7.5px;
+    color: #A0AEC0;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+/* Center Winged Rank Badge */
+.header-center-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.rank-top-txt {
+    font-size: 7px;
+    color: #F5A623;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 2px;
+    text-shadow: 0 0 4px rgba(245, 166, 35, 0.5);
+}
+
+.rank-shield-composite {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rank-wing-left,
+.rank-wing-right {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+}
+
+.wing-bar {
+    height: 2.5px;
+    background: linear-gradient(90deg, #FFE082 0%, #FFD700 50%, #F5A623 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+}
+
+.rank-wing-left .wb1 {
+    width: 7px;
+    transform: rotate(-20deg) translateX(1px);
+}
+
+.rank-wing-left .wb2 {
+    width: 10px;
+    transform: rotate(-8deg) translateX(1px);
+}
+
+.rank-wing-left .wb3 {
+    width: 6px;
+    transform: rotate(0deg) translateX(1px);
+}
+
+.rank-wing-right .wb1 {
+    width: 7px;
+    transform: rotate(20deg) translateX(-1px);
+}
+
+.rank-wing-right .wb2 {
+    width: 10px;
+    transform: rotate(8deg) translateX(-1px);
+}
+
+.rank-wing-right .wb3 {
+    width: 6px;
+    transform: rotate(0deg) translateX(-1px);
+}
+
+.rank-shield-core {
+    background: linear-gradient(180deg, #141108 0%, #06080E 100%);
+    border: 1.5px solid #FFD700;
+    border-radius: 4px;
+    padding: 2px 7px;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+}
+
+.rank-v2-val {
+    font-size: 13.5px;
+    font-weight: 900;
+    color: #FFE082;
+    text-shadow: 0 0 6px #FFD700;
+    line-height: 1.1;
+}
+
+/* Right Group */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.wallet-capsule {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #06080E;
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    border-radius: 16px;
+    padding: 4px 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.wallet-icon {
+    font-size: 10px;
+    color: #FFD700;
+}
+
+.wallet-live-dot {
+    width: 6px;
+    height: 6px;
+    background: #00FF88;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #00FF88;
+    animation: liveBeacon 1.8s ease-in-out infinite;
+}
+
+@keyframes liveBeacon {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 4px #00FF88;
+    }
+
+    50% {
+        transform: scale(1.25);
+        box-shadow: 0 0 10px #00FF88, 0 0 16px rgba(0, 255, 136, 0.6);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 4px #00FF88;
+    }
+}
+
+.wallet-chev {
+    color: #A0AEC0;
+    font-size: 8.5px;
+}
+
+.btn-notif {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background: #06080E;
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFE082;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.notif-count {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 13px;
+    height: 13px;
+    background: #FFD700;
+    color: #000;
+    font-size: 7.5px;
+    font-weight: 900;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 4px #FFD700;
+}
+
+/* ============================================================
+   2. HERO CARD — SPACIOUS & UNCLUTTERED MECHA HUD (100% MATCH)
+   ============================================================ */
+.hud-hero-wrap {
+    padding: 6px 8px 8px;
+}
+
+.exact-hero-mecha-card {
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(245, 166, 35, 0.09) 0%, transparent 65%),
+        linear-gradient(180deg, rgba(8, 10, 14, 0.94) 0%, rgba(4, 5, 8, 0.98) 100%),
+        url('/images/cai-hero-bg.jpg') center/cover no-repeat;
+    border: 1.5px solid var(--gold-border);
+    border-radius: 18px;
+    position: relative;
+    padding: 16px 14px 14px;
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(229, 168, 35, 0.2),
+        inset 0 0 12px rgba(229, 168, 35, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+}
+
+/* Stepped Notch Mecha Corners */
+.frame-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.fc-tl {
+    top: 0;
+    left: 0;
+    border-top: 3px solid #FFE082;
+    border-left: 3px solid #FFE082;
+    border-top-left-radius: 18px;
+}
+
+.fc-tr {
+    top: 0;
+    right: 0;
+    border-top: 3px solid #FFE082;
+    border-right: 3px solid #FFE082;
+    border-top-right-radius: 18px;
+}
+
+.fc-bl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 3px solid #FFE082;
+    border-left: 3px solid #FFE082;
+    border-bottom-left-radius: 18px;
+}
+
+.fc-br {
+    bottom: 0;
+    right: 0;
+    border-bottom: 3px solid #FFE082;
+    border-right: 3px solid #FFE082;
+    border-bottom-right-radius: 18px;
+}
+
+.frame-bolt {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #FFD700;
+    box-shadow: 0 0 6px #FFD700;
+    z-index: 6;
+}
+
+.fb-tl {
+    top: 5px;
+    left: 5px;
+}
+
+.fb-tr {
+    top: 5px;
+    right: 5px;
+}
+
+.fb-bl {
+    bottom: 5px;
+    left: 5px;
+}
+
+.fb-br {
+    bottom: 5px;
+    right: 5px;
+}
+
+/* 3-Column Hero Grid (Spacious & Clean Layout) */
+.hero-3col-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1.15fr;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    gap: 10px;
+}
+
+/* Left: Price & Area Chart */
+.col-live-price {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.row-live-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 3px;
+}
+
+.txt-live-title {
+    font-size: 8px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tag-live-green {
+    background: rgba(0, 255, 136, 0.15);
+    border: 1px solid #00FF88;
+    color: #00FF88;
+    font-size: 6.5px;
+    font-weight: 800;
+    padding: 1px 4px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.txt-price-big {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.1;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.txt-price-big span {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #A0AEC0;
+}
+
+.txt-price-growth {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #00FF88;
+    margin-top: 2px;
+}
+
+/* Candlestick / Area Grid Sparkline */
+.chart-grid-container {
+    position: relative;
+    width: 100%;
+    height: 46px;
+    margin-top: 4px;
+    overflow: visible;
+}
+
+.chart-pulse-ring {
+    animation: chartDotPulse 1.8s ease-in-out infinite;
+    transform-origin: 138px 5px;
+}
+
+@keyframes chartDotPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(2.0);
+        opacity: 0.1;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0.7;
+    }
+}
+
+/* Center: 3D Lion Medallion & Rotating Halo */
+.col-center-medallion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 2px;
+}
+
+.lion-halo-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lion-halo-wrap::before {
+    content: '';
+    position: absolute;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.45) 0%, rgba(245, 166, 35, 0.18) 50%, transparent 70%);
+    filter: blur(8px);
+    z-index: 1;
+    pointer-events: none;
+    animation: lionHaloBreathe 3s ease-in-out infinite alternate;
+}
+
+@keyframes lionHaloBreathe {
+    0% {
+        transform: scale(0.92);
+        opacity: 0.65;
+        filter: blur(6px);
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.95;
+        filter: blur(10px);
+    }
+
+    100% {
+        transform: scale(0.92);
+        opacity: 0.65;
+        filter: blur(6px);
+    }
+}
+
+.lion-disc-frame {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FFD700;
+    box-shadow:
+        0 0 0 2.5px rgba(229, 168, 35, 0.55),
+        0 0 20px rgba(255, 215, 0, 0.85),
+        0 0 32px rgba(245, 166, 35, 0.45);
+    animation: lionFloat 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes lionFloat {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+        box-shadow: 0 0 0 2.5px rgba(229, 168, 35, 0.55), 0 0 18px rgba(255, 215, 0, 0.75);
+    }
+
+    50% {
+        transform: translateY(-4px) rotate(0.8deg);
+        box-shadow: 0 0 0 3.5px #FFF3C4, 0 0 28px rgba(255, 215, 0, 0.95), 0 0 45px rgba(245, 166, 35, 0.5);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);
+        box-shadow: 0 0 0 2.5px rgba(229, 168, 35, 0.55), 0 0 18px rgba(255, 215, 0, 0.75);
+    }
+}
+
+.lion-disc-frame img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 18%;
+    display: block;
+    animation: coinSpinClockwise 14s linear infinite;
+    transform-origin: center center;
+}
+
+@keyframes coinSpinClockwise {
+    from {
+        transform: scale(1.35) rotate(0deg);
+    }
+
+    to {
+        transform: scale(1.35) rotate(360deg);
+    }
+}
+
+.col-center-medallion:hover .lion-disc-frame img {
+    animation-duration: 6s;
+    /* Spins faster on hover */
+}
+
+.txt-cai-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #FFF3C4;
+    letter-spacing: 2px;
+    text-shadow: none;
+    margin-top: 3px;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+/* Right: Total Portfolio & Embedded Claim Box */
+.col-right-portfolio {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.row-port-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.txt-port-title {
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.icon-eye-gold {
+    font-size: 8.5px;
+    color: #FFD700;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.icon-eye-gold:hover {
+    transform: scale(1.2);
+    color: #FFF3C4;
+}
+
+.txt-port-big {
+    font-size: 19px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.txt-port-unit {
+    font-size: 8px;
+    font-weight: 700;
+    color: #FFE082;
+    margin-bottom: 4px;
+}
+
+/* Embedded Mini Claim Box */
+.box-mini-claim {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(10, 12, 16, 0.95) 0%, rgba(4, 5, 8, 0.98) 100%);
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    border-radius: 10px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.lbl-claim-title {
+    font-size: 6.5px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.val-claim-num {
+    font-size: 13px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.sub-claim-usd {
+    font-size: 7.5px;
+    color: #A0AEC0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.btn-solid-gold-claim {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: linear-gradient(180deg, #FFF3C4 0%, #FFD700 50%, #E5A823 100%);
+    color: #000000;
+    font-size: 8.5px;
+    font-weight: 900;
+    padding: 4px 6px;
+    border-radius: 12px;
+    border: 1px solid #FFF3C4;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(245, 166, 35, 0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.btn-solid-gold-claim::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 35%;
+    height: 200%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+    transform: rotate(25deg);
+    animation: goldSheenSweep 3.5s infinite;
+}
+
+@keyframes goldSheenSweep {
+    0% {
+        left: -60%;
+    }
+
+    25%,
+    100% {
+        left: 140%;
+    }
+}
+
+.btn-solid-gold-claim:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
+}
+
+/* ============================================================
+   3. DYNAMIC CAPPING PROGRESS CARD — 100% MECHA HUD
+   ============================================================ */
+.hud-capping-wrap {
+    padding: 0 8px 10px;
+    width: 100%;
+}
+
+.hud-capping-card {
+    position: relative;
+    padding: 14px 16px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+.capping-frame-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 5px rgba(245, 166, 35, 0.35));
+}
+
+.capping-card-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.capping-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.capping-title-txt {
+    font-size: 11px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-shadow: none;
+}
+
+.capping-title-txt i {
+    font-size: 11px;
+    color: #F5A623;
+}
+
+.capping-tier-pill {
+    background: rgba(229, 168, 35, 0.12);
+    border: 1px solid #F5A623;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 0.8px;
+    box-shadow: 0 0 8px rgba(245, 166, 35, 0.25);
+}
+
+.capping-track-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.capping-track-bar {
+    flex: 1;
+    height: 14px;
+    background: #030508;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(229, 168, 35, 0.5);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+.capping-track-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #B87300 0%, #F5A623 50%, #FFE57F 100%);
+    position: relative;
+    box-shadow: 0 0 10px rgba(245, 166, 35, 0.6);
+    transition: width 0.8s ease;
+}
+
+.capping-track-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg,
+            transparent 0px,
+            transparent 6px,
+            rgba(0, 0, 0, 0.3) 6px,
+            rgba(0, 0, 0, 0.3) 12px);
+    animation: stripeMove 1.2s linear infinite;
+}
+
+@keyframes stripeMove {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 24px 0;
+    }
+}
+
+.capping-pct-txt {
+    font-size: 16px;
+    font-weight: 900;
+    color: #FFE082;
+    text-shadow: none;
+    min-width: 44px;
+    text-align: right;
+    line-height: 1;
+}
+
+.capping-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #A0AEC0;
+    margin-top: 2px;
+}
+
+.capping-meta-row strong {
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+}
+
+.cap-meta-lbl {
+    font-size: 9.5px;
+    color: #B0BEC5;
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+.capping-warning-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: rgba(245, 166, 35, 0.08);
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    border-radius: 8px;
+    padding: 7px 12px;
+    margin-top: 10px;
+    font-size: 9px;
+    font-weight: 600;
+    color: #FFE082;
+    text-align: center;
+}
+
+.capping-warning-banner i {
+    color: #FFB300;
+    font-size: 11px;
+    filter: drop-shadow(0 0 4px #FFB300);
+}
+
+/* ============================================================
+   4. QUICK ACTIONS — EXACT MECHA NOTCHED TILES (100% DITTO)
+   ============================================================ */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+    padding: 4px 8px 8px;
+}
+
+.action-card {
+    --neon: #F6B900;
+    --neon-glow: rgba(246, 185, 0, 0.45);
+    position: relative;
+    min-height: 88px;
+    padding: 8px 4px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    overflow: visible;
+    color: white;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), filter .25s ease;
+}
+
+/* 4 Specific Color Variants */
+.action-card.invest {
+    --neon: #FFA000;
+    --neon-glow: rgba(255, 160, 0, 0.45);
+    --neon-sub: #FFE082;
+}
+
+.action-card.withdraw {
+    --neon: #00E676;
+    --neon-glow: rgba(0, 230, 118, 0.45);
+    --neon-sub: #A7F3D0;
+}
+
+.action-card.invite {
+    --neon: #B34BFE;
+    --neon-glow: rgba(179, 75, 254, 0.45);
+    --neon-sub: #E9D5FF;
+}
+
+.action-card.referral {
+    --neon: #00D2FF;
+    --neon-glow: rgba(0, 210, 255, 0.45);
+    --neon-sub: #BAE6FD;
+}
+
+/* Mecha Frame SVG Background */
+.card-frame-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 4px var(--neon-glow));
+    transition: filter 0.25s ease;
+}
+
+.action-card:hover .card-frame-svg {
+    filter: drop-shadow(0 0 8px var(--neon)) drop-shadow(0 0 16px var(--neon-glow));
+}
+
+/* Compact Glowing Vector Icon */
+.action-icon {
+    position: relative;
+    z-index: 2;
+    height: 28px;
+    width: 28px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon);
+    filter: drop-shadow(0 0 5px var(--neon));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: iconHoverBob 3.6s ease-in-out infinite alternate;
+}
+
+.action-card.invest .action-icon {
+    animation-delay: 0s;
+}
+
+.action-card.withdraw .action-icon {
+    animation-delay: 0.6s;
+}
+
+.action-card.invite .action-icon {
+    animation-delay: 1.2s;
+}
+
+.action-card.referral .action-icon {
+    animation-delay: 1.8s;
+}
+
+@keyframes iconHoverBob {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-2.5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.action-icon svg.mecha-svg-icon {
+    width: 25px;
+    height: 25px;
+    overflow: visible;
+}
+
+.action-card:hover .action-icon {
+    transform: scale(1.15) translateY(-2px);
+    animation-play-state: paused;
+}
+
+/* Content Heading & Subtitle */
+.action-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.action-content h3 {
+    margin: 0;
+    font-size: 9.5px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    color: var(--neon);
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-shadow: none;
+    /* Removed text glow */
+}
+
+.action-sub-row {
+    margin-top: 1.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5px;
+    width: 100%;
+}
+
+.action-content p,
+.action-sub-txt {
+    margin: 0;
+    font-size: 7px;
+    font-weight: 600;
+    color: #D4AF37;
+    white-space: nowrap;
+    opacity: 0.9;
+    letter-spacing: 0.2px;
+    text-shadow: none;
+}
+
+/* Bottom Right Arrow */
+.action-arrow {
+    color: #FFB300;
+    font-size: 7.5px;
+    font-weight: 900;
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+
+.action-card:hover .action-arrow {
+    transform: translateX(3px);
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+}
+
+.action-card:active {
+    transform: scale(.96);
+    filter: brightness(1.2);
+}
+
+/* ============================================================
+   5. INCOME BREAKDOWN — ENLARGED MECHA HUD
+   ============================================================ */
+.section-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px 6px;
+    width: 100%;
+}
+
+.sec-title-txt {
+    font-size: 13.5px;
+    font-weight: 900;
+    color: #FFE082;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-shadow: none;
+}
+
+/* Total Earned Header Badge / Label */
+.income-total-earned-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+.income-total-earned-label .txt-tot-lbl {
+    color: #A0AEC0;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.income-total-earned-label .txt-tot-val {
+    color: #00FF88;
+    font-size: 13.5px;
+    font-weight: 900;
+    text-shadow: none;
+}
+
+.income-total-earned-label .txt-tot-val small {
+    font-size: 9px;
+    color: #A7F3D0;
+    font-weight: 700;
+}
+
+/* 2x2 Grid — Enlarged & 100% Fluid Mobile Responsive */
+.income-2x2-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    padding: 0 8px 12px;
+    width: 100%;
+}
+
+/* Income HUD Card */
+.income-hud-card {
+    position: relative;
+    padding: 13px 10px 11px;
+    min-height: 114px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    overflow: visible;
+    min-width: 0;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+}
+
+.income-hud-card:hover {
+    transform: translateY(-3px) scale(1.01);
+}
+
+/* 4 Theme Variants */
+.income-hud-card.inc-gold {
+    --inc-neon: #FFA000;
+    --inc-glow: rgba(255, 160, 0, 0.45);
+}
+
+.income-hud-card.inc-green {
+    --inc-neon: #00E676;
+    --inc-glow: rgba(0, 230, 118, 0.45);
+}
+
+.income-hud-card.inc-cyan {
+    --inc-neon: #00D2FF;
+    --inc-glow: rgba(0, 210, 255, 0.45);
+}
+
+.income-hud-card.inc-purple {
+    --inc-neon: #B34BFE;
+    --inc-glow: rgba(179, 75, 254, 0.45);
+}
+
+/* SVG Mecha Frame */
+.income-frame-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 5px var(--inc-glow));
+    transition: filter 0.2s ease;
+}
+
+.income-hud-card:hover .income-frame-svg {
+    filter: drop-shadow(0 0 8px var(--inc-neon)) drop-shadow(0 0 16px var(--inc-glow));
+}
+
+.income-card-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Top Row: Icon + Title & Amount + Chart */
+.income-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.income-icon-wrap {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 5px var(--inc-neon));
+    transition: transform 0.2s ease;
+}
+
+.income-hud-card:hover .income-icon-wrap {
+    transform: scale(1.12);
+}
+
+.income-vector-icon {
+    width: 26px;
+    height: 26px;
+    overflow: visible;
+}
+
+.income-title-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.inc-title-txt {
+    font-size: 8.5px;
+    font-weight: 800;
+    color: var(--inc-neon);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+    text-shadow: none;
+    /* Removed text glow */
+}
+
+.inc-amount-txt {
+    font-size: 14.5px;
+    font-weight: 900;
+    color: #FFFFFF;
+    letter-spacing: 0.3px;
+    line-height: 1.15;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inc-usdt-badge {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--inc-neon);
+    margin-left: 1.5px;
+}
+
+/* Ascending Mini Bar Chart & Live Equalizer Animation */
+.income-trend-wrap {
+    width: 42px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    filter: drop-shadow(0 0 4px var(--inc-neon));
+}
+
+.income-trend-chart {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.income-trend-chart rect {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: barEqPulse 2.4s ease-in-out infinite alternate;
+}
+
+.income-trend-chart rect:nth-of-type(1) {
+    animation-delay: 0.1s;
+}
+
+.income-trend-chart rect:nth-of-type(2) {
+    animation-delay: 0.25s;
+}
+
+.income-trend-chart rect:nth-of-type(3) {
+    animation-delay: 0.4s;
+}
+
+.income-trend-chart rect:nth-of-type(4) {
+    animation-delay: 0.55s;
+}
+
+.income-trend-chart rect:nth-of-type(5) {
+    animation-delay: 0.7s;
+}
+
+.income-trend-chart rect:nth-of-type(6) {
+    animation-delay: 0.85s;
+}
+
+@keyframes barEqPulse {
+    0% {
+        transform: scaleY(0.85);
+        opacity: 0.55;
+    }
+
+    50% {
+        transform: scaleY(1.15);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleY(0.85);
+        opacity: 0.55;
+    }
+}
+
+/* Bottom Meta Stats Tray */
+.income-bottom-meta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 7px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    width: 100%;
+    min-width: 0;
+}
+
+.meta-sub-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.meta-sub-col .meta-lbl {
+    font-size: 9px;
+    color: #94A3B8;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.meta-sub-col .meta-val {
+    font-size: 15px;
+    font-weight: 900;
+    color: #FFFFFF;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+    letter-spacing: 0.2px;
+}
+
+@media (max-width: 380px) {
+    .income-top-row {
+        gap: 4px;
+    }
+
+    .income-icon-wrap {
+        width: 24px;
+        height: 24px;
+    }
+
+    .income-vector-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .income-trend-wrap {
+        width: 34px;
+        height: 22px;
+    }
+
+    .inc-amount-txt {
+        font-size: 13px;
+    }
+
+    .inc-title-txt {
+        font-size: 7.5px;
+    }
+
+    .meta-sub-col .meta-val {
+        font-size: 13px;
+    }
+
+    .meta-sub-col .meta-lbl {
+        font-size: 8px;
+    }
+}
+
+
+/* Header Pill Action Button */
+.btn-mecha-pill {
+    background: rgba(229, 168, 35, 0.12);
+    border: 1px solid rgba(245, 166, 35, 0.5);
+    border-radius: 12px;
+    padding: 2.5px 10px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #FFE082;
+    text-decoration: none;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    box-shadow: 0 0 6px rgba(245, 166, 35, 0.2);
+    transition: all 0.2s ease;
+}
+
+.btn-mecha-pill:hover {
+    background: rgba(229, 168, 35, 0.22);
+    border-color: #FFD700;
+    color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   6. TEAM & LEG VOLUME STATUS — 4-GRID MECHA HUD
+   ============================================================ */
+.team-section-wrap {
+    padding: 0 8px 10px;
+    width: 100%;
+}
+
+.team-4col-grid,
+.team-2x2-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.team-stat-tile {
+    position: relative;
+    padding: 14px 12px;
+    min-height: 80px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    overflow: visible;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+}
+
+.team-stat-tile:hover {
+    transform: translateY(-2px);
+}
+
+/* Theme Colors */
+.team-stat-tile.team-gold {
+    --team-neon: #FFA000;
+    --team-glow: rgba(255, 160, 0, 0.4);
+}
+
+.team-stat-tile.team-cyan {
+    --team-neon: #00D2FF;
+    --team-glow: rgba(0, 210, 255, 0.4);
+}
+
+.team-stat-tile.team-purple {
+    --team-neon: #B34BFE;
+    --team-glow: rgba(179, 75, 254, 0.4);
+}
+
+/* Mecha Frame SVG */
+.team-frame-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 4px var(--team-glow));
+    transition: filter 0.2s ease;
+}
+
+.team-stat-tile:hover .team-frame-svg {
+    filter: drop-shadow(0 0 7px var(--team-neon)) drop-shadow(0 0 12px var(--team-glow));
+}
+
+.team-tile-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+.team-stat-ico {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.team-vector-ico {
+    width: 22px;
+    height: 22px;
+    overflow: visible;
+}
+
+.team-stat-text-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    flex: 1;
+}
+
+.team-stat-lbl {
+    font-size: 8px;
+    font-weight: 800;
+    color: #94A3B8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+}
+
+.team-stat-val {
+    font-size: 16px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.2;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.2px;
+}
+
+.team-stat-sub {
+    font-size: 8px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+}
+
+.team-stat-sub.sub-green {
+    color: #00FF88;
+}
+
+.team-stat-sub.sub-cyan {
+    color: #00D2FF;
+}
+
+.team-stat-sub.sub-gold {
+    color: #FFA000;
+}
+
+@media (max-width: 380px) {
+    .team-stat-tile {
+        min-height: 72px;
+        padding: 12px 8px;
+    }
+
+    .team-tile-inner {
+        gap: 6px;
+    }
+
+    .team-stat-ico {
+        width: 26px;
+        height: 26px;
+    }
+
+    .team-vector-ico {
+        width: 18px;
+        height: 18px;
+    }
+
+    .team-stat-val {
+        font-size: 14px;
+    }
+
+    .team-stat-lbl {
+        font-size: 7.5px;
+    }
+
+    .team-stat-sub {
+        font-size: 7.5px;
+    }
+}
+
+/* ============================================================
+   7. RECENT ACTIVITY — EXACT MECHA HUD FEED (100% MATCH)
+   ============================================================ */
+.recent-act-wrap {
+    padding: 0 8px 16px;
+    width: 100%;
+}
+
+.recent-act-card {
+    position: relative;
+    padding: 13px 14px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+.activity-frame-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 4px rgba(245, 166, 35, 0.25));
+}
+
+.activity-list-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    width: 100%;
+}
+
+.act-row-item {
+    display: grid;
+    grid-template-columns: 1.3fr 1.1fr 1.3fr 0.9fr;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 10px;
+    width: 100%;
+}
+
+.act-row-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.act-col-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.act-icon-bubble {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 9px;
+}
+
+.act-icon-bubble.bg-green-dim {
+    background: rgba(0, 255, 136, 0.12);
+    border: 1px solid rgba(0, 255, 136, 0.35);
+}
+
+.act-icon-bubble.bg-gold-dim {
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+.act-icon-bubble.bg-cyan-dim {
+    background: rgba(0, 210, 255, 0.12);
+    border: 1px solid rgba(0, 210, 255, 0.35);
+}
+
+.act-icon-bubble.bg-purple-dim {
+    background: rgba(179, 75, 254, 0.12);
+    border: 1px solid rgba(179, 75, 254, 0.35);
+}
+
+.act-type-title {
+    font-weight: 700;
+    color: #F0F4F8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+}
+
+.act-col-amount {
+    font-weight: 800;
+    color: #FFFFFF;
+    white-space: nowrap;
+    font-size: 10.5px;
+}
+
+.act-col-amount small {
+    font-size: 8px;
+    color: #A0AEC0;
+    font-weight: 600;
+}
+
+.act-col-amount.text-green {
+    color: #00FF88;
+}
+
+.act-col-amount.text-cyan {
+    color: #00D2FF;
+}
+
+.act-col-amount.text-purple {
+    color: #C084FC;
+}
+
+.act-col-status {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-txt-green {
+    color: #00FF88;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.act-col-time {
+    font-size: 9px;
+    color: #718096;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+@media (max-width: 380px) {
+    .act-row-item {
+        grid-template-columns: 1.2fr 1fr 1.2fr 0.8fr;
+        gap: 4px;
+        font-size: 9px;
+    }
+
+    .act-type-title {
+        font-size: 9px;
+    }
+
+    .act-col-amount {
+        font-size: 9.5px;
+    }
+
+    .status-txt-green {
+        font-size: 8.5px;
+    }
+
+    .act-col-time {
+        font-size: 8px;
+    }
+}
+
+/* ============================================================
+   7. BOTTOM NAVIGATION — FIXED NON-FLOATING DOCK WITH GOLD BORDER
+   ============================================================ */
+.hud-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--app-max-width);
+    height: 70px;
+    background: linear-gradient(180deg, #0D111A 0%, #05070B 100%);
+    border-top: 1.5px solid var(--gold-border);
+    border-left: 1px solid rgba(229, 168, 35, 0.2);
+    border-right: 1px solid rgba(229, 168, 35, 0.2);
+    border-bottom: none;
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 4px 6px 6px;
+    z-index: 200;
+    box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.95), 0 -1px 4px rgba(229, 168, 35, 0.15);
+    backdrop-filter: blur(20px);
+}
+
+.hud-nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    cursor: pointer;
+    padding: 4px 2px 2px;
+    text-decoration: none;
+    position: relative;
+    gap: 3px;
+    color: #94A3B8;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hud-nav-tab .tab-ico-wrap {
+    width: 32px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+    transition: all 0.2s ease;
+}
+
+.nav-svg-icon {
+    width: 25px;
+    height: 25px;
+    display: block;
+    transition: all 0.2s ease;
+    filter: none;
+}
+
+.hud-nav-tab .tab-lbl {
+    font-size: 10px;
+    color: #94A3B8;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.hud-nav-tab .tab-active-bar {
+    width: 20px;
+    height: 3px;
+    border-radius: 3px;
+    background: transparent;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+}
+
+/* Active State - Crisp and Sharp without blurry glow */
+.hud-nav-tab.active {
+    color: #FFD700;
+}
+
+.hud-nav-tab.active .tab-ico-wrap {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
+
+.hud-nav-tab.active .nav-svg-icon {
+    filter: none;
+}
+
+.hud-nav-tab.active .tab-lbl {
+    color: #FFD700;
+    font-weight: 900;
+    text-shadow: none;
+}
+
+.hud-nav-tab.active .tab-active-bar {
+    background: #FFD700;
+    box-shadow: none;
+}
+
+/* Hover State */
+.hud-nav-tab:hover {
+    color: #FFFFFF;
+}
+
+.hud-nav-tab:hover .tab-ico-wrap {
+    color: #FFFFFF;
+    transform: translateY(-1.5px);
+}
+
+.hud-nav-tab:hover .nav-svg-icon {
+    filter: none;
+}
+
+.hud-nav-tab:hover .tab-lbl {
+    color: #FFFFFF;
+}
+
+/* Center 3D CYERA AI Icon Button */
+.hud-center-lion-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    top: -14px;
+    flex-shrink: 0;
+    margin: 0 4px;
+    z-index: 10;
+    transition: transform 0.2s ease;
+}
+
+.hud-center-lion-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+}
+
+.nav-lion-corona {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-lion-corona::before {
+    display: none; /* Removed heavy blurry glow */
+}
+
+.nav-lion-ring {
+    position: relative;
+    z-index: 2;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #FFD700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), inset 0 0 6px rgba(255, 215, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #080A10;
+    padding: 2px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hud-center-lion-btn:hover .nav-lion-ring {
+    border-color: #FFF3C4;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9);
+}
+
+.nav-lion-ring img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
+    animation: coinSpinClockwise 16s linear infinite;
+    transform-origin: center center;
+}
+
+.nav-cai-lbl {
+    font-size: 10px;
+    font-weight: 900;
+    color: #FFD700;
+    letter-spacing: 1.2px;
+    text-shadow: none;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+@media (max-width: 380px) {
+    .hud-bottom-nav {
+        height: 66px;
+    }
+
+    .nav-svg-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .hud-nav-tab .tab-lbl {
+        font-size: 9px;
+    }
+
+    .nav-lion-corona {
+        width: 48px;
+        height: 48px;
+    }
+
+    .nav-lion-ring {
+        width: 46px;
+        height: 46px;
+    }
+}
+
+/* ============================================================
+   8. DITTO MECHA CYBERPUNK HUD SIDEBAR (100% MATCH)
+   ============================================================ */
+.mecha-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mecha-sidebar-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mecha-sidebar-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 325px;
+    max-width: 88vw;
+    background:
+        radial-gradient(ellipse 80% 30% at 50% 0%, rgba(245, 166, 35, 0.12) 0%, transparent 60%),
+        linear-gradient(180deg, #06080E 0%, #030407 50%, #010203 100%);
+    border-right: 1.8px solid var(--gold-border);
+    box-shadow:
+        16px 0 50px rgba(0, 0, 0, 0.98),
+        0 0 15px rgba(229, 168, 35, 0.2);
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mecha-sidebar-drawer.active {
+    transform: translateX(0);
+}
+
+.mecha-sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 10px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 168, 35, 0.25) transparent;
+}
+
+.mecha-sidebar-scroll::-webkit-scrollbar {
+    width: 3px;
+}
+
+.mecha-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(229, 168, 35, 0.25);
+    border-radius: 3px;
+}
+
+/* 1. Header Card — DITTO 100% MATCH */
+.mecha-sidebar-brand-card {
+    position: relative;
+    padding: 14px 12px 10px;
+    background: linear-gradient(180deg, #090D17 0%, #03050B 100%);
+    border-radius: 12px;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.95),
+        0 0 15px rgba(229, 168, 35, 0.25);
+    margin-bottom: 12px;
+}
+
+.profile-card-svg-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.btn-header-gear {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #06090F;
+    border: 1.5px solid #FFD700;
+    color: #FFD700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-header-gear:hover {
+    transform: rotate(45deg) scale(1.08);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+}
+
+.brand-card-top-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mecha-emblem-dial {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1A1406 0%, #000000 100%);
+    border: 2.2px solid #FFD700;
+    padding: 2px;
+    box-shadow:
+        0 0 0 3px rgba(229, 168, 35, 0.4),
+        0 0 18px rgba(255, 215, 0, 0.7),
+        inset 0 0 10px rgba(255, 215, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mecha-emblem-dial img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+}
+
+.brand-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.mecha-brand-title {
+    font-size: 18px;
+    font-weight: 900;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFE082 45%, #E5A823 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+}
+
+.mecha-brand-subtitle {
+    font-size: 8px;
+    font-weight: 800;
+    color: #94A3B8;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+.mecha-user-quick-rank {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.rank-tag-badge {
+    background: #090B10;
+    border: 1.2px solid #E5A823;
+    border-radius: 5px;
+    padding: 2px 7px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.rank-tag-badge .lbl {
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #94A3B8;
+    letter-spacing: 0.5px;
+}
+
+.rank-tag-badge .val {
+    font-size: 11px;
+    font-weight: 900;
+    color: #FFD700;
+}
+
+.tier-tag-badge {
+    background: #040E0A;
+    border: 1.2px solid #00FF88;
+    border-radius: 5px;
+    padding: 2px 7px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.tier-tag-badge .lbl {
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #00FF88;
+    letter-spacing: 0.5px;
+}
+
+.tier-tag-badge .val {
+    font-size: 11px;
+    font-weight: 900;
+    color: #00FF88;
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.6);
+}
+
+/* Connected Wallet Capsule inside Header */
+.header-wallet-capsule {
+    margin-top: 7px;
+    background: #04070D;
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    border-radius: 16px;
+    padding: 3.5px 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 9.5px;
+    color: #FFFFFF;
+}
+
+.hwc-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #FFE082;
+}
+
+.hwc-left i {
+    color: #E5A823;
+    font-size: 9.5px;
+}
+
+.hwc-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 8px;
+    font-weight: 900;
+    color: #00FF88;
+    letter-spacing: 0.6px;
+}
+
+.hwc-right .mecha-live-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #00FF88;
+    box-shadow: 0 0 6px #00FF88;
+}
+
+.hwc-right i {
+    color: #FFD700;
+    font-size: 8px;
+}
+
+/* 4 Mini Stat Grid inside Header Card */
+.header-4stat-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(229, 168, 35, 0.25);
+}
+
+.stat-mini-box {
+    background: #05080E;
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 6px;
+    padding: 5px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+}
+
+.stat-mini-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.stat-mini-icon-circle {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #141006;
+    border: 1px solid #FFD700;
+    color: #FFD700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6px;
+    flex-shrink: 0;
+}
+
+.stat-mini-lbl {
+    font-size: 6.5px;
+    font-weight: 800;
+    color: #94A3B8;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-mini-val {
+    font-size: 9.5px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.stat-mini-sub {
+    font-size: 7.5px;
+    color: #00FF88;
+    font-weight: 700;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* 2. Navigation Sections Header */
+.mecha-nav-section {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.mecha-section-label {
+    font-size: 8.5px;
+    font-weight: 900;
+    color: #E5A823;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 4px 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* 3. Mecha Nav Cards — Individual Tactile HUD Tiles */
+.mecha-nav-item {
+    position: relative;
+}
+
+.mecha-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #0C101A 0%, #06080E 100%);
+    border: 1.2px solid rgba(229, 168, 35, 0.45);
+    border-radius: 8px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0,
+            100% 8px, 100% calc(100% - 8px),
+            calc(100% - 8px) 100%, 8px 100%,
+            0 calc(100% - 8px), 0 8px);
+    position: relative;
+    color: #FFFFFF;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.9),
+        0 0 4px rgba(229, 168, 35, 0.15);
+}
+
+.mecha-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 14px;
+    width: 24px;
+    height: 1.8px;
+    background: #FFD700;
+    opacity: 0.75;
+    border-radius: 1px;
+}
+
+.mecha-nav-link:hover {
+    background: linear-gradient(135deg, #121826 0%, #090C14 100%);
+    border-color: #FFD700;
+    color: #FFFFFF;
+    transform: translateX(3px);
+    box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.95),
+        0 0 10px rgba(229, 168, 35, 0.35);
+}
+
+.nav-link-left-grp {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.nav-ico-orb {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #080C14;
+    border: 1px solid rgba(229, 168, 35, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13.5px;
+    color: #FFD700;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.9);
+    transition: all 0.2s ease;
+}
+
+.mecha-nav-link:hover .nav-ico-orb {
+    border-color: #FFD700;
+    color: #FFE082;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    transform: scale(1.06);
+}
+
+.nav-txt-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5px;
+}
+
+.nav-link-txt {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: #FFFFFF;
+    line-height: 1.15;
+}
+
+.nav-sub-txt {
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #8E99A8;
+    letter-spacing: 0.2px;
+    line-height: 1;
+}
+
+.nav-caret {
+    font-size: 10px;
+    color: #A0AEC0;
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.nav-link-arr {
+    font-size: 9px;
+    color: #FFD700;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.mecha-nav-link:hover .nav-link-arr {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+.mecha-nav-item.open>.mecha-nav-link .nav-caret {
+    transform: rotate(180deg);
+    color: #FFD700;
+}
+
+/* Active State Pill */
+.mecha-nav-link.active {
+    background: linear-gradient(135deg, #1A1408 0%, #0E0C06 100%);
+    border: 1.5px solid #FFD700;
+    box-shadow:
+        0 0 12px rgba(255, 215, 0, 0.35),
+        inset 0 0 10px rgba(255, 215, 0, 0.15);
+}
+
+.mecha-nav-link.active .nav-link-txt {
+    color: #FFE082;
+    font-weight: 900;
+}
+
+.mecha-nav-link.active .nav-sub-txt {
+    color: #FFEAA7;
+}
+
+.mecha-nav-link.active .nav-ico-orb {
+    border-color: #FFD700;
+    background: #141006;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.nav-active-badge {
+    font-size: 8px;
+    font-weight: 900;
+    background: #FFD700;
+    color: #000000;
+    padding: 2.5px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+/* 4. Submenu Dropdown Accordion (DITTO Tree Line & Yellow Bullet Dots) */
+.mecha-submenu {
+    display: none;
+    padding: 6px 0 6px 14px;
+    margin-left: 12px;
+    margin-top: 4px;
+    border-left: 1.5px dashed rgba(229, 168, 35, 0.45);
+    flex-direction: column;
+    gap: 5px;
+    animation: fadeInSub 0.2s ease;
+}
+
+.mecha-nav-item.open>.mecha-submenu {
+    display: flex;
+}
+
+@keyframes fadeInSub {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mecha-sub-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 11px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #E2E8F0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: linear-gradient(180deg, #090D16 0%, #04060B 100%);
+    border: 1px solid rgba(229, 168, 35, 0.3);
+    position: relative;
+}
+
+.mecha-sub-link::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    width: 10px;
+    height: 1px;
+    background: rgba(229, 168, 35, 0.45);
+}
+
+.sub-left-txt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sub-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #FFD700;
+    box-shadow: 0 0 5px #FFD700;
+    flex-shrink: 0;
+}
+
+.sub-arr {
+    font-size: 8.5px;
+    color: #FFD700;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.mecha-sub-link:hover {
+    background: #0F1522;
+    border-color: #FFD700;
+    color: #FFE082;
+    transform: translateX(3px);
+}
+
+.mecha-sub-link:hover .sub-arr {
+    opacity: 1;
+    transform: translateX(2px);
+    color: #FFD700;
+}
+
+.mecha-sub-link.active {
+    background: #141006;
+    border-color: #FFD700;
+    color: #FFD700;
+    font-weight: 800;
+}
+
+/* 5. Support 24/7 Banner Card */
+.mecha-support-banner-card {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #0D121B 0%, #06080E 100%);
+    border: 1.2px solid rgba(229, 168, 35, 0.45);
+    border-radius: 10px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0,
+            100% 8px, 100% calc(100% - 8px),
+            calc(100% - 8px) 100%, 8px 100%,
+            0 calc(100% - 8px), 0 8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+}
+
+.sup-card-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sup-ico-hex {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #000;
+    border: 1.5px solid #FFD700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 14px;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    flex-shrink: 0;
+}
+
+.sup-txt-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.sup-title-txt {
+    font-size: 10.5px;
+    font-weight: 900;
+    color: #FFE082;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.sup-sub-txt {
+    font-size: 7.5px;
+    color: #94A3B8;
+    font-weight: 600;
+}
+
+.btn-contact-sup {
+    background: #080A06;
+    border: 1px solid rgba(229, 168, 35, 0.5);
+    border-radius: 14px;
+    padding: 4px 8px;
+    font-size: 8px;
+    font-weight: 900;
+    color: #FFE082;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.btn-contact-sup:hover {
+    border-color: #FFD700;
+    color: #FFFFFF;
+}
+
+/* 6. Theme Switcher Bar */
+.mecha-theme-bar {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: #04060A;
+    border: 1px solid rgba(229, 168, 35, 0.3);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #A0AEC0;
+    letter-spacing: 0.5px;
+}
+
+.theme-toggle-orb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FFE082 0%, #FFD700 60%, #E5A823 100%);
+    box-shadow: 0 0 10px #FFD700, 0 0 4px #FFF;
+    cursor: pointer;
+}
+
+.social-ico-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #06080E;
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    color: #CBD5E1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-ico-btn:hover {
+    border-color: #FFD700;
+    color: #FFD700;
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   PRELOADER: 3D HOLOGRAPHIC GYROSCOPE ARC-REACTOR & CYBER HUD
+   ============================================================ */
+.cyera-loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: radial-gradient(circle at 50% 45%, #0A0D15 0%, #04060A 70%, #010203 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s ease;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.cyera-loader-overlay.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ============================================================
+   MINIMALIST LUXURY CYBER AI PRELOADER
+   ============================================================ */
+.cyera-loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    user-select: none;
+    max-width: 320px;
+    width: 88%;
+}
+
+/* Clean Stage with Single Smooth Glow Orbit */
+.clean-loader-stage {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.loader-halo-glow {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.28) 0%, rgba(245, 166, 35, 0.08) 50%, transparent 72%);
+    filter: blur(18px);
+    animation: loaderGlowPulse 2.5s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Single Sleek Modern Orbit Spinner Ring */
+.loader-spinner-ring {
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 215, 0, 0.12);
+    border-top: 2.5px solid #FFD700;
+    border-right: 2px solid rgba(0, 255, 136, 0.75);
+    animation: loaderRingRotate 1.4s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
+    pointer-events: none;
+}
+
+/* Central Coin Container */
+.loader-coin-box {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, #141A29 0%, #080B12 100%);
+    border: 1.5px solid rgba(255, 215, 0, 0.45);
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.8), inset 0 0 14px rgba(255, 215, 0, 0.2);
+    animation: loaderCoinPulse 2.4s ease-in-out infinite alternate;
+    z-index: 5;
+}
+
+.loader-coin-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+}
+
+/* Telemetry & Progress Panel */
+.loader-telemetry-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.telemetry-brand {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 3.5px;
+    color: #FFD700;
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 0 14px rgba(255, 215, 0, 0.55);
+}
+
+.telemetry-status-msg {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #94A3B8;
+    margin-bottom: 14px;
+    min-height: 15px;
+    font-family: 'SF Mono', Consolas, Monaco, monospace;
+    text-transform: uppercase;
+}
+
+.telemetry-progress-track {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.22);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+    margin-bottom: 10px;
+}
+
+.telemetry-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #F5A623 0%, #FFD700 50%, #00FF88 100%);
+    border-radius: 10px;
+    transition: width 0.18s ease-out;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.75);
+}
+
+.telemetry-meta-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9.5px;
+    font-weight: 600;
+    font-family: 'SF Mono', Consolas, Monaco, monospace;
+    color: #64748B;
+    letter-spacing: 1px;
+}
+
+.meta-pct {
+    color: #FFD700;
+    font-weight: 700;
+}
+
+/* Animations */
+@keyframes loaderRingRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loaderGlowPulse {
+    0% {
+        transform: scale(0.92);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1.12);
+        opacity: 0.95;
+    }
+}
+
+@keyframes loaderCoinPulse {
+    0% {
+        transform: scale(0.96);
+    }
+
+    100% {
+        transform: scale(1.03);
+    }
+}
+
+/* ============================================================
+   INNER PAGES UNIFIED CYBER MECHA UI SYSTEM
+   ============================================================ */
+.mecha-inner-body {
+    width: 100%;
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Page Header HUD Title Card */
+.mecha-page-title-card {
+    margin: 10px 12px 14px 12px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(16, 22, 36, 0.85) 0%, rgba(9, 13, 22, 0.92) 100%);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.mecha-page-title-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mecha-page-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(245, 166, 35, 0.05) 70%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 18px;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.2);
+}
+
+.mecha-page-text-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mecha-page-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 1px;
+    color: #718096;
+}
+
+.mecha-page-breadcrumb a {
+    color: #FFD700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mecha-page-breadcrumb a:hover {
+    color: #FFF;
+}
+
+.mecha-page-breadcrumb .sep {
+    color: #4A5568;
+}
+
+.mecha-page-breadcrumb .active {
+    color: #CBD5E1;
+    font-weight: 600;
+}
+
+.mecha-page-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #FFF;
+    text-transform: uppercase;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.mecha-page-title-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Mecha Alerts */
+.mecha-alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    backdrop-filter: blur(8px);
+    margin-bottom: 8px;
+}
+
+.mecha-alert-success {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.35);
+    color: #00FF88;
+}
+
+.mecha-alert-danger {
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: #FF4757;
+}
+
+.mecha-alert .alert-icon {
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.mecha-alert .alert-content {
+    flex: 1;
+}
+
+.mecha-alert .alert-title {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.mecha-alert p {
+    margin: 0;
+    font-size: 11px;
+    color: #E2E8F0;
+    line-height: 1.4;
+}
+
+.mecha-alert .alert-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.7;
+}
+
+.mecha-alert .alert-close:hover {
+    opacity: 1;
+}
+
+/* Mecha Cyber HUD Card Container */
+.mecha-hud-card {
+    background: linear-gradient(180deg, rgba(14, 19, 31, 0.94) 0%, rgba(8, 11, 18, 0.97) 100%);
+    border: 1px solid rgba(229, 168, 35, 0.32);
+    border-radius: 14px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 16px rgba(255, 215, 0, 0.03);
+    padding: 20px;
+    overflow: hidden;
+}
+
+.mecha-hud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FFD700, #00FF88, #00E5FF, transparent);
+    opacity: 0.8;
+}
+
+.mecha-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(229, 168, 35, 0.15);
+}
+
+.mecha-card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mecha-card-title-wrap i {
+    color: #FFD700;
+    font-size: 15px;
+}
+
+.mecha-card-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #FFF;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+}
+
+.mecha-card-subtitle {
+    font-size: 9.5px;
+    color: #718096;
+    letter-spacing: 0.5px;
+}
+
+.mecha-card-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    color: #FFD700;
+}
+
+/* Metric / Stats Mini Grid */
+.mecha-stat-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.mecha-stat-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 600px) {
+    .mecha-stat-grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.mecha-metric-box {
+    background: rgba(10, 14, 24, 0.85);
+    border: 1px solid rgba(229, 168, 35, 0.25);
+    border-radius: 10px;
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.mecha-metric-box:hover {
+    border-color: rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.mecha-metric-lbl {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #8C9BAE;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mecha-metric-val {
+    font-size: 16px;
+    font-weight: 800;
+    color: #FFF;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.mecha-metric-val.gold {
+    color: #FFD700;
+}
+
+.mecha-metric-val.green {
+    color: #00FF88;
+}
+
+.mecha-metric-val.cyan {
+    color: #00E5FF;
+}
+
+.mecha-metric-val.purple {
+    color: #B34BFE;
+}
+
+.mecha-metric-sub {
+    font-size: 8px;
+    color: #718096;
+    margin-top: 2px;
+}
+
+/* Mecha Cyber Form Controls */
+.mecha-form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mecha-form-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #CBD5E1;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mecha-form-label .label-sub {
+    font-size: 8.5px;
+    color: #718096;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.mecha-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.mecha-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #FFD700;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.mecha-input-control {
+    width: 100%;
+    height: 44px;
+    background: rgba(6, 9, 16, 0.85);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 8px;
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    padding: 0 14px 0 38px;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.mecha-input-control.no-icon {
+    padding-left: 14px;
+}
+
+.mecha-input-control:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.35), inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    background: rgba(8, 12, 22, 0.95);
+}
+
+.mecha-input-control::placeholder {
+    color: #4A5568;
+    font-weight: 500;
+}
+
+.mecha-input-control:disabled,
+.mecha-input-control[readonly] {
+    background: rgba(12, 16, 26, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #8C9BAE;
+    cursor: not-allowed;
+}
+
+.mecha-select-control {
+    width: 100%;
+    height: 44px;
+    background: rgba(6, 9, 16, 0.85);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 8px;
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 14px 0 38px;
+    outline: none;
+    cursor: pointer;
+}
+
+.mecha-select-control option {
+    background: #0B0F19;
+    color: #FFF;
+}
+
+.mecha-textarea-control {
+    width: 100%;
+    background: rgba(6, 9, 16, 0.85);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 8px;
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    padding: 12px 14px;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: vertical;
+    min-height: 90px;
+}
+
+.mecha-textarea-control:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+}
+
+.mecha-input-suffix-btn {
+    position: absolute;
+    right: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 6px;
+    color: #FFD700;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.mecha-input-suffix-btn:hover {
+    background: #FFD700;
+    color: #000;
+}
+
+/* Mecha Buttons */
+.mecha-btn-gold {
+    width: 100%;
+    height: 44px;
+    background: linear-gradient(180deg, #FFE082 0%, #FFD700 45%, #E5A823 100%);
+    border: none;
+    border-radius: 8px;
+    color: #06080E;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(229, 168, 35, 0.4);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.mecha-btn-gold:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+    color: #000;
+}
+
+.mecha-btn-cyan {
+    width: 100%;
+    height: 44px;
+    background: linear-gradient(180deg, #80FFEA 0%, #00FF88 45%, #00B359 100%);
+    border: none;
+    border-radius: 8px;
+    color: #06080E;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 255, 136, 0.35);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.mecha-btn-cyan:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.55);
+    color: #000;
+}
+
+.mecha-btn-outline {
+    height: 38px;
+    padding: 0 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 6px;
+    color: #CBD5E1;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.mecha-btn-outline:hover {
+    border-color: #FFD700;
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+/* High-Tech Cyber Data Table */
+.mecha-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid rgba(229, 168, 35, 0.2);
+    background: rgba(6, 9, 16, 0.8);
+}
+
+.mecha-cyber-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    color: #E2E8F0;
+    text-align: left;
+}
+
+.mecha-cyber-table thead {
+    background: linear-gradient(180deg, rgba(20, 28, 44, 0.95) 0%, rgba(12, 17, 28, 0.95) 100%);
+    border-bottom: 1px solid rgba(229, 168, 35, 0.35);
+}
+
+.mecha-cyber-table th {
+    padding: 12px 14px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #FFD700;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: none;
+}
+
+.mecha-cyber-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.mecha-cyber-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.mecha-cyber-table tbody tr:hover {
+    background: rgba(255, 215, 0, 0.04);
+}
+
+.mecha-cyber-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Pills */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.status-pill.success,
+.status-pill.active,
+.status-pill.paid,
+.status-pill.completed {
+    background: rgba(0, 255, 136, 0.12);
+    border: 1px solid rgba(0, 255, 136, 0.4);
+    color: #00FF88;
+}
+
+.status-pill.pending,
+.status-pill.processing {
+    background: rgba(255, 193, 7, 0.12);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    color: #FFC107;
+}
+
+.status-pill.danger,
+.status-pill.inactive,
+.status-pill.rejected,
+.status-pill.failed {
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: #FF4757;
+}
+
+/* DataTables Cyber Overrides */
+.dataTables_wrapper {
+    color: #CBD5E1 !important;
+    font-size: 11px;
+    padding: 10px 0;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 12px;
+    color: #CBD5E1 !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    background: rgba(6, 9, 16, 0.85) !important;
+    border: 1px solid rgba(229, 168, 35, 0.35) !important;
+    border-radius: 6px !important;
+    color: #FFF !important;
+    padding: 4px 8px !important;
+    outline: none !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+    color: #718096 !important;
+    font-size: 10px;
+    padding-top: 12px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 12px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(229, 168, 35, 0.25) !important;
+    border-radius: 4px !important;
+    color: #CBD5E1 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 4px 10px !important;
+    margin: 0 2px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #FFD700 !important;
+    border-color: #FFD700 !important;
+    color: #000 !important;
+}
+
+/* Cyber QR Code Box */
+.mecha-qr-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(6, 9, 16, 0.9);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 12px;
+    position: relative;
+}
+
+.mecha-qr-frame {
+    background: #FFF;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+    margin-bottom: 12px;
+}
+
+.mecha-qr-frame img {
+    display: block;
+    max-width: 160px;
+    height: auto;
+}
+
+/* ============================================================
+   3D GYROSCOPE ARC-REACTOR & CYBER HUD PRELOADER CSS
+   ============================================================ */
+.cyera-loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 45%, #080B12 0%, #020306 80%, #000000 100%);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+    pointer-events: all;
+    overflow: hidden;
+}
+
+.cyera-loader-overlay.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: none !important;
+}
+
+.cyera-loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    max-width: 320px;
+    width: 90%;
+}
+
+.gyro-reactor-stage {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 800px;
+    margin-bottom: 22px;
+}
+
+.reactor-plasma-flare {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.45) 0%, rgba(245, 166, 35, 0.2) 40%, transparent 70%);
+    filter: blur(12px);
+    animation: plasmaPulse 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes plasmaPulse {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+.gyro-ring {
+    position: absolute;
+    border-radius: 50%;
+    border-style: solid;
+    pointer-events: none;
+}
+
+.gyro-ring-outer {
+    width: 160px;
+    height: 160px;
+    border-width: 2px;
+    border-color: rgba(255, 215, 0, 0.85) transparent rgba(255, 215, 0, 0.25) transparent;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.35);
+    animation: gyroSpinOuter 4s linear infinite;
+}
+
+.gyro-ring-middle {
+    width: 120px;
+    height: 120px;
+    border-width: 2px;
+    border-color: transparent rgba(0, 255, 136, 0.85) transparent rgba(0, 229, 255, 0.85);
+    box-shadow: 0 0 14px rgba(0, 255, 136, 0.35);
+    animation: gyroSpinMiddle 3s linear infinite reverse;
+}
+
+.gyro-ring-inner {
+    width: 90px;
+    height: 90px;
+
+}
+
+/* ============================================================
+   SIDEBAR SOCIAL LINKS DOCK
+   ============================================================ */
+.mecha-social-bar {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, #0A0D15 0%, #04060A 100%);
+    border: 1px solid rgba(229, 168, 35, 0.35);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.mecha-social-title {
+    font-size: 8px;
+    font-weight: 800;
+    color: #FFE082;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.mecha-social-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.social-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #06090F;
+    border: 1px solid rgba(229, 168, 35, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #CBD5E1;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.social-icon-btn:hover {
+    transform: translateY(-3px) scale(1.1);
+}
+
+.social-icon-btn.insta:hover {
+    color: #E1306C;
+    border-color: #E1306C;
+    box-shadow: 0 0 12px rgba(225, 48, 108, 0.6);
+}
+
+.social-icon-btn.fb:hover {
+    color: #1877F2;
+    border-color: #1877F2;
+    box-shadow: 0 0 12px rgba(24, 119, 242, 0.6);
+}
+
+.social-icon-btn.twitter:hover {
+    color: #FFF;
+    border-color: #FFF;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.social-icon-btn.telegram:hover {
+    color: #229ED9;
+    border-color: #229ED9;
+    box-shadow: 0 0 12px rgba(34, 158, 217, 0.6);
+}
+
+.social-icon-btn.youtube:hover {
+    color: #FF0000;
+    border-color: #FF0000;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+}

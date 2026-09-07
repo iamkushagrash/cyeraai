@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "features": "Features",
+    "products": "Our Products",
+    "docs": "Documentation",
+    "help": "Help",
+    "publications" : "Publications"
+  },
+  "button": {
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "login": "Login",
+    "exploreCyera AI": "Explore Cyera AI",
+    "metaConsole": "Meta Console",
+    "mconnectButton": "Download M-Connect"
+  },
+  "footer": {
+    "footerDecription": "A single gateway connecting all Meta applications seamlessly",
+    "footerMail": "support@cyera.ai",
+    "footerAddress": "6 Raffles Quay, #14-06, Singapore - 048580",
+    "footerLinkTitle": "Quick Links",
+    "footerCopyright": "© 2026 Cyera AI. All rights reserved.",
+    "mconnectTitle": "One Gateway. Infinite Meta Experiences",
+    "mconnectDescription": "A single gateway connecting all Meta applications seamlessly"
+  }
+}

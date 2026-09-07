@@ -1,0 +1,132 @@
+[1mdiff --git a/app/Http/Controllers/Api/V1/UserDetailController.php b/app/Http/Controllers/Api/V1/UserDetailController.php[m
+[1mindex 99bd4ceb..953e9b2c 100644[m
+[1m--- a/app/Http/Controllers/Api/V1/UserDetailController.php[m
+[1m+++ b/app/Http/Controllers/Api/V1/UserDetailController.php[m
+[36m@@ -74,7 +74,11 @@[m [mclass UserDetailController extends BaseController[m
+     }[m
+ [m
+     public function userDatas($request){[m
+[31m-[m
+[32m+[m[32m        $editstatus=array();[m
+[32m+[m[32m        $editstatus=\App\AssetDetailChanges::where([['userid',\Session::get('user.id')],['asset_status','>',0]])->first();[m
+[32m+[m[32m        if(!is_null($editstatus)){[m
+[32m+[m[32m            $userdata['isEdited']=1;[m
+[32m+[m[32m        }[m
+         $userdata['email']=$request->user()->maskedEmail();[m
+         $userdata['name']=$request->user()->usersname;[m
+         $userdata['userid']=$request->user()->uuid;[m
+[36m@@ -89,6 +93,34 @@[m [mclass UserDetailController extends BaseController[m
+      public function updateUserDetails(Request $request){[m
+ [m
+         set_time_limit(0);[m
+[32m+[m[32m        if(!isset($request->otp)){[m
+[32m+[m[32m            $vali=Validator::make($request->all(),[[m
+[32m+[m[32m                'otp'  =>['required','numeric'],[m
+[32m+[m[32m            ]);[m
+[32m+[m[32m            if($vali->fails()){[m
+[32m+[m[32m                return $this->sendError('Validation Error.', $vali->errors());[m[41m       [m
+[32m+[m[32m            }[m
+[32m+[m[32m            $assetDetailChanges=\App\AssetDetailChanges::where(['userid',$request->user()->userDetails()->first()->id])->first();[m
+[32m+[m[32m            if(is_null($assetDetailChanges)){[m
+[32m+[m[32m                return $this->sendError('Oops There is an error .Please try again later.', []);[m[41m  [m
+[32m+[m[32m            }[m
+[32m+[m[32m            if($request->otp==$assetDetailChanges->token){[m
+[32m+[m[32m                $updateUser=\App\AssetDetail::firstOrCreate(['userid'=>$assetDetailChanges->userid]);[m
+[32m+[m[32m                if(!is_null($assetDetailChanges->bep20addr))[m
+[32m+[m[32m                $updateUser->bep20addr=$assetDetailChanges->bep20addr;[m
+[32m+[m[32m                if(!is_null($assetDetailChanges->usdttrc20addr))[m
+[32m+[m[32m                $updateUser->usdttrc20addr=$assetDetailChanges->usdttrc20addr;[m
+[32m+[m[32m                if(!is_null($assetDetailChanges->usdtbep20addr))[m
+[32m+[m[32m                $updateUser->usdtbep20addr=$assetDetailChanges->usdtbep20addr;[m
+[32m+[m[32m                $updateUser->asset_status=1;[m
+[32m+[m[32m                $updateUser->updated_at=now();[m
+[32m+[m[32m                $updateUser->save();[m
+[32m+[m[32m                $deleteUser=\App\AssetDetailChanges::where('id',$assetDetailChanges->id)->delete();[m
+[32m+[m[32m                return $this->sendResponse($this->userDatas($request) ,'Profile Updated');[m
+[32m+[m[32m            }else{[m
+[32m+[m[32m                return $this->sendError('Oops There is an error .Please try again later.', []);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+         /*$editstatus=\App\AssetDetailChanges::where([['userid',$request->user()->userDetails()->first()->id],['asset_status','>',0]])->get();[m
+         if(count($editstatus)){[m
+             return $this->sendError('Validation Error.', ['errors'=>'You already have a mail in your inbox to confirm.Please check your inbox.']);[m
+[36m@@ -104,12 +136,22 @@[m [mclass UserDetailController extends BaseController[m
+         if(!is_null($request->trcUsdtAddress)){$arrayName['usdttrc20addr'] = $request->trcUsdtAddress;}[m
+         if(!is_null($request->bep20UsdtAddress)){$arrayName['usdtbep20addr'] = $request->bep20UsdtAddress;}[m
+         if(sizeof($arrayName)){[m
+[31m-            if(count($arrayName))[m
+[31m-                $userUpdate=\App\AssetDetail::updateOrCreate(['userid'=>$request->user()->userDetails()->first()->id],[m
+[31m-                    $arrayName[m
+[31m-                );[m
+[31m-            [m
+[31m-            return $this->sendResponse($this->userDatas($request) ,'Profile Updated');[m
+[32m+[m[32m            $arrayName['userid']=$request->user()->userDetails()->first()->id;[m
+[32m+[m[32m            $arrayName['token']=rand(100000,999999);[m
+[32m+[m[32m            $arrayName['email']=$request->user()->email;[m
+[32m+[m[32m            $arrayName['email_time']=now();[m
+[32m+[m[32m            $userDetailSave=\App\AssetDetailChanges::insertGetId($arrayName);[m
+[32m+[m[32m            $arrayName['view']="otpMail";[m
+[32m+[m[32m            $arrayName['subject']="OTP to confirm profile changes.";[m
+[32m+[m[32m            $arrayName['useruuid']=$request->user()->uuid;[m
+[32m+[m[32m            $mail=new SupportQueryController();[m
+[32m+[m[32m            $response=$mail->sendMailgun($arrayName);[m
+[32m+[m[32m            if($response==0)[m
+[32m+[m[32m                $status=1;[m
+[32m+[m[32m            else[m
+[32m+[m[32m                $status=2;[m
+[32m+[m[32m            $updstatus=\App\AssetDetailChanges::where('id',$userDetailSave)->update(['asset_status'=>$status,'updated_at'=>now()]);[m
+[32m+[m[32m            return $this->sendResponse($this->userDatas($request) ,'We have sent an Email containing OTP to registered email id which required to confirm changes are made by you. Please enter OTP.');[m
+ [m
+         }else{[m
+             return $this->sendError('Validation Error.', ['errors'=> 'please update atleast one address.']);[m
+[1mdiff --git a/app/Http/Controllers/CpsIncomeController.php b/app/Http/Controllers/CpsIncomeController.php[m
+[1mindex dae6a0f6..4bd22f03 100644[m
+[1m--- a/app/Http/Controllers/CpsIncomeController.php[m
+[1m+++ b/app/Http/Controllers/CpsIncomeController.php[m
+[36m@@ -184,6 +184,18 @@[m [mclass CpsIncomeController extends Controller[m
+                 }[m
+                 $promotionalAdd->amount=(Crypt::encrypt($amt));[m
+                 $promotionalAdd->save();[m
+[32m+[m[32m                $sendMail=\App\SupportQueryController();[m
+[32m+[m[32m                try{[m
+[32m+[m[32m                    $dtail['email']=$transaction->userDetail()->user()->email;[m
+[32m+[m[32m                    $dtail['subject']='You got a topup.'[m
+[32m+[m[32m                    $dtail['view']='planactivationmail';[m
+[32m+[m[32m                    $dtail['amount']=$paymentCreation->actually_paid;[m
+[32m+[m[32m                    $dtail['userid']=$transaction->userDetail()->user()->uuid;[m
+[32m+[m[32m                    $status=$sendMail->sendMailgun($dtail);[m
+[32m+[m[32m                }catch(Exception $e){[m
+[32m+[m[32m                    \Log::info('Error in sending Topupmail for userid '.$transaction->userid);[m
+[32m+[m[32m                    \Log::info($e->messages());[m
+[32m+[m[32m                }[m
+                 $paymentStatus=1;[m
+                 $ransactionUrl='/User/Deposit';[m
+                 $transactionMessage='Transaction confirmed successfully. Amount transferred to your wallet.';[m
+[1mdiff --git a/app/TransactionDetail.php b/app/TransactionDetail.php[m
+[1mindex b5b5cf9a..557baf40 100644[m
+[1m--- a/app/TransactionDetail.php[m
+[1m+++ b/app/TransactionDetail.php[m
+[36m@@ -17,4 +17,8 @@[m [mclass TransactionDetail extends Model[m
+     public function walletTransfer(){[m
+         $this->hasOne('\App\walletTransfer','txnid','id');[m
+     }[m
+[32m+[m
+[32m+[m[32m    public function userDetail(){[m
+[32m+[m[32m        return $this->hasOne('\App\userDetails','userid','id');[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/routes/api.php b/routes/api.php[m
+[1mindex b76254d3..c5bada71 100644[m
+[1m--- a/routes/api.php[m
+[1m+++ b/routes/api.php[m
+[36m@@ -52,7 +52,9 @@[m [mRoute::group(['middleware' => ['auth:api']], function () {[m
+     Route::get('user/depositHistory', 'Api\V1\IncomeDetailController@userDepositHistory');[m
+ [m
+     //upgrade[m
+[31m-[m
+[32m+[m[32m    //Route::get('/user/stack', 'Api\V1\WalletTransferController@stakeCryptoPage');[m
+[32m+[m[32m    //Route::post('user/getUserCrypto','Api\V1\WalletTransferController@getUserDetailCrypto');[m
+[32m+[m[32m    //Route::post('user/coinPackageUpgrade', 'Api\V1\WalletTransferController@stakeSTYCoin');[m
+     Route::get('user/myPackages', 'Api\V1\IncomeDetailController@userMyPackages');[m
+     Route::get('user/transactionHistory', 'Api\V1\IncomeDetailController@userTransactionHistory');[m
+ [m
