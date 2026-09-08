@@ -104,74 +104,31 @@ class SupportQueryController extends Controller
     }
 
     public function sendMailgun($data){
-        $view=view('mail.'.$data['view'])->with('data',$data)->render();//\Log::info(is_string($view));\Log::info($view);
-        //$otpinsert=\DB::table('password_resets')->insert(["email"=>$data['email'],"token"=>$data['code'],"created_at"=>now()]);
-        $curl = curl_init();
-            $postData=array("from"=>array("address"=>"noreply@cyera.ai"),"to"=>array(array("email_address"=>array("address"=>$data["email"],"name"=>(isset($data["name"])?$data["name"]:"User")))),"subject"=>$data["subject"],"htmlbody"=>$view);//\Log::info(json_encode($postData));
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.zeptomail.in/v1.1/email",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => json_encode($postData),
-                CURLOPT_HTTPHEADER => array(
-                    "accept: application/json",
-                    "authorization: Zoho-enczapikey PHtE6r0EEOjoimB98xNU7Ke6Qs+hPYl8+e5kKlERuY8XWKcCTk1Uq4soljDloh4iUvBCRaWYmdhqtezJsuuAc267N21PDmqyqK3sx/VYSPOZsbq6x00fsl0ScEzeU4XsddVt1yXevN/fNA==",
-                    "cache-control: no-cache",
-                    "content-type: application/json",
-                ),
-            ));
-
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-
-            curl_close($curl);
-
-            if ($err) {
-                \Log::info( "cURL Error #:" . $err);
-                \Log::info('errors in '.$data['view'].' for User '.$data['useruuid']);
-                return 0;
-            } else {
-                //\Log::info( json_decode($response,true));
-                return 1;
-            }
-
-        /*try{
-            $header='api:6200e5248c100ad9f8f5a4ef8889c969-1ae02a08-0b94c253';
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-              CURLOPT_URL => 'https://api.mailgun.net/v3/cyera.ai/messages',
-              CURLOPT_USERPWD    => $header,
-              CURLOPT_RETURNTRANSFER => true,
-              CURLOPT_ENCODING => '',
-              CURLOPT_MAXREDIRS => 10,
-              CURLOPT_TIMEOUT => 0,
-              CURLOPT_FOLLOWLOCATION => true,
-              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-              CURLOPT_CUSTOMREQUEST => 'POST',
-              CURLOPT_POSTFIELDS => array('from' => 'Cyera AI <postmaster@cyera.ai>',
-                'to' => $data['email'],
-                'subject' => $data['subject'],
-                'html' => $view
-                ),
-            ));//\Log::info($curl);
-            $response = curl_exec($curl);$converted_response=json_decode($response,true);
-            //\Log::info(json_decode($response,true));
-            if(isset($converted_response['errors'])){
-                \Log::info('errors in '.$data['view'].' for User '.$data['useruuid']);\Log::info($converted_response['errors']);
-                curl_close($curl);
+        try {
+            if (!isset($data['view']) || !isset($data['email'])) {
+                \Log::warning('Mail sending skipped: missing view or email');
                 return 0;
             }
-            curl_close($curl);
+
+            $view = view('mail.'.$data['view'])->with('data', $data)->render();
+            $toEmail = $data['email'];
+            $toName = isset($data['name']) ? $data['name'] : 'User';
+            $subject = isset($data['subject']) ? $data['subject'] : 'Cyera AI Notification';
+            $fromAddress = config('mail.from.address', env('MAIL_FROM_ADDRESS', 'noreply@cyera.ai'));
+            $fromName = config('mail.from.name', env('MAIL_FROM_NAME', 'Cyera AI'));
+
+            \Mail::send([], [], function($message) use ($toEmail, $toName, $subject, $view, $fromAddress, $fromName) {
+                $message->to($toEmail, $toName)
+                        ->from($fromAddress, $fromName)
+                        ->subject($subject)
+                        ->setBody($view, 'text/html');
+            });
+
             return 1;
-        }
-        catch(Exception $e){
+        } catch (\Exception $e) {
+            \Log::error('Gmail SMTP mail sending failed: ' . $e->getMessage());
             return 0;
-        }*/
+        }
     }
 
 }
