@@ -2,1570 +2,975 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyera AI | Registration</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyera AI | Register Membership</title>
+    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        * {
+        :root {
+            --bg-main: #020204;
+            --bg-card: rgba(8, 11, 20, 0.88);
+            --bg-card-inner: rgba(4, 6, 12, 0.94);
+            --gold-pure: #FFD700;
+            --gold-main: #F5A623;
+            --gold-light: #FFE082;
+            --gold-border: rgba(245, 166, 35, 0.35);
+            --gold-glow: rgba(245, 166, 35, 0.25);
+            --cyan-neon: #00F0FF;
+            --cyan-glow: rgba(0, 240, 255, 0.25);
+            --green-neon: #00FF9D;
+            --text-white: #FFFFFF;
+            --text-muted: #8E99A8;
+            --text-dim: #5A6475;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --card-radius: 16px;
+        }
+
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --primary-blue: #0066FF;
-            --primary-cyan: #00D4FF;
-            --matrix-green: #00FF41;
-            --hack-green: #00FF9D;
-            --dark-bg: #0A0A0F;
-            --darker-bg: #050508;
-            --card-bg: rgba(10, 15, 25, 0.95);
-            --glass-border: rgba(0, 212, 255, 0.15);
-            --text-light: #FFFFFF;
-            --text-muted: #A0A0C0;
-            --success: #00FF9D;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
+            background-color: var(--bg-main);
+            color: var(--text-white);
             min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             overflow-x: hidden;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 24px 16px;
         }
 
-        /* Main Container */
-        .main-container {
-            width: 100%;
-            max-width: 1200px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Hacking Matrix Background */
-        .matrix-bg {
+        /* Ambient Nebula Glows */
+        .ambient-glow {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            overflow: hidden;
-            opacity: 0.1;
-        }
-
-        .matrix-stream {
-            position: absolute;
-            top: -50px;
-            color: var(--matrix-green);
-            font-size: 18px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 8px var(--matrix-green);
-            white-space: nowrap;
-            animation: matrixFall linear infinite;
-        }
-
-        @keyframes matrixFall {
-            0% {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% {
-                transform: translateY(100vh);
-                opacity: 0;
-            }
-        }
-
-        /* Scanning Lines Effect */
-        .scan-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15) 0px,
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            z-index: -1;
+            border-radius: 50%;
+            filter: blur(80px);
             pointer-events: none;
-            animation: scanMove 20s linear infinite;
+            z-index: 0;
+            opacity: 0.6;
         }
 
-        @keyframes scanMove {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100px); }
+        .glow-gold {
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 550px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(245, 166, 35, 0.22) 0%, rgba(255, 215, 0, 0.1) 50%, transparent 80%);
         }
 
-        /* Header */
-        .portal-header {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 0 20px;
+        .glow-cyan {
+            bottom: -10%;
+            right: 10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(0, 255, 157, 0.08) 50%, transparent 80%);
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
+        /* Matrix Grid & Scanlines */
+        .cyber-grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(245, 166, 35, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245, 166, 35, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.4);
-            position: relative;
-            overflow: hidden;
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.6;
         }
 
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to right,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            transform: rotate(45deg);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
-        }
-
-        .logo-icon i {
-            font-size: 2rem;
-            color: white;
-        }
-
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--primary-cyan), var(--hack-green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 1.5px;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .tagline {
-            font-size: 1rem;
-            color: var(--hack-green);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Content Wrapper */
-        .content-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        /* Portal Card */
-        .portal-card {
+        /* Main Shell Container */
+        .auth-shell {
             width: 100%;
             max-width: 480px;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(0, 212, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            overflow: hidden;
             position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin: auto 0;
+        }
+
+        /* Brand Header */
+        .auth-brand-header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 18px;
+            border-radius: 40px;
+            background: linear-gradient(180deg, rgba(20, 26, 40, 0.9) 0%, rgba(8, 11, 20, 0.95) 100%);
+            border: 1px solid var(--gold-border);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .brand-logo-wrap:hover {
+            border-color: var(--gold-pure);
+            box-shadow: 0 0 35px rgba(245, 166, 35, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .brand-logo-img {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(245, 166, 35, 0.4));
+        }
+
+        .brand-live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--cyan-neon);
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--cyan-neon);
+            box-shadow: 0 0 8px var(--cyan-neon);
+            animation: livePing 1.8s ease-in-out infinite;
+        }
+
+        @keyframes livePing {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* Mecha Auth Card */
+        .mecha-auth-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--gold-border);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.85),
+                0 0 30px rgba(245, 166, 35, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            padding: 28px 22px;
+        }
+
+        /* Mecha Corner Accents */
+        .mecha-auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            border-top: 2px solid var(--gold-pure);
+            border-left: 2px solid var(--gold-pure);
+            border-top-left-radius: var(--card-radius);
+            pointer-events: none;
+        }
+
+        .mecha-auth-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            border-bottom: 2px solid var(--cyan-neon);
+            border-right: 2px solid var(--cyan-neon);
+            border-bottom-right-radius: var(--card-radius);
+            pointer-events: none;
         }
 
         /* Card Header */
-        .card-header {
-            padding: 30px 30px 20px;
+        .card-auth-header {
             text-align: center;
-            background: linear-gradient(to bottom, rgba(0, 102, 255, 0.05), transparent);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .card-title {
+        .card-auth-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, var(--primary-cyan), var(--hack-green));
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, var(--gold-light) 60%, var(--gold-pure) 100%);
             -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+            text-transform: uppercase;
         }
 
-        .card-subtitle {
+        .card-auth-subtitle {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 0.95rem;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Tab Navigation */
-        .tab-navigation {
-            display: flex;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin: 0 30px 25px;
-            padding: 6px;
-            border: 1px solid rgba(0, 212, 255, 0.1);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            letter-spacing: 0.8px;
         }
 
-        .tab-btn.active {
-            background: rgba(0, 102, 255, 0.2);
-            color: var(--text-light);
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
-        .tab-btn i {
-            font-size: 1.1rem;
-        }
-
-        /* Form Container */
-        .form-container {
-            padding: 0 30px 30px;
-        }
-
-        .form {
-            display: none;
-            animation: formFadeIn 0.4s ease forwards;
-        }
-
-        @keyframes formFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form.active {
-            display: block;
-        }
-
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-light);
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .form-label span {
-            color: var(--hack-green);
-            margin-left: 2px;
-        }
-
-        .form-label i {
-            color: var(--primary-cyan);
-            font-size: 0.9rem;
-        }
-
-        .input-group {
+        /* Cyber Form Group */
+        .cyber-form-group {
+            margin-bottom: 16px;
             position: relative;
+        }
+
+        .cyber-label {
             display: flex;
             align-items: center;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            color: var(--primary-cyan);
-            font-size: 1.1rem;
-            z-index: 2;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px 16px 16px 50px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 10px;
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--hack-green);
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Country Code Select */
-        .country-select {
-            width: 140px;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 10px 0 0 10px;
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-            margin-right: -1px;
-            border-right: none;
-        }
-
-        .phone-input {
-            border-radius: 0 10px 10px 0;
-            padding-left: 16px;
-        }
-
-        /* Password Toggle */
-        .password-toggle {
-            position: absolute;
-            right: 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--hack-green);
-        }
-
-        /* Form Footer */
-        .form-footer {
-            margin-top: 25px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--hack-green));
-            border: none;
-            border-radius: 10px;
-            color: var(--text-light);
+            justify-content: space-between;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: var(--gold-light);
+            text-transform: uppercase;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+            margin-bottom: 6px;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 102, 255, 0.5);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Form Links */
-        .form-links {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            font-size: 0.9rem;
-        }
-
-        .form-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .form-link:hover {
-            color: var(--hack-green);
-        }
-
-        /* Footer */
-        .portal-footer {
-            width: 100%;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            padding: 20px;
-            margin-top: auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .footer-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-size: 0.85rem;
-            font-family: 'Courier New', monospace;
-        }
-
-        .footer-link:hover {
-            color: var(--hack-green);
-        }
-
-        /* Status Messages */
-        .message {
-            padding: 14px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-            animation: messageSlide 0.4s ease forwards;
-            border: 1px solid transparent;
-            font-family: 'Courier New', monospace;
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.success {
-            background: rgba(0, 255, 157, 0.1);
-            border-color: rgba(0, 255, 157, 0.2);
-            color: var(--success);
-        }
-
-        .message.error {
-            background: rgba(255, 77, 125, 0.1);
-            border-color: rgba(255, 77, 125, 0.2);
+        .cyber-label span.req {
             color: #FF4D7D;
         }
 
-        /* Progress Bar */
-        .progress-container {
-            margin-top: 25px;
-            display: none;
+        .cyber-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-card-inner);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
         }
 
-        .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 8px;
+        .cyber-input-wrap:focus-within {
+            border-color: var(--gold-main);
+            box-shadow: 0 0 16px rgba(245, 166, 35, 0.25), inset 0 0 10px rgba(245, 166, 35, 0.05);
+            background: rgba(8, 12, 22, 0.95);
+        }
+
+        .cyber-input-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 46px;
+            color: var(--gold-main);
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(245, 166, 35, 0.04);
+            transition: color 0.3s ease;
+        }
+
+        .cyber-input-wrap:focus-within .cyber-input-icon {
+            color: var(--gold-pure);
+            background: rgba(245, 166, 35, 0.08);
+        }
+
+        .cyber-input {
+            flex: 1;
+            height: 46px;
+            padding: 0 12px;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .cyber-input::placeholder {
+            color: var(--text-dim);
+            font-size: 0.82rem;
+        }
+
+        /* Country Code Select in Phone Input */
+        .cyber-country-select {
+            height: 46px;
+            background: rgba(14, 19, 32, 0.95);
+            border: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--gold-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 0 8px;
+            outline: none;
+            cursor: pointer;
+            max-width: 140px;
+        }
+
+        .cyber-country-select option {
+            background: #090e1a;
+            color: #fff;
+        }
+
+        /* Live Verified Sponsor Pill */
+        .sponsor-verified-box {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(0, 255, 157, 0.08);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-neon);
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Password Toggle */
+        .pwd-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            width: 42px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+            outline: none;
+        }
+
+        .pwd-toggle-btn:hover {
+            color: var(--gold-light);
+        }
+
+        /* Validation Error */
+        .cyber-error-msg {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #FF5A79;
+            font-weight: 600;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Alert Messages */
+        .cyber-alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: alertSlide 0.3s ease;
+        }
+
+        @keyframes alertSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cyber-alert-success {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            color: var(--green-neon);
+        }
+
+        .cyber-alert-error {
+            background: rgba(255, 77, 125, 0.1);
+            border: 1px solid rgba(255, 77, 125, 0.3);
+            color: #FF4D7D;
+        }
+
+        /* Terms Checkbox */
+        .terms-row {
+            margin: 12px 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .terms-row input[type="checkbox"] {
+            accent-color: var(--gold-main);
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .terms-row a {
+            color: var(--cyan-neon);
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .btn-mecha-submit {
+            width: 100%;
+            height: 52px;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #F5A623 0%, #FFD700 50%, #D48806 100%);
+            color: #05060A;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(245, 166, 35, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 157, 0.4), transparent);
-            animation: progressShine 2s infinite;
+        .btn-mecha-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none !important;
         }
 
-        @keyframes progressShine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(200%); }
+        .btn-mecha-submit:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(245, 166, 35, 0.55);
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-blue), var(--hack-green));
-            width: 0%;
-            border-radius: 2px;
-            transition: width 0.3s ease;
+        .btn-mecha-submit:not(:disabled):active {
+            transform: translateY(0);
         }
 
-        .progress-text {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Loading Animation */
-        .loading-spinner {
+        .btn-spinner {
             display: none;
             width: 20px;
             height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid #000;
+            border-top-color: transparent;
             border-radius: 50%;
-            border-top-color: var(--hack-green);
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Input Glitch Effect */
-        .form-input:focus {
-            animation: inputGlitch 0.3s ease;
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 16px 0;
+            color: var(--text-dim);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        @keyframes inputGlitch {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-2px); }
-            40% { transform: translateX(2px); }
-            60% { transform: translateX(-1px); }
-            80% { transform: translateX(1px); }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
         }
 
-        /* Submit Button Pulse */
-        .submit-btn {
-            animation: buttonPulse 2s infinite;
+        /* Login Secondary Button */
+        .btn-mecha-secondary {
+            width: 100%;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: var(--cyan-neon);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
         }
 
-        @keyframes buttonPulse {
-            0%, 100% { box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3); }
-            50% { box-shadow: 0 8px 25px rgba(0, 102, 255, 0.5), 0 0 15px rgba(0, 212, 255, 0.3); }
+        .btn-mecha-secondary:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+            color: #FFFFFF;
+            transform: translateY(-1px);
         }
 
-        /* ========== RESPONSIVE DESIGN ========== */
-
-        /* Desktop Large */
-        @media (min-width: 1200px) {
-            .logo-text {
-                font-size: 2.8rem;
-            }
-            
-            .logo-icon {
-                width: 70px;
-                height: 70px;
-            }
-            
-            .logo-icon i {
-                font-size: 2.3rem;
-            }
-            
-            .portal-card {
-                max-width: 500px;
-            }
+        /* Success Registration Credentials Box */
+        .cyber-success-box {
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 12px;
+            padding: 20px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
         }
 
-        /* Desktop */
-        @media (min-width: 992px) {
-            .content-wrapper {
-                flex-direction: row;
-                justify-content: center;
-                align-items: stretch;
-                gap: 60px;
-            }
-            
-            .portal-card {
-                margin: 0;
-            }
+        .success-cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        /* Tablet */
-        @media (max-width: 768px) {
+        .cred-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .cred-val {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Bottom Footer */
+        .auth-footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .footer-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-nav a:hover {
+            color: var(--gold-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
             body {
-                padding: 15px;
+                padding: 16px 10px;
             }
-            
-            .logo {
-                flex-direction: column;
-                gap: 10px;
+            .mecha-auth-card {
+                padding: 22px 16px;
             }
-            
-            .logo-text {
-                font-size: 2rem;
-                text-align: center;
+            .card-auth-title {
+                font-size: 1.2rem;
             }
-            
-            .logo-icon {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .logo-icon i {
-                font-size: 1.6rem;
-            }
-            
-            .tagline {
-                font-size: 0.9rem;
-                letter-spacing: 1.5px;
-            }
-            
-            .portal-header {
-                margin-bottom: 30px;
-            }
-            
-            .portal-card {
-                max-width: 100%;
-            }
-            
-            .card-header {
-                padding: 25px 20px 15px;
-            }
-            
-            .form-container {
-                padding: 0 20px 20px;
-            }
-            
-            .tab-navigation {
-                margin: 0 20px 20px;
-            }
-            
-            .form-links {
-                flex-direction: column;
-                gap: 15px;
-                align-items: center;
+            .cyber-country-select {
+                max-width: 110px;
+                font-size: 0.82rem;
             }
         }
-
-        /* Mobile */
-        @media (max-width: 576px) {
-            body {
-                padding: 10px;
-            }
-            
-            .logo-text {
-                font-size: 1.8rem;
-            }
-            
-            .logo-icon {
-                width: 45px;
-                height: 45px;
-            }
-            
-            .logo-icon i {
-                font-size: 1.4rem;
-            }
-            
-            .tagline {
-                font-size: 0.8rem;
-                letter-spacing: 1px;
-            }
-            
-            .portal-header {
-                margin-bottom: 25px;
-            }
-            
-            .card-title {
-                font-size: 1.5rem;
-            }
-            
-            .card-subtitle {
-                font-size: 0.85rem;
-            }
-            
-            .tab-navigation {
-                flex-direction: column;
-                gap: 5px;
-                padding: 8px;
-            }
-            
-            .tab-btn {
-                padding: 12px;
-            }
-            
-            .form-input {
-                padding: 14px 14px 14px 45px;
-                font-size: 0.95rem;
-            }
-            
-            .input-icon {
-                left: 14px;
-                font-size: 1rem;
-            }
-            
-            .country-select {
-                width: 120px;
-                padding: 14px;
-                font-size: 0.9rem;
-            }
-            
-            .submit-btn {
-                padding: 16px;
-                font-size: 1rem;
-            }
-            
-            .footer-links {
-                gap: 15px;
-            }
-        }
-
-        /* Extra Small Mobile */
-        @media (max-width: 400px) {
-            .logo-text {
-                font-size: 1.6rem;
-            }
-            
-            .card-title {
-                font-size: 1.3rem;
-            }
-            
-            .form-input {
-                padding: 12px 12px 12px 40px;
-                font-size: 0.9rem;
-            }
-            
-            .input-icon {
-                left: 12px;
-                font-size: 0.9rem;
-            }
-            
-            .country-select {
-                width: 100px;
-                padding: 12px;
-                font-size: 0.8rem;
-            }
-            
-            .submit-btn {
-                padding: 14px;
-                font-size: 0.95rem;
-            }
-        }
-
-        /* Height Adjustments */
-        @media (max-height: 700px) {
-            .portal-header {
-                margin-bottom: 20px;
-            }
-            
-            .content-wrapper {
-                gap: 20px;
-                margin-bottom: 20px;
-            }
-            
-            .portal-footer {
-                padding: 10px 20px;
-            }
-        }
-
-        /* Fix for very small screens */
-        @media (max-width: 350px) {
-            .logo-text {
-                font-size: 1.4rem;
-            }
-            
-            .tagline {
-                font-size: 0.75rem;
-            }
-            
-            .form-links {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .form-link {
-                font-size: 0.8rem;
-            }
-        }
-
-        .invalid-feedback {
-		    display: block;
-		    margin-top: 6px;
-		    color: #FF4D7D;
-		    font-size: 0.85rem;
-		    font-family: 'Courier New', monospace;
-		    animation: messageSlide 0.3s ease forwards;
-		}
-
-		.form-input.is-invalid {
-		    border-color: #FF4D7D !important;
-		    box-shadow: 0 0 0 2px rgba(255, 77, 125, 0.2);
-		}
     </style>
 </head>
 <body>
-    <!-- Hacking Matrix Background -->
-    <div class="matrix-bg" id="matrixBg"></div>
-    <div class="scan-lines"></div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Header -->
-        <header class="portal-header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-cube"></i>
-                </div>
-                <div class="logo-text">Cyera AI</div>
-            </div>
-            <div class="tagline">>_ ACCESS WEB3 FUTURE</div>
-        </header>
+    <!-- Background Ambient & Overlays -->
+    <div class="ambient-glow glow-gold"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="cyber-grid-overlay"></div>
+    <div class="scanlines"></div>
 
-        <!-- Content Wrapper -->
-        <div class="content-wrapper">
-            <!-- Portal Card -->
-            <div class="portal-card">
-                <div class="card-header">
-                    <h2 class="card-title">GET STARTED WITH US</h2>
-                    <p class="card-subtitle">>_ Register a new membership</p>
-                </div>
-
-
-                <!-- Messages -->
-                
-                @if (session('success'))
-                    <div class="message success" style="display:block;">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if (session('warning'))
-                    <div class="message error" style="display:block;">
-                        {{ session('warning') }}
-   		    	    </div>
-                @endif
-
-                <!-- Forms Container -->
-                <div class="form-container">
-                    <!-- Registration Form -->
-                    @if(!session('success'))
-                    <form action="{{ route('register') }}" method="POST" id="registerForm" class="form active">
-                    @csrf
-                    	<br>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-user-friends"></i>
-                                SPONSOR ID <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-id-card input-icon"></i>
-                                <input name="referrer" type="text" id="referrer" class="form-input @error('referrer') is-invalid @enderror" placeholder="Enter Sponsor ID" @if(!empty($userid)) value="{{$userid}}" @else value="{{old('referrer')}}" @endif required autofocus>
-                            </div>
-                                @error('referrer')
-		                            <small class="invalid-feedback">
-							            {{ $message }}
-							        </small>
-		                        @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-user-tag"></i>
-                                SPONSOR NAME <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-user input-icon"></i>
-                                <input name="referrername" type="text" id="spname" disabled="disabled" class="form-input" placeholder="Sponsor Name" value="" required autofocus>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-user"></i>
-                                FULL NAME <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-signature input-icon"></i>
-                                <input name="name" type="text" id="name" class="form-input @error('name') is-invalid @enderror" placeholder="Full Name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-                            </div>
-                                @error('name')
-		                            <small class="invalid-feedback">
-							            {{ $message }}
-							        </small>
-		                        @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-envelope"></i>
-                                EMAIL ADDRESS <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-at input-icon"></i>
-                                <input name="email" type="text" id="email" class="form-input @error('email') is-invalid @enderror" value="{{ old('email') }}" required autocomplete="email" placeholder="Enter Email Address">
-                            </div>
-                                @error('email')
-		                            <small class="invalid-feedback">
-							            {{ $message }}
-							        </small>
-		                        @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-phone"></i>
-                                MOBILE NO <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <select name="countrycode" class="country-select">
-                                    <option data-countryCode="SG" value="65">Singapore (+65)</option>
-								    <option data-countryCode="IN" value="91">India (+91)</option>
-	                                <option data-countryCode="GB" value="44">UK (+44)</option>
-								    <option data-countryCode="US" value="1">USA (+1)</option>
-								    <option data-countryCode="AE" value="971">United Arab Emirates (+971)</option>
-								    <optgroup label="Other countries">
-								        <option value="93">Afghanistan (+93)</option>
-										<option value="355">Albania (+355)</option>
-										<option value="213">Algeria (+213)</option>
-										<option value="1684">American Samoa (+1684)</option>
-										<option value="376">Andorra (+376)</option>
-										<option value="244">Angola (+244)</option>
-										<option value="1264">Anguilla (+1264)</option>
-										<option value="1268">Antigua & Barbuda (+1268)</option>
-										<option value="54">Argentina (+54)</option>
-										<option value="374">Armenia (+374)</option>
-										<option value="297">Aruba (+297)</option>
-										<option value="61">Australia (+61)</option>
-										<option value="43">Austria (+43)</option>
-										<option value="994">Azerbaijan (+994)</option>
-
-										<option value="1242">Bahamas (+1242)</option>
-										<option value="973">Bahrain (+973)</option>
-										<option value="880">Bangladesh (+880)</option>
-										<option value="1246">Barbados (+1246)</option>
-										<option value="375">Belarus (+375)</option>
-										<option value="32">Belgium (+32)</option>
-										<option value="501">Belize (+501)</option>
-										<option value="229">Benin (+229)</option>
-										<option value="1441">Bermuda (+1441)</option>
-										<option value="975">Bhutan (+975)</option>
-										<option value="591">Bolivia (+591)</option>
-										<option value="387">Bosnia & Herzegovina (+387)</option>
-										<option value="267">Botswana (+267)</option>
-										<option value="55">Brazil (+55)</option>
-										<option value="673">Brunei (+673)</option>
-										<option value="359">Bulgaria (+359)</option>
-										<option value="226">Burkina Faso (+226)</option>
-										<option value="257">Burundi (+257)</option>
-
-										<option value="855">Cambodia (+855)</option>
-										<option value="237">Cameroon (+237)</option>
-										<option value="1">Canada (+1)</option>
-										<option value="238">Cape Verde (+238)</option>
-										<option value="1345">Cayman Islands (+1345)</option>
-										<option value="236">Central African Republic (+236)</option>
-										<option value="235">Chad (+235)</option>
-										<option value="56">Chile (+56)</option>
-										<option value="86">China (+86)</option>
-										<option value="57">Colombia (+57)</option>
-										<option value="269">Comoros (+269)</option>
-										<option value="243">Congo (DRC) (+243)</option>
-										<option value="242">Congo (Republic) (+242)</option>
-										<option value="682">Cook Islands (+682)</option>
-										<option value="506">Costa Rica (+506)</option>
-										<option value="385">Croatia (+385)</option>
-										<option value="53">Cuba (+53)</option>
-										<option value="357">Cyprus (+357)</option>
-										<option value="420">Czech Republic (+420)</option>
-
-										<option value="45">Denmark (+45)</option>
-										<option value="253">Djibouti (+253)</option>
-										<option value="1767">Dominica (+1767)</option>
-										<option value="1809">Dominican Republic (+1809)</option>
-
-										<option value="593">Ecuador (+593)</option>
-										<option value="20">Egypt (+20)</option>
-										<option value="503">El Salvador (+503)</option>
-										<option value="240">Equatorial Guinea (+240)</option>
-										<option value="291">Eritrea (+291)</option>
-										<option value="372">Estonia (+372)</option>
-										<option value="251">Ethiopia (+251)</option>
-
-										<option value="500">Falkland Islands (+500)</option>
-										<option value="298">Faroe Islands (+298)</option>
-										<option value="679">Fiji (+679)</option>
-										<option value="358">Finland (+358)</option>
-										<option value="33">France (+33)</option>
-
-										<option value="594">French Guiana (+594)</option>
-										<option value="689">French Polynesia (+689)</option>
-
-										<option value="241">Gabon (+241)</option>
-										<option value="220">Gambia (+220)</option>
-										<option value="995">Georgia (+995)</option>
-										<option value="49">Germany (+49)</option>
-										<option value="233">Ghana (+233)</option>
-										<option value="350">Gibraltar (+350)</option>
-										<option value="30">Greece (+30)</option>
-										<option value="299">Greenland (+299)</option>
-										<option value="1473">Grenada (+1473)</option>
-										<option value="590">Guadeloupe (+590)</option>
-										<option value="1671">Guam (+1671)</option>
-										<option value="502">Guatemala (+502)</option>
-										<option value="224">Guinea (+224)</option>
-										<option value="245">Guinea-Bissau (+245)</option>
-										<option value="592">Guyana (+592)</option>
-
-										<option value="509">Haiti (+509)</option>
-										<option value="504">Honduras (+504)</option>
-										<option value="852">Hong Kong (+852)</option>
-										<option value="36">Hungary (+36)</option>
-
-										<option value="354">Iceland (+354)</option>
-										<option value="91">India (+91)</option>
-										<option value="62">Indonesia (+62)</option>
-										<option value="98">Iran (+98)</option>
-										<option value="964">Iraq (+964)</option>
-										<option value="353">Ireland (+353)</option>
-										<option value="972">Israel (+972)</option>
-										<option value="39">Italy (+39)</option>
-
-										<option value="1876">Jamaica (+1876)</option>
-										<option value="81">Japan (+81)</option>
-										<option value="962">Jordan (+962)</option>
-
-										<option value="7">Kazakhstan (+7)</option>
-										<option value="254">Kenya (+254)</option>
-										<option value="686">Kiribati (+686)</option>
-										<option value="850">North Korea (+850)</option>
-										<option value="82">South Korea (+82)</option>
-										<option value="965">Kuwait (+965)</option>
-										<option value="996">Kyrgyzstan (+996)</option>
-
-										<option value="856">Laos (+856)</option>
-										<option value="371">Latvia (+371)</option>
-										<option value="961">Lebanon (+961)</option>
-										<option value="266">Lesotho (+266)</option>
-										<option value="231">Liberia (+231)</option>
-										<option value="218">Libya (+218)</option>
-										<option value="423">Liechtenstein (+423)</option>
-										<option value="370">Lithuania (+370)</option>
-										<option value="352">Luxembourg (+352)</option>
-
-										<option value="853">Macau (+853)</option>
-										<option value="389">North Macedonia (+389)</option>
-										<option value="261">Madagascar (+261)</option>
-										<option value="265">Malawi (+265)</option>
-										<option value="60">Malaysia (+60)</option>
-										<option value="960">Maldives (+960)</option>
-										<option value="223">Mali (+223)</option>
-										<option value="356">Malta (+356)</option>
-										<option value="692">Marshall Islands (+692)</option>
-										<option value="596">Martinique (+596)</option>
-										<option value="222">Mauritania (+222)</option>
-										<option value="230">Mauritius (+230)</option>
-										<option value="262">Mayotte (+262)</option>
-										<option value="52">Mexico (+52)</option>
-										<option value="691">Micronesia (+691)</option>
-										<option value="373">Moldova (+373)</option>
-										<option value="377">Monaco (+377)</option>
-										<option value="976">Mongolia (+976)</option>
-										<option value="382">Montenegro (+382)</option>
-										<option value="1664">Montserrat (+1664)</option>
-										<option value="212">Morocco (+212)</option>
-										<option value="258">Mozambique (+258)</option>
-										<option value="95">Myanmar (+95)</option>
-
-										<option value="264">Namibia (+264)</option>
-										<option value="674">Nauru (+674)</option>
-										<option value="977">Nepal (+977)</option>
-										<option value="31">Netherlands (+31)</option>
-										<option value="599">Netherlands Antilles (+599)</option>
-										<option value="687">New Caledonia (+687)</option>
-										<option value="64">New Zealand (+64)</option>
-										<option value="505">Nicaragua (+505)</option>
-										<option value="227">Niger (+227)</option>
-										<option value="234">Nigeria (+234)</option>
-										<option value="683">Niue (+683)</option>
-										<option value="672">Norfolk Island (+672)</option>
-										<option value="1670">Northern Mariana Islands (+1670)</option>
-										<option value="47">Norway (+47)</option>
-
-										<option value="968">Oman (+968)</option>
-
-										<option value="92">Pakistan (+92)</option>
-										<option value="680">Palau (+680)</option>
-										<option value="507">Panama (+507)</option>
-										<option value="675">Papua New Guinea (+675)</option>
-										<option value="595">Paraguay (+595)</option>
-										<option value="51">Peru (+51)</option>
-										<option value="63">Philippines (+63)</option>
-										<option value="48">Poland (+48)</option>
-										<option value="351">Portugal (+351)</option>
-										<option value="1787">Puerto Rico (+1787)</option>
-
-										<option value="974">Qatar (+974)</option>
-
-										<option value="242">Reunion (+262)</option>
-										<option value="40">Romania (+40)</option>
-										<option value="7">Russia (+7)</option>
-										<option value="250">Rwanda (+250)</option>
-
-										<option value="590">Saint Barthelemy (+590)</option>
-										<option value="290">Saint Helena (+290)</option>
-										<option value="1869">Saint Kitts & Nevis (+1869)</option>
-										<option value="1758">Saint Lucia (+1758)</option>
-										<option value="1599">Saint Martin (+1599)</option>
-										<option value="508">Saint Pierre & Miquelon (+508)</option>
-										<option value="1784">Saint Vincent & Grenadines (+1784)</option>
-
-										<option value="685">Samoa (+685)</option>
-										<option value="378">San Marino (+378)</option>
-										<option value="239">Sao Tome & Principe (+239)</option>
-										<option value="966">Saudi Arabia (+966)</option>
-										<option value="221">Senegal (+221)</option>
-										<option value="381">Serbia (+381)</option>
-										<option value="248">Seychelles (+248)</option>
-										<option value="232">Sierra Leone (+232)</option>
-										<option value="65">Singapore (+65)</option>
-										<option value="421">Slovakia (+421)</option>
-										<option value="386">Slovenia (+386)</option>
-										<option value="677">Solomon Islands (+677)</option>
-										<option value="252">Somalia (+252)</option>
-										<option value="27">South Africa (+27)</option>
-										<option value="34">Spain (+34)</option>
-										<option value="94">Sri Lanka (+94)</option>
-										<option value="249">Sudan (+249)</option>
-										<option value="597">Suriname (+597)</option>
-										<option value="268">Eswatini (+268)</option>
-										<option value="46">Sweden (+46)</option>
-										<option value="41">Switzerland (+41)</option>
-										<option value="963">Syria (+963)</option>
-
-										<option value="886">Taiwan (+886)</option>
-										<option value="992">Tajikistan (+992)</option>
-										<option value="255">Tanzania (+255)</option>
-										<option value="66">Thailand (+66)</option>
-										<option value="228">Togo (+228)</option>
-										<option value="690">Tokelau (+690)</option>
-										<option value="676">Tonga (+676)</option>
-										<option value="1868">Trinidad & Tobago (+1868)</option>
-										<option value="216">Tunisia (+216)</option>
-										<option value="90">Turkey (+90)</option>
-										<option value="993">Turkmenistan (+993)</option>
-										<option value="1649">Turks & Caicos Islands (+1649)</option>
-										<option value="688">Tuvalu (+688)</option>
-
-										<option value="256">Uganda (+256)</option>
-										<option value="380">Ukraine (+380)</option>
-										<option value="971">United Arab Emirates (+971)</option>
-										<option value="44">United Kingdom (+44)</option>
-										<option value="1">United States (+1)</option>
-										<option value="598">Uruguay (+598)</option>
-										<option value="998">Uzbekistan (+998)</option>
-
-										<option value="678">Vanuatu (+678)</option>
-										<option value="379">Vatican City (+379)</option>
-										<option value="58">Venezuela (+58)</option>
-										<option value="84">Vietnam (+84)</option>
-										<option value="1284">Virgin Islands (British) (+1284)</option>
-										<option value="1340">Virgin Islands (US) (+1340)</option>
-
-										<option value="681">Wallis & Futuna (+681)</option>
-										<option value="967">Yemen (+967)</option>
-										<option value="260">Zambia (+260)</option>
-										<option value="263">Zimbabwe (+263)</option>
-								    </optgroup>
-                                </select>
-                                <input  name="contact" type="text" maxlength="11" id="contact" class="form-input phone-input @error('contact') is-invalid @enderror" value="{{ old('contact') }}" autocomplete="contact" placeholder="Mobile No">
-                            </div>
-                                @error('contact')
-		                            <small class="invalid-feedback">
-							            {{ $message }}
-							        </small>
-		                        @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-lock"></i>
-                                PASSWORD <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-key input-icon"></i>
-                                <input name="password" type="password" id="password" class="form-input password-input @error('password') is-invalid @enderror" required autocomplete="new-password" placeholder="Create Password">
-                                <button type="button" class="password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                                @error('password')
-		                            <small class="invalid-feedback">
-							            {{ $message }}
-							        </small>
-		                        @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-lock"></i>
-                                CONFIRM PASSWORD <span>*</span>
-                            </label>
-                            <div class="input-group">
-                                <i class="fas fa-key input-icon"></i>
-                                <input type="password" id="password-confirm" name="password_confirmation" class="form-input confirm-password-input" required autocomplete="new-password" placeholder="repeat password">
-                                <button type="button" class="password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label class="form-label" style="font-size: 0.95rem; color: var(--text-light); display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="agreeTerms" style="width:18px; height:18px; cursor:pointer;">
-                                I agree with <a href="/terms" target="_blank" style="color: var(--primary-cyan); text-decoration: underline;">Terms & Conditions</a>
-                            </label>
-                        </div>
-
-                        <div class="form-footer">
-                            <button type="submit" class="submit-btn" id="registerBtn" onclick="this.disabled=true;this.value='Processing, please wait...';this.form.submit();" disabled>
-                                <i class="fas fa-rocket"></i> CREATE ACCOUNT
-                                <div class="loading-spinner" id="registerSpinner"></div>
-                            </button>
-                            
-                            <div class="form-links">
-                                <a href="/login" class="form-link" id="switchToLogin">
-                                    <i class="fas fa-sign-in-alt"></i> ALREADY HAVE AN ACCOUNT?
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                    @endif
-                	@if (session('success'))
-                	<form action="#" name="form2" id="form2" class="form active">
-                		<h3 class="card-title"><br>Registration Successful</h3>
-                		<div class="form-group">
-                			 <label class="form-label"> User ID : {{session('details.uniqueid') }} </label>
-                		</div>
-                		<div class="form-group">
-                			 <label class="form-label"> Email : {{session('details.username') }} </label>
-                		</div>
-                		<div class="form-group">
-                			 <label class="form-label"> Password : {{session('details.password') }} </label>
-                		</div>
-                		<div class="form-footer">
-                            <a href="/register"><button type="button" class="submit-btn">
-                                Back
-                            </button></a>
-                            
-                            <div class="form-links">
-                                <a href="/login" class="form-link" id="switchToLogin">
-                                    <i class="fas fa-sign-in-alt"></i> ALREADY HAVE AN ACCOUNT?
-                                </a>
-                            </div>
-                        </div>
-                	</form>
-                	@endif
-                </div>
+    <!-- Main Shell -->
+    <div class="auth-shell">
+        
+        <!-- Brand Header -->
+        <div class="auth-brand-header">
+            <a href="{{ url('/') }}" class="brand-logo-wrap" title="Cyera AI">
+                <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="brand-logo-img">
+            </a>
+            <div class="brand-live-pill">
+                <span class="live-dot"></span>
+                <span>INITIALIZE NEW MEMBERSHIP</span>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="portal-footer">
-            <p>>_ © 2026 Cyera AI.</p>
-            <div class="footer-links">
-                <a href="#" class="footer-link">TERMS</a>
-                <a href="#" class="footer-link">PRIVACY</a>
-                <a href="#" class="footer-link">SUPPORT</a>
-                <a href="#" class="footer-link">DOCS</a>
+        <!-- Auth Card -->
+        <div class="mecha-auth-card">
+            
+            <div class="card-auth-header">
+                <h1 class="card-auth-title">Create Account</h1>
+                <p class="card-auth-subtitle">>_ Join the Cyera AI decentralized network</p>
             </div>
+
+            <!-- Session Alerts -->
+            @if (session('success'))
+                <div class="cyber-alert cyber-alert-success">
+                    <i class="fas fa-circle-check"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if (session('warning'))
+                <div class="cyber-alert cyber-alert-error">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>{{ session('warning') }}</span>
+                </div>
+            @endif
+
+            @if(!session('success'))
+            <!-- Registration Form -->
+            <form action="{{ route('register') }}" method="POST" id="registerForm">
+                @csrf
+
+                <!-- Sponsor ID -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="referrer">
+                        <span><i class="fas fa-id-card-clip"></i> Sponsor ID</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
+                        <input type="text" name="referrer" id="referrer" class="cyber-input" placeholder="Enter Sponsor ID" @if(!empty($userid)) value="{{$userid}}" @else value="{{old('referrer')}}" @endif required autofocus>
+                    </div>
+                    <!-- Live Verified Sponsor Name Display -->
+                    <div class="sponsor-verified-box" id="spdiv">
+                        <i class="fas fa-circle-check"></i>
+                        <span>SPONSOR: <strong id="spname_text"></strong></span>
+                    </div>
+                    <input type="hidden" id="spname" name="referrername">
+                    @error('referrer')
+                        <span class="cyber-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Full Name -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="name">
+                        <span><i class="fas fa-user"></i> Full Name</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-signature"></i>
+                        </div>
+                        <input type="text" name="name" id="name" class="cyber-input" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
+                    </div>
+                    @error('name')
+                        <span class="cyber-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Email Address -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="email">
+                        <span><i class="fas fa-envelope"></i> Email Address</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-at"></i>
+                        </div>
+                        <input type="email" name="email" id="email" class="cyber-input" placeholder="Enter your email" value="{{ old('email') }}" required autocomplete="email">
+                    </div>
+                    @error('email')
+                        <span class="cyber-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Contact & Country Code -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="contact">
+                        <span><i class="fas fa-phone-volume"></i> Mobile Number</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <select name="countrycode" class="cyber-country-select">
+                            <option data-countryCode="SG" value="65">SG (+65)</option>
+                            <option data-countryCode="IN" value="91" selected>IN (+91)</option>
+                            <option data-countryCode="GB" value="44">UK (+44)</option>
+                            <option data-countryCode="US" value="1">USA (+1)</option>
+                            <option data-countryCode="AE" value="971">UAE (+971)</option>
+                            <option value="61">AU (+61)</option>
+                            <option value="1">CA (+1)</option>
+                            <option value="49">DE (+49)</option>
+                            <option value="33">FR (+33)</option>
+                            <option value="81">JP (+81)</option>
+                            <option value="60">MY (+60)</option>
+                            <option value="63">PH (+63)</option>
+                            <option value="966">SA (+966)</option>
+                            <option value="66">TH (+66)</option>
+                            <option value="84">VN (+84)</option>
+                            <option value="27">ZA (+27)</option>
+                        </select>
+                        <input type="tel" name="contact" id="contact" maxlength="15" class="cyber-input" placeholder="Mobile Number" value="{{ old('contact') }}" required autocomplete="tel">
+                    </div>
+                    @error('contact')
+                        <span class="cyber-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="password">
+                        <span><i class="fas fa-key"></i> Create Password</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" name="password" id="password" class="cyber-input" placeholder="Minimum 8 characters" required autocomplete="new-password">
+                        <button type="button" class="pwd-toggle-btn" id="togglePassword" title="Show / Hide Password">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                    @error('password')
+                        <span class="cyber-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="cyber-form-group">
+                    <label class="cyber-label" for="password_confirmation">
+                        <span><i class="fas fa-shield-check"></i> Confirm Password</span>
+                        <span class="req">*</span>
+                    </label>
+                    <div class="cyber-input-wrap">
+                        <div class="cyber-input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="cyber-input" placeholder="Repeat your password" required autocomplete="new-password">
+                        <button type="button" class="pwd-toggle-btn" id="togglePasswordConf" title="Show / Hide Password">
+                            <i class="fas fa-eye" id="toggleIconConf"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions Checkbox -->
+                <label class="terms-row">
+                    <input type="checkbox" id="agreeTerms" required>
+                    <span>I agree to Cyera AI <a href="{{ url('/terms') }}" target="_blank">Terms & Conditions</a></span>
+                </label>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-mecha-submit" id="registerBtn" disabled>
+                    <span id="btnText"><i class="fas fa-rocket"></i> INITIALIZE & REGISTER</span>
+                    <div class="btn-spinner" id="btnSpinner"></div>
+                </button>
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span>Already have an ID?</span>
+                </div>
+
+                <!-- Sign In Link -->
+                <a href="{{ url('/login') }}" class="btn-mecha-secondary">
+                    <i class="fas fa-sign-in-alt"></i> SIGN IN TO DASHBOARD
+                </a>
+
+            </form>
+            @endif
+
+            @if(session('success'))
+            <!-- Registration Completed Details Card -->
+            <div class="cyber-success-box">
+                <div class="success-cred-row">
+                    <span class="cred-label">Assigned User ID:</span>
+                    <span class="cred-val">{{ session('details.uniqueid') }}</span>
+                </div>
+                <div class="success-cred-row">
+                    <span class="cred-label">Email:</span>
+                    <span class="cred-val" style="font-size:0.9rem;">{{ session('details.username') }}</span>
+                </div>
+                <div class="success-cred-row">
+                    <span class="cred-label">Password:</span>
+                    <span class="cred-val">{{ session('details.password') }}</span>
+                </div>
+            </div>
+
+            <a href="{{ url('/login') }}" class="btn-mecha-submit" style="text-decoration:none;">
+                <i class="fas fa-right-to-bracket"></i> PROCEED TO LOGIN
+            </a>
+
+            <div style="margin-top:14px;">
+                <a href="{{ url('/register') }}" class="btn-mecha-secondary">
+                    <i class="fas fa-user-plus"></i> REGISTER ANOTHER ACCOUNT
+                </a>
+            </div>
+            @endif
+
+        </div>
+
+        <!-- Bottom Footer -->
+        <footer class="auth-footer">
+            <div class="footer-nav">
+                <a href="{{ url('/terms') }}">Terms of Service</a>
+                <span>•</span>
+                <a href="{{ url('/terms') }}">Privacy Policy</a>
+                <span>•</span>
+                <a href="https://t.me/" target="_blank">Support</a>
+            </div>
+            <div>&copy; 2026 CYERA AI. DECENTRALIZED MECHA PROTOCOL.</div>
         </footer>
+
     </div>
 
+    <!-- jQuery for AJAX Sponsor Lookup -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        // Create Matrix Rain Effect
-        function createMatrixRain() {
-            const container = document.getElementById('matrixBg');
-            const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
-            
-            for (let i = 0; i < 40; i++) {
-                const stream = document.createElement('div');
-                stream.className = 'matrix-stream';
-                
-                // Random position
-                stream.style.left = `${Math.random() * 100}vw`;
-                
-                // Random speed
-                const duration = 3 + Math.random() * 5;
-                stream.style.animationDuration = `${duration}s`;
-                
-                // Random delay
-                stream.style.animationDelay = `${Math.random() * 5}s`;
-                
-                // Random characters
-                let content = '';
-                const length = 15 + Math.floor(Math.random() * 10);
-                for (let j = 0; j < length; j++) {
-                    content += chars[Math.floor(Math.random() * chars.length)];
-                }
-                
-                stream.textContent = content;
-                container.appendChild(stream);
-            }
-        }
-
-        // Tab switching functionality
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const forms = document.querySelectorAll('.form');
-        const switchToLogin = document.getElementById('switchToLogin');
-        const switchToRegister = document.getElementById('switchToRegister');
-
-
-        // Password toggle functionality
-        document.querySelectorAll('.password-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const input = this.parentElement.querySelector('.password-input, .confirm-password-input');
-                const icon = this.querySelector('i');
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            });
-        });
-
-        // Show message function
-        function showMessage(text, type) {
-            const container = document.getElementById('messageContainer');
-            
-            // Remove existing message
-            const existingMsg = container.querySelector('.message');
-            if (existingMsg) existingMsg.remove();
-            
-            // Create new message
-            const message = document.createElement('div');
-            message.className = `message ${type}`;
-            message.textContent = `>_ ${text}`;
-            message.style.display = 'block';
-            
-            container.appendChild(message);
-            
-            // Auto remove after 4 seconds
-            setTimeout(() => {
-                message.style.opacity = '0';
-                message.style.transform = 'translateY(-10px)';
-                setTimeout(() => message.remove(), 400);
-            }, 4000);
-        }
-
-
-        // Form submission - Registration
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const password = this.querySelector('.password-input').value;
-            const confirmPassword = this.querySelector('.confirm-password-input').value;
-            
-            // Validation
-            if (password !== confirmPassword) {
-                showMessage('PASSWORDS DO NOT MATCH!', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('PASSWORD MUST BE AT LEAST 6 CHARACTERS', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.submit-btn');
-            const spinner = document.getElementById('registerSpinner');
-            
-            submitBtn.disabled = true;
-            spinner.style.display = 'block';
-            
-            // Show progress bar
-            showProgress(true);
-            
-            // Simulate registration process
-            updateProgress(10, 'VALIDATING DATA...');
-            await sleep(500);
-            
-            updateProgress(30, 'CHECKING SPONSOR...');
-            await sleep(800);
-            
-            updateProgress(50, 'CREATING ACCOUNT...');
-            await sleep(600);
-            
-            updateProgress(80, 'SETTING UP WALLET...');
-            await sleep(700);
-            
-            updateProgress(100, 'ACCOUNT CREATED!');
-            await sleep(500);
-            
-            // Hide spinner
-            spinner.style.display = 'none';
-            
-            // Hide progress bar
-            setTimeout(() => {
-                showProgress(false);
-            }, 1000);
-            
-            // Show success message
-            showMessage('REGISTRATION SUCCESSFUL! WELCOME TO CYERA AI.', 'success');
-            
-            // Reset form after delay
-            setTimeout(() => {
-                this.reset();
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-
-
-        // Form input validation
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('blur', function() {
-                if (this.value.trim() === '') {
-                    this.style.borderColor = 'rgba(255, 77, 125, 0.3)';
-                } else {
-                    this.style.borderColor = 'rgba(0, 212, 255, 0.2)';
-                }
-            });
-            
-            input.addEventListener('input', function() {
-                this.style.borderColor = 'rgba(0, 102, 255, 0.3)';
-            });
-        });
-
-        // Sleep helper function
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            
-            // Submit with Enter
-            if (e.key === 'Enter') {
-                const activeForm = document.querySelector('.form.active');
-                if (activeForm) {
-                    e.preventDefault();
-                    activeForm.dispatchEvent(new Event('submit'));
-                }
-            }
-        });
-
-        // Initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            // Create background effects
-            createMatrixRain();
-            
-            // Add some subtle animation to the card
-            const card = document.querySelector('.portal-card');
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px) scale(0.95)';
-            
-            setTimeout(() => {
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0) scale(1)';
-            }, 300);
-            
-            // Show initial message
-            setTimeout(() => {
-                showMessage('WELCOME TO CYERA AIS WEB3 PORTAL', 'success');
-            }, 1000);
-        });
-    </script>
-
-
-    <script src="{{asset('assets/js/jquery-1.11.2.min.js')}}"></script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            if($("#referrer").val()!="")
-                $("#referrer").blur();
-        });
-        $("#referrer").on('blur',function(){
-            $("#spdiv").hide();
-            $.ajax({
-                     type:'GET',
-                     url:'/getSponsor/'+$("#referrer").val(),
-                     dataType: "json",
-                     success:function(data){
-                        if(data.status==0){
-                           $("#spdiv").show();
-                           $("#spname").val(data.name);
-                        }else{
-                           $("#spdiv").hide();
+        // Sponsor Lookup via AJAX
+        function checkSponsor() {
+            var val = $("#referrer").val().trim();
+            if (val !== "") {
+                $.ajax({
+                    type: 'GET',
+                    url: '/getSponsor/' + val,
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.status == 0 && data.name) {
+                            $("#spdiv").css('display', 'flex');
+                            $("#spname_text").text(data.name);
+                            $("#spname").val(data.name);
+                        } else {
+                            $("#spdiv").hide();
+                            $("#spname").val('');
                         }
-                     }
-                 });
-        });
-    </script>
+                    },
+                    error: function() {
+                        $("#spdiv").hide();
+                    }
+                });
+            } else {
+                $("#spdiv").hide();
+            }
+        }
 
-    <script>
+        $(document).ready(function() {
+            if ($("#referrer").val() != "") {
+                checkSponsor();
+            }
+            $("#referrer").on('blur change', checkSponsor);
+        });
+
+        // Terms Checkbox enabler
         const agreeCheckbox = document.getElementById('agreeTerms');
         const registerBtn = document.getElementById('registerBtn');
 
-        agreeCheckbox.addEventListener('change', function() {
-            registerBtn.disabled = !this.checked;
-        });
+        if (agreeCheckbox && registerBtn) {
+            agreeCheckbox.addEventListener('change', function() {
+                registerBtn.disabled = !this.checked;
+            });
+        }
+
+        // Password Toggles
+        function setupPasswordToggle(toggleId, inputId, iconId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (toggle && input && icon) {
+                toggle.addEventListener('click', function() {
+                    const isPwd = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPwd ? 'text' : 'password');
+                    icon.classList.toggle('fa-eye', !isPwd);
+                    icon.classList.toggle('fa-eye-slash', isPwd);
+                });
+            }
+        }
+
+        setupPasswordToggle('togglePassword', 'password', 'toggleIcon');
+        setupPasswordToggle('togglePasswordConf', 'password_confirmation', 'toggleIconConf');
+
+        // Form Submit Loading State
+        const regForm = document.getElementById('registerForm');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        if (regForm && registerBtn) {
+            regForm.addEventListener('submit', function() {
+                registerBtn.style.pointerEvents = 'none';
+                registerBtn.style.opacity = '0.85';
+                if (btnText) btnText.style.display = 'none';
+                if (btnSpinner) btnSpinner.style.display = 'block';
+            });
+        }
     </script>
-
-
 </body>
 </html>
