@@ -17,19 +17,19 @@
     <style>
         :root {
             --bg-body: #020204;
-            --card-bg: rgba(8, 12, 24, 0.82);
-            --input-bg: rgba(4, 7, 16, 0.90);
+            --card-bg: rgba(10, 15, 28, 0.88);
+            --card-border: rgba(245, 166, 35, 0.32);
+            --input-bg: rgba(4, 7, 16, 0.92);
             --gold-primary: #F5A623;
             --gold-gradient: linear-gradient(135deg, #FFD700 0%, #F5A623 50%, #D48806 100%);
-            --gold-glow: rgba(245, 166, 35, 0.4);
+            --gold-glow: rgba(245, 166, 35, 0.45);
             --cyan-accent: #00F0FF;
             --green-active: #00FF88;
             --text-primary: #FFFFFF;
             --text-secondary: #94A3B8;
             --text-muted: #64748B;
-            --border-glass: rgba(245, 166, 35, 0.28);
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --radius-card: 22px;
+            --radius-card: 24px;
             --radius-btn: 14px;
         }
 
@@ -52,10 +52,10 @@
             justify-content: center;
             overflow-x: hidden;
             position: relative;
-            padding: 30px 16px;
+            padding: 24px 16px;
         }
 
-        /* Master Auth Wrapper */
+        /* Master Container */
         .auth-master-shell {
             width: 100%;
             max-width: 440px;
@@ -63,7 +63,7 @@
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 20px;
             margin: auto 0;
             animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -71,7 +71,7 @@
         @keyframes authFadeUp {
             from {
                 opacity: 0;
-                transform: translateY(24px) scale(0.98);
+                transform: translateY(24px) scale(0.97);
             }
             to {
                 opacity: 1;
@@ -79,62 +79,85 @@
             }
         }
 
-        /* Brand Header */
-        .auth-brand-block {
+        /* Luxury Glassmorphic Card Container with Logo Inside */
+        .auth-card-unified {
+            background: var(--card-bg);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--card-border);
+            box-shadow: 
+                0 32px 64px -16px rgba(0, 0, 0, 0.95),
+                0 0 45px rgba(245, 166, 35, 0.15),
+                inset 0 1px 1px rgba(255, 255, 255, 0.18);
+            padding: 36px 30px 32px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle Top Edge Shimmer Ray */
+        .auth-card-unified::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8), rgba(0, 240, 255, 0.6), transparent);
+        }
+
+        /* Inside Card Header Block */
+        .card-brand-header {
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            margin-bottom: 26px;
+            position: relative;
         }
 
-        .auth-brand-logo-wrap {
+        .inside-logo-wrap {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 16px;
-            border-radius: 40px;
-            background: linear-gradient(180deg, rgba(18, 24, 40, 0.85) 0%, rgba(6, 10, 20, 0.95) 100%);
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
             text-decoration: none;
         }
 
-        .auth-brand-logo-wrap:hover {
-            transform: scale(1.04) translateY(-2px);
-            box-shadow: 0 0 40px rgba(245, 166, 35, 0.45);
-            border-color: #FFD700;
+        .inside-logo-wrap:hover {
+            transform: scale(1.05);
         }
 
-        .auth-brand-logo-img {
-            height: 42px;
+        .inside-logo-img {
+            height: 46px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 0 14px rgba(245, 166, 35, 0.5));
+            filter: drop-shadow(0 0 16px rgba(245, 166, 35, 0.5));
         }
 
-        .auth-live-pill {
+        .inside-live-badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 5px 14px;
-            border-radius: 30px;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
             background: rgba(0, 255, 136, 0.08);
             border: 1px solid rgba(0, 255, 136, 0.28);
-            font-size: 0.72rem;
+            font-size: 0.70rem;
             font-weight: 700;
             letter-spacing: 0.8px;
             color: #00FF88;
             text-transform: uppercase;
+            margin-bottom: 14px;
         }
 
-        .live-pulse-dot {
-            width: 7px;
-            height: 7px;
+        .live-dot-pulse {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #00FF88;
-            box-shadow: 0 0 10px #00FF88;
+            box-shadow: 0 0 8px #00FF88;
             animation: liveDotPing 1.8s ease-in-out infinite;
         }
 
@@ -143,61 +166,29 @@
             50% { opacity: 0.35; transform: scale(0.8); }
         }
 
-        /* Luxury Glassmorphic Auth Card */
-        .auth-luxury-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border-radius: var(--radius-card);
-            border: 1px solid var(--border-glass);
-            box-shadow: 
-                0 30px 60px -15px rgba(0, 0, 0, 0.9),
-                0 0 40px rgba(245, 166, 35, 0.12),
-                inset 0 1px 1px rgba(255, 255, 255, 0.15);
-            padding: 34px 28px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Subtle Top Corner Shimmer */
-        .auth-luxury-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
-        }
-
-        .card-header-block {
-            text-align: center;
-            margin-bottom: 26px;
-        }
-
-        .card-auth-heading {
+        .card-auth-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 800;
             letter-spacing: -0.3px;
             background: linear-gradient(135deg, #FFFFFF 0%, #FFF3C4 60%, var(--gold-primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
-        .card-auth-subtext {
+        .card-auth-subtitle {
             font-size: 0.86rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
-        /* Input Form Items */
+        /* Form Fields */
         .form-field-group {
             margin-bottom: 20px;
         }
 
-        .field-label-text {
+        .field-label {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -208,12 +199,12 @@
             letter-spacing: 0.2px;
         }
 
-        .field-label-text .label-icon {
+        .field-label .label-icon {
             color: var(--gold-primary);
             margin-right: 6px;
         }
 
-        .field-label-text .req-star {
+        .field-label .req-star {
             color: #F43F5E;
             font-size: 0.9rem;
         }
@@ -231,8 +222,8 @@
 
         .input-glass-wrap:focus-within {
             border-color: var(--gold-primary);
-            box-shadow: 0 0 22px rgba(245, 166, 35, 0.3), inset 0 0 8px rgba(245, 166, 35, 0.06);
-            background: rgba(8, 14, 28, 0.95);
+            box-shadow: 0 0 24px rgba(245, 166, 35, 0.32), inset 0 0 8px rgba(245, 166, 35, 0.08);
+            background: rgba(8, 14, 28, 0.96);
         }
 
         .input-leading-icon {
@@ -341,7 +332,7 @@
             font-size: 0.83rem;
         }
 
-        .remember-label-styled {
+        .remember-label {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -350,7 +341,7 @@
             user-select: none;
         }
 
-        .remember-label-styled input[type="checkbox"] {
+        .remember-label input[type="checkbox"] {
             accent-color: var(--gold-primary);
             width: 16px;
             height: 16px;
@@ -379,7 +370,7 @@
             background: var(--gold-gradient);
             color: #060912;
             font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
+            font-size: 1.02rem;
             font-weight: 800;
             letter-spacing: 0.3px;
             display: flex;
@@ -387,7 +378,7 @@
             justify-content: center;
             gap: 10px;
             cursor: pointer;
-            box-shadow: 0 10px 25px var(--gold-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 26px var(--gold-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
@@ -400,13 +391,13 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transition: 0.5s;
         }
 
         .btn-submit-gold:hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(245, 166, 35, 0.55);
+            box-shadow: 0 14px 34px rgba(245, 166, 35, 0.58);
         }
 
         .btn-submit-gold:hover::after {
@@ -461,7 +452,7 @@
             border: 1px solid rgba(0, 240, 255, 0.28);
             color: var(--cyan-accent);
             font-family: 'Outfit', sans-serif;
-            font-size: 0.94rem;
+            font-size: 0.95rem;
             font-weight: 600;
             text-decoration: none;
             display: flex;
@@ -474,7 +465,7 @@
         .btn-action-secondary:hover {
             background: rgba(0, 240, 255, 0.08);
             border-color: var(--cyan-accent);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 22px rgba(0, 240, 255, 0.22);
             color: #FFFFFF;
             transform: translateY(-1px);
         }
@@ -507,14 +498,17 @@
 
         @media (max-width: 480px) {
             body {
-                padding: 20px 12px;
+                padding: 16px 12px;
             }
-            .auth-luxury-card {
-                padding: 26px 18px;
-                border-radius: 18px;
+            .auth-card-unified {
+                padding: 28px 20px 24px 20px;
+                border-radius: 20px;
             }
-            .card-auth-heading {
-                font-size: 1.38rem;
+            .card-auth-title {
+                font-size: 1.45rem;
+            }
+            .inside-logo-img {
+                height: 40px;
             }
         }
     </style>
@@ -535,23 +529,20 @@
     <!-- Main Container -->
     <div class="auth-master-shell">
         
-        <!-- Brand Header -->
-        <div class="auth-brand-block">
-            <a href="{{ url('/') }}" class="auth-brand-logo-wrap" title="Cyera AI">
-                <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="auth-brand-logo-img">
-            </a>
-            <div class="auth-live-pill">
-                <span class="live-pulse-dot"></span>
-                <span>SECURE WEB3 GATEWAY</span>
-            </div>
-        </div>
-
-        <!-- Luxury Auth Card -->
-        <div class="auth-luxury-card">
+        <!-- Luxury Unified Auth Card (With Logo Inside) -->
+        <div class="auth-card-unified">
             
-            <div class="card-header-block">
-                <h1 class="card-auth-heading">Welcome Back</h1>
-                <p class="card-auth-subtext">Sign in to manage your Web3 portfolio</p>
+            <!-- Inside Card Brand Header -->
+            <div class="card-brand-header">
+                <a href="{{ url('/') }}" class="inside-logo-wrap" title="Cyera AI">
+                    <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="inside-logo-img">
+                </a>
+                <div class="inside-live-badge">
+                    <span class="live-dot-pulse"></span>
+                    <span>SECURE WEB3 GATEWAY</span>
+                </div>
+                <h1 class="card-auth-title">Welcome Back</h1>
+                <p class="card-auth-subtitle">Sign in to manage your Web3 portfolio</p>
             </div>
 
             <!-- Session Alerts -->
@@ -575,7 +566,7 @@
 
                 <!-- User ID -->
                 <div class="form-field-group">
-                    <label class="field-label-text" for="email">
+                    <label class="field-label" for="email">
                         <span><i class="fas fa-id-badge label-icon"></i> User ID / Email</span>
                         <span class="req-star">*</span>
                     </label>
@@ -592,7 +583,7 @@
 
                 <!-- Password -->
                 <div class="form-field-group">
-                    <label class="field-label-text" for="password">
+                    <label class="field-label" for="password">
                         <span><i class="fas fa-lock label-icon"></i> Password</span>
                         <span class="req-star">*</span>
                     </label>
@@ -612,7 +603,7 @@
 
                 <!-- Remember & Forgot Password -->
                 <div class="auth-aux-row">
-                    <label class="remember-label-styled">
+                    <label class="remember-label">
                         <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                         <span>Remember me</span>
                     </label>
