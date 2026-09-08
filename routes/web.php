@@ -12,10 +12,10 @@
 */
 
 Route::get('/', function () {
-    return view('front2.index');
+    return redirect('/login');
 });
 Route::get('/index', function () {
-    return view('front2.index');
+    return redirect('/login');
 });
 Route::get('/about', function () {
     return view('front2.about');

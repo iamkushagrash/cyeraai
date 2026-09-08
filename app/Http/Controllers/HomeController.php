@@ -30,7 +30,7 @@ class HomeController extends Controller
     }*/
     public function index()
     {
-        return view('front2.index');
+        return redirect('/User/Dashboard');
     }
     public function documentation()
     {
