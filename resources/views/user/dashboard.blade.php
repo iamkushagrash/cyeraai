@@ -64,54 +64,127 @@
     @php
         $uid = $data['userDetail']->id;
 
-        // Use direct DB queries to avoid Collection method errors
-        $directIncome          = \App\BonusReward::where('userid',$uid)->where('status','!=',3)->sum('amt_usdt');
-        $stakingIncome         = \App\CpsIncome::where('userid',$uid)->sum('amt_usdt');
-        $stakingReferralIncome = \App\LevelIncome::where('userid',$uid)->where('description','l')->sum('amt_usdt');
-        $teamDevelopmentIncome = \App\LevelIncome::where('userid',$uid)->where('description','r')->sum('amt_usdt');
-        $clubIncome            = \App\ClubIncome::where('userid',$uid)->sum('amt_usdt');
+        // Direct database calculations for live user data
+        $directIncome          = (float)\App\BonusReward::where('userid',$uid)->where('status','!=',3)->sum('amt_usdt');
+        $stakingIncome         = (float)\App\CpsIncome::where('userid',$uid)->sum('amt_usdt');
+        $stakingReferralIncome = (float)\App\LevelIncome::where('userid',$uid)->where('description','l')->sum('amt_usdt');
+        $teamDevelopmentIncome = (float)\App\LevelIncome::where('userid',$uid)->where('description','r')->sum('amt_usdt');
+        $clubIncome            = (float)\App\ClubIncome::where('userid',$uid)->sum('amt_usdt');
         $totalIncomeUsdt       = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome;
-        if ($totalIncomeUsdt <= 0) $totalIncomeUsdt = 3250.00;
 
-        $remaining   = is_null($data['userDetail']->remainingCapping()) ? 0 : $data['userDetail']->remainingCapping();
-        if ($remaining > 0) {
-            $maxCapping = $totalIncomeUsdt + $remaining;
-            $filledPct  = ($totalIncomeUsdt / $maxCapping) * 100;
+        // Total Invested by user
+        $totalInvested  = (float)\App\StackingDeposite::where('userid',$uid)->where('status',1)->sum('usdt');
+
+        // Dynamic Capping Calculation
+        $remainingCap = is_null($data['userDetail']->remainingCapping()) ? 0 : (float)$data['userDetail']->remainingCapping();
+        if ($remainingCap > 0) {
+            $maxCapping = $totalIncomeUsdt + $remainingCap;
+            $filledPct  = ($maxCapping > 0) ? ($totalIncomeUsdt / $maxCapping) * 100 : 0;
         } else {
-            // Default reference value
-            $maxCapping = 5000.00;
-            $filledPct  = 65.0;
+            if ($totalInvested > 0) {
+                $maxCapping = $totalInvested * 5;
+                $filledPct  = ($maxCapping > 0) ? ($totalIncomeUsdt / $maxCapping) * 100 : 0;
+            } else {
+                $maxCapping = 0.00;
+                $filledPct  = 0.0;
+            }
         }
         $filledPct = min(100, max(0, round($filledPct)));
 
-        // CAI Claimable (remaining ROI in CAI tokens)
-        $profileStore   = \App\ProfileStore::where('id',1)->first();
-        $caiPrice       = $profileStore ? (float)$profileStore->price : 1.25;
-        $claimableUsdt  = \App\CpsIncome::where('userid',$uid)->where('status',0)->sum('remaining_usdt');
-        if ($claimableUsdt <= 0) $claimableUsdt = 56.87;
-        $claimableCai   = $caiPrice > 0 ? $claimableUsdt / $caiPrice : 45.50;
-        $claimableUsdVal= $claimableCai * $caiPrice;
+        // CAI Live Price & Claimable ROI in CAI Tokens
+        $profileStore    = \App\ProfileStore::where('id',1)->first();
+        $caiPrice        = $profileStore ? (float)$profileStore->price : 1.25;
+        if ($caiPrice <= 0) $caiPrice = 1.25;
+        $claimableUsdt   = (float)\App\CpsIncome::where('userid',$uid)->where('status',0)->sum('remaining_usdt');
+        $claimableCai    = $caiPrice > 0 ? $claimableUsdt / $caiPrice : 0.00;
+        $claimableUsdVal = $claimableUsdt;
 
-        // Total invested
-        $totalInvested  = \App\StackingDeposite::where('userid',$uid)->where('status',1)->sum('usdt');
-        if ($totalInvested <= 0) $totalInvested = 1250.00;
+        // Directs & Team Data
+        $sponsorUserId = $data['userDetail']->userid;
+        $totalDirects  = \App\UserDetails::where('sponsorid', $sponsorUserId)->count();
+        $activeDirects = \App\UserDetails::where('sponsorid', $sponsorUserId)->where('userstatus', 1)->count();
+        $totalTeam     = (int)($data['userDetail']->total_downline ?? 0);
+        $activeTeam    = (int)($data['userDetail']->active_downline ?? 0);
 
-        // Directs & team
-        $totalDirects   = $data['userdetails']->totalDirects ?? 0;
-        $activeDirects  = $data['userdetails']->activeDirects ?? 0;
-        $totalTeam      = $data['userdetails']->totalTeam ?? 0;
-        $powerLeg       = $data['userdetails']->powerleg ?? 0;
-        $otherLegs      = $data['userdetails']->otherlegs ?? 0;
+        // Power Leg and Other Legs Volume
+        $clubBiz   = $data['userDetail']->clubBusiness();
+        $powerLeg  = (float)($clubBiz['first'] ?? 0);
+        $otherLegs = (float)($clubBiz['rest'] ?? 0);
 
-        // Multiplier tier
-        $selfInv   = $data['userdetails']->current_self_investment ?? 0;
-        if ($selfInv >= 1000)      $tierLabel = '10X';
-        elseif ($selfInv >= 500)   $tierLabel = '5X';
-        elseif ($selfInv >= 200)   $tierLabel = '3X';
-        else                       $tierLabel = '5X';
+        // Dynamic Tier Multiplier
+        $tierLabel = '5X';
 
-        $rank = $data['userdetails']->userstate ?? 0;
-        $rankLabel = $rank > 0 ? 'V'.$rank : 'V2';
+        $rank = $data['userDetail']->userstate ?? 0;
+        $rankLabel = $rank > 0 ? 'V'.$rank : 'V1';
+
+        // Recent Activity Dynamic Query
+        $recentTxns = collect();
+
+        // 1. Deposits
+        $deposits = \App\StackingDeposite::where('userid', $uid)
+            ->orderBy('id', 'desc')->take(3)->get()->map(function($item) {
+                return (object)[
+                    'type'       => 'Invested',
+                    'icon'       => 'fa-arrow-down',
+                    'color_type' => 'green',
+                    'amount'     => '$' . number_format($item->usdt, 2),
+                    'status'     => $item->status == 1 ? 'On-Chain Success' : 'Pending',
+                    'status_cls' => 'status-txt-green',
+                    'time'       => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->diffForHumans() : 'Recently',
+                    'timestamp'  => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->timestamp : 0
+                ];
+            });
+        $recentTxns = $recentTxns->concat($deposits);
+
+        // 2. Withdrawals
+        $withdrawals = \App\TransactionDetail::where('userid', $uid)->where('txntype', 1)
+            ->orderBy('id', 'desc')->take(3)->get()->map(function($item) {
+                return (object)[
+                    'type'       => 'Withdrawal',
+                    'icon'       => 'fa-arrow-up',
+                    'color_type' => 'gold',
+                    'amount'     => '$' . number_format($item->amountusdt, 2),
+                    'status'     => $item->paymentstatus == 2 ? 'Completed' : ($item->paymentstatus == 1 ? 'Pending' : 'Rejected'),
+                    'status_cls' => $item->paymentstatus == 2 ? 'status-txt-green' : 'status-txt-gold',
+                    'time'       => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->diffForHumans() : 'Recently',
+                    'timestamp'  => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->timestamp : 0
+                ];
+            });
+        $recentTxns = $recentTxns->concat($withdrawals);
+
+        // 3. Direct Bonuses
+        $bonuses = \App\BonusReward::where('userid', $uid)->where('status', '!=', 3)
+            ->orderBy('id', 'desc')->take(3)->get()->map(function($item) {
+                return (object)[
+                    'type'       => 'Direct Bonus',
+                    'icon'       => 'fa-user-plus',
+                    'color_type' => 'green',
+                    'amount'     => '+$' . number_format($item->amt_usdt, 2),
+                    'status'     => 'Credited',
+                    'status_cls' => 'status-txt-green',
+                    'time'       => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->diffForHumans() : 'Recently',
+                    'timestamp'  => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->timestamp : 0
+                ];
+            });
+        $recentTxns = $recentTxns->concat($bonuses);
+
+        // 4. Staking / Level Incomes
+        $levelIncomes = \App\LevelIncome::where('userid', $uid)
+            ->orderBy('id', 'desc')->take(3)->get()->map(function($item) {
+                return (object)[
+                    'type'       => 'Level Income',
+                    'icon'       => 'fa-users',
+                    'color_type' => 'cyan',
+                    'amount'     => '+$' . number_format($item->amt_usdt, 2),
+                    'status'     => 'Credited',
+                    'status_cls' => 'status-txt-green',
+                    'time'       => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->diffForHumans() : 'Recently',
+                    'timestamp'  => $item->created_at ? \Carbon\Carbon::parse($item->created_at)->timestamp : 0
+                ];
+            });
+        $recentTxns = $recentTxns->concat($levelIncomes);
+
+        $recentActivities = $recentTxns->sortByDesc('timestamp')->take(5);
     @endphp
 
     @include('user.sidebar-mecha')
@@ -778,8 +851,8 @@
                         </div>
                         <div class="team-stat-text-col">
                             <span class="team-stat-lbl">DIRECTS</span>
-                            <span class="team-stat-val">{{ $data['userdetails']->totalDirects ?? 15 }}</span>
-                            <span class="team-stat-sub sub-green">Active</span>
+                            <span class="team-stat-val">{{ $activeDirects }}</span>
+                            <span class="team-stat-sub sub-green">{{ $totalDirects }} Total</span>
                         </div>
                     </div>
                 </div>
@@ -810,8 +883,8 @@
                         </div>
                         <div class="team-stat-text-col">
                             <span class="team-stat-lbl">TOTAL TEAM</span>
-                            <span class="team-stat-val">{{ $data['userdetails']->totalTeam ?? 142 }}</span>
-                            <span class="team-stat-sub sub-cyan">Members</span>
+                            <span class="team-stat-val">{{ $totalTeam }}</span>
+                            <span class="team-stat-sub sub-cyan">{{ $activeTeam }} Active</span>
                         </div>
                     </div>
                 </div>
@@ -837,7 +910,7 @@
                         </div>
                         <div class="team-stat-text-col">
                             <span class="team-stat-lbl">POWER LEG</span>
-                            <span class="team-stat-val">${{ number_format($data['userdetails']->powerbusiness ?? 26400, 0) }}</span>
+                            <span class="team-stat-val">${{ number_format($powerLeg, 2) }}</span>
                             <span class="team-stat-sub sub-green">Strong Leg</span>
                         </div>
                     </div>
@@ -866,7 +939,7 @@
                         </div>
                         <div class="team-stat-text-col">
                             <span class="team-stat-lbl">OTHER LEGS</span>
-                            <span class="team-stat-val">${{ number_format((($data['userdetails']->levelbusiness ?? 0) - ($data['userdetails']->powerbusiness ?? 0)) ?: 25100, 0) }}</span>
+                            <span class="team-stat-val">${{ number_format($otherLegs, 2) }}</span>
                             <span class="team-stat-sub sub-gold">Other Legs</span>
                         </div>
                     </div>
@@ -897,90 +970,28 @@
                 </svg>
 
                 <div class="activity-list-inner">
-                    <!-- Row 1: Invested -->
-                    <div class="act-row-item">
-                        <div class="act-col-left">
-                            <div class="act-icon-bubble bg-green-dim">
-                                <i class="fas fa-arrow-down" style="color:#00FF88;"></i>
+                    @forelse($recentActivities as $act)
+                        <div class="act-row-item">
+                            <div class="act-col-left">
+                                <div class="act-icon-bubble bg-{{ $act->color_type }}-dim">
+                                    <i class="fas {{ $act->icon }}" style="color: @if($act->color_type == 'green') #00FF88 @elseif($act->color_type == 'gold') #FFD700 @elseif($act->color_type == 'cyan') #00D2FF @else #B34BFE @endif;"></i>
+                                </div>
+                                <span class="act-type-title">{{ $act->type }}</span>
                             </div>
-                            <span class="act-type-title">Invested</span>
-                        </div>
-                        <div class="act-col-amount">
-                            <strong>$100.00</strong>
-                        </div>
-                        <div class="act-col-status">
-                            <span class="status-txt-green">On-Chain Success <i class="fas fa-arrow-up-right-from-square" style="font-size:7px;"></i></span>
-                        </div>
-                        <div class="act-col-time">2 min ago</div>
-                    </div>
-
-                    <!-- Row 2: Claimed CAI -->
-                    <div class="act-row-item">
-                        <div class="act-col-left">
-                            <div class="act-icon-bubble bg-gold-dim">
-                                <i class="fas fa-coins" style="color:#FFD700;"></i>
+                            <div class="act-col-amount @if($act->color_type == 'green') text-green @elseif($act->color_type == 'cyan') text-cyan @elseif($act->color_type == 'gold') text-gold @endif">
+                                <strong>{{ $act->amount }}</strong>
                             </div>
-                            <span class="act-type-title">Claimed CAI</span>
-                        </div>
-                        <div class="act-col-amount">
-                            <strong>25.00</strong> <small>CAI</small>
-                        </div>
-                        <div class="act-col-status">
-                            <span class="status-txt-green">Claimed <i class="fas fa-circle-check" style="font-size:8px;"></i></span>
-                        </div>
-                        <div class="act-col-time">15 min ago</div>
-                    </div>
-
-                    <!-- Row 3: Direct Bonus -->
-                    <div class="act-row-item">
-                        <div class="act-col-left">
-                            <div class="act-icon-bubble bg-green-dim">
-                                <i class="fas fa-user-plus" style="color:#00FF88;"></i>
+                            <div class="act-col-status">
+                                <span class="{{ $act->status_cls }}">{{ $act->status }} <i class="fas fa-circle-check" style="font-size:8px;"></i></span>
                             </div>
-                            <span class="act-type-title">Direct Bonus</span>
+                            <div class="act-col-time">{{ $act->time }}</div>
                         </div>
-                        <div class="act-col-amount text-green">
-                            <strong>+$15.00</strong>
+                    @empty
+                        <div style="text-align: center; padding: 28px 16px; color: var(--text-muted); font-size: 0.85rem;">
+                            <i class="fas fa-receipt" style="font-size: 24px; margin-bottom: 8px; color: var(--gold-primary); opacity: 0.6; display: block;"></i>
+                            No recent activity found. Topup or stake to generate rewards!
                         </div>
-                        <div class="act-col-status">
-                            <span class="status-txt-green">Credited <i class="fas fa-circle-check" style="font-size:8px;"></i></span>
-                        </div>
-                        <div class="act-col-time">30 min ago</div>
-                    </div>
-
-                    <!-- Row 4: Level 3 Income -->
-                    <div class="act-row-item">
-                        <div class="act-col-left">
-                            <div class="act-icon-bubble bg-cyan-dim">
-                                <i class="fas fa-users" style="color:#00D2FF;"></i>
-                            </div>
-                            <span class="act-type-title">Level 3 Income</span>
-                        </div>
-                        <div class="act-col-amount text-cyan">
-                            <strong>+$8.50</strong>
-                        </div>
-                        <div class="act-col-status">
-                            <span class="status-txt-green">Credited <i class="fas fa-circle-check" style="font-size:8px;"></i></span>
-                        </div>
-                        <div class="act-col-time">1 hr ago</div>
-                    </div>
-
-                    <!-- Row 5: Pool Reward -->
-                    <div class="act-row-item">
-                        <div class="act-col-left">
-                            <div class="act-icon-bubble bg-purple-dim">
-                                <i class="fas fa-star" style="color:#B34BFE;"></i>
-                            </div>
-                            <span class="act-type-title">Pool Reward</span>
-                        </div>
-                        <div class="act-col-amount text-purple">
-                            <strong>+$12.00</strong>
-                        </div>
-                        <div class="act-col-status">
-                            <span class="status-txt-green">Credited <i class="fas fa-circle-check" style="font-size:8px;"></i></span>
-                        </div>
-                        <div class="act-col-time">2 hr ago</div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

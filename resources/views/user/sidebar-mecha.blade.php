@@ -59,6 +59,20 @@
                     </div>
                 </div>
             </div>
+@php
+    $sideUid = Session::get('user.id');
+    $sidePortfolio = (float)\App\StackingDeposite::where('userid', $sideUid)->where('status', 1)->sum('usdt');
+    $sideCaiPrice = (float)(\App\ProfileStore::where('id', 1)->value('price') ?? 1.25);
+    if ($sideCaiPrice <= 0) $sideCaiPrice = 1.25;
+    $sideClaimableUsdt = (float)\App\CpsIncome::where('userid', $sideUid)->where('status', 0)->sum('remaining_usdt');
+    $sideClaimableCai = $sideCaiPrice > 0 ? $sideClaimableUsdt / $sideCaiPrice : 0;
+
+    $sideDirectIncome = (float)\App\BonusReward::where('userid', $sideUid)->where('status', '!=', 3)->sum('amt_usdt');
+    $sideStakingIncome = (float)\App\CpsIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideLevelIncome = (float)\App\LevelIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideClubIncome = (float)\App\ClubIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideTotalEarned = $sideDirectIncome + $sideStakingIncome + $sideLevelIncome + $sideClubIncome;
+@endphp
 
             <!-- Bottom Row: 3 Mini Stat Boxes Grid -->
             <div class="header-3stat-grid">
@@ -67,7 +81,7 @@
                         <span class="stat-mini-icon-circle"><i class="fas fa-coins"></i></span>
                         <span class="stat-mini-lbl">PORTFOLIO</span>
                     </div>
-                    <div class="stat-mini-val">$1,250.00</div>
+                    <div class="stat-mini-val">${{ number_format($sidePortfolio, 2) }}</div>
                     <div class="stat-mini-sub" style="color: #FFD700;">USDT</div>
                 </div>
 
@@ -76,8 +90,8 @@
                         <span class="stat-mini-icon-circle"><i class="fas fa-bolt"></i></span>
                         <span class="stat-mini-lbl">CLAIMABLE</span>
                     </div>
-                    <div class="stat-mini-val">45.50 CAI</div>
-                    <div class="stat-mini-sub" style="color: #00FF88;">≈ $56.87</div>
+                    <div class="stat-mini-val">{{ number_format($sideClaimableCai, 2) }} CAI</div>
+                    <div class="stat-mini-sub" style="color: #00FF88;">≈ ${{ number_format($sideClaimableUsdt, 2) }}</div>
                 </div>
 
                 <div class="stat-mini-box">
@@ -85,7 +99,7 @@
                         <span class="stat-mini-icon-circle"><i class="fas fa-chart-pie"></i></span>
                         <span class="stat-mini-lbl">EARNED</span>
                     </div>
-                    <div class="stat-mini-val">$1,480.00</div>
+                    <div class="stat-mini-val">${{ number_format($sideTotalEarned, 2) }}</div>
                     <div class="stat-mini-sub" style="color: #00E5FF;">Total Profit</div>
                 </div>
             </div>
