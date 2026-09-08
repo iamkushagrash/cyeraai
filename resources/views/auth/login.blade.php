@@ -16,14 +16,14 @@
     
     <style>
         :root {
-            --bg-body: #020204;
-            --card-bg: rgba(10, 15, 28, 0.88);
+            --bg-body: #000000;
+            --card-bg: #060609;
             --card-border: rgba(245, 166, 35, 0.32);
-            --input-bg: rgba(4, 7, 16, 0.92);
+            --input-bg: #09090d;
             --gold-primary: #F5A623;
             --gold-gradient: linear-gradient(135deg, #FFD700 0%, #F5A623 50%, #D48806 100%);
             --gold-glow: rgba(245, 166, 35, 0.45);
-            --cyan-accent: #00F0FF;
+            --cyan-accent: #FFD700;
             --green-active: #00FF88;
             --text-primary: #FFFFFF;
             --text-secondary: #94A3B8;
@@ -82,15 +82,15 @@
 
         /* Luxury Glassmorphic Card Container with Logo Inside */
         .auth-card-unified {
-            background: var(--card-bg);
+            background: #060609;
             backdrop-filter: blur(32px);
             -webkit-backdrop-filter: blur(32px);
             border-radius: var(--radius-card);
             border: 1px solid var(--card-border);
             box-shadow: 
-                0 32px 64px -16px rgba(0, 0, 0, 0.95),
-                0 0 45px rgba(245, 166, 35, 0.15),
-                inset 0 1px 1px rgba(255, 255, 255, 0.18);
+                0 32px 64px -16px rgba(0, 0, 0, 0.98),
+                0 0 35px rgba(245, 166, 35, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.12);
             padding: 36px 30px 32px 30px;
             position: relative;
             overflow: hidden;
@@ -104,7 +104,7 @@
             left: 10%;
             right: 10%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8), rgba(0, 240, 255, 0.6), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.9), rgba(245, 166, 35, 0.8), transparent);
         }
 
         /* Inside Card Header Block */
@@ -143,12 +143,12 @@
             gap: 6px;
             padding: 4px 12px;
             border-radius: 20px;
-            background: rgba(0, 255, 136, 0.08);
-            border: 1px solid rgba(0, 255, 136, 0.28);
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.32);
             font-size: 0.70rem;
             font-weight: 700;
             letter-spacing: 0.8px;
-            color: #00FF88;
+            color: #FFD700;
             text-transform: uppercase;
             margin-bottom: 14px;
         }
@@ -157,8 +157,8 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #00FF88;
-            box-shadow: 0 0 8px #00FF88;
+            background: #FFD700;
+            box-shadow: 0 0 8px #FFD700;
             animation: liveDotPing 1.8s ease-in-out infinite;
         }
 
@@ -214,7 +214,7 @@
             position: relative;
             display: flex;
             align-items: center;
-            background: var(--input-bg);
+            background: #09090d;
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -224,7 +224,7 @@
         .input-glass-wrap:focus-within {
             border-color: var(--gold-primary);
             box-shadow: 0 0 24px rgba(245, 166, 35, 0.32), inset 0 0 8px rgba(245, 166, 35, 0.08);
-            background: rgba(8, 14, 28, 0.96);
+            background: #0d0d12;
         }
 
         .input-leading-icon {
@@ -449,9 +449,9 @@
             width: 100%;
             height: 48px;
             border-radius: var(--radius-btn);
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 240, 255, 0.28);
-            color: var(--cyan-accent);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(245, 166, 35, 0.35);
+            color: #FFD700;
             font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
@@ -464,9 +464,9 @@
         }
 
         .btn-action-secondary:hover {
-            background: rgba(0, 240, 255, 0.08);
-            border-color: var(--cyan-accent);
-            box-shadow: 0 0 22px rgba(0, 240, 255, 0.22);
+            background: rgba(245, 166, 35, 0.08);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 22px rgba(245, 166, 35, 0.25);
             color: #FFFFFF;
             transform: translateY(-1px);
         }
