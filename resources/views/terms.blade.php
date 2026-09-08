@@ -2,383 +2,683 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CYERA AI | Terms & Conditions</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Fonts & Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyera AI | Terms & Conditions</title>
+    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Dashboard Theme CSS -->
+    <link href="{{ asset('css/cyera-dashboard.css') }}" rel="stylesheet">
+    
     <style>
-        * {
+        :root {
+            --bg-body: #020204;
+            --card-bg: rgba(10, 15, 28, 0.90);
+            --card-border: rgba(245, 166, 35, 0.32);
+            --gold-primary: #F5A623;
+            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #F5A623 50%, #D48806 100%);
+            --gold-glow: rgba(245, 166, 35, 0.4);
+            --cyan-accent: #00F0FF;
+            --green-active: #00FF88;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-glass: rgba(245, 166, 35, 0.22);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --radius-card: 24px;
+            --radius-btn: 14px;
+        }
+
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --primary-blue: #0066FF;
-            --primary-cyan: #00D4FF;
-            --hack-green: #00FF9D;
-            --dark-bg: #0A0A0F;
-            --darker-bg: #050508;
-            --card-bg: rgba(10, 15, 25, 0.95);
-            --glass-border: rgba(0, 212, 255, 0.15);
-            --text-light: #FFFFFF;
-            --text-muted: #A0A0C0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
+            font-family: 'Inter', sans-serif !important;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
             min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 16px 60px 16px;
         }
 
-        .scan-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Master Container */
+        .terms-master-shell {
             width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15) 0px,
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            z-index: -1;
-            pointer-events: none;
-            animation: scanMove 20s linear infinite;
+            max-width: 900px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin: 0 auto;
+            animation: termsFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        @keyframes scanMove {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100px); }
+        @keyframes termsFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        header {
-            width: 100%;
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.8rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--primary-cyan), var(--hack-green));
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: 1.5px;
-        }
-
-        .tagline {
-            font-size: 1rem;
-            color: var(--hack-green);
-            letter-spacing: 1.5px;
-            font-family: 'Courier New', monospace;
-            margin-top: 6px;
-        }
-
-        .terms-card {
-            width: 100%;
-            max-width: 1000px;
+        /* Luxury Card Container */
+        .terms-luxury-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--card-border);
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(0, 212, 255, 0.1);
+                0 32px 64px -16px rgba(0, 0, 0, 0.95),
+                0 0 45px rgba(245, 166, 35, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.18);
+            padding: 42px 36px;
+            position: relative;
             overflow: hidden;
-            margin-top: 30px;
-            margin-bottom: 60px;
-            padding: 30px 30px 40px;
         }
 
-        .terms-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            background: linear-gradient(90deg, var(--primary-cyan), var(--hack-green));
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        .terms-luxury-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8), rgba(0, 240, 255, 0.6), transparent);
         }
 
-        .terms-subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 18px;
-        }
-
-        .terms-content {
-            max-height: 70vh;
-            overflow-y: auto;
-            padding-right: 10px;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .terms-content strong {
-            color: var(--primary-cyan);
-        }
-
-        .terms-content ul {
-            padding-left: 20px;
-            margin-top: 6px;
-            margin-bottom: 6px;
-        }
-
-        .terms-content li {
-            margin-bottom: 6px;
-        }
-
-        footer {
-            width: 100%;
+        /* Header Block */
+        .terms-header-block {
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            padding: 20px;
-            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 24px;
         }
 
-        footer a {
-            color: var(--text-muted);
+        .terms-logo-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            transition: transform 0.3s ease;
             text-decoration: none;
-            margin: 0 15px;
         }
 
-        footer a:hover {
-            color: var(--hack-green);
+        .terms-logo-link:hover {
+            transform: scale(1.05);
+        }
+
+        .terms-logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(245, 166, 35, 0.5));
+        }
+
+        .terms-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.28);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: var(--cyan-accent);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .terms-main-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF3C4 60%, var(--gold-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .terms-meta-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Terms Content Container */
+        .terms-body-content {
+            color: #CBD5E1;
+            font-size: 0.94rem;
+            line-height: 1.75;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .terms-section {
+            background: rgba(6, 10, 20, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            transition: border-color 0.25s ease;
+        }
+
+        .terms-section:hover {
+            border-color: rgba(245, 166, 35, 0.25);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            letter-spacing: 0.2px;
+        }
+
+        .section-title .sec-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(245, 166, 35, 0.15);
+            border: 1px solid rgba(245, 166, 35, 0.35);
+            color: var(--gold-primary);
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .terms-body-content p {
+            margin-bottom: 10px;
+        }
+
+        .terms-body-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .terms-body-content strong {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .terms-body-content ul {
+            padding-left: 22px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terms-body-content li {
+            color: #94A3B8;
+        }
+
+        .terms-body-content li strong {
+            color: #E2E8F0;
+        }
+
+        /* Highlight Notice Box */
+        .notice-highlight-box {
+            background: rgba(245, 166, 35, 0.08);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: #FFE082;
+            font-size: 0.90rem;
+            font-weight: 500;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notice-highlight-box i {
+            color: var(--gold-primary);
+            font-size: 1.2rem;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Action Buttons */
+        .terms-action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            flex-wrap: wrap;
+        }
+
+        .btn-gold-action {
+            height: 48px;
+            padding: 0 28px;
+            border-radius: var(--radius-btn);
+            background: var(--gold-gradient);
+            color: #060912;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 10px 24px var(--gold-glow);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(245, 166, 35, 0.55);
+        }
+
+        .btn-cyan-action {
+            height: 48px;
+            padding: 0 28px;
+            border-radius: var(--radius-btn);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.28);
+            color: var(--cyan-accent);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cyan-action:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: var(--cyan-accent);
+            color: #FFFFFF;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Footer */
+        .terms-footer-block {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-nav-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .footer-nav-row a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-nav-row a:hover {
+            color: var(--gold-primary);
+        }
+
+        @media (max-width: 768px) {
+            .terms-luxury-card {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+            .terms-main-title {
+                font-size: 1.6rem;
+            }
+            .terms-section {
+                padding: 18px 16px;
+            }
         }
     </style>
 </head>
-
 <body>
 
-<div class="scan-lines"></div>
+    <!-- ============================================================
+         LIVE ANIMATED CYBER VIDEO CANVAS BACKGROUND (DITTO DASHBOARD)
+         ============================================================ -->
+    <div class="cyber-video-bg-container" aria-hidden="true">
+        <div class="cyber-nebula-orb orb-1"></div>
+        <div class="cyber-nebula-orb orb-2"></div>
+        <div class="cyber-nebula-orb orb-3"></div>
+        <div class="cyber-grid-scan-layer"></div>
+        <canvas id="cyberMatrixCanvas"></canvas>
+    </div>
 
-<header>
-    <div class="logo-text">CYERA AI</div>
-    <div class="tagline">TERMS & CONDITIONS & USER AGREEMENT</div>
-</header>
+    <!-- Main Container Shell -->
+    <div class="terms-master-shell">
+        
+        <!-- Luxury Terms Card -->
+        <div class="terms-luxury-card">
+            
+            <!-- Header Block -->
+            <div class="terms-header-block">
+                <a href="{{ url('/') }}" class="terms-logo-link" title="Cyera AI">
+                    <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="terms-logo-img">
+                </a>
+                <div class="terms-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>CAI PROTOCOL USER AGREEMENT</span>
+                </div>
+                <h1 class="terms-main-title">Terms & Conditions</h1>
+                <div class="terms-meta-date">Last Updated: September 2026 • Version 2.4 (CAI Token Standard)</div>
+            </div>
 
-<div class="terms-card">
-    <div class="terms-title">Terms & Conditions</div>
-    <div class="terms-subtitle">Last Updated: 01/01/2026</div>
+            <!-- Important Notice Banner -->
+            <div class="notice-highlight-box">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Decentralized Smart Contract Disclaimer:</strong> Cyera AI operates as an autonomous decentralized AI & Web3 tokenized ecosystem powered by the <strong>CAI Token</strong>. Staking, yield release, dynamic capping, and automated vaults execute purely on-chain via algorithmic protocol rules.
+                </div>
+            </div>
 
-    <div class="terms-content">
+            <br>
 
-        1. <strong>LEGAL ENTITIES & GOVERNING PARTIES</strong><br>
-        Cyera AI (“Cyera AI”, “We”, “Us”, “Our”) operates as a blockchain-based decentralized digital ecosystem through the following registered entities:<br><br>
+            <!-- Terms Body Content -->
+            <div class="terms-body-content">
 
-        <strong>Singapore Entity</strong><br>
-        Registered Address: 6 Raffles Quay, #14-006, Singapore – 48580<br>
-        Registration No.: 202139673D<br><br>
+                <!-- Section 1 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">1</span>
+                        <span>Scope of the CAI Protocol & Ecosystem</span>
+                    </div>
+                    <p>
+                        Cyera AI (<strong>“CAI”</strong>, <strong>“Platform”</strong>, <strong>“We”</strong>, <strong>“Protocol”</strong>) is a decentralized Web3 AI compute infrastructure, automated arbitrage mechanism, and tokenized staking system.
+                    </p>
+                    <p>
+                        The native utility token <strong>CAI</strong> powers all network fee settlements, staking yield rewards, governance weight, and ecosystem service access across the Cyera ecosystem.
+                    </p>
+                </div>
 
-        <strong>United Kingdom Entity</strong><br>
-        Company Name: Cyera AI<br>
-        Company No.: 14951300<br>
-        Registered Office: 7 Copperfield Road, Coventry, West Midlands, England, CV2 4AQ<br><br>
+                <!-- Section 2 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">2</span>
+                        <span>Digital Acceptance & Binding Agreement</span>
+                    </div>
+                    <p>
+                        By checking the agreement box during registration, connecting your Web3 wallet, depositing USDT/CAI, staking assets, or activating node contracts, you explicitly agree and enter into a legally binding digital contract.
+                    </p>
+                    <ul>
+                        <li>Checking <strong>“I agree to Cyera AI Terms & Conditions”</strong> constitutes valid cryptographic & legal consent.</li>
+                        <li>Platform interaction without formal dispute within 24 hours of protocol updates constitutes continuous acceptance of amended terms.</li>
+                    </ul>
+                </div>
 
-        Cyera AI operates globally through decentralized technology and does not restrict access based on geography unless required by law.<br><br>
+                <!-- Section 3 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">3</span>
+                        <span>CAI Staking & 5X Dynamic Capping Mechanism</span>
+                    </div>
+                    <p>
+                        The Cyera AI platform utilizes an algorithmic <strong>Dynamic Capping Protocol</strong> designed for long-term ecosystem sustainability and deflationary liquidity protection:
+                    </p>
+                    <ul>
+                        <li><strong>Maximum Earnings Ceiling (5X Capping):</strong> Total earnings across Daily ROI, Direct Referrals, Level Bonuses, and Team Incentives are capped up to a maximum of <strong>500% (5X)</strong> of the user's active staking package tier.</li>
+                        <li><strong>Capping Fulfillment:</strong> Once cumulative earnings reach 100% of the 5X maximum limit, further income generation automatically pauses until package re-staking or tier re-activation occurs.</li>
+                        <li><strong>Income Release Schedule:</strong> Daily staking yields and staking bonuses are credited to users' claimable balance as governed by protocol parameters and live valuation metrics.</li>
+                    </ul>
+                </div>
 
-        2. <strong>ACCEPTANCE OF TERMS (DIGITAL ACCEPTANCE)</strong><br>
-        By accessing, registering, using, staking, transacting, or interacting with any Cyera AI platform including but not limited to:<br>
-        <ul>
-            <li>Cyera AI Website</li>
-            <li>Cyera AI WebApp</li>
-            <li>Cyera AI Mobile App</li>
-            <li>Meta Wallet Mobile App</li>
-        </ul>
-        you confirm, agree, and legally accept these Terms & Conditions.<br><br>
+                <!-- Section 4 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">4</span>
+                        <span>Decentralized Vaults, Deposits & Withdrawals</span>
+                    </div>
+                    <ul>
+                        <li><strong>Deposit Verification:</strong> Users are responsible for confirming correct smart contract addresses, token standards (USDT BEP-20 / TRC-20 / CAI), and transaction hashes during deposits.</li>
+                        <li><strong>Automated Vault Execution:</strong> Withdrawal requests are processed through decentralized liquidity vaults. Minimum withdrawal amounts, network gas fees, and dynamic slippage parameters are calculated transparently at the time of claim.</li>
+                        <li><strong>Self-Custodial Security:</strong> Users bear 100% sole responsibility for safeguarding their private keys, seed phrases, and account credentials. Cyera AI administrators will never request your private keys.</li>
+                    </ul>
+                </div>
 
-        ✔ Clicking “I Agree”, “Accept”, “Continue”, or similar action<br>
-        ✔ Using the platform after publication of these terms<br>
-        ✔ Making any transaction, staking, or wallet interaction<br><br>
+                <!-- Section 5 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">5</span>
+                        <span>Community Referrals & Multi-Tier Incentives</span>
+                    </div>
+                    <p>
+                        Cyera AI offers multi-level decentralized network incentives to reward community builders and ecosystem expansion:
+                    </p>
+                    <ul>
+                        <li><strong>Direct Referral Bonus:</strong> Automatically calculated and distributed upon confirmed staking by personally invited downline members.</li>
+                        <li><strong>Level Bonus Distribution:</strong> Unlocks incrementally across community network levels based on user's active package tier and direct sponsor criteria.</li>
+                        <li><strong>Anti-Abuse & Wash Trading Prevention:</strong> Generating artificial sponsor chains, multi-account spamming, or manipulating volume metrics is strictly monitored by algorithmic integrity filters.</li>
+                    </ul>
+                </div>
 
-        shall constitute valid digital acceptance, legally binding and equivalent to a signed physical agreement, enforceable in courts of law worldwide.<br><br>
+                <!-- Section 6 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">6</span>
+                        <span>Risk Disclosure & Volatility Notice</span>
+                    </div>
+                    <p>
+                        Digital assets, decentralized finance (DeFi), and AI-tokenized algorithms carry inherent market volatility and technological risks:
+                    </p>
+                    <ul>
+                        <li>Cryptocurrency valuations and token price indices fluctuate in real time depending on open market liquidity.</li>
+                        <li>Historical staking yield performance does not constitute a guaranteed promise of future token valuations.</li>
+                        <li>Users should only stake and commit capital they are fully prepared to allocate within decentralized market conditions.</li>
+                    </ul>
+                </div>
 
-        3. <strong>ELIGIBILITY</strong><br>
-        You confirm that:<br>
-        <ul>
-            <li>You are at least 18 years of age</li>
-            <li>You are legally allowed to use crypto assets in your jurisdiction</li>
-            <li>You are not restricted by any local or international law</li>
-            <li>You understand blockchain, crypto assets, and digital wallets</li>
-        </ul>
-        Cyera AI does not provide legal, tax, or financial advice.<br><br>
+                <!-- Section 7 -->
+                <div class="terms-section">
+                    <div class="section-title">
+                        <span class="sec-num">7</span>
+                        <span>Official Communication & Support</span>
+                    </div>
+                    <p>
+                        For technical assistance, node inquiry, or legal correspondence regarding the CAI protocol:
+                    </p>
+                    <ul>
+                        <li>📧 <strong>Official Support:</strong> support@cyera.ai</li>
+                        <li>📧 <strong>Compliance & Legal:</strong> legal@cyera.ai</li>
+                        <li>🌐 <strong>Web3 Portal:</strong> <a href="{{ url('/') }}" style="color:var(--cyan-accent); text-decoration:none;">https://cyera.ai</a></li>
+                    </ul>
+                </div>
 
-        4. <strong>NATURE OF CYERA AI PLATFORM</strong><br>
-        Cyera AI is a blockchain-based decentralized ecosystem designed to provide access to:<br>
-        <ul>
-            <li>Decentralized applications (DApps)</li>
-            <li>Wallet services</li>
-            <li>Crypto staking mechanisms</li>
-            <li>Blockchain-based reward systems</li>
-            <li>Digital asset utilities</li>
-        </ul>
-        Cyera AI is NOT:<br>
-        <ul>
-            <li>A bank</li>
-            <li>A financial institution</li>
-            <li>A regulated investment advisor</li>
-            <li>A deposit-taking entity</li>
-            <li>A guaranteed returns platform</li>
-        </ul><br>
+            </div>
 
-        5. <strong>INVESTMENT WARNING & RISK DISCLOSURE</strong><br>
-        <strong>IMPORTANT INVESTMENT WARNING</strong><br>
-        Crypto assets and blockchain technologies involve high risk.<br><br>
+            <!-- Action Bar -->
+            <div class="terms-action-bar">
+                <a href="{{ url('/register') }}" class="btn-gold-action">
+                    <i class="fas fa-user-plus"></i> Proceed to Registration
+                </a>
+                <a href="{{ url('/login') }}" class="btn-cyan-action">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Sign In to Account
+                </a>
+            </div>
 
-        By using Cyera AI, you explicitly acknowledge and agree that:<br>
-        <ul>
-            <li>Cryptocurrency markets are extremely volatile</li>
-            <li>Digital assets can lose value rapidly or entirely</li>
-            <li>Smart contracts may fail or behave unexpectedly</li>
-            <li>Regulatory changes may impact access, value, or legality</li>
-            <li>Blockchain networks may face congestion, hacks, or failures</li>
-        </ul>
-        You understand that past performance does not guarantee future results.<br><br>
+        </div>
 
-        6. <strong>NO GUARANTEED RETURNS</strong><br>
-        <ul>
-            <li>Any staking rewards, yields, or returns shown are indicative only</li>
-            <li>Returns are not fixed, guaranteed, or assured</li>
-            <li>Cyera AI does not promise profits</li>
-            <li>Returns depend on market conditions, protocols, liquidity, and blockchain performance</li>
-        </ul>
-        You participate entirely at your own risk.<br><br>
-
-        7. <strong>LIMITATION OF LIABILITY</strong><br>
-        To the maximum extent permitted by law:<br>
-        Cyera AI, its directors, officers, developers, partners, affiliates, and service providers shall not be liable for:<br>
-        <ul>
-            <li>Market losses</li>
-            <li>Price fluctuations</li>
-            <li>Missed rewards</li>
-            <li>Technical failures</li>
-            <li>Smart contract vulnerabilities</li>
-            <li>Regulatory changes</li>
-            <li>Third-party blockchain failures</li>
-            <li>Wallet compromises not caused by Cyera AI’s direct negligence</li>
-        </ul><br>
-
-        8. <strong>PRINCIPAL RECOVERY CLAUSE (LIMITED LIABILITY)</strong><br>
-        In the event of any mishap, failure, or loss directly attributable to Cyera AI:<br>
-        <ul>
-            <li>Cyera AI’s maximum responsibility shall be limited to principal recovery only</li>
-            <li>Any income, rewards, incentives, bonuses, or earnings already received shall be deducted</li>
-            <li>No additional compensation, damages, or claims shall be entertained</li>
-        </ul>
-        Under no circumstances shall Cyera AI be liable for:<br>
-        <ul>
-            <li>Lost profits</li>
-            <li>Opportunity costs</li>
-            <li>Emotional distress</li>
-            <li>Indirect or consequential damages</li>
-        </ul><br>
-
-        9. <strong>USER RESPONSIBILITIES</strong><br>
-        You are solely responsible for:<br>
-        <ul>
-            <li>Safeguarding private keys and wallet access</li>
-            <li>Verifying transaction details before confirmation</li>
-            <li>Understanding staking lock-in periods</li>
-            <li>Compliance with local laws and taxes</li>
-            <li>Maintaining device and cybersecurity hygiene</li>
-        </ul>
-        Loss of access due to user negligence is not recoverable.<br><br>
-
-        10. <strong>NO FUTURE CLAIMS OR RIGHTS</strong><br>
-        By accepting these Terms, you confirm:<br>
-        <ul>
-            <li>No ownership, equity, or voting rights in Cyera AI</li>
-            <li>No claim on future funding rounds, token issuance, valuations, or business decisions</li>
-            <li>No entitlement beyond platform utility access</li>
-        </ul><br>
-
-        11. <strong>REGULATORY DISCLAIMER</strong><br>
-        Cyera AI operates as a decentralized technology platform.<br>
-        We do not:<br>
-        <ul>
-            <li>Register as an investment fund</li>
-            <li>Offer securities</li>
-            <li>Solicit investments in jurisdictions where prohibited</li>
-        </ul>
-        Users are solely responsible for determining legality in their jurisdiction.<br><br>
-
-        12. <strong>SUSPENSION & TERMINATION</strong><br>
-        Cyera AI reserves the right to:<br>
-        <ul>
-            <li>Suspend or terminate accounts</li>
-            <li>Restrict access</li>
-            <li>Freeze transactions if required by law, security, or misuse</li>
-        </ul>
-        No compensation shall arise from lawful suspension.<br><br>
-
-        13. <strong>INTELLECTUAL PROPERTY</strong><br>
-        All branding, logos, designs, interfaces, code, and content belong to Cyera AI or its licensors.<br>
-        Unauthorized use is strictly prohibited.<br><br>
-
-        14. <strong>AMENDMENTS TO TERMS</strong><br>
-        Cyera AI may update these Terms at any time.<br>
-        Continued usage after updates constitutes acceptance of revised terms.<br><br>
-
-        15. <strong>DISPUTE RESOLUTION & ARBITRATION</strong><br>
-        <strong>Mandatory Arbitration</strong><br>
-        <ul>
-            <li>All disputes shall be resolved through binding arbitration only</li>
-            <li>No class actions or collective claims permitted</li>
-            <li>Courts shall only be used for enforcement of arbitration awards</li>
-        </ul>
-        <strong>Governing Law</strong><br>
-        At Cyera AI’s discretion:<br>
-        <ul>
-            <li>Singapore Law or</li>
-            <li>England & Wales Law</li>
-        </ul>
-        shall apply.<br><br>
-
-        16. <strong>SEVERABILITY</strong><br>
-        If any clause is found invalid, remaining clauses shall remain fully enforceable.<br><br>
-
-        17. <strong>CONTACT INFORMATION</strong><br>
-        For all queries, notices, or legal communication:<br>
-        📧 Info: info@mwtmail.io<br>
-        📧 Legal: legal@mwtmail.io<br><br>
-
-        18. <strong>FINAL ACKNOWLEDGEMENT</strong><br>
-        By using Cyera AI, you confirm that:<br>
-        <ul>
-            <li>You have read and understood these Terms</li>
-            <li>You accept all risks knowingly</li>
-            <li>You waive claims beyond stated liability limits</li>
-            <li>You accept digital acceptance as legally binding</li>
-        </ul>
+        <!-- Footer -->
+        <footer class="terms-footer-block">
+            <div class="footer-nav-row">
+                <a href="{{ url('/login') }}">Login</a>
+                <span>•</span>
+                <a href="{{ url('/register') }}">Register</a>
+                <span>•</span>
+                <a href="https://t.me/" target="_blank">Telegram Support</a>
+            </div>
+            <div>&copy; 2026 CYERA AI (CAI PROTOCOL). All Rights Reserved.</div>
+        </footer>
 
     </div>
-</div>
 
-<footer>
-    <p>>_ © 2026 Cyera AI</p>
-    <a href="/login">LOGIN</a>
-    <!-- <a href="/privacy">PRIVACY</a>
-    <a href="/support">SUPPORT</a> -->
-</footer>
+    <!-- ============================================================
+         CYBER PARTICLES & BEAM MATRIX CANVAS SCRIPT (DITTO DASHBOARD)
+         ============================================================ -->
+    <script>
+    (function () {
+        const canvas = document.getElementById('cyberMatrixCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let circuitBeams = [];
 
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initElements();
+        }
+
+        function initElements() {
+            particles = [];
+            circuitBeams = [];
+            const count = Math.min(Math.floor((width * height) / 20000), 45);
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 2.2 + 1.0,
+                    vx: (Math.random() - 0.5) * 0.45,
+                    vy: (Math.random() - 0.5) * 0.45,
+                    alpha: Math.random() * 0.65 + 0.35,
+                    color: Math.random() > 0.45 ? '#FFD700' : (Math.random() > 0.5 ? '#00FF88' : '#00E5FF'),
+                    pulsing: Math.random() * Math.PI,
+                    pulseSpeed: Math.random() * 0.005 + 0.002
+                });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                circuitBeams.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    length: Math.random() * 90 + 45,
+                    speed: Math.random() * 0.4 + 0.2,
+                    vertical: Math.random() > 0.45,
+                    alpha: Math.random() * 0.45 + 0.25,
+                    color: Math.random() > 0.4 ? 'rgba(255, 215, 0, ' : (Math.random() > 0.5 ? 'rgba(0, 255, 136, ' : 'rgba(0, 229, 255, ')
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 130) {
+                        const alpha = (1 - dist / 130) * 0.35;
+                        ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.pulsing += p.pulseSpeed;
+                if (p.y < -15) p.y = height + 15;
+                if (p.x < -15) p.x = width + 15;
+                if (p.x > width + 15) p.x = -15;
+
+                const currentAlpha = Math.max(0.2, p.alpha + Math.sin(p.pulsing) * 0.3);
+                ctx.save();
+                ctx.globalAlpha = currentAlpha;
+                ctx.shadowBlur = 14;
+                ctx.shadowColor = p.color;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            for (let i = 0; i < circuitBeams.length; i++) {
+                const b = circuitBeams[i];
+                ctx.save();
+                ctx.lineWidth = 1.8;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = b.color + '0.8)';
+                const grad = b.vertical
+                    ? ctx.createLinearGradient(b.x, b.y - b.length, b.x, b.y)
+                    : ctx.createLinearGradient(b.x - b.length, b.y, b.x, b.y);
+                grad.addColorStop(0, b.color + '0)');
+                grad.addColorStop(0.7, b.color + (b.alpha * 0.8) + ')');
+                grad.addColorStop(1, b.color + b.alpha + ')');
+                ctx.strokeStyle = grad;
+                ctx.beginPath();
+                if (b.vertical) {
+                    ctx.moveTo(b.x, b.y - b.length);
+                    ctx.lineTo(b.x, b.y);
+                    b.y += b.speed;
+                    if (b.y - b.length > height) {
+                        b.y = 0;
+                        b.x = Math.random() * width;
+                    }
+                } else {
+                    ctx.moveTo(b.x - b.length, b.y);
+                    ctx.lineTo(b.x, b.y);
+                    b.x += b.speed;
+                    if (b.x - b.length > width) {
+                        b.x = 0;
+                        b.y = Math.random() * height;
+                    }
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        requestAnimationFrame(animate);
+    })();
+    </script>
 </body>
 </html>
