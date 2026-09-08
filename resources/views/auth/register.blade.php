@@ -10,25 +10,27 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Dashboard Theme CSS -->
+    <link href="{{ asset('css/cyera-dashboard.css') }}" rel="stylesheet">
     
     <style>
         :root {
-            --bg-body: #03060E;
-            --card-bg: rgba(10, 16, 30, 0.82);
-            --input-bg: rgba(6, 10, 20, 0.85);
+            --bg-body: #020204;
+            --card-bg: rgba(8, 12, 24, 0.84);
+            --input-bg: rgba(4, 7, 16, 0.90);
             --gold-primary: #F5A623;
             --gold-gradient: linear-gradient(135deg, #FFD700 0%, #F5A623 50%, #D48806 100%);
-            --gold-glow: rgba(245, 166, 35, 0.35);
+            --gold-glow: rgba(245, 166, 35, 0.4);
             --cyan-accent: #00F0FF;
-            --green-active: #10B981;
+            --green-active: #00FF88;
             --text-primary: #FFFFFF;
             --text-secondary: #94A3B8;
             --text-muted: #64748B;
-            --border-glass: rgba(245, 166, 35, 0.22);
+            --border-glass: rgba(245, 166, 35, 0.28);
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --radius-card: 20px;
-            --radius-btn: 12px;
+            --radius-card: 22px;
+            --radius-btn: 14px;
         }
 
         *, *::before, *::after {
@@ -39,7 +41,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif !important;
             background-color: var(--bg-body);
             color: var(--text-primary);
             min-height: 100vh;
@@ -53,59 +55,32 @@
             padding: 30px 16px;
         }
 
-        /* Ambient Fluid Glow Effects */
-        .ambient-aurora {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.55;
-            transition: all 0.5s ease;
-        }
-
-        .aurora-gold {
-            top: -12%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 580px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(245, 166, 35, 0.28) 0%, rgba(255, 215, 0, 0.12) 40%, transparent 75%);
-        }
-
-        .aurora-cyan {
-            bottom: -15%;
-            right: 5%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
-        }
-
-        .bg-subtle-grid {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 32px 32px;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Main Container Shell */
-        .auth-container {
+        /* Master Auth Wrapper */
+        .auth-master-shell {
             width: 100%;
             max-width: 480px;
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 22px;
             margin: auto 0;
+            animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes authFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         /* Brand Header */
-        .brand-header {
+        .auth-brand-block {
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -113,26 +88,33 @@
             gap: 12px;
         }
 
-        .brand-logo-link {
+        .auth-brand-logo-wrap {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.3s ease;
+            padding: 6px 16px;
+            border-radius: 40px;
+            background: linear-gradient(180deg, rgba(18, 24, 40, 0.85) 0%, rgba(6, 10, 20, 0.95) 100%);
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
         }
 
-        .brand-logo-link:hover {
-            transform: scale(1.03);
+        .auth-brand-logo-wrap:hover {
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 0 40px rgba(245, 166, 35, 0.45);
+            border-color: #FFD700;
         }
 
-        .brand-logo-img {
-            height: 44px;
+        .auth-brand-logo-img {
+            height: 42px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 0 16px rgba(245, 166, 35, 0.45));
+            filter: drop-shadow(0 0 14px rgba(245, 166, 35, 0.5));
         }
 
-        .brand-badge {
+        .auth-live-pill {
             display: inline-flex;
             align-items: center;
             gap: 7px;
@@ -147,33 +129,45 @@
             text-transform: uppercase;
         }
 
-        .pulse-dot {
+        .live-pulse-dot {
             width: 7px;
             height: 7px;
             border-radius: 50%;
             background: var(--cyan-accent);
-            box-shadow: 0 0 8px var(--cyan-accent);
-            animation: pulseGlow 2s infinite;
+            box-shadow: 0 0 10px var(--cyan-accent);
+            animation: liveDotPing 1.8s ease-in-out infinite;
         }
 
-        @keyframes pulseGlow {
+        @keyframes liveDotPing {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
+            50% { opacity: 0.35; transform: scale(0.8); }
         }
 
-        /* Luxury Glass Card */
-        .luxury-card {
+        /* Luxury Glassmorphic Auth Card */
+        .auth-luxury-card {
             background: var(--card-bg);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border-radius: var(--radius-card);
             border: 1px solid var(--border-glass);
             box-shadow: 
-                0 30px 60px -15px rgba(0, 0, 0, 0.85),
-                0 0 35px rgba(245, 166, 35, 0.08),
-                inset 0 1px 1px rgba(255, 255, 255, 0.12);
+                0 30px 60px -15px rgba(0, 0, 0, 0.9),
+                0 0 40px rgba(245, 166, 35, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
             padding: 34px 28px;
             position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle Top Corner Shimmer */
+        .auth-luxury-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
         }
 
         .card-header-block {
@@ -181,9 +175,9 @@
             margin-bottom: 24px;
         }
 
-        .card-title {
+        .card-auth-heading {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.55rem;
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: -0.3px;
             background: linear-gradient(135deg, #FFFFFF 0%, #FFF3C4 60%, var(--gold-primary) 100%);
@@ -192,18 +186,18 @@
             margin-bottom: 6px;
         }
 
-        .card-subtitle {
+        .card-auth-subtext {
             font-size: 0.86rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
-        /* Input Form Groups */
-        .input-group-item {
+        /* Input Form Items */
+        .form-field-group {
             margin-bottom: 18px;
         }
 
-        .field-label {
+        .field-label-text {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -214,34 +208,34 @@
             letter-spacing: 0.2px;
         }
 
-        .field-label .icon-tag {
+        .field-label-text .label-icon {
             color: var(--gold-primary);
             margin-right: 6px;
         }
 
-        .field-label .required-dot {
+        .field-label-text .req-star {
             color: #F43F5E;
             font-size: 0.9rem;
         }
 
-        .input-wrapper {
+        .input-glass-wrap {
             position: relative;
             display: flex;
             align-items: center;
             background: var(--input-bg);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
-            transition: all 0.25s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
         }
 
-        .input-wrapper:focus-within {
+        .input-glass-wrap:focus-within {
             border-color: var(--gold-primary);
-            box-shadow: 0 0 20px rgba(245, 166, 35, 0.25), inset 0 0 8px rgba(245, 166, 35, 0.05);
-            background: rgba(10, 16, 30, 0.95);
+            box-shadow: 0 0 22px rgba(245, 166, 35, 0.3), inset 0 0 8px rgba(245, 166, 35, 0.06);
+            background: rgba(8, 14, 28, 0.95);
         }
 
-        .input-icon-box {
+        .input-leading-icon {
             width: 46px;
             height: 48px;
             display: flex;
@@ -252,15 +246,15 @@
             flex-shrink: 0;
             border-right: 1px solid rgba(255, 255, 255, 0.04);
             background: rgba(245, 166, 35, 0.04);
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .input-wrapper:focus-within .input-icon-box {
+        .input-glass-wrap:focus-within .input-leading-icon {
             color: #FFD700;
             background: rgba(245, 166, 35, 0.08);
         }
 
-        .form-control-custom {
+        .input-control-styled {
             flex: 1;
             height: 48px;
             padding: 0 14px;
@@ -273,12 +267,12 @@
             font-weight: 500;
         }
 
-        .form-control-custom::placeholder {
+        .input-control-styled::placeholder {
             color: var(--text-muted);
             font-weight: 400;
         }
 
-        .country-select-custom {
+        .country-select-styled {
             height: 48px;
             background: rgba(14, 20, 36, 0.95);
             border: none;
@@ -293,28 +287,33 @@
             max-width: 130px;
         }
 
-        .country-select-custom option {
+        .country-select-styled option {
             background: #090e1a;
             color: #fff;
         }
 
         /* Verified Sponsor Pill */
-        .sponsor-verified-box {
+        .sponsor-verified-badge {
             display: none;
             align-items: center;
             gap: 8px;
             margin-top: 7px;
             padding: 7px 14px;
             border-radius: 10px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             font-size: 0.82rem;
             font-weight: 600;
-            color: #34D399;
-            animation: fadeIn 0.3s ease;
+            color: #00FF88;
+            animation: badgeSlideIn 0.3s ease;
         }
 
-        .eye-toggle-btn {
+        @keyframes badgeSlideIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .eye-toggle-action {
             background: transparent;
             border: none;
             color: var(--text-muted);
@@ -329,12 +328,12 @@
             outline: none;
         }
 
-        .eye-toggle-btn:hover {
+        .eye-toggle-action:hover {
             color: #FFFFFF;
         }
 
-        /* Error Text */
-        .error-hint {
+        /* Error Hint */
+        .error-hint-msg {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -345,7 +344,7 @@
         }
 
         /* Alerts */
-        .alert-box {
+        .auth-alert-banner {
             padding: 13px 16px;
             border-radius: 12px;
             font-size: 0.85rem;
@@ -354,28 +353,28 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: fadeIn 0.3s ease;
+            animation: alertFadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
+        @keyframes alertFadeIn {
             from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .alert-box-success {
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #34D399;
+        .auth-alert-success {
+            background: rgba(0, 255, 136, 0.12);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00FF88;
         }
 
-        .alert-box-error {
+        .auth-alert-error {
             background: rgba(244, 63, 94, 0.12);
             border: 1px solid rgba(244, 63, 94, 0.3);
             color: #FB7185;
         }
 
         /* Terms & Conditions Row */
-        .terms-row {
+        .terms-condition-row {
             margin: 14px 0 22px 0;
             display: flex;
             align-items: center;
@@ -386,7 +385,7 @@
             user-select: none;
         }
 
-        .terms-row input[type="checkbox"] {
+        .terms-condition-row input[type="checkbox"] {
             accent-color: var(--gold-primary);
             width: 17px;
             height: 17px;
@@ -394,13 +393,13 @@
             flex-shrink: 0;
         }
 
-        .terms-row a {
+        .terms-condition-row a {
             color: var(--cyan-accent);
             text-decoration: underline;
         }
 
         /* Primary Submit Button */
-        .btn-primary-gold {
+        .btn-submit-gold {
             width: 100%;
             height: 52px;
             border: none;
@@ -410,7 +409,7 @@
             color: #060912;
             font-family: 'Outfit', sans-serif;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 0.3px;
             display: flex;
             align-items: center;
@@ -423,38 +422,38 @@
             overflow: hidden;
         }
 
-        .btn-primary-gold:disabled {
+        .btn-submit-gold:disabled {
             opacity: 0.45;
             cursor: not-allowed;
             box-shadow: none;
             transform: none !important;
         }
 
-        .btn-primary-gold:not(:disabled):hover {
+        .btn-submit-gold:not(:disabled):hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 30px rgba(245, 166, 35, 0.5);
+            box-shadow: 0 14px 32px rgba(245, 166, 35, 0.55);
         }
 
-        .btn-primary-gold:not(:disabled):active {
+        .btn-submit-gold:not(:disabled):active {
             transform: translateY(0);
         }
 
-        .spinner-loader {
+        .btn-spinner-icon {
             display: none;
             width: 22px;
             height: 22px;
             border: 2.5px solid #060912;
             border-top-color: transparent;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spinCircle 0.8s linear infinite;
         }
 
-        @keyframes spin {
+        @keyframes spinCircle {
             to { transform: rotate(360deg); }
         }
 
         /* Divider */
-        .or-divider {
+        .auth-divider-line {
             display: flex;
             align-items: center;
             gap: 14px;
@@ -466,8 +465,8 @@
             letter-spacing: 0.8px;
         }
 
-        .or-divider::before,
-        .or-divider::after {
+        .auth-divider-line::before,
+        .auth-divider-line::after {
             content: '';
             flex: 1;
             height: 1px;
@@ -475,7 +474,7 @@
         }
 
         /* Secondary Button (Sign In) */
-        .btn-secondary-cyan {
+        .btn-action-secondary {
             width: 100%;
             height: 48px;
             border-radius: var(--radius-btn);
@@ -493,7 +492,7 @@
             transition: all 0.25s ease;
         }
 
-        .btn-secondary-cyan:hover {
+        .btn-action-secondary:hover {
             background: rgba(0, 240, 255, 0.08);
             border-color: var(--cyan-accent);
             box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
@@ -503,8 +502,8 @@
 
         /* Success Registration Credentials Box */
         .success-cred-box {
-            background: rgba(16, 185, 129, 0.06);
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            background: rgba(0, 255, 136, 0.06);
+            border: 1px solid rgba(0, 255, 136, 0.25);
             border-radius: 14px;
             padding: 22px 18px;
             margin-bottom: 22px;
@@ -537,7 +536,7 @@
         }
 
         /* Clean Footer */
-        .auth-footer-clean {
+        .auth-footer-block {
             text-align: center;
             font-size: 0.78rem;
             color: var(--text-muted);
@@ -546,19 +545,19 @@
             gap: 10px;
         }
 
-        .footer-links-row {
+        .footer-nav-links {
             display: flex;
             justify-content: center;
             gap: 20px;
         }
 
-        .footer-links-row a {
+        .footer-nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.2s ease;
         }
 
-        .footer-links-row a:hover {
+        .footer-nav-links a:hover {
             color: var(--gold-primary);
         }
 
@@ -566,14 +565,14 @@
             body {
                 padding: 20px 12px;
             }
-            .luxury-card {
+            .auth-luxury-card {
                 padding: 26px 18px;
-                border-radius: 16px;
+                border-radius: 18px;
             }
-            .card-title {
-                font-size: 1.35rem;
+            .card-auth-heading {
+                font-size: 1.38rem;
             }
-            .country-select-custom {
+            .country-select-styled {
                 max-width: 100px;
                 font-size: 0.82rem;
             }
@@ -582,43 +581,49 @@
 </head>
 <body>
 
-    <!-- Ambient Aurora Background -->
-    <div class="ambient-aurora aurora-gold"></div>
-    <div class="ambient-aurora aurora-cyan"></div>
-    <div class="bg-subtle-grid"></div>
+    <!-- ============================================================
+         LIVE ANIMATED CYBER VIDEO CANVAS BACKGROUND (DITTO DASHBOARD)
+         ============================================================ -->
+    <div class="cyber-video-bg-container" aria-hidden="true">
+        <div class="cyber-nebula-orb orb-1"></div>
+        <div class="cyber-nebula-orb orb-2"></div>
+        <div class="cyber-nebula-orb orb-3"></div>
+        <div class="cyber-grid-scan-layer"></div>
+        <canvas id="cyberMatrixCanvas"></canvas>
+    </div>
 
     <!-- Main Container -->
-    <div class="auth-container">
+    <div class="auth-master-shell">
         
         <!-- Brand Header -->
-        <div class="brand-header">
-            <a href="{{ url('/') }}" class="brand-logo-link" title="Cyera AI">
-                <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="brand-logo-img">
+        <div class="auth-brand-block">
+            <a href="{{ url('/') }}" class="auth-brand-logo-wrap" title="Cyera AI">
+                <img src="{{ asset('logo.png') }}" alt="Cyera AI" class="auth-brand-logo-img">
             </a>
-            <div class="brand-badge">
-                <span class="pulse-dot"></span>
+            <div class="auth-live-pill">
+                <span class="live-pulse-dot"></span>
                 <span>NEW MEMBERSHIP</span>
             </div>
         </div>
 
-        <!-- Luxury Card -->
-        <div class="luxury-card">
+        <!-- Luxury Auth Card -->
+        <div class="auth-luxury-card">
             
             <div class="card-header-block">
-                <h1 class="card-title">Create Account</h1>
-                <p class="card-subtitle">Join the Cyera AI decentralized network</p>
+                <h1 class="card-auth-heading">Create Account</h1>
+                <p class="card-auth-subtext">Join the Cyera AI decentralized network</p>
             </div>
 
             <!-- Session Alerts -->
             @if (session('success'))
-                <div class="alert-box alert-box-success">
+                <div class="auth-alert-banner auth-alert-success">
                     <i class="fas fa-circle-check"></i>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             @if (session('warning'))
-                <div class="alert-box alert-box-error">
+                <div class="auth-alert-banner auth-alert-error">
                     <i class="fas fa-circle-exclamation"></i>
                     <span>{{ session('warning') }}</span>
                 </div>
@@ -630,73 +635,73 @@
                 @csrf
 
                 <!-- Sponsor ID -->
-                <div class="input-group-item">
-                    <label class="field-label" for="referrer">
-                        <span><i class="fas fa-id-card-clip icon-tag"></i> Sponsor ID</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="referrer">
+                        <span><i class="fas fa-id-card-clip label-icon"></i> Sponsor ID</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-user-tag"></i>
                         </div>
-                        <input type="text" name="referrer" id="referrer" class="form-control-custom" placeholder="Enter Sponsor ID" @if(!empty($userid)) value="{{$userid}}" @else value="{{old('referrer')}}" @endif required autofocus>
+                        <input type="text" name="referrer" id="referrer" class="input-control-styled" placeholder="Enter Sponsor ID" @if(!empty($userid)) value="{{$userid}}" @else value="{{old('referrer')}}" @endif required autofocus>
                     </div>
                     <!-- Live Verified Sponsor Name Display -->
-                    <div class="sponsor-verified-box" id="spdiv">
+                    <div class="sponsor-verified-badge" id="spdiv">
                         <i class="fas fa-circle-check"></i>
                         <span>Sponsor: <strong id="spname_text"></strong></span>
                     </div>
                     <input type="hidden" id="spname" name="referrername">
                     @error('referrer')
-                        <div class="error-hint"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <!-- Full Name -->
-                <div class="input-group-item">
-                    <label class="field-label" for="name">
-                        <span><i class="fas fa-user icon-tag"></i> Full Name</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="name">
+                        <span><i class="fas fa-user label-icon"></i> Full Name</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-signature"></i>
                         </div>
-                        <input type="text" name="name" id="name" class="form-control-custom" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
+                        <input type="text" name="name" id="name" class="input-control-styled" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
                     </div>
                     @error('name')
-                        <div class="error-hint"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <!-- Email Address -->
-                <div class="input-group-item">
-                    <label class="field-label" for="email">
-                        <span><i class="fas fa-envelope icon-tag"></i> Email Address</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="email">
+                        <span><i class="fas fa-envelope label-icon"></i> Email Address</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-at"></i>
                         </div>
-                        <input type="email" name="email" id="email" class="form-control-custom" placeholder="Enter your email" value="{{ old('email') }}" required autocomplete="email">
+                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email" value="{{ old('email') }}" required autocomplete="email">
                     </div>
                     @error('email')
-                        <div class="error-hint"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <!-- Contact & Country Code -->
-                <div class="input-group-item">
-                    <label class="field-label" for="contact">
-                        <span><i class="fas fa-phone-volume icon-tag"></i> Mobile Number</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="contact">
+                        <span><i class="fas fa-phone-volume label-icon"></i> Mobile Number</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-globe"></i>
                         </div>
-                        <select name="countrycode" class="country-select-custom">
+                        <select name="countrycode" class="country-select-styled">
                             <option data-countryCode="SG" value="65">SG (+65)</option>
                             <option data-countryCode="IN" value="91" selected>IN (+91)</option>
                             <option data-countryCode="GB" value="44">UK (+44)</option>
@@ -714,69 +719,69 @@
                             <option value="84">VN (+84)</option>
                             <option value="27">ZA (+27)</option>
                         </select>
-                        <input type="tel" name="contact" id="contact" maxlength="15" class="form-control-custom" placeholder="Mobile Number" value="{{ old('contact') }}" required autocomplete="tel">
+                        <input type="tel" name="contact" id="contact" maxlength="15" class="input-control-styled" placeholder="Mobile Number" value="{{ old('contact') }}" required autocomplete="tel">
                     </div>
                     @error('contact')
-                        <div class="error-hint"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <!-- Password -->
-                <div class="input-group-item">
-                    <label class="field-label" for="password">
-                        <span><i class="fas fa-key icon-tag"></i> Create Password</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="password">
+                        <span><i class="fas fa-key label-icon"></i> Create Password</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-lock"></i>
                         </div>
-                        <input type="password" name="password" id="password" class="form-control-custom" placeholder="Minimum 8 characters" required autocomplete="new-password">
-                        <button type="button" class="eye-toggle-btn" id="togglePassword" title="Show / Hide Password">
+                        <input type="password" name="password" id="password" class="input-control-styled" placeholder="Minimum 8 characters" required autocomplete="new-password">
+                        <button type="button" class="eye-toggle-action" id="togglePassword" title="Show / Hide Password">
                             <i class="fas fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>
                     @error('password')
-                        <div class="error-hint"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <!-- Confirm Password -->
-                <div class="input-group-item">
-                    <label class="field-label" for="password_confirmation">
-                        <span><i class="fas fa-shield-halved icon-tag"></i> Confirm Password</span>
-                        <span class="required-dot">*</span>
+                <div class="form-field-group">
+                    <label class="field-label-text" for="password_confirmation">
+                        <span><i class="fas fa-shield-halved label-icon"></i> Confirm Password</span>
+                        <span class="req-star">*</span>
                     </label>
-                    <div class="input-wrapper">
-                        <div class="input-icon-box">
+                    <div class="input-glass-wrap">
+                        <div class="input-leading-icon">
                             <i class="fas fa-lock"></i>
                         </div>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control-custom" placeholder="Repeat password" required autocomplete="new-password">
-                        <button type="button" class="eye-toggle-btn" id="togglePasswordConf" title="Show / Hide Password">
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="input-control-styled" placeholder="Repeat password" required autocomplete="new-password">
+                        <button type="button" class="eye-toggle-action" id="togglePasswordConf" title="Show / Hide Password">
                             <i class="fas fa-eye" id="toggleIconConf"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Terms & Conditions Checkbox -->
-                <label class="terms-row">
+                <label class="terms-condition-row">
                     <input type="checkbox" id="agreeTerms" required>
                     <span>I agree to Cyera AI <a href="{{ url('/terms') }}" target="_blank">Terms & Conditions</a></span>
                 </label>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-primary-gold" id="registerBtn" disabled>
+                <button type="submit" class="btn-submit-gold" id="registerBtn" disabled>
                     <span id="btnText"><i class="fas fa-user-plus"></i> Create Account</span>
-                    <div class="spinner-loader" id="btnSpinner"></div>
+                    <div class="btn-spinner-icon" id="btnSpinner"></div>
                 </button>
 
                 <!-- Divider -->
-                <div class="or-divider">
+                <div class="auth-divider-line">
                     <span>Already have an account?</span>
                 </div>
 
                 <!-- Sign In Link -->
-                <a href="{{ url('/login') }}" class="btn-secondary-cyan">
+                <a href="{{ url('/login') }}" class="btn-action-secondary">
                     <i class="fas fa-arrow-right-to-bracket"></i> Sign In to Dashboard
                 </a>
 
@@ -800,12 +805,12 @@
                 </div>
             </div>
 
-            <a href="{{ url('/login') }}" class="btn-primary-gold" style="text-decoration:none;">
+            <a href="{{ url('/login') }}" class="btn-submit-gold" style="text-decoration:none;">
                 <i class="fas fa-arrow-right-to-bracket"></i> Proceed to Login
             </a>
 
             <div style="margin-top:14px;">
-                <a href="{{ url('/register') }}" class="btn-secondary-cyan">
+                <a href="{{ url('/register') }}" class="btn-action-secondary">
                     <i class="fas fa-user-plus"></i> Register Another Account
                 </a>
             </div>
@@ -814,8 +819,8 @@
         </div>
 
         <!-- Clean Footer -->
-        <footer class="auth-footer-clean">
-            <div class="footer-links-row">
+        <footer class="auth-footer-block">
+            <div class="footer-nav-links">
                 <a href="{{ url('/terms') }}">Terms of Service</a>
                 <span>•</span>
                 <a href="{{ url('/terms') }}">Privacy Policy</a>
@@ -826,6 +831,144 @@
         </footer>
 
     </div>
+
+    <!-- ============================================================
+         CYBER PARTICLES & BEAM MATRIX CANVAS SCRIPT (DITTO DASHBOARD)
+         ============================================================ -->
+    <script>
+    (function () {
+        const canvas = document.getElementById('cyberMatrixCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let circuitBeams = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initElements();
+        }
+
+        function initElements() {
+            particles = [];
+            circuitBeams = [];
+            const count = Math.min(Math.floor((width * height) / 20000), 45);
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 2.2 + 1.0,
+                    vx: (Math.random() - 0.5) * 0.45,
+                    vy: (Math.random() - 0.5) * 0.45,
+                    alpha: Math.random() * 0.65 + 0.35,
+                    color: Math.random() > 0.45 ? '#FFD700' : (Math.random() > 0.5 ? '#00FF88' : '#00E5FF'),
+                    pulsing: Math.random() * Math.PI,
+                    pulseSpeed: Math.random() * 0.005 + 0.002
+                });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                circuitBeams.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    length: Math.random() * 90 + 45,
+                    speed: Math.random() * 0.4 + 0.2,
+                    vertical: Math.random() > 0.45,
+                    alpha: Math.random() * 0.45 + 0.25,
+                    color: Math.random() > 0.4 ? 'rgba(255, 215, 0, ' : (Math.random() > 0.5 ? 'rgba(0, 255, 136, ' : 'rgba(0, 229, 255, ')
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Connect nearest nodes with laser circuit lines
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 130) {
+                        const alpha = (1 - dist / 130) * 0.35;
+                        ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw and update glowing particles
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.pulsing += p.pulseSpeed;
+                if (p.y < -15) p.y = height + 15;
+                if (p.x < -15) p.x = width + 15;
+                if (p.x > width + 15) p.x = -15;
+
+                const currentAlpha = Math.max(0.2, p.alpha + Math.sin(p.pulsing) * 0.3);
+                ctx.save();
+                ctx.globalAlpha = currentAlpha;
+                ctx.shadowBlur = 14;
+                ctx.shadowColor = p.color;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Draw high-speed laser beams
+            for (let i = 0; i < circuitBeams.length; i++) {
+                const b = circuitBeams[i];
+                ctx.save();
+                ctx.lineWidth = 1.8;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = b.color + '0.8)';
+                const grad = b.vertical
+                    ? ctx.createLinearGradient(b.x, b.y - b.length, b.x, b.y)
+                    : ctx.createLinearGradient(b.x - b.length, b.y, b.x, b.y);
+                grad.addColorStop(0, b.color + '0)');
+                grad.addColorStop(0.7, b.color + (b.alpha * 0.8) + ')');
+                grad.addColorStop(1, b.color + b.alpha + ')');
+                ctx.strokeStyle = grad;
+                ctx.beginPath();
+                if (b.vertical) {
+                    ctx.moveTo(b.x, b.y - b.length);
+                    ctx.lineTo(b.x, b.y);
+                    b.y += b.speed;
+                    if (b.y - b.length > height) {
+                        b.y = 0;
+                        b.x = Math.random() * width;
+                    }
+                } else {
+                    ctx.moveTo(b.x - b.length, b.y);
+                    ctx.lineTo(b.x, b.y);
+                    b.x += b.speed;
+                    if (b.x - b.length > width) {
+                        b.x = 0;
+                        b.y = Math.random() * height;
+                    }
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        requestAnimationFrame(animate);
+    })();
+    </script>
 
     <!-- jQuery for AJAX Sponsor Lookup -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
