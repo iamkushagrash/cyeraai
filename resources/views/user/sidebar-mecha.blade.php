@@ -26,9 +26,9 @@
             </svg>
 
             <!-- Gear Settings Button Top-Right -->
-            <button type="button" class="btn-header-gear" onclick="closeMechaSidebar()" title="Close / Settings">
+            <a href="{{ url('/User/EditProfile') }}" class="btn-header-gear" title="Account Settings & Profile" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-gear"></i>
-            </button>
+            </a>
 
 @php
     $sideUid = Session::get('user.id');
@@ -144,6 +144,22 @@
                         </div>
                     </div>
                     <span class="nav-active-badge">ACTIVE</span>
+                </a>
+            </div>
+
+            <!-- My Profile & Identity -->
+            <div class="mecha-nav-item">
+                <a href="{{ url('/User/EditProfile') }}" class="mecha-nav-link {{ request()->is('User/EditProfile*') || request()->is('User/Profile*') ? 'active' : '' }}">
+                    <div class="nav-link-left-grp">
+                        <div class="nav-ico-orb">
+                            <i class="fas fa-id-card-clip"></i>
+                        </div>
+                        <div class="nav-txt-stack">
+                            <span class="nav-link-txt">My Profile</span>
+                            <span class="nav-sub-txt">Identity & Web3 Vault</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right nav-link-arr"></i>
                 </a>
             </div>
 

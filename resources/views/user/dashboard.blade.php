@@ -469,6 +469,64 @@
             </div>
 
             <!-- ============================================================
+                 3A. PROMINENT 1-CLICK REFERRAL LINK HUD BAR
+                 ============================================================ -->
+            @php
+                $dashUserUuid = Session::get('user.userid') ?? ($data['userDetail']->user()->uuid ?? 'CAI000001');
+                $dashReferralUrl = url('/register/' . $dashUserUuid);
+            @endphp
+            <div class="hud-referral-quick-bar" style="margin-bottom: 22px;">
+                <div style="background: linear-gradient(135deg, rgba(245, 166, 35, 0.12) 0%, rgba(13, 14, 24, 0.95) 100%); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 16px; padding: 18px 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.08); position: relative; overflow: hidden;">
+                    <!-- Top Edge Gold Hairline -->
+                    <div style="position: absolute; top: 0; left: 10%; right: 10%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.9), rgba(245, 166, 35, 0.8), transparent);"></div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 215, 0, 0.15); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 0 14px rgba(245, 166, 35, 0.3);">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div>
+                                <div style="font-family: 'Outfit', sans-serif; font-size: 1.02rem; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                                    <span>INSTANT REFERRAL LINK</span>
+                                    <span style="font-size: 0.68rem; background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: #00FF88; padding: 2px 7px; border-radius: 12px; font-weight: 700;">5% DIRECT BONUS</span>
+                                </div>
+                                <div style="font-size: 0.78rem; color: #94A3B8;">Invite friends to Cyera AI & build your 15-level decentralized team</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 0.76rem; color: #94A3B8; font-weight: 600;">SPONSOR CODE:</span>
+                            <span style="font-family: 'Space Mono', monospace; font-size: 0.86rem; font-weight: 800; color: #FFD700; background: rgba(0,0,0,0.6); padding: 3px 9px; border-radius: 6px; border: 1px solid rgba(245, 166, 35, 0.3);">
+                                {{ $dashUserUuid }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <div style="flex: 1; min-width: 240px; background: #07080d; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
+                            <input type="text" id="dashRefInput" value="{{ $dashReferralUrl }}" readonly style="background: transparent; border: none; outline: none; color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.85rem; width: 100%; font-weight: 600;">
+                        </div>
+
+                        <button type="button" onclick="copyDashRefLink()" class="btn-solid-gold-claim" style="height: 42px; padding: 0 20px; font-size: 0.88rem; white-space: nowrap; cursor: pointer; border: none; border-radius: 10px; font-weight: 800;">
+                            <i class="fas fa-copy"></i> <span id="dashCopyBtnText">COPY LINK</span>
+                        </button>
+
+                        <a href="https://t.me/share/url?url={{ urlencode($dashReferralUrl) }}&text={{ urlencode('Join Cyera AI with my referral link:') }}" target="_blank" style="height: 42px; width: 42px; border-radius: 10px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.35); color: #00E5FF; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.15rem;" title="Share on Telegram">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+
+                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join Cyera AI with my referral link: ' . $dashReferralUrl) }}" target="_blank" style="height: 42px; width: 42px; border-radius: 10px; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.35); color: #00FF88; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.15rem;" title="Share on WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+
+                        <a href="{{ url('/User/Referral') }}" style="height: 42px; padding: 0 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; display: flex; align-items: center; gap: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 600; white-space: nowrap;" title="Open QR & Referral Hub">
+                            <i class="fas fa-qrcode" style="color: #FFD700;"></i> QR HUB
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
                  3B. TOTAL INCOME & 5 REWARDS HUBS (CPS, DIRECT, LEVEL, POOL, RANK)
                  ============================================================ -->
             <div class="hud-incomes-matrix-wrap">
@@ -1728,6 +1786,20 @@
             const parent = elem.closest('.mecha-nav-has-sub');
             if (parent) {
                 parent.classList.toggle('open');
+            }
+        }
+
+        function copyDashRefLink() {
+            const input = document.getElementById('dashRefInput');
+            const btnText = document.getElementById('dashCopyBtnText');
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(input.value);
+                if (btnText) btnText.innerText = 'COPIED!';
+                setTimeout(function() {
+                    if (btnText) btnText.innerText = 'COPY LINK';
+                }, 2000);
             }
         }
     </script>

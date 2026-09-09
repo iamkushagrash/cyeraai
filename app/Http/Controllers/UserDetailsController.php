@@ -347,17 +347,44 @@ class UserDetailsController extends Controller
 
 
 
-    //User
+    //User Profile Page
     public function showEditData(){
-        $memberdt=DB::table('user_details')->where([['users.licence','1'],['user_details.id',Session::get('user.id')]])
-        ->leftJoin('users','users.id','=','user_details.userid')
-        ->leftJoin('users as gd','gd.id','=','user_details.sponsorid')
-        ->leftJoin('asset_details','asset_details.userid','=','user_details.id')
-        ->select('users.usersname', 'users.email', 'users.contact', 'users.ccode', 'gd.usersname as guidername', 'gd.email as guiderid', 'asset_details.bep20addr as styaddress', 'asset_details.usdttrc20addr as usdttrc20address', 'asset_details.usdtbep20addr as usdtbep20address')
-        ->get()->first();
-        $editstatus=\App\AssetDetailChanges::where([['userid',\Session::get('user.id')],['asset_status','>',0]])->first();
+        $userSessionId = Session::get('user.id');
+        $userDetail = \App\UserDetails::where('id', $userSessionId)->first();
+        if (!$userDetail && \Auth::check()) {
+            $userDetail = \App\UserDetails::where('userid', \Auth::id())->first();
+        }
+        
+        $memberdt = null;
+        if ($userDetail) {
+            $memberdt = DB::table('user_details')->where('user_details.id', $userDetail->id)
+                ->leftJoin('users', 'users.id', '=', 'user_details.userid')
+                ->leftJoin('user_details as gd_detail', 'gd_detail.id', '=', 'user_details.sponsorid')
+                ->leftJoin('users as gd', 'gd.id', '=', 'gd_detail.userid')
+                ->leftJoin('asset_details', 'asset_details.userid', '=', 'user_details.id')
+                ->select(
+                    'users.id as uid',
+                    'users.uuid as uuid',
+                    'users.usersname',
+                    'users.email',
+                    'users.contact',
+                    'users.ccode',
+                    'users.doj',
+                    'gd.usersname as guidername',
+                    'gd.uuid as guiderid',
+                    'asset_details.bep20addr as bep20address',
+                    'asset_details.usdtbep20addr as usdtbep20address',
+                    'user_details.userstatus',
+                    'user_details.rank_name',
+                    'user_details.current_self_investment',
+                    'user_details.total_self_investment'
+                )
+                ->first();
+        }
 
-        return view('user.profile')->with('profile',$memberdt)->with('changeasset',$editstatus);
+        $editstatus = \App\AssetDetailChanges::where([['userid', $userSessionId], ['asset_status', '>', 0]])->first();
+
+        return view('user.profile')->with('profile', $memberdt)->with('changeasset', $editstatus)->with('userDetail', $userDetail);
     }
     public function userUpdate(Request $request){
         set_time_limit(0);
