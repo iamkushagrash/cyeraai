@@ -451,7 +451,7 @@ class UserDetails extends Model
             ->distinct('user_details.id')
             ->count('user_details.id');
 
-        $dailyQual = ($selfInv >= 100);
+        $dailyQual = ($selfInv >= 100 && $directs100 >= 1);
         $weeklyQual = ($selfInv >= 100 && $directs100 >= 5);
         $monthlyQual = ($selfInv >= 100 && $directs100 >= 15 && $power >= 5000 && $weaker >= 5000);
 
@@ -467,7 +467,9 @@ class UserDetails extends Model
                 'is_qualified' => $dailyQual,
                 'req_self' => 100,
                 'current_self' => $selfInv,
-                'progress_pct' => min(100, round(($selfInv / 100) * 100)),
+                'req_directs' => 1,
+                'current_directs' => $directs100,
+                'progress_pct' => min(100, round((min($selfInv / 100, $directs100 / 1)) * 100)),
             ],
             'weekly' => [
                 'name' => 'Weekly Pool',

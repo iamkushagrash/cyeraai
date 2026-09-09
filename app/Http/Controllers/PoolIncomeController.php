@@ -44,19 +44,31 @@ class PoolIncomeController extends Controller
             return;
         }
 
-        $totalTurnover = (float)StackingDeposite::where('status', 1)
+        // 1. Get all deposits created in yesterday's period
+        $depositsInPeriod = StackingDeposite::where('status', 1)
             ->whereBetween('created_at', [$periodStart, $periodEnd])
-            ->sum('usdt');
-
-        $poolAmount = ($totalTurnover * (float)$pool->pool_percent) / 100;
-
-        // Eligible users: Active user, not capped out, self investment >= $100
-        $eligibleUsers = UserDetails::where('userstatus', 1)
-            ->where('capping', '!=', 1)
-            ->where('current_self_investment', '>=', (float)$pool->min_self_investment)
             ->get();
 
-        $eligibleCount = $eligibleUsers->count();
+        $totalTurnover = (float)$depositsInPeriod->sum('usdt');
+        $poolAmount = ($totalTurnover * (float)$pool->pool_percent) / 100;
+
+        // 2. Find Sponsors of the users who staked in this period
+        $eligibleUserMap = [];
+        foreach ($depositsInPeriod as $dep) {
+            $stakedUser = UserDetails::where('id', $dep->userid)->orWhere('userid', $dep->userid)->first();
+            if ($stakedUser && $stakedUser->sponsorid > 0) {
+                $sponsor = UserDetails::where('id', $stakedUser->sponsorid)->orWhere('userid', $stakedUser->sponsorid)->first();
+                if ($sponsor) {
+                    // Check Sponsor's own qualification: Active user, not capped out, self investment >= min_self_investment ($100)
+                    if ($sponsor->userstatus == 1 && $sponsor->capping != 1 && (float)$sponsor->current_self_investment >= (float)$pool->min_self_investment) {
+                        $eligibleUserMap[$sponsor->id] = $sponsor;
+                    }
+                }
+            }
+        }
+
+        $eligibleUsers = array_values($eligibleUserMap);
+        $eligibleCount = count($eligibleUsers);
         $perUserShare = ($eligibleCount > 0 && $poolAmount > 0) ? ($poolAmount / $eligibleCount) : 0;
 
         $distribution = PoolDistribution::create([
