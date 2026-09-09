@@ -787,20 +787,12 @@
                 </div>
                 <div class="cred-item-row">
                     <span class="cred-item-label">Full Name:</span>
-                    <span class="cred-item-value" style="font-size:0.92rem;">{{ session('details.name') }}</span>
-                </div>
-                <div class="cred-item-row">
-                    <span class="cred-item-label">Email:</span>
-                    <span class="cred-item-value" style="font-size:0.92rem;">{{ session('details.username') }}</span>
-                </div>
-                <div class="cred-item-row">
-                    <span class="cred-item-label">Password:</span>
-                    <span class="cred-item-value">{{ session('details.password') }}</span>
+                    <span class="cred-item-value" style="font-size:0.95rem; color: #FFFFFF;">{{ session('details.name') }}</span>
                 </div>
                 @if(!empty(session('details.wallet')))
-                <div class="cred-item-row">
-                    <span class="cred-item-label">Linked BEP-20:</span>
-                    <span class="cred-item-value" style="font-size:0.75rem;">{{ session('details.wallet') }}</span>
+                <div class="cred-item-row" style="flex-wrap: wrap; gap: 6px;">
+                    <span class="cred-item-label" style="white-space: nowrap;">Linked BEP-20:</span>
+                    <span class="cred-item-value" style="font-size:0.80rem; font-family: monospace; color: #00FF88; word-break: break-all;">{{ session('details.wallet') }}</span>
                 </div>
                 @endif
             </div>
