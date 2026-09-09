@@ -9,7 +9,7 @@ class UserDetails extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['userid', 'sponserid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected'];
+    protected $fillable = ['userid', 'sponsorid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected'];
 
 
     public function stackingDeposite()
@@ -504,20 +504,20 @@ class UserDetails extends Model
     public function getRankQualification()
     {
         $legs = $this->getLegBusiness();
-        $power = (float)($legs['power'] ?? 0);
-        $weaker = (float)($legs['weaker'] ?? 0);
+        $power = (float) ($legs['power'] ?? 0);
+        $weaker = (float) ($legs['weaker'] ?? 0);
 
         $allRanks = \App\RankDetail::where('status', 1)->orderBy('rank_level', 'asc')->get();
         if ($allRanks->isEmpty()) {
             $ranksData = [
-                (object)['id' => 1, 'rank_name' => 'V1', 'rank_level' => 1, 'power_leg' => 500, 'weaker_leg' => 500, 'weekly_reward' => 5],
-                (object)['id' => 2, 'rank_name' => 'V2', 'rank_level' => 2, 'power_leg' => 1000, 'weaker_leg' => 1000, 'weekly_reward' => 10],
-                (object)['id' => 3, 'rank_name' => 'V3', 'rank_level' => 3, 'power_leg' => 5000, 'weaker_leg' => 5000, 'weekly_reward' => 25],
-                (object)['id' => 4, 'rank_name' => 'V4', 'rank_level' => 4, 'power_leg' => 10000, 'weaker_leg' => 10000, 'weekly_reward' => 50],
-                (object)['id' => 5, 'rank_name' => 'V5', 'rank_level' => 5, 'power_leg' => 25000, 'weaker_leg' => 25000, 'weekly_reward' => 100],
-                (object)['id' => 6, 'rank_name' => 'V6', 'rank_level' => 6, 'power_leg' => 50000, 'weaker_leg' => 50000, 'weekly_reward' => 250],
-                (object)['id' => 7, 'rank_name' => 'V7', 'rank_level' => 7, 'power_leg' => 100000, 'weaker_leg' => 100000, 'weekly_reward' => 500],
-                (object)['id' => 8, 'rank_name' => 'V8', 'rank_level' => 8, 'power_leg' => 500000, 'weaker_leg' => 500000, 'weekly_reward' => 2000],
+                (object) ['id' => 1, 'rank_name' => 'V1', 'rank_level' => 1, 'power_leg' => 500, 'weaker_leg' => 500, 'weekly_reward' => 5],
+                (object) ['id' => 2, 'rank_name' => 'V2', 'rank_level' => 2, 'power_leg' => 1000, 'weaker_leg' => 1000, 'weekly_reward' => 10],
+                (object) ['id' => 3, 'rank_name' => 'V3', 'rank_level' => 3, 'power_leg' => 5000, 'weaker_leg' => 5000, 'weekly_reward' => 25],
+                (object) ['id' => 4, 'rank_name' => 'V4', 'rank_level' => 4, 'power_leg' => 10000, 'weaker_leg' => 10000, 'weekly_reward' => 50],
+                (object) ['id' => 5, 'rank_name' => 'V5', 'rank_level' => 5, 'power_leg' => 25000, 'weaker_leg' => 25000, 'weekly_reward' => 100],
+                (object) ['id' => 6, 'rank_name' => 'V6', 'rank_level' => 6, 'power_leg' => 50000, 'weaker_leg' => 50000, 'weekly_reward' => 250],
+                (object) ['id' => 7, 'rank_name' => 'V7', 'rank_level' => 7, 'power_leg' => 100000, 'weaker_leg' => 100000, 'weekly_reward' => 500],
+                (object) ['id' => 8, 'rank_name' => 'V8', 'rank_level' => 8, 'power_leg' => 500000, 'weaker_leg' => 500000, 'weekly_reward' => 2000],
             ];
         } else {
             $ranksData = $allRanks;
@@ -528,10 +528,10 @@ class UserDetails extends Model
         $matrix = [];
 
         foreach ($ranksData as $r) {
-            $rObj = (object)$r;
-            $plReq = (float)$rObj->power_leg;
-            $wlReq = (float)$rObj->weaker_leg;
-            $reward = (float)$rObj->weekly_reward;
+            $rObj = (object) $r;
+            $plReq = (float) $rObj->power_leg;
+            $wlReq = (float) $rObj->weaker_leg;
+            $reward = (float) $rObj->weekly_reward;
             $isAchieved = ($power >= $plReq && $weaker >= $wlReq);
 
             if ($isAchieved) {
@@ -547,7 +547,7 @@ class UserDetails extends Model
             $matrix[] = [
                 'id' => $rObj->id ?? 0,
                 'rank_name' => $rObj->rank_name,
-                'rank_level' => (int)$rObj->rank_level,
+                'rank_level' => (int) $rObj->rank_level,
                 'power_leg' => $plReq,
                 'weaker_leg' => $wlReq,
                 'weekly_reward' => $reward,
@@ -559,12 +559,12 @@ class UserDetails extends Model
         }
 
         $currentRankName = $highestRank ? $highestRank->rank_name : 'None';
-        $currentRankLevel = $highestRank ? (int)$highestRank->rank_level : 0;
-        $currentWeeklyReward = $highestRank ? (float)$highestRank->weekly_reward : 0.0;
+        $currentRankLevel = $highestRank ? (int) $highestRank->rank_level : 0;
+        $currentWeeklyReward = $highestRank ? (float) $highestRank->weekly_reward : 0.0;
 
         $nextRankName = $nextRank ? $nextRank->rank_name : null;
-        $nextPlReq = $nextRank ? (float)$nextRank->power_leg : 0.0;
-        $nextWlReq = $nextRank ? (float)$nextRank->weaker_leg : 0.0;
+        $nextPlReq = $nextRank ? (float) $nextRank->power_leg : 0.0;
+        $nextWlReq = $nextRank ? (float) $nextRank->weaker_leg : 0.0;
         $nextPlNeeded = $nextRank ? max(0.0, $nextPlReq - $power) : 0.0;
         $nextWlNeeded = $nextRank ? max(0.0, $nextWlReq - $weaker) : 0.0;
         $nextPlProgress = ($nextRank && $nextPlReq > 0) ? min(100.0, round(($power / $nextPlReq) * 100, 1)) : 100.0;
