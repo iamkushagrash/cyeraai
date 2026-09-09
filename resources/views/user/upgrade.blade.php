@@ -221,6 +221,7 @@
             const SPLITTER_ADDRESS = "{{ $splitterContract }}";
             const USDT_ADDRESS = "{{ $usdtContract }}";
             const BSC_CHAIN_ID = '0x38'; // 56 BSC Mainnet
+            const IS_DEMO_MODE = {{ (config('app.demo_mode') || env('DEMO_MODE') == 'true' || env('DEMO_MODE') === true || env('TEST_MODE') == 'true' || env('TEST_MODE') === true) ? 'true' : 'false' }};
 
             // Minimal ABIs
             const ERC20_ABI = [
@@ -507,7 +508,9 @@
                         bnbBalance = parseFloat(ethers.formatEther(rawBnb));
                     } catch(e) {}
 
-                    if (err.code === 'ACTION_REJECTED' || err.code === 4001 || (err.message && err.message.includes('rejected'))) {
+                    if (IS_DEMO_MODE) {
+                        errMsg = 'Demo Mode Error: ' + (err.message || 'Simulation execution failed');
+                    } else if (err.code === 'ACTION_REJECTED' || err.code === 4001 || (err.message && err.message.includes('rejected'))) {
                         errMsg = 'Transaction was rejected in your wallet.';
                     } else if (usdtBalance < amount) {
                         errMsg = 'Transaction Failed (Insufficient USDT): Your wallet (' + userAccount.substring(0, 6) + '...' + userAccount.substring(userAccount.length - 4) + ') has $' + usdtBalance.toFixed(2) + ' USDT (BEP-20). Staking requires $' + amount.toFixed(2) + ' USDT.';
