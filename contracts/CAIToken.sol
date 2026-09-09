@@ -82,7 +82,42 @@ abstract contract Ownable2Step is Context {
     }
 }
 
-contract CAIToken is Context, IERC20, IERC20Metadata, Ownable2Step {
+abstract contract Pausable is Context {
+    event Paused(address account);
+    event Unpaused(address account);
+
+    bool private _paused;
+
+    constructor() {
+        _paused = false;
+    }
+
+    modifier whenNotPaused() {
+        require(!_paused, "Pausable: paused");
+        _;
+    }
+
+    modifier whenPaused() {
+        require(_paused, "Pausable: not paused");
+        _;
+    }
+
+    function paused() public view virtual returns (bool) {
+        return _paused;
+    }
+
+    function _pause() internal virtual whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
+
+    function _unpause() internal virtual whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
+}
+
+contract CAIToken is Context, IERC20, IERC20Metadata, Ownable2Step, Pausable {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
 
@@ -222,11 +257,11 @@ contract CAIToken is Context, IERC20, IERC20Metadata, Ownable2Step {
     }
 
     /**
-     * @dev Internal transfer logic enforcing AMM Whitelist on Buys.
+     * @dev Internal transfer logic enforcing AMM Whitelist on Buys & Pausable control.
      *      - If `from` is a registered AMM Pair (Buy): `to` must be whitelisted.
      *      - If `to` is a registered AMM Pair (Sell): Always allowed (unrestricted for all holders).
      */
-    function _transfer(address from, address to, uint256 value) internal {
+    function _transfer(address from, address to, uint256 value) internal whenNotPaused {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
@@ -261,5 +296,16 @@ contract CAIToken is Context, IERC20, IERC20Metadata, Ownable2Step {
                 _approve(tokenOwner, spender, currentAllowance - value);
             }
         }
+    }
+
+    /**
+     * @notice Emergency Pause / Unpause for all token transfers (Admin Owner only).
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }

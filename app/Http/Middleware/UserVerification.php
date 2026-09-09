@@ -15,15 +15,24 @@ class UserVerification
      */
     public function handle($request, Closure $next)
     {
-        if (\Auth::user()->licence == "1" && \Auth::user()->permission == 1)
-        {
-            return $next($request);
+        if (!\Auth::check()) {
+            return redirect('/login');
         }
-        elseif(\Auth::user()->permission == 0){
+
+        if (\Auth::user()->permission == 0) {
             \Auth::logout();
             \Session::flush();
-            return redirect()->back()->with('warning',"Your Account has been blocked");
+            return redirect('/login')->with('warning', "Your Account has been blocked");
         }
-        return redirect()->back();
+
+        if (\Auth::user()->licence == "3" || \Auth::user()->licence == "2" || \Auth::user()->licence == "4") {
+            return redirect('/Main/DashboardToday');
+        }
+
+        if (\Auth::user()->permission == 1) {
+            return $next($request);
+        }
+
+        return redirect('/login');
     }
 }

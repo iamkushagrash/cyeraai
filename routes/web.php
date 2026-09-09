@@ -111,6 +111,12 @@ Route::get('/terms', function () {
 
 Auth::routes();
 
+// Web3 dApp Authentication (1-Click MetaMask & Auto-Register with Cryptographic Proof)
+Route::post('/auth/check-wallet', 'Auth\Web3AuthController@checkWallet');
+Route::post('/auth/web3-nonce', 'Auth\Web3AuthController@getNonce');
+Route::post('/auth/web3-login', 'Auth\Web3AuthController@web3Login');
+Route::post('/auth/web3-register', 'Auth\Web3AuthController@web3Register');
+
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/Transaction/transactionStatus/{id}', 'CpsIncomeController@paymentStatus');
@@ -343,9 +349,10 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     /*Route::get('/User/BuyCAI', 'TransactionDetailController@showTransactionPage');
     Route::post('/User/BuyCAI', 'TransactionDetailController@submitTransaction');*/
 
-    // Transaction using NP
-    Route::get('/User/Deposit', 'CpsIncomeController@showPage');
-    Route::post('/User/Deposit', 'CpsIncomeController@submitTransaction');
+    // Redirect old deposit to Web3 Staking
+    Route::get('/User/Deposit', function () {
+        return redirect('/User/Stake');
+    });
 
     // Deposit History
     Route::get('/User/DepositHistory', 'BonusRewardController@userDepositHistory');
@@ -354,6 +361,7 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::get('/User/Stake', 'WalletTransferController@stakePage');
     Route::post('/User/getUser', 'WalletTransferController@getUserDetail');
     Route::post('/User/Stake', 'WalletTransferController@stakemwt');
+    Route::post('/User/Web3UnifiedStake', 'WalletTransferController@web3UnifiedStake');
     Route::get('/User/StakingHistory', 'BonusRewardController@userUpgradeHistory');
     Route::get('/User/StakingTxnHistory', 'BonusRewardController@userUpgradeTxnHistory');
 

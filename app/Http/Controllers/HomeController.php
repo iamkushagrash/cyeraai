@@ -123,6 +123,17 @@ class HomeController extends Controller
 
     //User
     public function userindex(){
+        if (!Session::has('user.id') && \Auth::check()) {
+            $user = \Auth::user();
+            $uDetail = \App\UserDetails::where('user_details.userid', $user->id)
+                ->leftjoin('users', 'users.id', '=', 'user_details.userid')
+                ->leftjoin('users as guider', 'guider.id', '=', 'user_details.sponsorid')
+                ->select('user_details.id as id', 'users.usersname as name', 'users.uuid as userid', 'users.email as email', 'users.licence as licence', 'users.permission as permission', 'users.uuid as uuid', 'guider.uuid as sponsorid', 'users.doj')
+                ->first();
+            Session::put('user', $uDetail);
+            Session::put('logtime', strtotime(now()));
+        }
+
         $userdetails=\App\UserDetails::where([['user_details.id',Session::get('user.id')]])
         ->leftJoin(DB::raw('(SELECT * FROM stacking_deposites WHERE id IN (SELECT MIN(id) FROM stacking_deposites GROUP BY userid)) as first_stack'), 'user_details.id', '=', 'first_stack.userid')
         ->select('total_direct as totaldirect','active_direct as activedirect','total_downline as totaldownline','active_downline as activedownline','total_direct_investment as directbusiness','total_level_investment as levelbusiness','total_investment as totalbusiness','current_self_investment as currentself','capping as capping','booster as booster')

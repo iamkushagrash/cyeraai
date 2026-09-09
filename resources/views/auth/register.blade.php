@@ -184,6 +184,28 @@
             font-weight: 400;
         }
 
+        /* Wallet Connected Banner */
+        .wallet-connected-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            margin-bottom: 14px;
+            font-size: 0.82rem;
+            color: #00FF88;
+            word-break: break-all;
+        }
+
+        .wallet-prompt-banner {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
         /* Form Fields */
         .form-field-group {
             margin-bottom: 13px;
@@ -421,9 +443,9 @@
         }
 
         .btn-submit-gold:disabled {
-            opacity: 0.62;
+            opacity: 0.55;
             cursor: not-allowed;
-            filter: grayscale(0.2);
+            filter: grayscale(0.3);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             transform: none !important;
         }
@@ -607,7 +629,7 @@
                 </a>
                 <div class="inside-live-badge">
                     <span class="live-dot-pulse"></span>
-                    <span>NEW MEMBERSHIP</span>
+                    <span>WEB3 REGISTRATION</span>
                 </div>
                 <h1 class="card-auth-title">Create Account</h1>
                 <p class="card-auth-subtitle">Join the Cyera AI decentralized network</p>
@@ -628,10 +650,37 @@
                 </div>
             @endif
 
+            <div id="regWeb3Alert" class="auth-alert-banner auth-alert-error" style="display: none;">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="regWeb3AlertText"></span>
+            </div>
+
             @if(!session('success'))
+            
+            @php
+                $prefilledWallet = request('wallet', $wallet ?? '');
+                $prefilledRef = !empty($userid) ? $userid : request('ref', request('sponsor', old('referrer', '')));
+            @endphp
+
+            <!-- Web3 Wallet Connection Banner -->
+            <div class="wallet-connected-banner" id="walletConnectedBanner" style="{{ !empty($prefilledWallet) ? 'display: flex;' : 'display: none;' }}">
+                <i class="fas fa-circle-check" style="color: #00FF88;"></i>
+                <span>Linked BEP-20 Wallet: <strong id="walletDisplay">{{ !empty($prefilledWallet) ? substr($prefilledWallet, 0, 6) . '...' . substr($prefilledWallet, -4) : '' }}</strong></span>
+            </div>
+
+            <div class="wallet-prompt-banner" id="walletPromptBox" style="{{ empty($prefilledWallet) ? 'display: flex;' : 'display: none;' }}">
+                <button type="button" class="btn-submit-gold" id="btnConnectRegWallet" style="height: 46px; font-size: 0.92rem; background: linear-gradient(135deg, #F5A623 0%, #D48806 100%);">
+                    <i class="fas fa-wallet"></i>
+                    <span id="regWalletBtnText">Connect MetaMask / TrustWallet (Required)</span>
+                    <div class="btn-spinner-icon" id="regWalletSpinner" style="display: none;"></div>
+                </button>
+            </div>
+
             <!-- Registration Form -->
             <form action="{{ route('register') }}" method="POST" id="registerForm">
                 @csrf
+
+                <input type="hidden" name="wallet_address" id="wallet_address" value="{{ $prefilledWallet }}">
 
                 <!-- Sponsor ID -->
                 <div class="form-field-group">
@@ -643,12 +692,15 @@
                         <div class="input-leading-icon">
                             <i class="fas fa-user-tag"></i>
                         </div>
-                        <input type="text" name="referrer" id="referrer" class="input-control-styled" placeholder="Enter Sponsor ID" @if(!empty($userid)) value="{{$userid}}" @else value="{{old('referrer')}}" @endif required autofocus>
+                        <input type="text" name="referrer" id="referrer" class="input-control-styled" placeholder="Enter Sponsor ID (e.g. CAI000001)" value="{{ $prefilledRef }}" required autofocus>
                     </div>
                     <!-- Live Verified Sponsor Name Display -->
                     <div class="sponsor-verified-badge" id="spdiv">
                         <i class="fas fa-circle-check"></i>
                         <span>Sponsor: <strong id="spname_text"></strong></span>
+                    </div>
+                    <div class="error-hint-msg" id="sperr" style="display: none;">
+                        <i class="fas fa-circle-exclamation"></i> Invalid Sponsor ID. Please verify your sponsor code.
                     </div>
                     <input type="hidden" id="spname" name="referrername">
                     @error('referrer')
@@ -683,7 +735,7 @@
                         <div class="input-leading-icon">
                             <i class="fas fa-at"></i>
                         </div>
-                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email" value="{{ old('email') }}" required autocomplete="email">
+                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email address" value="{{ old('email') }}" required autocomplete="email">
                     </div>
                     @error('email')
                         <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
@@ -701,22 +753,22 @@
                             <i class="fas fa-globe"></i>
                         </div>
                         <select name="countrycode" class="country-select-styled">
-                            <option data-countryCode="SG" value="65">SG (+65)</option>
-                            <option data-countryCode="IN" value="91" selected>IN (+91)</option>
-                            <option data-countryCode="GB" value="44">UK (+44)</option>
-                            <option data-countryCode="US" value="1">USA (+1)</option>
-                            <option data-countryCode="AE" value="971">UAE (+971)</option>
-                            <option value="61">AU (+61)</option>
-                            <option value="1">CA (+1)</option>
-                            <option value="49">DE (+49)</option>
-                            <option value="33">FR (+33)</option>
-                            <option value="81">JP (+81)</option>
-                            <option value="60">MY (+60)</option>
-                            <option value="63">PH (+63)</option>
-                            <option value="966">SA (+966)</option>
-                            <option value="66">TH (+66)</option>
-                            <option value="84">VN (+84)</option>
-                            <option value="27">ZA (+27)</option>
+                            <option data-countryCode="IN" value="+91" selected>IN (+91)</option>
+                            <option data-countryCode="AE" value="+971">UAE (+971)</option>
+                            <option data-countryCode="US" value="+1">USA (+1)</option>
+                            <option data-countryCode="GB" value="+44">UK (+44)</option>
+                            <option data-countryCode="SG" value="+65">SG (+65)</option>
+                            <option value="+61">AU (+61)</option>
+                            <option value="+1">CA (+1)</option>
+                            <option value="+49">DE (+49)</option>
+                            <option value="+33">FR (+33)</option>
+                            <option value="+81">JP (+81)</option>
+                            <option value="+60">MY (+60)</option>
+                            <option value="+63">PH (+63)</option>
+                            <option value="+966">SA (+966)</option>
+                            <option value="+66">TH (+66)</option>
+                            <option value="+84">VN (+84)</option>
+                            <option value="+27">ZA (+27)</option>
                         </select>
                         <input type="tel" name="contact" id="contact" maxlength="15" class="input-control-styled" placeholder="Mobile Number" value="{{ old('contact') }}" required autocomplete="tel">
                     </div>
@@ -795,6 +847,10 @@
                     <span class="cred-item-value">{{ session('details.uniqueid') }}</span>
                 </div>
                 <div class="cred-item-row">
+                    <span class="cred-item-label">Full Name:</span>
+                    <span class="cred-item-value" style="font-size:0.92rem;">{{ session('details.name') }}</span>
+                </div>
+                <div class="cred-item-row">
                     <span class="cred-item-label">Email:</span>
                     <span class="cred-item-value" style="font-size:0.92rem;">{{ session('details.username') }}</span>
                 </div>
@@ -802,17 +858,17 @@
                     <span class="cred-item-label">Password:</span>
                     <span class="cred-item-value">{{ session('details.password') }}</span>
                 </div>
+                @if(!empty(session('details.wallet')))
+                <div class="cred-item-row">
+                    <span class="cred-item-label">Linked BEP-20:</span>
+                    <span class="cred-item-value" style="font-size:0.75rem;">{{ session('details.wallet') }}</span>
+                </div>
+                @endif
             </div>
 
             <a href="{{ url('/login') }}" class="btn-submit-gold" style="text-decoration:none;">
                 <i class="fas fa-arrow-right-to-bracket"></i> Proceed to Login
             </a>
-
-            <div style="margin-top:14px;">
-                <a href="{{ url('/register') }}" class="btn-action-secondary">
-                    <i class="fas fa-user-plus"></i> Register Another Account
-                </a>
-            </div>
             @endif
 
         </div>
@@ -896,7 +952,7 @@
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.lineTo(particles[j].y, particles[j].y);
                         ctx.stroke();
                     }
                 }
@@ -969,33 +1025,132 @@
     })();
     </script>
 
-    <!-- jQuery for AJAX Sponsor Lookup -->
+    <!-- jQuery for AJAX Sponsor Lookup & Web3 Provider -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        function getMetaMaskProvider() {
+            if (typeof window.ethereum === 'undefined') {
+                return null;
+            }
+            if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+                if (mm) return mm;
+                const tw = window.ethereum.providers.find(p => p.isTrust || p.isTrustWallet || p.isBinance);
+                if (tw) return tw;
+                const nonPhantom = window.ethereum.providers.find(p => !p.isPhantom);
+                if (nonPhantom) return nonPhantom;
+                return window.ethereum.providers[0];
+            }
+            if (window.trustwallet) return window.trustwallet;
+            return window.ethereum;
+        }
+
+        function showRegError(msg) {
+            $("#regWeb3AlertText").text(msg);
+            $("#regWeb3Alert").show();
+        }
+
+        // Connect Wallet Action on Register Form
+        const btnConnectRegWallet = document.getElementById('btnConnectRegWallet');
+        const regWalletBtnText = document.getElementById('regWalletBtnText');
+        const regWalletSpinner = document.getElementById('regWalletSpinner');
+
+        if (btnConnectRegWallet) {
+            btnConnectRegWallet.addEventListener('click', async function() {
+                $("#regWeb3Alert").hide();
+                const provider = getMetaMaskProvider();
+                if (!provider) {
+                    showRegError('MetaMask / Web3 Wallet not detected! Please open inside MetaMask or TrustWallet dApp browser.');
+                    return;
+                }
+
+                if (regWalletBtnText) regWalletBtnText.innerText = 'Connecting MetaMask...';
+                if (regWalletSpinner) regWalletSpinner.style.display = 'block';
+                btnConnectRegWallet.style.pointerEvents = 'none';
+
+                try {
+                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                    if (!accounts || accounts.length === 0) {
+                        throw new Error('No wallet account selected.');
+                    }
+                    const walletAddr = accounts[0];
+
+                    // Check if this wallet is ALREADY registered in Cyera AI (read-only check, no unauthorized session)
+                    const checkRes = await fetch("{{ url('/auth/check-wallet') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            address: walletAddr
+                        })
+                    });
+
+                    const checkData = await checkRes.json();
+
+                    if (checkData.status === 'success' && checkData.is_registered) {
+                        if (regWalletBtnText) regWalletBtnText.innerText = 'Wallet Registered! Redirecting...';
+                        $("#regWeb3AlertText").html('<i class="fas fa-circle-check" style="color: #00FF88;"></i> This wallet is already registered. Redirecting to Sign In...');
+                        $("#regWeb3Alert").removeClass('auth-alert-error').addClass('auth-alert-success').show();
+                        setTimeout(function() {
+                            window.location.href = "{{ url('/login') }}";
+                        }, 1200);
+                        return;
+                    }
+
+                    // New unregistered wallet -> Proceed with registration
+                    $("#wallet_address").val(walletAddr);
+                    const shortAddr = walletAddr.substring(0, 6) + '...' + walletAddr.substring(walletAddr.length - 4);
+                    $("#walletDisplay").text(shortAddr);
+                    $("#walletConnectedBanner").css('display', 'flex');
+                    $("#walletPromptBox").hide();
+
+                    if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
+                    if (regWalletSpinner) regWalletSpinner.style.display = 'none';
+                    btnConnectRegWallet.style.pointerEvents = 'auto';
+
+                    updateSubmitButtonState();
+
+                } catch (err) {
+                    if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
+                    if (regWalletSpinner) regWalletSpinner.style.display = 'none';
+                    btnConnectRegWallet.style.pointerEvents = 'auto';
+                    showRegError(err.message || 'Wallet connection was cancelled.');
+                }
+            });
+        }
+
         // Sponsor Lookup via AJAX
         function checkSponsor() {
             var val = $("#referrer").val().trim();
-            if (val !== "") {
+            if (val.length >= 4) {
                 $.ajax({
                     type: 'GET',
-                    url: '/getSponsor/' + val,
+                    url: "{{ url('/getSponsor') }}/" + encodeURIComponent(val),
                     dataType: "json",
                     success: function(data) {
                         if (data.status == 0 && data.name) {
                             $("#spdiv").css('display', 'flex');
+                            $("#sperr").hide();
                             $("#spname_text").text(data.name);
                             $("#spname").val(data.name);
                         } else {
                             $("#spdiv").hide();
+                            $("#sperr").show();
                             $("#spname").val('');
                         }
                     },
                     error: function() {
                         $("#spdiv").hide();
+                        $("#sperr").show();
                     }
                 });
             } else {
                 $("#spdiv").hide();
+                $("#sperr").hide();
+                $("#spname").val('');
             }
         }
 
@@ -1003,17 +1158,26 @@
             if ($("#referrer").val() != "") {
                 checkSponsor();
             }
-            $("#referrer").on('blur change', checkSponsor);
+            $("#referrer").on('keyup blur change', function() {
+                checkSponsor();
+            });
+            updateSubmitButtonState();
         });
 
-        // Terms Checkbox enabler
+        // Terms & Wallet Checkbox enabler
         const agreeCheckbox = document.getElementById('agreeTerms');
         const registerBtn = document.getElementById('registerBtn');
 
-        if (agreeCheckbox && registerBtn) {
-            agreeCheckbox.addEventListener('change', function() {
-                registerBtn.disabled = !this.checked;
-            });
+        function updateSubmitButtonState() {
+            if (!registerBtn) return;
+            const isWalletConnected = $("#wallet_address").val() && $("#wallet_address").val().trim() !== '';
+            const isTermsAgreed = agreeCheckbox ? agreeCheckbox.checked : false;
+
+            registerBtn.disabled = !(isWalletConnected && isTermsAgreed);
+        }
+
+        if (agreeCheckbox) {
+            agreeCheckbox.addEventListener('change', updateSubmitButtonState);
         }
 
         // Password Toggles
@@ -1040,7 +1204,13 @@
         const btnSpinner = document.getElementById('btnSpinner');
 
         if (regForm && registerBtn) {
-            regForm.addEventListener('submit', function() {
+            regForm.addEventListener('submit', function(e) {
+                const wAddr = $("#wallet_address").val();
+                if (!wAddr || wAddr.trim() === '') {
+                    e.preventDefault();
+                    showRegError('Please connect your Web3 Wallet before submitting the registration form.');
+                    return false;
+                }
                 registerBtn.style.pointerEvents = 'none';
                 registerBtn.style.opacity = '0.9';
                 if (btnText) btnText.style.display = 'none';

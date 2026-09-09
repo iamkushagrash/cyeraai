@@ -70,12 +70,40 @@
                 $uid = $data['userDetail']->id;
 
                 // Direct database calculations for live user data
+                // 1. CPS Income (Daily Staking Yield)
+                $cpsIncome = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
+                $cpsRemaining = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+                $stakingIncome = $cpsIncome;
+                $stakingRemaining = $cpsRemaining;
+
+                // 2. Direct Income (Referral Bonus)
                 $directIncome = (float) \App\BonusReward::where('userid', $uid)->where('status', '!=', 3)->sum('amt_usdt');
-                $stakingIncome = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
+                $directRemaining = (float) \App\BonusReward::where('userid', $uid)->where('status', '!=', 3)->sum('remaining_usdt');
+
+                // 3. Level Income (Staking Referral + Team Development)
                 $stakingReferralIncome = (float) \App\LevelIncome::where('userid', $uid)->where('description', 'l')->sum('amt_usdt');
                 $teamDevelopmentIncome = (float) \App\LevelIncome::where('userid', $uid)->where('description', 'r')->sum('amt_usdt');
+                $levelIncomeTotal = (float) \App\LevelIncome::where('userid', $uid)->sum('amt_usdt');
+                if ($levelIncomeTotal == 0) {
+                    $levelIncomeTotal = $stakingReferralIncome + $teamDevelopmentIncome;
+                }
+                $levelRemaining = (float) \App\LevelIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+
+                // 4. Pool / Club Income (Global Turnover Pools & Club Dividends)
                 $clubIncome = (float) \App\ClubIncome::where('userid', $uid)->sum('amt_usdt');
-                $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome;
+                $poolIncome = (float) \App\PoolIncome::where('userid', $uid)->sum('amt_usdt');
+                $totalPoolIncome = $clubIncome + $poolIncome;
+                $poolRemaining = (float) \App\ClubIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+
+                // 5. Rank & Lifetime / Achievement Income
+                $achievementIncome = (float) \App\AchievementIncome::where('userid', $uid)->sum('amount');
+                $rankIncome = (float) \App\RankIncome::where('userid', $uid)->sum('amt_usdt');
+                $totalRankIncome = $achievementIncome + $rankIncome;
+                $rankRemaining = (float) \App\AchievementIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
+
+                // Combined Totals (All 5 Incomes)
+                $totalIncomeUsdt = $cpsIncome + $directIncome + $levelIncomeTotal + $totalPoolIncome + $totalRankIncome;
+                $readyToReleaseUsdt = $cpsRemaining + $directRemaining + $levelRemaining + $poolRemaining + $rankRemaining;
 
                 // Total Invested by user
                 $totalInvested = (float) \App\StackingDeposite::where('userid', $uid)->where('status', 1)->sum('usdt');
@@ -93,14 +121,31 @@
                 $filledPct = ($maxCapping > 0) ? ($totalIncomeUsdt / $maxCapping) * 100 : 0;
                 $filledPct = min(100, max(0, round($filledPct)));
 
-                // CAI Live Price & Claimable ROI in CAI Tokens
+                // CAI Live Price & Dynamic Runtime ROI Calculations
                 $profileStore = \App\ProfileStore::where('id', 1)->first();
-                $caiPrice = $profileStore ? (float) $profileStore->price : 1.25;
+                $caiPrice = $profileStore ? (float) $profileStore->price : 1.00;
                 if ($caiPrice <= 0)
-                    $caiPrice = 1.25;
-                $claimableUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
-                $claimableCai = $caiPrice > 0 ? $claimableUsdt / $caiPrice : 0.00;
-                $claimableUsdVal = $claimableUsdt;
+                    $caiPrice = 1.00;
+
+                // Claimable CPS ROI in CAI tokens and dynamic live USD value
+                $claimableCai = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
+                $claimableUsdtRaw = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+                if ($claimableCai <= 0 && $claimableUsdtRaw > 0) {
+                    $claimableCai = $claimableUsdtRaw;
+                }
+                $claimableUsdDynamic = $claimableCai * $caiPrice;
+                $claimableUsdt = $claimableUsdDynamic;
+                $claimableUsdVal = $claimableUsdDynamic;
+
+                // Total CPS in CAI tokens and dynamic USD
+                $cpsCaiTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amount');
+                $cpsUsdtRaw = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
+                if ($cpsCaiTotal <= 0 && $cpsUsdtRaw > 0) {
+                    $cpsCaiTotal = $cpsUsdtRaw;
+                }
+                $cpsUsdDynamic = $cpsCaiTotal * $caiPrice;
+
+                $readyToReleaseCai = $claimableCai + ($caiPrice > 0 ? (($directRemaining + $levelRemaining + $poolRemaining + $rankRemaining) / $caiPrice) : 0.00);
 
                 // Fund Wallet Balance (Account Deposit)
                 $fundWalletDeposit = \App\AccountDeposit::where('userid', $uid)->first();
@@ -277,7 +322,7 @@
 
                             </div>
 
-                            <!-- Right Column: Total Portfolio Value (Clean & Spacious) -->
+                            <!-- Right Column: Total Portfolio Value + Total Income + Ready To Release -->
                             <div class="col-right-portfolio">
                                 <div class="row-port-title">
                                     <span class="txt-port-title">TOTAL PORTFOLIO</span>
@@ -285,6 +330,18 @@
                                 </div>
                                 <div class="txt-port-big">${{ number_format($totalInvested, 2) }}</div>
                                 <div class="txt-port-unit">USDT STAKED VALUE</div>
+
+                                <!-- Sub-stats below Total Portfolio -->
+                                <div class="hero-port-substats">
+                                    <div class="port-substat-row">
+                                        <span class="substat-lbl"><i class="fas fa-arrow-trend-up" style="color: #FFD700; font-size: 7px;"></i> TOTAL INCOME:</span>
+                                        <span class="substat-val gold">${{ number_format($totalIncomeUsdt, 2) }}</span>
+                                    </div>
+                                    <div class="port-substat-row">
+                                        <span class="substat-lbl"><i class="fas fa-bolt" style="color: #00FF88; font-size: 7px;"></i> READY TO CLAIM:</span>
+                                        <span class="substat-val gold">{{ number_format($claimableCai, 2) }} CAI <small style="color: #00FF88; font-weight: 700; font-size: 8.5px;">(${{ number_format($claimableUsdDynamic, 2) }})</small></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -324,13 +381,15 @@
                                 </div>
                             </div>
 
-                            <!-- 3. Claimable ROI -->
+                            <!-- 3. Ready to Claim ROI (Staking Yield) -->
                             <div class="strip-col-item">
                                 <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i>
-                                    CLAIMABLE</span>
+                                    READY TO CLAIM ROI</span>
                                 <div class="strip-val-wrap">
-                                    <span class="strip-col-val roi-val">{{ number_format($claimableCai, 2) }}
-                                        <small>CAI</small></span>
+                                    <span class="strip-col-val roi-val" style="color: #FFD700; font-size: 11px; font-weight: 900; font-family: 'Space Mono', monospace;">
+                                        {{ number_format($claimableCai, 2) }} <span style="font-size: 9.5px; color: #FFD700;">CAI</span>
+                                        <span style="color: #00FF88; font-size: 9.5px; font-weight: 800; margin-left: 2px;">(${{ number_format($claimableUsdDynamic, 2) }})</span>
+                                    </span>
                                 </div>
                             </div>
 
@@ -349,7 +408,7 @@
              ============================================================ -->
                 <div class="quick-actions">
                     <!-- 1. INVEST (Gold / Amber) -->
-                <a href="{{ url('/User/Deposit') }}" class="action-card invest" id="btn-invest">
+                <a href="{{ url('/User/Stake') }}" class="action-card invest" id="btn-invest">
                     <div class="action-card-corner-glow"></div>
                     <div class="action-badge-icon">
                         <i class="fas fa-rocket"></i>
@@ -407,6 +466,147 @@
                         </div>
                     </div>
                 </a>
+            </div>
+
+            <!-- ============================================================
+                 3B. TOTAL INCOME & 5 REWARDS HUBS (CPS, DIRECT, LEVEL, POOL, RANK)
+                 ============================================================ -->
+            <div class="hud-incomes-matrix-wrap">
+                <div class="hud-incomes-matrix-card">
+                    <!-- Header -->
+                    <div class="incomes-matrix-header">
+                        <div class="matrix-header-left">
+                            <div class="matrix-badge-icon">
+                                <i class="fas fa-sack-dollar"></i>
+                            </div>
+                            <div>
+                                <div class="matrix-main-title">TOTAL INCOME &amp; REWARD HUBS</div>
+                                <div class="matrix-sub-title">5-Stream Automated Yield &amp; Distribution Protocols</div>
+                            </div>
+                        </div>
+                        <div class="matrix-total-pill">
+                            <span class="matrix-pulse-dot"></span>
+                            <span class="matrix-total-lbl">TOTAL EARNED:</span>
+                            <span class="matrix-total-val">${{ number_format($totalIncomeUsdt, 2) }} USDT</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Dual Summary Banner: Total Income & Ready To Release -->
+                    <div class="incomes-dual-summary-banner">
+                        <div class="summary-banner-box earned-box">
+                            <div class="banner-box-left">
+                                <span class="banner-lbl"><i class="fas fa-chart-line"></i> TOTAL LIFETIME EARNED</span>
+                                <span class="banner-val">${{ number_format($totalIncomeUsdt, 2) }} <small>USDT</small></span>
+                            </div>
+                            <div class="banner-box-icon"><i class="fas fa-wallet"></i></div>
+                        </div>
+                        <div class="summary-banner-box release-box">
+                            <div class="banner-box-left">
+                                <span class="banner-lbl"><i class="fas fa-bolt-lightning"></i> READY TO CLAIM ROI</span>
+                                <span class="banner-val val-gold">{{ number_format($claimableCai, 2) }} <small style="color:#FFD700;">CAI</small> <span style="color: #00FF88; font-size: 11px; font-weight: 800;">(${{ number_format($claimableUsdDynamic, 2) }})</span></span>
+                            </div>
+                            <a href="{{ url('/User/WithdrawRequest') }}" class="banner-claim-btn"><i class="fas fa-bolt"></i> CLAIM</a>
+                        </div>
+                    </div>
+
+                    <!-- 5-Stream Cyber Grid -->
+                    <div class="incomes-5stream-grid">
+                        <!-- 1. CPS Income -->
+                        <a href="{{ url('/User/StakingReward') }}" class="income-stream-card stream-cps">
+                            <div class="stream-corner-glow"></div>
+                            <div class="stream-top-row">
+                                <div class="stream-icon-box icon-cyan">
+                                    <i class="fas fa-bolt-lightning"></i>
+                                </div>
+                                <span class="stream-tag-pill">DAILY CPS</span>
+                            </div>
+                            <div class="stream-amount-wrap">
+                                <span class="stream-lbl">CPS INCOME</span>
+                                <span class="stream-amt val-cyan" style="font-size: 11.5px;">{{ number_format($cpsCaiTotal, 2) }} <small style="font-size: 8.5px;">CAI</small> <span style="color: #00FF88; font-size: 9px; font-weight: 800;">(${{ number_format($cpsUsdDynamic, 2) }})</span></span>
+                            </div>
+                            <div class="stream-footer-row">
+                                <span class="stream-sub">Daily Yield &amp; Boosters</span>
+                                <span class="stream-arrow">→</span>
+                            </div>
+                        </a>
+
+                        <!-- 2. Direct Bonus -->
+                        <a href="{{ url('/User/DirectBonus') }}" class="income-stream-card stream-direct">
+                            <div class="stream-corner-glow"></div>
+                            <div class="stream-top-row">
+                                <div class="stream-icon-box icon-gold">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <span class="stream-tag-pill">5% DIRECT</span>
+                            </div>
+                            <div class="stream-amount-wrap">
+                                <span class="stream-lbl">DIRECT BONUS</span>
+                                <span class="stream-amt val-gold">${{ number_format($directIncome, 2) }}</span>
+                            </div>
+                            <div class="stream-footer-row">
+                                <span class="stream-sub">Direct Referral Reward</span>
+                                <span class="stream-arrow">→</span>
+                            </div>
+                        </a>
+
+                        <!-- 3. Level Income -->
+                        <a href="{{ url('/User/StakingReferralReward') }}" class="income-stream-card stream-level">
+                            <div class="stream-corner-glow"></div>
+                            <div class="stream-top-row">
+                                <div class="stream-icon-box icon-purple">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <span class="stream-tag-pill">TEAM LEVEL</span>
+                            </div>
+                            <div class="stream-amount-wrap">
+                                <span class="stream-lbl">LEVEL INCOME</span>
+                                <span class="stream-amt val-purple">${{ number_format($levelIncomeTotal, 2) }}</span>
+                            </div>
+                            <div class="stream-footer-row">
+                                <span class="stream-sub">Multi-Tier Dev Bonus</span>
+                                <span class="stream-arrow">→</span>
+                            </div>
+                        </a>
+
+                        <!-- 4. Pool Income -->
+                        <a href="{{ url('/User/PoolIncome') }}" class="income-stream-card stream-pool">
+                            <div class="stream-corner-glow"></div>
+                            <div class="stream-top-row">
+                                <div class="stream-icon-box icon-cyan">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="stream-tag-pill">GLOBAL POOL</span>
+                            </div>
+                            <div class="stream-amount-wrap">
+                                <span class="stream-lbl">POOL INCOME</span>
+                                <span class="stream-amt val-cyan">${{ number_format($totalPoolIncome, 2) }}</span>
+                            </div>
+                            <div class="stream-footer-row">
+                                <span class="stream-sub">5% Turnover Dividends</span>
+                                <span class="stream-arrow">→</span>
+                            </div>
+                        </a>
+
+                        <!-- 5. Rank Income -->
+                        <a href="{{ url('/User/RankIncome') }}" class="income-stream-card stream-rank">
+                            <div class="stream-corner-glow"></div>
+                            <div class="stream-top-row">
+                                <div class="stream-icon-box icon-amber">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <span class="stream-tag-pill">RANK BONUS</span>
+                            </div>
+                            <div class="stream-amount-wrap">
+                                <span class="stream-lbl">RANK REWARD</span>
+                                <span class="stream-amt val-amber">${{ number_format($totalRankIncome, 2) }}</span>
+                            </div>
+                            <div class="stream-footer-row">
+                                <span class="stream-sub">Milestone Achievements</span>
+                                <span class="stream-arrow">→</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
         <!-- ============================================================
@@ -1040,185 +1240,7 @@
                 </div>
             </div>
 
-            <!-- ============================================================
-             5. INCOME BREAKDOWN (2x2 GRID — BOOSTER STYLE)
-             ============================================================ -->
 
-            <div class="section-bar-header">
-                <div class="sec-title-txt">INCOME BREAKDOWN</div>
-                <div class="income-total-earned-label">
-                    <span class="txt-tot-lbl">TOTAL EARNED</span>
-                    <span class="txt-tot-val">${{ number_format($totalIncomeUsdt, 2) }}</span>
-                </div>
-            </div>
-
-            <div class="income-2x2-grid">
-                <!-- 1. Daily Staking ROI (Gold) -->
-                <div class="income-hud-card inc-gold" onclick="window.location.href='{{ url('/User/StakingReward') }}'">
-                    <div class="income-card-corner-glow"></div>
-                    <div class="income-card-inner">
-                        <!-- Top Row: Icon + Mini Trend Chart -->
-                        <div class="income-top-row">
-                            <div class="income-icon-wrap">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="income-trend-wrap">
-                                <svg class="income-trend-chart" viewBox="0 0 54 36" fill="none">
-                                    <path d="M4 30 Q 20 28, 32 18 T 50 4" fill="none" stroke="#FFA000" stroke-width="1.2" opacity="0.6" stroke-dasharray="2,2" />
-                                    <rect x="6" y="24" width="4.5" height="10" rx="1.5" fill="#FFA000" opacity="0.35" />
-                                    <rect x="14" y="20" width="4.5" height="14" rx="1.5" fill="#FFA000" opacity="0.5" />
-                                    <rect x="22" y="15" width="4.5" height="19" rx="1.5" fill="#FFA000" opacity="0.65" />
-                                    <rect x="30" y="10" width="4.5" height="24" rx="1.5" fill="#FFA000" opacity="0.8" />
-                                    <rect x="38" y="6" width="4.5" height="28" rx="1.5" fill="#FFA000" opacity="0.95" />
-                                    <rect x="46" y="2" width="4.5" height="32" rx="1.5" fill="#FFA000" />
-                                    <circle cx="48.25" cy="2" r="2" fill="#FFFFFF" filter="drop-shadow(0 0 3px #FFA000)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- Full Width Title & Amount -->
-                        <div class="income-title-col">
-                            <span class="inc-title-txt">DAILY STAKING ROI (0.5%)</span>
-                            <div class="inc-amount-txt">${{ number_format($stakingIncome, 2) }}</div>
-                        </div>
-
-                        <!-- Bottom Meta Row with Claim ROI Button -->
-                        <div class="income-bottom-meta">
-                            <div class="meta-sub-col">
-                                <span class="meta-lbl">Today Earned</span>
-                                <span class="meta-val">${{ number_format(\App\CpsIncome::where('userid', $uid)->whereDate('created_at', today())->sum('amt_usdt'), 2) }}</span>
-                            </div>
-                            <div class="meta-sub-col" style="text-align: right;">
-                                <a href="{{ url('/User/Stake') }}" onclick="event.stopPropagation();"
-                                    style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-size: 8px; font-weight: 900; border-radius: 5px; text-decoration: none; box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); letter-spacing: 0.3px;">
-                                    <i class="fas fa-bolt"></i> CLAIM
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Direct Referral Bonus (Green) -->
-                <div class="income-hud-card inc-green" onclick="window.location.href='{{ url('/User/DirectBonus') }}'">
-                    <div class="income-card-corner-glow"></div>
-                    <div class="income-card-inner">
-                        <!-- Top Row: Icon + Mini Trend Chart -->
-                        <div class="income-top-row">
-                            <div class="income-icon-wrap">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="income-trend-wrap">
-                                <svg class="income-trend-chart" viewBox="0 0 54 36" fill="none">
-                                    <path d="M4 30 Q 20 28, 32 18 T 50 4" fill="none" stroke="#00E676" stroke-width="1.2" opacity="0.6" stroke-dasharray="2,2" />
-                                    <rect x="6" y="24" width="4.5" height="10" rx="1.5" fill="#00E676" opacity="0.35" />
-                                    <rect x="14" y="20" width="4.5" height="14" rx="1.5" fill="#00E676" opacity="0.5" />
-                                    <rect x="22" y="15" width="4.5" height="19" rx="1.5" fill="#00E676" opacity="0.65" />
-                                    <rect x="30" y="10" width="4.5" height="24" rx="1.5" fill="#00E676" opacity="0.8" />
-                                    <rect x="38" y="6" width="4.5" height="28" rx="1.5" fill="#00E676" opacity="0.95" />
-                                    <rect x="46" y="2" width="4.5" height="32" rx="1.5" fill="#00E676" />
-                                    <circle cx="48.25" cy="2" r="2" fill="#FFFFFF" filter="drop-shadow(0 0 3px #00E676)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- Full Width Title & Amount -->
-                        <div class="income-title-col">
-                            <span class="inc-title-txt">DIRECT BONUS (5%)</span>
-                            <div class="inc-amount-txt">${{ number_format($directIncome, 2) }}</div>
-                        </div>
-
-                        <!-- Bottom Meta Row -->
-                        <div class="income-bottom-meta">
-                            <div class="meta-sub-col">
-                                <span class="meta-lbl">Total Direct Bonus</span>
-                                <span class="meta-val">${{ number_format($directIncome, 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. 15-Level Unilevel Income (Cyan) -->
-                <div class="income-hud-card inc-cyan" onclick="window.location.href='{{ url('/User/StakingReferralReward') }}'">
-                    <div class="income-card-corner-glow"></div>
-                    <div class="income-card-inner">
-                        <!-- Top Row: Icon + Mini Trend Chart -->
-                        <div class="income-top-row">
-                            <div class="income-icon-wrap">
-                                <i class="fas fa-sitemap"></i>
-                            </div>
-                            <div class="income-trend-wrap">
-                                <svg class="income-trend-chart" viewBox="0 0 54 36" fill="none">
-                                    <path d="M4 30 Q 20 28, 32 18 T 50 4" fill="none" stroke="#00D2FF" stroke-width="1.2" opacity="0.6" stroke-dasharray="2,2" />
-                                    <rect x="6" y="24" width="4.5" height="10" rx="1.5" fill="#00D2FF" opacity="0.35" />
-                                    <rect x="14" y="20" width="4.5" height="14" rx="1.5" fill="#00D2FF" opacity="0.5" />
-                                    <rect x="22" y="15" width="4.5" height="19" rx="1.5" fill="#00D2FF" opacity="0.65" />
-                                    <rect x="30" y="10" width="4.5" height="24" rx="1.5" fill="#00D2FF" opacity="0.8" />
-                                    <rect x="38" y="6" width="4.5" height="28" rx="1.5" fill="#00D2FF" opacity="0.95" />
-                                    <rect x="46" y="2" width="4.5" height="32" rx="1.5" fill="#00D2FF" />
-                                    <circle cx="48.25" cy="2" r="2" fill="#FFFFFF" filter="drop-shadow(0 0 3px #00D2FF)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- Full Width Title & Amount -->
-                        <div class="income-title-col">
-                            <span class="inc-title-txt">15-LEVEL UNILEVEL</span>
-                            <div class="inc-amount-txt">${{ number_format($stakingReferralIncome, 2) }}</div>
-                        </div>
-
-                        <!-- Bottom Meta Row -->
-                        <div class="income-bottom-meta">
-                            <div class="meta-sub-col">
-                                <span class="meta-lbl">Total Team Income</span>
-                                <span class="meta-val">${{ number_format($stakingReferralIncome, 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Club & Pool Income (Purple) -->
-                <div class="income-hud-card inc-purple" onclick="window.location.href='{{ url('/User/ClubReward') }}'">
-                    <div class="income-card-corner-glow"></div>
-                    <div class="income-card-inner">
-                        <!-- Top Row: Icon + Mini Trend Chart -->
-                        <div class="income-top-row">
-                            <div class="income-icon-wrap">
-                                <i class="fas fa-layer-group"></i>
-                            </div>
-                            <div class="income-trend-wrap">
-                                <svg class="income-trend-chart" viewBox="0 0 54 36" fill="none">
-                                    <path d="M4 30 Q 20 28, 32 18 T 50 4" fill="none" stroke="#B34BFE" stroke-width="1.2" opacity="0.6" stroke-dasharray="2,2" />
-                                    <rect x="6" y="24" width="4.5" height="10" rx="1.5" fill="#B34BFE" opacity="0.35" />
-                                    <rect x="14" y="20" width="4.5" height="14" rx="1.5" fill="#B34BFE" opacity="0.5" />
-                                    <rect x="22" y="15" width="4.5" height="19" rx="1.5" fill="#B34BFE" opacity="0.65" />
-                                    <rect x="30" y="10" width="4.5" height="24" rx="1.5" fill="#B34BFE" opacity="0.8" />
-                                    <rect x="38" y="6" width="4.5" height="28" rx="1.5" fill="#B34BFE" opacity="0.95" />
-                                    <rect x="46" y="2" width="4.5" height="32" rx="1.5" fill="#B34BFE" />
-                                    <circle cx="48.25" cy="2" r="2" fill="#FFFFFF" filter="drop-shadow(0 0 3px #B34BFE)" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- Full Width Title & Amount -->
-                        <div class="income-title-col">
-                            <span class="inc-title-txt">CLUB &amp; POOL INCOME</span>
-                            <div class="inc-amount-txt">${{ number_format($clubIncome, 2) }}</div>
-                        </div>
-
-                        <!-- Bottom Meta Row -->
-                        <div class="income-bottom-meta">
-                            <div class="meta-sub-col">
-                                <span class="meta-lbl">Daily Pool</span>
-                                <span class="meta-val">${{ number_format(\App\ClubIncome::where('userid', $uid)->where('clubid', 1)->sum('amt_usdt'), 2) }}</span>
-                            </div>
-                            <div class="meta-sub-col" style="text-align: right;">
-                                <span class="meta-lbl">Weekly Pool</span>
-                                <span class="meta-val">${{ number_format(\App\ClubIncome::where('userid', $uid)->where('clubid', 2)->sum('amt_usdt'), 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- ============================================================
              6. TEAM & LEG VOLUME STATUS (4-GRID BOOSTER HUD)

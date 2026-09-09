@@ -5573,3 +5573,358 @@ body {
     font-size: 7px;
     color: #00D2FF;
 }
+
+/* ============================================================
+   TOTAL INCOME & 5 REWARDS HUBS MATRIX
+   ============================================================ */
+.hero-port-substats {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 3px;
+    align-items: flex-end;
+}
+
+.port-substat-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 7.5px;
+    white-space: nowrap;
+}
+
+.substat-lbl {
+    color: #8C9BAE;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    font-size: 7px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.substat-val {
+    font-weight: 800;
+    font-size: 9px;
+    font-family: 'Space Mono', monospace;
+}
+
+.substat-val.gold { color: #FFD700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.3); }
+.substat-val.green { color: #00FF88; text-shadow: 0 0 6px rgba(0, 255, 136, 0.3); }
+
+.hud-incomes-matrix-wrap {
+    margin: 10px 10px 12px 10px;
+}
+
+.hud-incomes-matrix-card {
+    background: linear-gradient(135deg, rgba(8, 10, 16, 0.96) 0%, rgba(4, 6, 10, 0.99) 100%) !important;
+    border: 1px solid rgba(229, 168, 35, 0.22) !important;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(229, 168, 35, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.incomes-matrix-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.matrix-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.matrix-badge-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 14px;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+.matrix-main-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #FFF;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.matrix-sub-title {
+    font-size: 9.5px;
+    color: #8C9BAE;
+    font-weight: 600;
+}
+
+.matrix-total-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.matrix-pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: #00FF88;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00FF88;
+    animation: matrixPulse 1.5s infinite;
+}
+
+@keyframes matrixPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.matrix-total-lbl {
+    font-size: 9px;
+    font-weight: 700;
+    color: #FFE082;
+    letter-spacing: 0.5px;
+}
+
+.matrix-total-val {
+    font-size: 11px;
+    font-weight: 900;
+    color: #FFD700;
+    font-family: 'Space Mono', monospace;
+}
+
+/* Dual Summary Banner */
+.incomes-dual-summary-banner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 580px) {
+    .incomes-dual-summary-banner {
+        grid-template-columns: 1fr;
+    }
+}
+
+.summary-banner-box {
+    background: rgba(4, 6, 10, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summary-banner-box.earned-box {
+    border-left: 3px solid #FFD700 !important;
+}
+
+.summary-banner-box.release-box {
+    border-left: 3px solid #00FF88 !important;
+}
+
+.banner-box-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.banner-lbl {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #8C9BAE;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.banner-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: #FFFFFF;
+    font-family: 'Space Mono', monospace;
+}
+
+.banner-val.val-green {
+    color: #00FF88;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.banner-val small {
+    font-size: 9px;
+    color: #8C9BAE;
+    font-weight: 600;
+}
+
+.banner-box-icon {
+    font-size: 18px;
+    color: #FFD700;
+    opacity: 0.8;
+}
+
+.banner-claim-btn {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000 !important;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+    transition: all 0.2s ease;
+}
+
+.banner-claim-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+}
+
+/* 5 Streams Grid */
+.incomes-5stream-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+@media (max-width: 900px) {
+    .incomes-5stream-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 580px) {
+    .incomes-5stream-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+}
+
+.income-stream-card {
+    background: rgba(4, 6, 10, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    border-radius: 10px;
+    padding: 10px 10px 8px 10px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.income-stream-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 215, 0, 0.45) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.stream-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.stream-icon-box {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.icon-cyan { background: rgba(0, 229, 255, 0.12); color: #00E5FF; border: 1px solid rgba(0, 229, 255, 0.25); }
+.icon-gold { background: rgba(255, 215, 0, 0.12); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.25); }
+.icon-purple { background: rgba(168, 85, 247, 0.12); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.25); }
+.icon-blue { background: rgba(255, 215, 0, 0.12); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.25); }
+.icon-amber { background: rgba(245, 158, 11, 0.12); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.25); }
+
+.stream-tag-pill {
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #8C9BAE;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.stream-amount-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 6px;
+}
+
+.stream-lbl {
+    font-size: 8px;
+    font-weight: 700;
+    color: #8C9BAE;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.stream-amt {
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.1;
+    font-family: 'Space Mono', monospace;
+}
+
+.val-cyan { color: #00E5FF; text-shadow: 0 0 8px rgba(0, 229, 255, 0.25); }
+.val-gold { color: #FFD700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.25); }
+.val-purple { color: #C084FC; text-shadow: 0 0 8px rgba(192, 132, 252, 0.25); }
+.val-blue { color: #00FF88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.25); }
+.val-amber { color: #FBBF24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.25); }
+
+.stream-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #64748B;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: 4px;
+}
+
+.stream-sub {
+    font-size: 7.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stream-arrow {
+    color: #FFD700;
+    font-weight: 800;
+    font-size: 9px;
+    transition: transform 0.2s ease;
+}
+
+.income-stream-card:hover .stream-arrow {
+    transform: translateX(3px);
+}

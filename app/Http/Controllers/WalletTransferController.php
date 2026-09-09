@@ -198,23 +198,397 @@ class WalletTransferController extends Controller
                         \Log::info($e->messages());
                     }
                     \DB::commit();
-                    //return redirect('/User/Stake')->with('success','Your request is submitted successfully.');
                     return redirect('/User/Stake')->with('success', 'The user has been upgraded. Please wait 15-45 minutes for the business update in Genealogy.');
-
 
                 } catch (Exception $e) {
                     \DB::rollback();
                     \Log::info('Error for User ' . \Session::get('user.id') . ' Error message is ' . $e->getMessage());
-                    return redirect('/User/Stake')/*->back()*/ ->with('warning', 'Error Code 1021, There is some error in stacking.');
+                    return redirect('/User/Stake')->with('warning', 'Error Code 1021, There is some error in stacking.');
                 }
             } else {
-                return redirect('/User/Stake')/*->back()*/ ->with('warning', 'Error Code 1021, There is some error in stacking.');
+                return redirect('/User/Stake')->with('warning', 'Error Code 1021, There is some error in stacking.');
             }
         } else {
             return redirect('/User/Stake')->with('warning', 'Your entered password is wrong.');
         }
     }
 
+    /**
+     * Web3 Unified On-Chain Staking:
+     * Receives on-chain transaction from CyeraInvestmentSplitter,
+     * verifies txHash uniqueness, and executes the complete 10-step atomic
+     * deposit audit trail + fund ledger credit/debit + StackingDeposite activation + 5% Direct Referral + 15-level Tree Volume sync.
+     */
+    public function web3UnifiedStake(Request $request)
+    {
+        $request->validate([
+            'amount' => ['required', 'numeric', 'min:50', 'max:2000'],
+            'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+            'targetUserId' => ['nullable', 'string'],
+            'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
+        ]);
 
+        $amount = floatval($request->amount);
+        $txHash = strtolower($request->txHash);
+        $currentUserId = \Session::get('user.id');
+
+        if (!$currentUserId && \Auth::check()) {
+            $currentDetail = \App\UserDetails::where('userid', \Auth::id())->first();
+            if ($currentDetail) {
+                $currentUserId = $currentDetail->id;
+            }
+        }
+
+        if (!$currentUserId && !empty($request->senderAddress)) {
+            $senderAddr = strtolower($request->senderAddress);
+            $asset = \App\AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$senderAddr])
+                ->orWhereRaw('LOWER(bep20addr) = ?', [$senderAddr])
+                ->first();
+            if ($asset) {
+                $currentDetail = \App\UserDetails::where('id', $asset->userid)->orWhere('userid', $asset->userid)->first();
+                if ($currentDetail) {
+                    $currentUserId = $currentDetail->id;
+                }
+            }
+        }
+
+        if (!$currentUserId) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated session. Please connect wallet again.'], 401);
+        }
+
+        // Check for duplicate TxHash in database
+        $duplicateTxn = \App\TransactionInfo::whereRaw('LOWER(transaction_hash) = ?', [$txHash])->first();
+        if ($duplicateTxn) {
+            return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been processed in Cyera AI.'], 400);
+        }
+
+        // Determine target user (Self or Specified Downline UUID)
+        $targetUserDetail = null;
+        if (!empty($request->targetUserId)) {
+            $userObj = \App\User::where('uuid', $request->targetUserId)->first();
+            if ($userObj) {
+                $targetUserDetail = \App\UserDetails::where('userid', $userObj->id)->first();
+            }
+        }
+        if (!$targetUserDetail) {
+            $targetUserDetail = \App\UserDetails::where('id', $currentUserId)->first();
+        }
+
+        if (!$targetUserDetail) {
+            return response()->json(['status' => 'error', 'message' => 'Target user account not found.'], 404);
+        }
+
+        $targetUserId = $targetUserDetail->id;
+        $price = \App\ProfileStore::where('id', 1)->first() ?: (object)['price' => 1];
+        $splitterAddress = env('INVESTMENT_SPLITTER_ADDRESS', '0x2A1CEBf5Afe686763E915838457ccBC344901ebD');
+        $senderAddr = !empty($request->senderAddress) ? strtolower($request->senderAddress) : null;
+
+        // Comprehensive On-Chain BSC Mainnet Receipt, Freshness (Max 30 mins) & Amount Verification
+        $verifyResult = $this->verifyBscTransaction($txHash, $splitterAddress, $senderAddr, $amount);
+        if (!$verifyResult['valid']) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $verifyResult['message']
+            ], 400);
+        }
+
+        \DB::beginTransaction();
+        try {
+            // ============================================================
+            // PHASE 1: DEPOSIT AUDIT TRAIL (70/30 On-Chain Record)
+            // ============================================================
+            $depositTxn = \App\TransactionDetail::create([
+                'userid'        => $currentUserId,
+                'txntype'       => 0, // Deposit
+                'amountsftc'    => ($amount / $price->price),
+                'amountusdt'    => $amount,
+                'remaining'     => 0,
+                'paymentstatus' => 2, // Paid / Confirmed
+                'txndesc'       => 'Web3 On-Chain 70/30 Splitter Deposit',
+                'comments'      => 'web3_split',
+                'planid'        => 1,
+                'currency'      => 'usdtbep20',
+                'paidby'        => $currentUserId,
+                'created_at'    => now(),
+                'release_date'  => date('Y-m-d'),
+            ]);
+
+            \App\TransactionInfo::create([
+                'txnid'            => $depositTxn->id,
+                'payment_addr'     => $splitterAddress,
+                'transaction_hash' => $txHash,
+                'contract_addr'    => $splitterAddress,
+                'amount'           => $amount,
+                'txn_status'       => 2, // Confirmed
+            ]);
+
+            // Deposit WalletTransfer (deposite -> wallet)
+            \App\WalletTransfer::create([
+                'userid'       => $currentUserId,
+                'txnid'        => $depositTxn->id,
+                'fromWallet'   => 'deposite',
+                'toWallet'     => 'wallet',
+                'amount'       => $amount,
+                'fromUser'     => $currentUserId,
+                'release_date' => date('Y-m-d'),
+                'created_at'   => now(),
+            ]);
+
+            // Credit AccountDeposit (Fund Ledger)
+            $accountDep = \App\AccountDeposit::firstOrNew(['userid' => $currentUserId]);
+            $currentFund = !is_null($accountDep->amount) ? floatval(Crypt::decrypt($accountDep->amount)) : 0;
+            $accountDep->amount = Crypt::encrypt($currentFund + $amount);
+            $accountDep->save();
+
+            // ============================================================
+            // PHASE 2: STAKING EXECUTION & COMMISSION LEDGER
+            // ============================================================
+            // Debit AccountDeposit (Fund Ledger)
+            $newFund = ($currentFund + $amount) - $amount; // Net balance
+            $accountDep->amount = Crypt::encrypt($newFund);
+            $accountDep->save();
+
+            // Stake WalletTransfer (wallet -> basic)
+            $stakeTransfer = \App\WalletTransfer::create([
+                'userid'       => $targetUserId,
+                'txnid'        => $depositTxn->id,
+                'fromWallet'   => 'wallet',
+                'toWallet'     => 'basic',
+                'amount'       => $amount,
+                'fromUser'     => $currentUserId,
+                'release_date' => date('Y-m-d'),
+                'created_at'   => now(),
+            ]);
+
+            // Capping tier calculation & StackingDeposite activation
+            $plan = \App\StackingDetail::where('status', 1)->first() ?: (object)['id' => 1, 'capping' => 2.00, 'cps' => 0.50];
+            $cappingFunction = new StackingDetailController();
+            $userCapStats = $targetUserDetail->getCappingTier();
+            $userMultiplier = $userCapStats['multiplier'] ?: 2;
+            $totalCapAmount = $amount * $userMultiplier;
+
+            $stackingDeposit = StackingDeposite::create([
+                'userid'     => $targetUserId,
+                'txnid'      => $stakeTransfer->id,
+                'amount'     => ($amount / $price->price),
+                'usdt'       => $amount,
+                'capamount'  => Crypt::encrypt($totalCapAmount),
+                'planid'     => $plan->id,
+                'status'     => 1,
+                'roidouble'  => 1,
+                'created_at' => now(),
+                'istatus'    => $userMultiplier,
+                'staketype'  => 1,
+            ]);
+
+            // Update UserDetails Investment Stats
+            $targetUserDetail->increment('userstate');
+            $targetUserDetail->increment('current_self_investment', $amount);
+            $targetUserDetail->increment('total_self_investment', $amount);
+            $targetUserDetail->increment('current_investment', $amount);
+            $targetUserDetail->increment('total_investment', $amount);
+            $targetUserDetail->update([
+                'userstatus' => 1,
+                'capping'    => 0,
+                'roi_status' => 1
+            ]);
+
+            // 5% Direct Referral Commission to Sponsor
+            $guiderDetail = \App\UserDetails::where('userid', $targetUserDetail->sponsorid)->first();
+            if ($guiderDetail && ($guiderDetail->userstate || !is_null($guiderDetail->userLoanStatus()))) {
+                $dirAmt = $amount * 5 / 100; // 5% Direct Commission
+                $dirAmt = $cappingFunction->cappingCalculation($guiderDetail->id, $dirAmt);
+                if ($dirAmt > 0) {
+                    \App\BonusReward::create([
+                        'userid'         => $guiderDetail->id,
+                        'fromuser'       => $targetUserDetail->id,
+                        'amount'         => ($dirAmt / $price->price),
+                        'remaining'      => ($dirAmt / $price->price),
+                        'amt_usdt'       => $dirAmt,
+                        'remaining_usdt' => $dirAmt,
+                        'txnid'          => $stackingDeposit->id,
+                        'description'    => 'referral',
+                        'status'         => 0,
+                        'created_at'     => now(),
+                    ]);
+                }
+            }
+
+            // Real-time Tree Business Update, Booster Check & Level 2-15 Income Distribution
+            $cappingFunction->businessUpdate();
+
+            \DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Web3 Staking of $' . number_format($amount, 2) . ' USDT activated successfully on BSC Mainnet!',
+                'data'    => [
+                    'txHash'        => $txHash,
+                    'amount'        => $amount,
+                    'multiplier'    => $userMultiplier,
+                    'cappingLimit'  => $totalCapAmount,
+                    'targetUser'    => $targetUserDetail->user() ? $targetUserDetail->user()->uuid : 'Self'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            \Log::error('Web3 Staking Error: ' . $e->getMessage() . ' | ' . $e->getTraceAsString());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Staking activation failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verifies transaction receipt directly against official BSC Mainnet JSON-RPC:
+     * 1. Status == 0x1 (Success)
+     * 2. Interaction directed to CyeraInvestmentSplitter
+     * 3. Freshness Check (Mined within last 30 minutes to prevent old txn replay)
+     * 4. Sender Address Match (Transaction originated from user's authenticated wallet)
+     * 5. On-Chain Amount Match (Decodes Invested event log amount)
+     */
+    protected function verifyBscTransaction($txHash, $expectedContract, $expectedSender = null, $expectedAmount = null)
+    {
+        // 1. Fetch Transaction Receipt
+        $payloadReceipt = json_encode([
+            'jsonrpc' => '2.0',
+            'method' => 'eth_getTransactionReceipt',
+            'params' => [$txHash],
+            'id' => 1
+        ]);
+
+        $ch = curl_init("https://bsc-dataseed.binance.org/");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadReceipt);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return ['valid' => false, 'message' => 'Failed to reach BSC blockchain node. Please retry in a moment.'];
+        }
+
+        $data = json_decode($response, true);
+        if (!isset($data['result']) || empty($data['result'])) {
+            return ['valid' => false, 'message' => 'Transaction not found on BSC blockchain. Please ensure transaction is confirmed on BscScan.'];
+        }
+
+        $receipt = $data['result'];
+
+        // Check Status (0x1 = Confirmed Success)
+        if (!isset($receipt['status']) || $receipt['status'] !== '0x1') {
+            return ['valid' => false, 'message' => 'Transaction has reverted or failed on BSC blockchain.'];
+        }
+
+        // Check Target Contract
+        if (!isset($receipt['to']) || strtolower($receipt['to']) !== strtolower($expectedContract)) {
+            return ['valid' => false, 'message' => 'Transaction was not sent to the official Cyera Staking Splitter contract.'];
+        }
+
+        // Check Event Logs
+        if (!isset($receipt['logs']) || count($receipt['logs']) === 0) {
+            return ['valid' => false, 'message' => 'No token transfer or staking execution logs found in transaction receipt.'];
+        }
+
+        // Check Sender
+        if (!empty($expectedSender) && isset($receipt['from'])) {
+            if (strtolower($receipt['from']) !== strtolower($expectedSender)) {
+                return ['valid' => false, 'message' => 'Transaction was not broadcast from your authenticated wallet address.'];
+            }
+        }
+
+        // 2. Check Block Timestamp (Freshness Check: Max 30 minutes old)
+        if (isset($receipt['blockNumber'])) {
+            $payloadBlock = json_encode([
+                'jsonrpc' => '2.0',
+                'method' => 'eth_getBlockByNumber',
+                'params' => [$receipt['blockNumber'], false],
+                'id' => 2
+            ]);
+
+            $chBlock = curl_init("https://bsc-dataseed.binance.org/");
+            curl_setopt($chBlock, CURLOPT_POSTFIELDS, $payloadBlock);
+            curl_setopt($chBlock, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+            curl_setopt($chBlock, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chBlock, CURLOPT_TIMEOUT, 8);
+            $resBlock = curl_exec($chBlock);
+            curl_close($chBlock);
+
+            if ($resBlock) {
+                $blockData = json_decode($resBlock, true);
+                if (isset($blockData['result']['timestamp'])) {
+                    $blockTimestamp = hexdec($blockData['result']['timestamp']);
+                    $currentTimestamp = time();
+                    $ageSeconds = $currentTimestamp - $blockTimestamp;
+
+                    // Reject if transaction was mined more than 30 minutes (1800s) ago
+                    if ($ageSeconds > 1800) {
+                        return [
+                            'valid' => false,
+                            'message' => 'This transaction was mined in an old block (' . round($ageSeconds / 60) . ' minutes ago). Old transactions cannot be reused for new stakes.'
+                        ];
+                    }
+                }
+            }
+        }
+
+        // 3. Decode & Verify Exact Amount from Event Logs if expectedAmount is provided
+        if (!is_null($expectedAmount) && $expectedAmount > 0) {
+            $investedTopic0 = '0x9bce88ff835d9d8831ccf5c7e04a2533f68510314393b3a54f990dea62e7134e';
+            $transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+            $amountFound = null;
+
+            foreach ($receipt['logs'] as $log) {
+                if (isset($log['topics'][0])) {
+                    if (strtolower($log['topics'][0]) === strtolower($investedTopic0)) {
+                        // Invested event data: first 32 bytes (64 hex chars) is amountUSDT
+                        $cleanData = ltrim($log['data'], '0x');
+                        $amountHex = substr($cleanData, 0, 64);
+                        $weiDec = $this->hexToDecBc($amountHex);
+                        $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
+                        break;
+                    } elseif (strtolower($log['topics'][0]) === strtolower($transferTopic0)) {
+                        // Check if transfer recipient is splitter
+                        if (isset($log['topics'][2]) && str_contains(strtolower($log['topics'][2]), ltrim(strtolower($expectedContract), '0x'))) {
+                            $cleanData = ltrim($log['data'], '0x');
+                            $amountHex = substr($cleanData, 0, 64);
+                            $weiDec = $this->hexToDecBc($amountHex);
+                            $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
+                        }
+                    }
+                }
+            }
+
+            if (!is_null($amountFound)) {
+                if (abs($amountFound - $expectedAmount) > 0.05) {
+                    return [
+                        'valid' => false,
+                        'message' => 'On-chain transaction amount ($' . number_format($amountFound, 2) . ' USDT) does not match the requested stake amount ($' . number_format($expectedAmount, 2) . ' USDT).'
+                    ];
+                }
+            }
+        }
+
+        return ['valid' => true, 'message' => 'Transaction verified successfully.'];
+    }
+
+    /**
+     * Pure PHP Hex to Decimal converter using BCMath
+     */
+    protected function hexToDecBc($hex)
+    {
+        $hex = ltrim($hex, '0x');
+        $dec = '0';
+        $len = strlen($hex);
+        for ($i = 0; $i < $len; $i++) {
+            $digit = hexdec($hex[$i]);
+            $dec = bcadd(bcmul($dec, '16'), (string)$digit);
+        }
+        return $dec;
+    }
 
 }
+

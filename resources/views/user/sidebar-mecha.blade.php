@@ -148,34 +148,30 @@
             </div>
 
             <!-- Invest / Staking (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/Deposit*') || request()->is('User/Stake*') || request()->is('User/StakingHistory*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/Stake*') || request()->is('User/StakingHistory*') || request()->is('User/DepositHistory*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
-                            <i class="fas fa-coins"></i>
+                            <i class="fas fa-cubes"></i>
                         </div>
                         <div class="nav-txt-stack">
-                            <span class="nav-link-txt">Invest / Staking</span>
-                            <span class="nav-sub-txt">Deposit & Staking Pools</span>
+                            <span class="nav-link-txt">Web3 Staking</span>
+                            <span class="nav-sub-txt">On-Chain Staking & Pools</span>
                         </div>
                     </div>
                     <i class="fas fa-chevron-down nav-caret"></i>
                 </div>
                 <div class="mecha-submenu">
-                    <a href="{{ url('/User/Deposit') }}" class="mecha-sub-link {{ request()->is('User/Deposit') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> New Deposit</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/DepositHistory') }}" class="mecha-sub-link {{ request()->is('User/DepositHistory') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Deposit History</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
                     <a href="{{ url('/User/Stake') }}" class="mecha-sub-link {{ request()->is('User/Stake') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Stake CAI</div>
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Stake / Upgrade</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/StakingHistory') }}" class="mecha-sub-link {{ request()->is('User/StakingHistory') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> My Staking</div>
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Staking History</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/DepositHistory') }}" class="mecha-sub-link {{ request()->is('User/DepositHistory') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Deposit Records</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                 </div>

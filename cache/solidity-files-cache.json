@@ -45,8 +45,8 @@
       ]
     },
     "D:\\Cyera AI\\contracts\\CAIToken.sol": {
-      "lastModificationDate": 1788773625645,
-      "contentHash": "ad04e263a983330b4a2fcee834df2407",
+      "lastModificationDate": 1788950779596,
+      "contentHash": "b09fdc9b931d6be0c016b6945d47a03b",
       "sourceName": "contracts/CAIToken.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -81,7 +81,8 @@
         "Context",
         "IERC20",
         "IERC20Metadata",
-        "Ownable2Step"
+        "Ownable2Step",
+        "Pausable"
       ]
     },
     "D:\\Cyera AI\\contracts\\test\\MockUSDT.sol": {
@@ -166,8 +167,8 @@
       ]
     },
     "D:\\Cyera AI\\contracts\\TreasuryClaimVault.sol": {
-      "lastModificationDate": 1788773650951,
-      "contentHash": "f1da6563c7d4e93f58ac18b635f44bc2",
+      "lastModificationDate": 1788950786871,
+      "contentHash": "9621165fad612a57b9883674400ff145",
       "sourceName": "contracts/TreasuryClaimVault.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -201,6 +202,7 @@
         "Context",
         "IERC20",
         "Ownable2Step",
+        "Pausable",
         "ReentrancyGuard",
         "SafeERC20",
         "TreasuryClaimVault"

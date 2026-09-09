@@ -16,6 +16,15 @@ class CpsIncomeController extends Controller
         $getAllDeposit = \App\StackingDeposite::where([['status', 1], ['staketype', '>', 0], ['planid', '>', 0], ['created_at', '<', date('Y-m-d')]])->get();
         $profileStore = \App\ProfileStore::where('id', 1)->first();
         foreach ($getAllDeposit as $deposit) {
+            $useractivedeposit = \App\StackingDeposite::where([['userid', $deposit->userid], ['status', '>', 0]])->get();
+            $totalCap = 0;
+
+            foreach ($useractivedeposit as $item) {
+                $totalCap += (float) Crypt::decrypt($item->capamount);
+            }
+
+            $remCap = $totalCap;
+
             $loanStatus = (((!is_null($deposit->userDetail()->userLoanStatus()) && $deposit->userDetail()->userLoanStatus()->status == 0 && $deposit->userDetail()->userLoanStatus()->remaining == 0) || is_null($deposit->userDetail()->userLoanStatus())) ? 0 : 3);
             if (
                 $loanStatus != 3 &&
@@ -23,7 +32,8 @@ class CpsIncomeController extends Controller
                 $deposit->usdt == $deposit->walletTransfer()->amount &&
                 $deposit->userDetail()->user()->permission == 1 &&
                 $deposit->userDetail()->capping != 1 &&
-                $deposit->userDetail()->roi_status != 0
+                $deposit->userDetail()->roi_status != 0 &&
+                $remCap > 0
             ) {
                 $dailyRoiRate = 0.50; // Base: 0.5% daily
                 if ($deposit->userDetail()->booster == 3) {
@@ -34,7 +44,8 @@ class CpsIncomeController extends Controller
 
                 $cps = ($deposit->usdt * $dailyRoiRate) / 100;
                 $cappingFunction = new StackingDetailController();
-                $returnAmount = $cappingFunction->cappingCalculation($deposit->userid, $cps);
+                //$returnAmount = $cappingFunction->cappingCalculation($deposit->userid, $cps);
+                $returnAmount = $cps;
                 //\Log::info('Return Amount AC '.$returnAmount);
                 $insIncomeEntry = \App\CpsIncome::create([
                     'userid' => $deposit->userid,

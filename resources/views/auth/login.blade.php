@@ -540,10 +540,10 @@
                 </a>
                 <div class="inside-live-badge">
                     <span class="live-dot-pulse"></span>
-                    <span>SECURE WEB3 GATEWAY</span>
+                    <span>BSC MAINNET DAPP GATEWAY</span>
                 </div>
-                <h1 class="card-auth-title">Welcome Back</h1>
-                <p class="card-auth-subtitle">Sign in to manage your Web3 portfolio</p>
+                <h1 class="card-auth-title">Cyera AI Portal</h1>
+                <p class="card-auth-subtitle">Connect your Web3 BEP-20 Wallet to enter dApp</p>
             </div>
 
             <!-- Session Alerts -->
@@ -561,73 +561,32 @@
                 </div>
             @endif
 
-            <!-- Login Form -->
-            <form action="{{ route('login') }}" method="POST" id="loginForm">
-                @csrf
+            <div id="web3Alert" class="auth-alert-banner auth-alert-error" style="display: none;">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="web3AlertText"></span>
+            </div>
 
-                <!-- User ID -->
-                <div class="form-field-group">
-                    <label class="field-label" for="email">
-                        <span><i class="fas fa-id-badge label-icon"></i> User ID / Email</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <input type="text" id="email" name="email" class="input-control-styled" placeholder="Enter your User ID" value="{{ old('email') }}" required autofocus autocomplete="username">
-                    </div>
-                    @error('email')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Password -->
-                <div class="form-field-group">
-                    <label class="field-label" for="password">
-                        <span><i class="fas fa-lock label-icon"></i> Password</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <input type="password" id="password" name="password" class="input-control-styled" placeholder="Enter your password" required autocomplete="current-password">
-                        <button type="button" class="eye-toggle-action" id="togglePassword" title="Show / Hide Password">
-                            <i class="fas fa-eye" id="toggleIcon"></i>
-                        </button>
-                    </div>
-                    @error('password')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Remember & Forgot Password -->
-                <div class="auth-aux-row">
-                    <label class="remember-label">
-                        <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <span>Remember me</span>
-                    </label>
-                    <a href="{{ route('password.request') }}" class="forgot-link-styled">Forgot Password?</a>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn-submit-gold" id="btnSubmit">
-                    <span id="btnText"><i class="fas fa-arrow-right-to-bracket"></i> Sign In to Account</span>
-                    <div class="btn-spinner-icon" id="btnSpinner"></div>
+            <!-- ============================================================
+                 1. PRIMARY WEB3 CONNECT SECTION
+                 ============================================================ -->
+            <div id="web3ConnectSection">
+                <button type="button" class="btn-submit-gold" id="btnConnectWeb3" style="font-size: 1.05rem; padding: 0 20px; margin-bottom: 16px;">
+                    <i class="fas fa-wallet" style="font-size: 1.2rem;"></i>
+                    <span id="web3BtnText">Connect MetaMask / TrustWallet</span>
+                    <div class="btn-spinner-icon" id="web3Spinner" style="display: none;"></div>
                 </button>
 
-                <!-- Divider -->
-                <div class="auth-divider-line">
-                    <span>Don't have an account?</span>
+                <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; color: var(--text-muted); font-size: 0.82rem;">
+                    <span><i class="fab fa-ethereum" style="color: #F5A623;"></i> BNB Chain (BEP-20)</span>
+                    <span>•</span>
+                    <span><i class="fas fa-shield-halved" style="color: #00FF88;"></i> Cryptographically Verified</span>
                 </div>
 
-                <!-- Register Link -->
-                <a href="{{ url('/register') }}" class="btn-action-secondary">
-                    <i class="fas fa-user-plus"></i> Create New Account
+                <!-- Create Account Link -->
+                <a href="{{ url('/register') }}{{ request('ref') ? '?ref='.request('ref') : '' }}" class="btn-action-secondary" style="margin-bottom: 6px;">
+                    <i class="fas fa-user-plus"></i> Create New Account / Register
                 </a>
-
-            </form>
+            </div>
 
         </div>
 
@@ -698,7 +657,6 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
-            // Connect nearest nodes with laser circuit lines
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -706,8 +664,8 @@
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 130) {
                         const alpha = (1 - dist / 130) * 0.35;
-                        ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
-                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = `rgba(245, 166, 35, ${alpha})`;
+                        ctx.lineWidth = 0.6;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -716,98 +674,246 @@
                 }
             }
 
-            // Draw and update glowing particles
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
+            particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.pulsing += p.pulseSpeed;
-                if (p.y < -15) p.y = height + 15;
-                if (p.x < -15) p.x = width + 15;
-                if (p.x > width + 15) p.x = -15;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
 
-                const currentAlpha = Math.max(0.2, p.alpha + Math.sin(p.pulsing) * 0.3);
+                p.pulsing += p.pulseSpeed;
+                const dynamicAlpha = p.alpha * (0.7 + 0.3 * Math.sin(p.pulsing));
+
                 ctx.save();
-                ctx.globalAlpha = currentAlpha;
-                ctx.shadowBlur = 14;
-                ctx.shadowColor = p.color;
+                ctx.globalAlpha = dynamicAlpha;
                 ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
-            }
+            });
 
-            // Draw high-speed laser beams
-            for (let i = 0; i < circuitBeams.length; i++) {
-                const b = circuitBeams[i];
-                ctx.save();
-                ctx.lineWidth = 1.8;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = b.color + '0.8)';
-                const grad = b.vertical
-                    ? ctx.createLinearGradient(b.x, b.y - b.length, b.x, b.y)
-                    : ctx.createLinearGradient(b.x - b.length, b.y, b.x, b.y);
-                grad.addColorStop(0, b.color + '0)');
-                grad.addColorStop(0.7, b.color + (b.alpha * 0.8) + ')');
-                grad.addColorStop(1, b.color + b.alpha + ')');
-                ctx.strokeStyle = grad;
-                ctx.beginPath();
+            circuitBeams.forEach(b => {
                 if (b.vertical) {
-                    ctx.moveTo(b.x, b.y - b.length);
-                    ctx.lineTo(b.x, b.y);
                     b.y += b.speed;
-                    if (b.y - b.length > height) {
-                        b.y = 0;
+                    if (b.y > height + b.length) {
+                        b.y = -b.length;
                         b.x = Math.random() * width;
                     }
-                } else {
-                    ctx.moveTo(b.x - b.length, b.y);
+                    const grad = ctx.createLinearGradient(b.x, b.y - b.length, b.x, b.y);
+                    grad.addColorStop(0, b.color + '0)');
+                    grad.addColorStop(1, b.color + b.alpha + ')');
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(b.x, b.y - b.length);
                     ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                } else {
                     b.x += b.speed;
-                    if (b.x - b.length > width) {
-                        b.x = 0;
+                    if (b.x > width + b.length) {
+                        b.x = -b.length;
                         b.y = Math.random() * height;
                     }
+                    const grad = ctx.createLinearGradient(b.x - b.length, b.y, b.x, b.y);
+                    grad.addColorStop(0, b.color + '0)');
+                    grad.addColorStop(1, b.color + b.alpha + ')');
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(b.x - b.length, b.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
                 }
-                ctx.stroke();
-                ctx.restore();
-            }
+            });
 
             requestAnimationFrame(animate);
         }
 
         window.addEventListener('resize', resize);
         resize();
-        requestAnimationFrame(animate);
+        animate();
     })();
 
-    // Password Visibility Toggle
-    const toggleBtn = document.getElementById('togglePassword');
-    const pwdInput = document.getElementById('password');
-    const toggleIcon = document.getElementById('toggleIcon');
+    // ============================================================
+    // WEB3 DAPP METAMASK & TRUSTWALLET CRYPTOGRAPHIC AUTHENTICATION
+    // ============================================================
+    let detectedWalletAddress = null;
+    const btnConnectWeb3 = document.getElementById('btnConnectWeb3');
+    const web3BtnText = document.getElementById('web3BtnText');
+    const web3Spinner = document.getElementById('web3Spinner');
+    const web3Alert = document.getElementById('web3Alert');
+    const web3AlertText = document.getElementById('web3AlertText');
 
-    if (toggleBtn && pwdInput) {
-        toggleBtn.addEventListener('click', function () {
-            const isPassword = pwdInput.getAttribute('type') === 'password';
-            pwdInput.setAttribute('type', isPassword ? 'text' : 'password');
-            toggleIcon.classList.toggle('fa-eye', !isPassword);
-            toggleIcon.classList.toggle('fa-eye-slash', isPassword);
-        });
+    function getMetaMaskProvider() {
+        if (typeof window.ethereum === 'undefined') {
+            return null;
+        }
+        if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+            const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+            if (mm) return mm;
+            const tw = window.ethereum.providers.find(p => p.isTrust || p.isTrustWallet || p.isBinance);
+            if (tw) return tw;
+            const nonPhantom = window.ethereum.providers.find(p => !p.isPhantom);
+            if (nonPhantom) return nonPhantom;
+            return window.ethereum.providers[0];
+        }
+        if (window.trustwallet) return window.trustwallet;
+        return window.ethereum;
     }
 
-    // Submit Loader
-    const loginForm = document.getElementById('loginForm');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const btnText = document.getElementById('btnText');
-    const btnSpinner = document.getElementById('btnSpinner');
+    function showWeb3Error(msg) {
+        if (web3Alert && web3AlertText) {
+            web3AlertText.innerText = msg;
+            web3Alert.style.display = 'flex';
+        }
+    }
 
-    if (loginForm && btnSubmit) {
-        loginForm.addEventListener('submit', function () {
-            btnSubmit.style.pointerEvents = 'none';
-            btnSubmit.style.opacity = '0.9';
-            if (btnText) btnText.style.display = 'none';
-            if (btnSpinner) btnSpinner.style.display = 'block';
+    function setWeb3Loading(isLoading, text = 'Connecting...') {
+        if (!btnConnectWeb3) return;
+        if (isLoading) {
+            btnConnectWeb3.style.pointerEvents = 'none';
+            btnConnectWeb3.style.opacity = '0.85';
+            if (web3BtnText) web3BtnText.innerText = text;
+            if (web3Spinner) web3Spinner.style.display = 'block';
+        } else {
+            btnConnectWeb3.style.pointerEvents = 'auto';
+            btnConnectWeb3.style.opacity = '1';
+            if (web3BtnText) web3BtnText.innerText = 'Connect MetaMask / TrustWallet';
+            if (web3Spinner) web3Spinner.style.display = 'none';
+        }
+    }
+
+    async function triggerWeb3Login(address, provider) {
+        detectedWalletAddress = address;
+        setWeb3Loading(true, 'Requesting Security Challenge...');
+
+        try {
+            // Check / Switch to BSC Mainnet (Chain ID 56 / 0x38)
+            const currentChain = await provider.request({ method: 'eth_chainId' });
+            if (currentChain !== '0x38') {
+                try {
+                    await provider.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await provider.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain Mainnet',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                blockExplorerUrls: ['https://bscscan.com/']
+                            }],
+                        });
+                    }
+                }
+            }
+
+            // 1. Fetch Nonce Challenge from Server
+            const nonceResponse = await fetch("{{ url('/auth/web3-nonce') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    address: detectedWalletAddress
+                })
+            });
+
+            const nonceData = await nonceResponse.json();
+            if (nonceData.status !== 'success' || !nonceData.message) {
+                throw new Error(nonceData.message || 'Failed to generate security nonce.');
+            }
+
+            // 2. Request Cryptographic Signature in Wallet Popup
+            setWeb3Loading(true, 'Please sign message in wallet...');
+            let signature = null;
+            try {
+                signature = await provider.request({
+                    method: 'personal_sign',
+                    params: [nonceData.message, detectedWalletAddress]
+                });
+            } catch (signErr) {
+                setWeb3Loading(false);
+                showWeb3Error('Signature rejected in wallet. Authentication aborted.');
+                return;
+            }
+
+            setWeb3Loading(true, 'Verifying Cryptographic Proof...');
+
+            // Check for referral sponsor in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sponsorRef = urlParams.get('ref') || '';
+
+            // 3. Send Signature + Message to Backend for Strict On-Chain Verification
+            const response = await fetch("{{ url('/auth/web3-login') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    address: detectedWalletAddress,
+                    signature: signature,
+                    message: nonceData.message,
+                    sponsor: sponsorRef
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                setWeb3Loading(true, 'Access Granted! Entering...');
+                window.location.href = data.redirect;
+            } else if (data.status === 'not_registered') {
+                setWeb3Loading(true, 'Redirecting to Registration...');
+                const regUrl = "{{ url('/register') }}?wallet=" + encodeURIComponent(detectedWalletAddress) + (sponsorRef ? "&ref=" + encodeURIComponent(sponsorRef) : "");
+                window.location.href = regUrl;
+            } else {
+                setWeb3Loading(false);
+                showWeb3Error(data.message || 'Authentication failed.');
+            }
+
+        } catch (err) {
+            setWeb3Loading(false);
+            showWeb3Error(err.message || 'Verification cancelled or failed.');
+        }
+    }
+
+    if (btnConnectWeb3) {
+        btnConnectWeb3.addEventListener('click', async function () {
+            if (web3Alert) web3Alert.style.display = 'none';
+
+            const provider = getMetaMaskProvider();
+            if (!provider) {
+                showWeb3Error('MetaMask / Web3 Wallet not found! Please install MetaMask or open inside TrustWallet dApp Browser.');
+                return;
+            }
+
+            setWeb3Loading(true, 'Requesting Wallet...');
+
+            try {
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('No account selected');
+                }
+
+                await triggerWeb3Login(accounts[0], provider);
+
+            } catch (err) {
+                setWeb3Loading(false);
+                showWeb3Error(err.message || 'Connection cancelled or failed.');
+            }
         });
     }
     </script>

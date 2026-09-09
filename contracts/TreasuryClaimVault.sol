@@ -94,13 +94,48 @@ abstract contract ReentrancyGuard {
     }
 }
 
+abstract contract Pausable is Context {
+    event Paused(address account);
+    event Unpaused(address account);
+
+    bool private _paused;
+
+    constructor() {
+        _paused = false;
+    }
+
+    modifier whenNotPaused() {
+        require(!_paused, "Pausable: paused");
+        _;
+    }
+
+    modifier whenPaused() {
+        require(_paused, "Pausable: not paused");
+        _;
+    }
+
+    function paused() public view virtual returns (bool) {
+        return _paused;
+    }
+
+    function _pause() internal virtual whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
+
+    function _unpause() internal virtual whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
+}
+
 /**
  * @title TreasuryClaimVault
  * @notice Holds the 70% USDT treasury fund. 
  *         Only authorized Admin Owner can claim or release funds.
  * @dev Employs OpenZeppelin SafeERC20. `rescueTokens` is strictly forbidden from touching treasury USDT.
  */
-contract TreasuryClaimVault is Context, Ownable2Step, ReentrancyGuard {
+contract TreasuryClaimVault is Context, Ownable2Step, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable usdtToken;
@@ -131,7 +166,7 @@ contract TreasuryClaimVault is Context, Ownable2Step, ReentrancyGuard {
         address recipient,
         uint256 amount,
         string calldata reason
-    ) external onlyOwner nonReentrant {
+    ) external onlyOwner nonReentrant whenNotPaused {
         require(recipient != address(0), "TreasuryVault: Recipient cannot be zero address");
         require(amount > 0, "TreasuryVault: Amount must be greater than zero");
         require(usdtToken.balanceOf(address(this)) >= amount, "TreasuryVault: Insufficient balance");
@@ -151,5 +186,13 @@ contract TreasuryClaimVault is Context, Ownable2Step, ReentrancyGuard {
         
         IERC20(tokenAddress).safeTransfer(to, amount);
         emit EmergencyTokensRecovered(tokenAddress, to, amount);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }
