@@ -13,52 +13,136 @@ class CpsIncomeController extends Controller
 {
     public function cpsGeneration()
     {
-        $getAllDeposit = \App\StackingDeposite::where([['status', 1], ['staketype', '>', 0], ['planid', '>', 0], ['created_at', '<', date('Y-m-d')]])->get();
-        $profileStore = \App\ProfileStore::where('id', 1)->first();
-        foreach ($getAllDeposit as $deposit) {
-            $useractivedeposit = \App\StackingDeposite::where([['userid', $deposit->userid], ['status', '>', 0]])->get();
+        \Log::info("==================================================================");
+        \Log::info(">>> [CPS GENERATION START] Starting Daily ROI Calculation at " . now());
+        \Log::info("==================================================================");
+
+        $todayDate = date('Y-m-d');
+        $allDeposits = \App\StackingDeposite::where('status', 1)
+            ->where('staketype', '>', 0)
+            ->where('planid', '>', 0)
+            ->get();
+
+        \Log::info("[CPS SCAN] Found " . $allDeposits->count() . " active Staking Deposits in database.");
+
+        $profileStore = \App\ProfileStore::where('id', 1)->first() ?: (object)['price' => 1];
+        $processedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($allDeposits as $deposit) {
+            $depositId = $deposit->id;
+            $userId = $deposit->userid;
+            $depositCreatedAt = substr($deposit->created_at, 0, 10);
+
+            // 1. Check Date (T+1 Cycle)
+            if ($depositCreatedAt >= $todayDate) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User ID {$userId}): Staked TODAY ({$deposit->created_at}). Daily ROI starts from next day (T+1 cycle).");
+                $skippedCount++;
+                continue;
+            }
+
+            // 2. Check duplicate ROI already credited today
+            $alreadyCreditedToday = \App\CpsIncome::where('txnid', $depositId)
+                ->where('created_at', '>=', $todayDate . ' 00:00:00')
+                ->where('created_at', '<=', $todayDate . ' 23:59:59')
+                ->exists();
+
+            if ($alreadyCreditedToday) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User ID {$userId}): Daily ROI already credited today ({$todayDate}).");
+                $skippedCount++;
+                continue;
+            }
+
+            // 3. User Details & Permission
+            $userDetail = $deposit->userDetail();
+            if (!$userDetail) {
+                \Log::warning("[ROI SKIPPED] Deposit #{$depositId}: UserDetail record not found for user_details.id = {$userId}.");
+                $skippedCount++;
+                continue;
+            }
+
+            $user = $userDetail->user();
+            if (!$user || $user->permission != 1) {
+                $perm = $user ? $user->permission : 'null';
+                \Log::warning("[ROI SKIPPED] Deposit #{$depositId} (User ID {$userId}): User permission is inactive (permission: {$perm}).");
+                $skippedCount++;
+                continue;
+            }
+
+            // 4. Check ROI Status
+            if ($userDetail->roi_status == 0) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User {$user->uuid}): User's ROI status is disabled (roi_status = 0).");
+                $skippedCount++;
+                continue;
+            }
+
+            // 5. Check User Capping Limit
+            if ($userDetail->capping == 1) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User {$user->uuid}): User has reached max capping limit (capping = 1).");
+                $skippedCount++;
+                continue;
+            }
+
+            // 6. Check Total Remaining Capping
+            $userActiveDeposits = \App\StackingDeposite::where([['userid', $userId], ['status', '>', 0]])->get();
             $totalCap = 0;
-
-            foreach ($useractivedeposit as $item) {
-                $totalCap += (float) Crypt::decrypt($item->capamount);
+            foreach ($userActiveDeposits as $item) {
+                try {
+                    $totalCap += (float) Crypt::decrypt($item->capamount);
+                } catch (\Exception $e) {}
             }
 
-            $remCap = $totalCap;
-
-            $loanStatus = (((!is_null($deposit->userDetail()->userLoanStatus()) && $deposit->userDetail()->userLoanStatus()->status == 0 && $deposit->userDetail()->userLoanStatus()->remaining == 0) || is_null($deposit->userDetail()->userLoanStatus())) ? 0 : 3);
-            if (
-                $loanStatus != 3 &&
-                !is_null($deposit->walletTransfer()) &&
-                $deposit->usdt == $deposit->walletTransfer()->amount &&
-                $deposit->userDetail()->user()->permission == 1 &&
-                $deposit->userDetail()->capping != 1 &&
-                $deposit->userDetail()->roi_status != 0 &&
-                $remCap > 0
-            ) {
-                $dailyRoiRate = 0.50; // Base: 0.5% daily
-                if ($deposit->userDetail()->booster == 3) {
-                    $dailyRoiRate = 1.50; // Booster 2: 1.5% daily
-                } elseif ($deposit->userDetail()->booster == 2) {
-                    $dailyRoiRate = 1.00; // Booster 1: 1.0% daily
-                }
-
-                $cps = ($deposit->usdt * $dailyRoiRate) / 100;
-                $cappingFunction = new StackingDetailController();
-                //$returnAmount = $cappingFunction->cappingCalculation($deposit->userid, $cps);
-                $returnAmount = $cps;
-                //\Log::info('Return Amount AC '.$returnAmount);
-                $insIncomeEntry = \App\CpsIncome::create([
-                    'userid' => $deposit->userid,
-                    'txnid' => $deposit->id,
-                    'amount' => $returnAmount / $profileStore->price,
-                    'remaining' => $returnAmount / $profileStore->price,
-                    'amt_usdt' => $returnAmount,
-                    'remaining_usdt' => $returnAmount,
-                    'status' => 0,
-                    'created_at' => now(),
-                ]);
+            if ($totalCap <= 0) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User {$user->uuid}): Total remaining capping is $0.00.");
+                $skippedCount++;
+                continue;
             }
+
+            // 7. Check Loan Status
+            $loanStatus = (((!is_null($userDetail->userLoanStatus()) && $userDetail->userLoanStatus()->status == 0 && $userDetail->userLoanStatus()->remaining == 0) || is_null($userDetail->userLoanStatus())) ? 0 : 3);
+            if ($loanStatus == 3) {
+                \Log::info("[ROI SKIPPED] Deposit #{$depositId} (User {$user->uuid}): User has an active/pending loan repayment.");
+                $skippedCount++;
+                continue;
+            }
+
+            // 8. Calculate Daily ROI Rate based on Booster status
+            $dailyRoiRate = 0.50; // Base: 0.50% daily
+            $boosterName = 'Base (0.5%)';
+            if ($userDetail->booster == 3) {
+                $dailyRoiRate = 1.50; // Booster 2: 1.50% daily
+                $boosterName = 'Booster 2 (1.5%)';
+            } elseif ($userDetail->booster == 2) {
+                $dailyRoiRate = 1.00; // Booster 1: 1.00% daily
+                $boosterName = 'Booster 1 (1.0%)';
+            }
+
+            $cpsUsdt = ($deposit->usdt * $dailyRoiRate) / 100;
+            if ($cpsUsdt <= 0) {
+                \Log::warning("[ROI SKIPPED] Deposit #{$depositId}: Calculated CPS amount is $0.");
+                $skippedCount++;
+                continue;
+            }
+
+            // 9. Generate Daily ROI Income Record
+            $insIncomeEntry = \App\CpsIncome::create([
+                'userid'         => $deposit->userid,
+                'txnid'          => $deposit->id,
+                'amount'         => $cpsUsdt / $profileStore->price,
+                'remaining'      => $cpsUsdt / $profileStore->price,
+                'amt_usdt'       => $cpsUsdt,
+                'remaining_usdt' => $cpsUsdt,
+                'status'         => 0,
+                'created_at'     => now(),
+            ]);
+
+            \Log::info("[ROI SUCCESS] Generated \${$cpsUsdt} USDT ({$boosterName}) on \${$deposit->usdt} stake for User {$user->uuid} (Deposit #{$depositId}). Income ID: {$insIncomeEntry->id}");
+            $processedCount++;
         }
+
+        \Log::info("==================================================================");
+        \Log::info(">>> [CPS GENERATION COMPLETE] Processed: {$processedCount} | Skipped: {$skippedCount}");
+        \Log::info("==================================================================");
     }
 
 
