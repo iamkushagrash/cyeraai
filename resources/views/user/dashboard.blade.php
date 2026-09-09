@@ -1277,9 +1277,9 @@
                                 <i class="fas fa-user-check"></i>
                             </div>
                             <div class="team-stat-text-col">
-                                <span class="team-stat-lbl">DIRECTS</span>
-                                <span class="team-stat-val">{{ $activeDirects }}</span>
-                                <span class="team-stat-sub sub-green">{{ $totalDirects }} Total</span>
+                                <span class="team-stat-lbl">TOTAL DIRECTS</span>
+                                <span class="team-stat-val">{{ $totalDirects }}</span>
+                                <span class="team-stat-sub sub-green">{{ $activeDirects }} Active</span>
                             </div>
                         </div>
                     </div>
