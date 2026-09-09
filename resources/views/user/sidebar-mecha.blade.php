@@ -25,10 +25,10 @@
                 <circle cx="12" cy="203" r="1.5" fill="#FFD700" opacity="0.8" />
             </svg>
 
-            <!-- Gear Settings Button Top-Right -->
-            <a href="{{ url('/User/EditProfile') }}" class="btn-header-gear" title="Account Settings & Profile" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-gear"></i>
-            </a>
+            <!-- Close Sidebar Button Top-Right -->
+            <button type="button" class="btn-header-gear" onclick="closeMechaSidebar()" title="Close Sidebar" aria-label="Close Sidebar" style="text-decoration: none; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; outline: none; background: rgba(245, 166, 35, 0.15);">
+                <i class="fas fa-xmark" style="font-size: 15px; color: #FFD700;"></i>
+            </button>
 
 @php
     $sideUid = Session::get('user.id');

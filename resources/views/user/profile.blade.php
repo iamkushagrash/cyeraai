@@ -19,58 +19,58 @@
     $referralLink = url('/register/' . $userUuid);
 @endphp
 
-<div style="max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+<div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;">
 
     <!-- ============================================================
-         1. HERO PROFILE IDENTITY HEADER CARD
+         1. COMPACT HERO IDENTITY HEADER
          ============================================================ -->
-    <div class="mecha-hud-card" style="position: relative; overflow: hidden; padding: 28px 24px;">
-        <!-- Top Edge Gold Shimmer -->
+    <div class="mecha-hud-card" style="padding: 16px 18px; position: relative; overflow: hidden;">
+        <!-- Top Edge Gold Hairline -->
         <div style="position: absolute; top: 0; left: 10%; right: 10%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.9), rgba(245, 166, 35, 0.8), transparent);"></div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-            <!-- Left: Avatar & User Identity Info -->
-            <div style="display: flex; align-items: center; gap: 18px;">
-                <div style="width: 76px; height: 76px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, #FFD700, #F5A623, #B8860B); position: relative; box-shadow: 0 0 24px rgba(245, 166, 35, 0.45); flex-shrink: 0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <!-- Left: Avatar + Identity Info -->
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #FFD700, #F5A623, #B8860B); position: relative; box-shadow: 0 0 16px rgba(245, 166, 35, 0.35); flex-shrink: 0;">
                     <div style="width: 100%; height: 100%; border-radius: 50%; background: #07080d; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                         <img src="{{ asset('images/cai-lion-coin.png') }}" alt="CYERA AI" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <span style="position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: {{ $isActive ? '#00FF88' : '#64748B' }}; border: 2px solid #07080d; box-shadow: 0 0 8px {{ $isActive ? '#00FF88' : '#64748B' }};"></span>
+                    <span style="position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; background: {{ $isActive ? '#00FF88' : '#64748B' }}; border: 2px solid #07080d; box-shadow: 0 0 6px {{ $isActive ? '#00FF88' : '#64748B' }};"></span>
                 </div>
 
                 <div>
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
-                        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.55rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px; margin: 0;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: #FFFFFF; margin: 0; line-height: 1.2;">
                             {{ $userName }}
                         </h2>
-                        <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.4); color: #FFD700; font-weight: 700; text-transform: uppercase;">
+                        <span style="font-size: 0.65rem; padding: 2px 7px; border-radius: 5px; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.35); color: #FFD700; font-weight: 700;">
                             <i class="fas fa-crown"></i> {{ $rankName }}
                         </span>
                         @if($isActive)
-                            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; background: rgba(0, 255, 136, 0.12); border: 1px solid rgba(0, 255, 136, 0.35); color: #00FF88; font-weight: 700;">
-                                <i class="fas fa-circle-check"></i> ACTIVE
+                            <span style="font-size: 0.65rem; padding: 2px 7px; border-radius: 5px; background: rgba(0, 255, 136, 0.12); border: 1px solid rgba(0, 255, 136, 0.35); color: #00FF88; font-weight: 700;">
+                                ACTIVE
                             </span>
                         @else
-                            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.35); color: #FB7185; font-weight: 700;">
-                                <i class="fas fa-circle-xmark"></i> INACTIVE
+                            <span style="font-size: 0.65rem; padding: 2px 7px; border-radius: 5px; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.35); color: #FB7185; font-weight: 700;">
+                                INACTIVE
                             </span>
                         @endif
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 12px; color: #94A3B8; font-size: 0.84rem; flex-wrap: wrap;">
-                        <span><strong style="color: #FFD700;">User ID:</strong> {{ $userUuid }}</span>
+                    <div style="display: flex; align-items: center; gap: 8px; color: #94A3B8; font-size: 0.78rem; margin-top: 3px; flex-wrap: wrap;">
+                        <span><strong style="color: #FFD700;">ID:</strong> {{ $userUuid }}</span>
                         <span>•</span>
                         <span><i class="far fa-calendar-alt" style="color: #FFD700;"></i> Joined {{ $userDoj }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Fast Action Shortcuts -->
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="{{ url('/User/Stake') }}" class="mecha-btn-gold" style="height: 42px; padding: 0 16px; font-size: 0.86rem; text-decoration: none;">
-                    <i class="fas fa-bolt"></i> STAKE / UPGRADE
+            <!-- Right: Action Pills -->
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="{{ url('/User/Stake') }}" class="mecha-btn-gold" style="height: 34px; padding: 0 14px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-bolt"></i> STAKE
                 </a>
-                <a href="{{ url('/User/ChangePassword') }}" class="mecha-btn-outline" style="height: 42px; padding: 0 16px; font-size: 0.86rem; text-decoration: none;">
+                <a href="{{ url('/User/ChangePassword') }}" class="mecha-btn-outline" style="height: 34px; padding: 0 12px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                     <i class="fas fa-key"></i> SECURITY
                 </a>
             </div>
@@ -78,170 +78,99 @@
     </div>
 
     <!-- ============================================================
-         2. EXCLUSIVE 1-CLICK REFERRAL SHARE HUD BAR
+         2. ULTRA-COMPACT 1-LINE REFERRAL BAR
          ============================================================ -->
-    <div class="mecha-hud-card" style="background: linear-gradient(135deg, rgba(245, 166, 35, 0.08) 0%, rgba(6, 9, 18, 0.95) 100%); border-color: rgba(245, 166, 35, 0.35);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 215, 0, 0.15); color: #FFD700; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-share-nodes"></i>
-                </div>
-                <div>
-                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0;">
-                        YOUR OFFICIAL REFERRAL LINK
-                    </h3>
-                    <div style="font-size: 0.78rem; color: #94A3B8;">Share your unique referral link to earn 5% Direct Commission + 15-Level Income</div>
-                </div>
-            </div>
-            <span style="font-size: 0.78rem; color: #00FF88; font-weight: 700; background: rgba(0, 255, 136, 0.1); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.3);">
-                SPONSOR CODE: {{ $userUuid }}
-            </span>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-            <div style="flex: 1; min-width: 260px; position: relative; background: #07080d; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; overflow: hidden;">
-                <input type="text" id="profRefInput" value="{{ $referralLink }}" readonly style="background: transparent; border: none; outline: none; color: #FFD700; font-family: monospace; font-size: 0.88rem; width: 100%; font-weight: 600;">
-            </div>
-
-            <button type="button" class="mecha-btn-gold" onclick="copyProfileRefLink()" style="height: 42px; padding: 0 18px; font-size: 0.88rem; white-space: nowrap;">
-                <i class="fas fa-copy"></i> <span id="profCopyBtnText">COPY LINK</span>
-            </button>
-
-            <!-- Telegram Share -->
-            <a href="https://t.me/share/url?url={{ urlencode($referralLink) }}&text={{ urlencode('Join Cyera AI Decentralized Network under my team:') }}" target="_blank" class="mecha-btn-outline" style="height: 42px; padding: 0 14px; color: #00E5FF; border-color: rgba(0, 229, 255, 0.4); text-decoration: none;" title="Share on Telegram">
-                <i class="fab fa-telegram" style="font-size: 1.1rem;"></i>
-            </a>
-
-            <!-- WhatsApp Share -->
-            <a href="https://api.whatsapp.com/send?text={{ urlencode('Join Cyera AI with my referral link: ' . $referralLink) }}" target="_blank" class="mecha-btn-outline" style="height: 42px; padding: 0 14px; color: #00FF88; border-color: rgba(0, 255, 136, 0.4); text-decoration: none;" title="Share on WhatsApp">
-                <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i>
-            </a>
-        </div>
+    <div style="background: rgba(8, 9, 15, 0.9); backdrop-filter: blur(16px); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 12px; padding: 5px 6px 5px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.06);">
+        <i class="fas fa-link" style="color: #FFD700; font-size: 0.85rem; flex-shrink: 0;"></i>
+        <input type="text" id="profRefInput" value="{{ $referralLink }}" readonly style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding: 0;">
+        <button type="button" onclick="copyProfileRefLink()" class="btn-solid-gold-claim" style="height: 32px; padding: 0 12px; font-size: 0.75rem; border-radius: 8px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; cursor: pointer; border: none;">
+            <i class="fas fa-copy"></i> <span id="profCopyBtnText">COPY</span>
+        </button>
     </div>
 
     <!-- ============================================================
-         3. 2-COLUMN PROFILE SPECIFICATION HUD GRID
+         3. COMPACT PROFILE SPECIFICATION CARDS
          ============================================================ -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
 
-        <!-- Column 1: Account & Sponsor Credentials -->
-        <div class="mecha-hud-card">
-            <div class="mecha-card-header" style="margin-bottom: 18px;">
-                <div class="mecha-card-title-wrap">
-                    <i class="fas fa-user-shield" style="color: #FFD700;"></i>
-                    <div>
-                        <h3 class="mecha-card-title" style="font-size: 1.05rem;">ACCOUNT CREDENTIALS</h3>
-                        <div class="mecha-card-subtitle">Verified membership records</div>
-                    </div>
+        <!-- Account Info -->
+        <div class="mecha-hud-card" style="padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-shield" style="color: #FFD700;"></i> ACCOUNT INFO
                 </div>
-                <span class="mecha-card-badge">IDENTITY</span>
+                <span style="font-size: 0.65rem; color: #94A3B8; font-weight: 700; letter-spacing: 0.5px;">IDENTITY</span>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
                 <!-- Full Name -->
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">
-                        <i class="fas fa-user" style="color: #FFD700; margin-right: 4px;"></i> Member Name
-                    </div>
-                    <div style="font-size: 0.96rem; font-weight: 700; color: #FFFFFF;">
-                        {{ $userName }}
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-user" style="color: #FFD700; width: 14px;"></i> Name</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userName }}</span>
                 </div>
 
-                <!-- Email Address -->
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">
-                        <i class="fas fa-envelope" style="color: #FFD700; margin-right: 4px;"></i> Email Address
-                    </div>
-                    <div style="font-size: 0.96rem; font-weight: 700; color: #FFFFFF;">
-                        {{ $userEmail }}
-                    </div>
+                <!-- Email -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-envelope" style="color: #FFD700; width: 14px;"></i> Email</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $userEmail }}</span>
                 </div>
 
-                <!-- Contact Number -->
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">
-                        <i class="fas fa-phone-volume" style="color: #FFD700; margin-right: 4px;"></i> Mobile Contact
-                    </div>
-                    <div style="font-size: 0.96rem; font-weight: 700; color: #FFFFFF;">
-                        {{ $userContact }}
-                    </div>
+                <!-- Mobile -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-phone" style="color: #FFD700; width: 14px;"></i> Mobile</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userContact }}</span>
                 </div>
 
-                <!-- Sponsor Info -->
-                <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.2); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #FFD700; text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">
-                        <i class="fas fa-user-tag" style="color: #FFD700; margin-right: 4px;"></i> Sponsor / Introducer
-                    </div>
-                    <div style="font-size: 0.96rem; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between;">
-                        <span>{{ $sponsorName }}</span>
-                        <span style="font-family: monospace; font-size: 0.82rem; color: #FFD700; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 6px;">{{ $sponsorId }}</span>
-                    </div>
+                <!-- Sponsor -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.2); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #FFD700;"><i class="fas fa-user-tag" style="color: #FFD700; width: 14px;"></i> Sponsor</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFD700;">{{ $sponsorName }} ({{ $sponsorId }})</span>
                 </div>
             </div>
         </div>
 
-        <!-- Column 2: Web3 Blockchain & Settlement Vault -->
-        <div class="mecha-hud-card">
-            <div class="mecha-card-header" style="margin-bottom: 18px;">
-                <div class="mecha-card-title-wrap">
-                    <i class="fas fa-wallet" style="color: #00FF88;"></i>
-                    <div>
-                        <h3 class="mecha-card-title" style="font-size: 1.05rem;">WEB3 SETTLEMENT VAULT</h3>
-                        <div class="mecha-card-subtitle">On-chain BEP-20 payout architecture</div>
-                    </div>
+        <!-- Web3 & Staking Vault -->
+        <div class="mecha-hud-card" style="padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-wallet" style="color: #00FF88;"></i> WEB3 SETTLEMENT
                 </div>
-                <span class="mecha-card-badge" style="background: rgba(0, 255, 136, 0.12); color: #00FF88; border-color: rgba(0, 255, 136, 0.3);">
-                    BSC MAINNET
-                </span>
+                <span style="font-size: 0.65rem; color: #00FF88; font-weight: 700; background: rgba(0, 255, 136, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 255, 136, 0.3);">BEP-20</span>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-                <!-- Linked BEP20 Wallet Address -->
-                <div style="background: rgba(0, 255, 136, 0.04); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 12px; padding: 14px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                        <span style="font-size: 0.74rem; color: #00FF88; text-transform: uppercase; font-weight: 700;">
-                            <i class="fas fa-shield-check"></i> Linked BEP-20 Payout Address
-                        </span>
-                        <span style="font-size: 0.70rem; color: #00FF88; background: rgba(0, 255, 136, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 700;">
-                            VERIFIED
-                        </span>
-                    </div>
-
-                    <div style="font-family: monospace; font-size: 0.88rem; color: #FFFFFF; word-break: break-all; font-weight: 600; line-height: 1.4; margin-bottom: 10px;">
-                        {{ !empty($walletAddress) ? $walletAddress : 'Not Bound (Connect MetaMask)' }}
-                    </div>
-
-                    @if(!empty($walletAddress))
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" onclick="navigator.clipboard.writeText('{{ $walletAddress }}'); showProfileToast('Wallet Address Copied!');" class="mecha-btn-outline" style="height: 32px; padding: 0 10px; font-size: 0.76rem; color: #00FF88; border-color: rgba(0, 255, 136, 0.3);">
-                            <i class="fas fa-copy"></i> Copy Address
-                        </button>
-                        <a href="https://bscscan.com/address/{{ $walletAddress }}" target="_blank" class="mecha-btn-outline" style="height: 32px; padding: 0 10px; font-size: 0.76rem; color: #94A3B8; text-decoration: none;">
-                            <i class="fas fa-arrow-up-right-from-square"></i> BscScan
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Wallet Address Row -->
+                <div style="padding: 9px 10px; background: rgba(0, 255, 136, 0.04); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 0.70rem; color: #00FF88; font-weight: 700;"><i class="fas fa-shield-check"></i> Connected Wallet</span>
+                        @if(!empty($walletAddress))
+                        <a href="https://bscscan.com/address/{{ $walletAddress }}" target="_blank" style="font-size: 0.68rem; color: #94A3B8; text-decoration: none;">
+                            BscScan <i class="fas fa-arrow-up-right-from-square"></i>
                         </a>
+                        @endif
                     </div>
-                    @endif
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                        <span style="font-family: 'Space Mono', monospace; font-size: 0.78rem; color: #FFFFFF; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ !empty($walletAddress) ? (substr($walletAddress, 0, 10) . '...' . substr($walletAddress, -8)) : 'Not Bound' }}
+                        </span>
+                        @if(!empty($walletAddress))
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $walletAddress }}'); showProfileToast('Wallet Copied!');" style="background: transparent; border: none; color: #00FF88; cursor: pointer; padding: 2px 6px; font-size: 0.78rem;" title="Copy Wallet Address">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        @endif
+                    </div>
                 </div>
 
-                <!-- Protocol Security Status -->
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">
-                        <i class="fas fa-lock" style="color: #FFD700; margin-right: 4px;"></i> Authentication Protocol
-                    </div>
-                    <div style="font-size: 0.90rem; font-weight: 600; color: #00FF88; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-shield-halved"></i> EIP-191 Secp256k1 Cryptographic Proof
-                    </div>
+                <!-- Self Staked Total -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-cubes" style="color: #FFD700; width: 14px;"></i> Total Staked</span>
+                    <span style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;">${{ number_format($profile->total_self_investment ?? 0, 2) }} <span style="font-size: 0.70rem; color: #94A3B8;">USDT</span></span>
                 </div>
 
-                <!-- Self Investment Summary -->
-                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px 14px;">
-                    <div style="font-size: 0.74rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">
-                        <i class="fas fa-cubes" style="color: #FFD700; margin-right: 4px;"></i> Total Self Staked
-                    </div>
-                    <div style="font-size: 1.15rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;">
-                        ${{ number_format($profile->total_self_investment ?? 0, 2) }} <span style="font-size: 0.75rem; color: #94A3B8;">USDT</span>
-                    </div>
+                <!-- Auth Protocol -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-lock" style="color: #FFD700; width: 14px;"></i> Auth Type</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #00FF88;"><i class="fas fa-shield-halved"></i> EIP-191 Secp256k1</span>
                 </div>
             </div>
         </div>
