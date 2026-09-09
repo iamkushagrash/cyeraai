@@ -557,9 +557,21 @@
                         </div>
                         <div class="member-name-stack">
                             <span class="member-full-name" title="{{ $row->name }}">{{ $displayName }}</span>
-                            <div class="member-id-pill" onclick="copyUserId('{{ $row->userid }}')" title="Click to copy User ID">
-                                <span>{{ $row->userid }}</span>
-                                <i class="fas fa-copy"></i>
+                            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 3px;">
+                                <div class="member-id-pill" onclick="copyUserId('{{ $row->userid }}')" title="Click to copy User ID">
+                                    <span>{{ $row->userid }}</span>
+                                    <i class="fas fa-copy"></i>
+                                </div>
+                                @php
+                                    $mWallet = $row->walletaddress ?? $row->bep20address ?? '';
+                                @endphp
+                                @if(!empty($mWallet))
+                                <div class="member-id-pill" onclick="copyUserId('{{ $mWallet }}')" title="BEP-20 Wallet: {{ $mWallet }} (Click to copy)" style="background: rgba(0, 255, 136, 0.08); border-color: rgba(0, 255, 136, 0.3); color: #00FF88;">
+                                    <i class="fas fa-wallet" style="font-size: 8px;"></i>
+                                    <span style="font-family: monospace;">{{ substr($mWallet, 0, 6) }}...{{ substr($mWallet, -4) }}</span>
+                                    <i class="fas fa-copy" style="font-size: 8px;"></i>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -598,9 +610,23 @@
                     <span class="card-index-tag">
                         <i class="fas fa-hashtag"></i>{{ $i }} Member
                     </span>
+                    @php
+                        $spWallet = $row->sponsor_wallet ?? '';
+                    @endphp
+                    @if(!empty($spWallet))
+                    <span style="font-size: 0.70rem; color: #94A3B8; display: flex; align-items: center; gap: 4px;" title="Sponsor Wallet: {{ $spWallet }}">
+                        <i class="fas fa-user-tag" style="color: #FFD700;"></i> Sponsor:
+                        <span class="member-id-pill" onclick="copyUserId('{{ $spWallet }}')" style="font-size: 0.65rem; padding: 1px 5px; height: auto; background: rgba(245, 166, 35, 0.1); border-color: rgba(245, 166, 35, 0.3); color: #FFD700;">
+                            <i class="fas fa-wallet" style="font-size: 7px;"></i>
+                            <span style="font-family: monospace;">{{ substr($spWallet, 0, 6) }}...{{ substr($spWallet, -4) }}</span>
+                            <i class="fas fa-copy" style="font-size: 7px;"></i>
+                        </span>
+                    </span>
+                    @else
                     <span class="card-date-txt">
                         <i class="fas fa-user-check" style="color: #00FF88;"></i> Direct Sponsor
                     </span>
+                    @endif
                 </div>
             </div>
             @php $i++; @endphp

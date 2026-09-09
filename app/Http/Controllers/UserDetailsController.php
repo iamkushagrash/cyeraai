@@ -496,7 +496,26 @@ class UserDetailsController extends Controller
         $directList=\App\UserDetails::where([['user_details.id',Session::get('user.id')],['u.permission','1']])
         ->join('user_details as ud','user_details.userid','=','ud.sponsorid')
         ->join('users as u','ud.userid','=','u.id')
-        ->select('user_details.id as id','u.id as userid', 'u.usersname as name', 'u.uuid as userid', 'u.email as username', 'u.doj as doj', 'ud.current_self_investment as shares', 'ud.total_self_investment as totalself','ud.total_investment as teamtotal','ud.leveluser as leveluser')
+        ->leftJoin('asset_details as ad','u.id','=','ad.userid')
+        ->leftJoin('users as gu','user_details.userid','=','gu.id')
+        ->leftJoin('asset_details as sad','gu.id','=','sad.userid')
+        ->select(
+            'user_details.id as id',
+            'u.id as user_id',
+            'u.usersname as name',
+            'u.uuid as userid',
+            'u.email as username',
+            'u.doj as doj',
+            'ud.current_self_investment as shares',
+            'ud.total_self_investment as totalself',
+            'ud.total_investment as teamtotal',
+            'ud.leveluser as leveluser',
+            'ad.usdtbep20addr as walletaddress',
+            'ad.bep20addr as bep20address',
+            'gu.uuid as sponsor_uuid',
+            'gu.usersname as sponsor_name',
+            'sad.usdtbep20addr as sponsor_wallet'
+        )
         ->selectRaw('case when ud.userstatus=0 then "Inactive" when ud.userstatus=1 then "Active" end as status')
         ->selectRaw('case when ud.userstatus=0 then "FF0000 " when ud.userstatus=1 then "3cd2a5 " end as statusclass')
         ->orderByRaw('u.id DESC')
@@ -522,8 +541,21 @@ class UserDetailsController extends Controller
                         ->whereIn('ud.sponsorid',$uid)
                         ->join('user_details as ud','users.id','=','ud.userid')
                         ->join('users as gu','ud.sponsorid','=','gu.id')
-                        /*->leftJoin(DB::raw('(SELECT * FROM stacking_deposites WHERE id IN (SELECT MIN(id) FROM stacking_deposites GROUP BY userid)) as first_stack'), 'ud.id', '=', 'first_stack.userid')*/
-                        ->select('users.id as id','users.usersname as name','users.email as username','users.uuid as userid','ud.current_self_investment as current','ud.leveluser as leveluser')
+                        ->leftJoin('asset_details as ad','users.id','=','ad.userid')
+                        ->leftJoin('asset_details as sad','gu.id','=','sad.userid')
+                        ->select(
+                            'users.id as id',
+                            'users.usersname as name',
+                            'users.email as username',
+                            'users.uuid as userid',
+                            'ud.current_self_investment as current',
+                            'ud.leveluser as leveluser',
+                            'ad.usdtbep20addr as walletaddress',
+                            'ad.bep20addr as bep20address',
+                            'gu.uuid as sponsor_uuid',
+                            'gu.usersname as sponsor_name',
+                            'sad.usdtbep20addr as sponsor_wallet'
+                        )
                         ->selectRaw('"Level-'. $i.'" as level,DATE_FORMAT(users.doj,"%d-%m-%Y") as doj')
                         ->selectRaw('case when ud.userstatus=0 then "Inactive" when ud.userstatus=1 then "Active" end as status')
                         ->selectRaw('case when ud.userstatus=1 then "3cd2a5 " when ud.userstatus=0 then "FF0000 " else "FF0000 " end as statusclass')
