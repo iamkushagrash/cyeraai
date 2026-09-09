@@ -278,25 +278,32 @@ class Web3AuthController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate unique user UUID
-            $uniqueCode = 'CY' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 7));
+            // Generate unique user UUID (CAI format)
+            $uniqueCode = 'CAI' . rand(1111111, 9999999);
             while (User::where('uuid', $uniqueCode)->exists()) {
-                $uniqueCode = 'CY' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 7));
+                $uniqueCode = 'CAI' . rand(1111111, 9999999);
             }
+
+            $userEmail = !empty($request->email) ? $request->email : ($walletAddress . '@cyera.ai');
+            $userName = !empty($request->name) ? $request->name : ('Cyera_' . substr($request->address, 2, 6));
+            $userContact = !empty($request->contact) ? $request->contact : '';
+            $countryCode = !empty($request->countrycode) ? $request->countrycode : '+91';
+            $defaultPassword = 'CY@' . rand(100000, 999999);
 
             // Create User
             $newUser = User::create([
                 'uuid' => $uniqueCode,
-                'usersname' => 'Cyera_' . substr($request->address, 2, 6),
-                'email' => $request->address . '@cyera.ai',
-                'password' => Hash::make($request->address . '_' . time()),
-                's_password' => substr(md5($request->address), 0, 8),
+                'usersname' => $userName,
+                'email' => $userEmail,
+                'password' => Hash::make($defaultPassword),
+                's_password' => Crypt::encrypt($defaultPassword),
                 'permission' => 1,
                 'status' => 1,
                 'licence' => 0,
                 'doj' => date('Y-m-d H:i:s'),
-                'contact' => '',
-                'ccode' => '+1'
+                'contact' => $userContact,
+                'ccode' => $countryCode,
+                'email_verified_at' => now(),
             ]);
 
             // Create UserDetails

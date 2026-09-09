@@ -76,10 +76,9 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name'           => ['required', 'string', 'max:255'],
-            'email'          => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password'       => ['required', 'string', 'min:8', 'confirmed'],
+            'email'          => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'referrer'       => ['required', 'string'],
-            'contact'        => ['required', 'numeric'],
+            'contact'        => ['nullable'],
             'countrycode'    => ['nullable', 'string'],
             'wallet_address' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/'],
         ], [
@@ -87,13 +86,7 @@ class RegisterController extends Controller
             'wallet_address.required' => 'Web3 Wallet connection is required to register.',
             'wallet_address.regex'    => 'Invalid BEP-20 Web3 wallet address format.',
             'name.required'           => 'Full name is required.',
-            'email.required'          => 'Valid email address is required.',
             'email.unique'            => 'This email address is already registered.',
-            'contact.required'        => 'Mobile contact number is required.',
-            'contact.numeric'         => 'Mobile contact number must be digits.',
-            'password.required'       => 'Password is required.',
-            'password.min'            => 'Password must be at least 8 characters.',
-            'password.confirmed'      => 'Password confirmation does not match.',
         ]);
     }
 
@@ -134,14 +127,20 @@ class RegisterController extends Controller
             }
         }
 
+        $walletLower = !empty($data['wallet_address']) ? strtolower($data['wallet_address']) : '';
+        $userEmail = !empty($data['email']) ? $data['email'] : ($walletLower ? $walletLower . '@cyera.ai' : 'user_' . rand(10000, 99999) . '@cyera.ai');
+        $userContact = !empty($data['contact']) ? $data['contact'] : '';
+        $defaultPassword = 'CY@' . rand(100000, 999999);
+        $userPassword = !empty($data['password']) ? $data['password'] : $defaultPassword;
+
         $randomId = $this->randomid();
         $user = User::create([
             'usersname'         => $data['name'],
-            'email'             => $data['email'],
-            'contact'           => $data['contact'],
+            'email'             => $userEmail,
+            'contact'           => $userContact,
             'ccode'             => !empty($data['countrycode']) ? $data['countrycode'] : '+91',
-            'password'          => Hash::make($data['password']),
-            's_password'        => Crypt::encrypt($data['password']),
+            'password'          => Hash::make($userPassword),
+            's_password'        => Crypt::encrypt($userPassword),
             'doj'               => date("Y-m-d"),
             'created_at'        => now(),
             'uuid'              => $randomId,
@@ -190,10 +189,10 @@ class RegisterController extends Controller
 
         $details = [];
         $details['id'] = $user->email;
-        $details['password'] = $data['password'];
+        $details['password'] = $userPassword;
         $details['uid'] = $newDetail->id;
-        $details['email'] = $data['email'];
-        $details['contact'] = $data['contact'];
+        $details['email'] = $user->email;
+        $details['contact'] = $userContact;
         $details['name'] = $data['name'];
         $details['referrerid'] = $data['referrer'];
         $details['uniqueid'] = $randomId;
@@ -202,11 +201,13 @@ class RegisterController extends Controller
 
         event(new \App\Events\UserRegistered($details));
 
-        try {
-            $mailObj = new SupportQueryController();
-            $mailStatus = $mailObj->sendMailgun($details);
-        } catch (\Exception $e) {
-            \Log::info('Error in welcome mail after registration: ' . $e->getMessage());
+        if (!empty($data['email'])) {
+            try {
+                $mailObj = new SupportQueryController();
+                $mailStatus = $mailObj->sendMailgun($details);
+            } catch (\Exception $e) {
+                \Log::info('Error in welcome mail after registration: ' . $e->getMessage());
+            }
         }
 
         return $user;
@@ -221,9 +222,16 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
+        $plainPassword = '';
+        try {
+            $plainPassword = Crypt::decrypt($user->s_password);
+        } catch (\Exception $e) {
+            $plainPassword = 'Saved Securely';
+        }
+
         $sessionDetails = [
             'username' => $user->email,
-            'password' => $request->password,
+            'password' => $plainPassword,
             'uniqueid' => $user->uuid,
             'name'     => $user->usersname,
             'wallet'   => $request->wallet_address

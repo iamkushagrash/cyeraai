@@ -725,28 +725,26 @@
                     @enderror
                 </div>
 
-                <!-- Email Address -->
+                <!-- Email Address (Optional) -->
                 <div class="form-field-group">
                     <label class="field-label" for="email">
-                        <span><i class="fas fa-envelope label-icon"></i> Email Address</span>
-                        <span class="req-star">*</span>
+                        <span><i class="fas fa-envelope label-icon"></i> Email Address <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></span>
                     </label>
                     <div class="input-glass-wrap">
                         <div class="input-leading-icon">
                             <i class="fas fa-at"></i>
                         </div>
-                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email address" value="{{ old('email') }}" required autocomplete="email">
+                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email address (Optional)" value="{{ old('email') }}" autocomplete="email">
                     </div>
                     @error('email')
                         <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
 
-                <!-- Contact & Country Code -->
+                <!-- Contact & Country Code (Optional) -->
                 <div class="form-field-group">
                     <label class="field-label" for="contact">
-                        <span><i class="fas fa-phone-volume label-icon"></i> Mobile Number</span>
-                        <span class="req-star">*</span>
+                        <span><i class="fas fa-phone-volume label-icon"></i> Mobile Number <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></span>
                     </label>
                     <div class="input-glass-wrap">
                         <div class="input-leading-icon">
@@ -770,48 +768,11 @@
                             <option value="+84">VN (+84)</option>
                             <option value="+27">ZA (+27)</option>
                         </select>
-                        <input type="tel" name="contact" id="contact" maxlength="15" class="input-control-styled" placeholder="Mobile Number" value="{{ old('contact') }}" required autocomplete="tel">
+                        <input type="tel" name="contact" id="contact" maxlength="15" class="input-control-styled" placeholder="Mobile Number (Optional)" value="{{ old('contact') }}" autocomplete="tel">
                     </div>
                     @error('contact')
                         <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
-                </div>
-
-                <!-- Password -->
-                <div class="form-field-group">
-                    <label class="field-label" for="password">
-                        <span><i class="fas fa-key label-icon"></i> Create Password</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <input type="password" name="password" id="password" class="input-control-styled" placeholder="Minimum 8 characters" required autocomplete="new-password">
-                        <button type="button" class="eye-toggle-action" id="togglePassword" title="Show / Hide Password">
-                            <i class="fas fa-eye" id="toggleIcon"></i>
-                        </button>
-                    </div>
-                    @error('password')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Confirm Password -->
-                <div class="form-field-group">
-                    <label class="field-label" for="password_confirmation">
-                        <span><i class="fas fa-shield-halved label-icon"></i> Confirm Password</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="input-control-styled" placeholder="Repeat password" required autocomplete="new-password">
-                        <button type="button" class="eye-toggle-action" id="togglePasswordConf" title="Show / Hide Password">
-                            <i class="fas fa-eye" id="toggleIconConf"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Terms & Conditions Checkbox -->
@@ -1239,24 +1200,6 @@
         if (agreeCheckbox) {
             agreeCheckbox.addEventListener('change', updateSubmitButtonState);
         }
-
-        // Password Toggles
-        function setupPasswordToggle(toggleId, inputId, iconId) {
-            const toggle = document.getElementById(toggleId);
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            if (toggle && input && icon) {
-                toggle.addEventListener('click', function() {
-                    const isPwd = input.getAttribute('type') === 'password';
-                    input.setAttribute('type', isPwd ? 'text' : 'password');
-                    icon.classList.toggle('fa-eye', !isPwd);
-                    icon.classList.toggle('fa-eye-slash', isPwd);
-                });
-            }
-        }
-
-        setupPasswordToggle('togglePassword', 'password', 'toggleIcon');
-        setupPasswordToggle('togglePasswordConf', 'password_confirmation', 'toggleIconConf');
 
         // Form Submit Loading State
         const regForm = document.getElementById('registerForm');
