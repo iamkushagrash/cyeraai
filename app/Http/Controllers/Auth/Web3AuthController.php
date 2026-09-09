@@ -255,14 +255,22 @@ class Web3AuthController extends Controller
             }
         }
 
-        // Validate Sponsor
+        // Validate Sponsor (Strictly required in Cyera AI)
         $sponsorUser = null;
         if (!empty($request->sponsor)) {
-            $sponsorUser = User::where('uuid', $request->sponsor)->orWhere('usersname', $request->sponsor)->first();
+            $ref = trim($request->sponsor);
+            $sponsorUser = User::where('uuid', $ref)
+                ->orWhereRaw('LOWER(uuid) = ?', [strtolower($ref)])
+                ->orWhere('email', $ref)
+                ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
+                ->first();
         }
+
         if (!$sponsorUser) {
-            // Default to root admin
-            $sponsorUser = User::where('licence', 3)->first() ?: User::first();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Valid Sponsor ID is required for registration. Please provide a valid sponsor code.'
+            ], 422);
         }
 
         $sponsorDetail = UserDetails::where('userid', $sponsorUser->id)->first();
