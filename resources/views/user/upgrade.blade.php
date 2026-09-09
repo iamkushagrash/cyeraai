@@ -259,20 +259,24 @@
             }
 
             function getMetaMaskProvider() {
-                if (typeof window.ethereum === 'undefined') {
-                    return null;
+                if (typeof window.ethereum !== 'undefined') {
+                    if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                        const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+                        if (mm) return mm;
+                        const known = window.ethereum.providers.find(p => p.isSafePal || p.isTrust || p.isTrustWallet || p.isBinance || p.isOkxWallet || p.isTokenPocket || p.isBitKeep);
+                        if (known) return known;
+                        return window.ethereum.providers[0];
+                    }
+                    return window.ethereum;
                 }
-                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
-                    const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
-                    if (mm) return mm;
-                    const tw = window.ethereum.providers.find(p => p.isTrust || p.isTrustWallet || p.isBinance);
-                    if (tw) return tw;
-                    const nonPhantom = window.ethereum.providers.find(p => !p.isPhantom);
-                    if (nonPhantom) return nonPhantom;
-                    return window.ethereum.providers[0];
-                }
+                if (window.safepal) return window.safepal;
+                if (window.phantom && window.phantom.ethereum) return window.phantom.ethereum;
                 if (window.trustwallet) return window.trustwallet;
-                return window.ethereum;
+                if (window.okxwallet) return window.okxwallet;
+                if (window.tokenpocket) return window.tokenpocket;
+                if (window.binance) return window.binance;
+                if (window.bitkeep && window.bitkeep.ethereum) return window.bitkeep.ethereum;
+                return null;
             }
 
             // Connect / Check Wallet
