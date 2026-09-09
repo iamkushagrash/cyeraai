@@ -103,12 +103,12 @@ class StackingDetailController extends Controller
     }
 
     /**
-     * Distribute Level 2 to Level 15 Unilevel Income on Staking/Investment.
-     * Level 1 is already handled by 5% Direct Referral income.
+     * Distribute Level 2 to Level 15 Unilevel Income INSTANTLY on Staking/Investment.
+     * Level 1 is already handled instantly as 5% Direct Referral income.
      */
     public function distributeLevelIncomeOnStaking($stakingDepositId, $stakingUserId, $amount) {
-        $profileStore = \App\ProfileStore::where('id', 1)->first();
-        $stakingUser = \App\UserDetails::where('id', $stakingUserId)->first();
+        $profileStore = \App\ProfileStore::where('id', 1)->first() ?: (object)['price' => 1];
+        $stakingUser = \App\UserDetails::where('id', $stakingUserId)->orWhere('userid', $stakingUserId)->first();
         if (!$stakingUser) return;
 
         $allLevelConfigs = \App\LevelDetails::where('status', 1)->get()->keyBy('open_level');
@@ -117,10 +117,10 @@ class StackingDetailController extends Controller
         $levelDepth = 1;
 
         while ($currentSponsorId > 0 && $levelDepth <= 15) {
-            $upline = \App\UserDetails::where('userid', $currentSponsorId)->first();
+            $upline = \App\UserDetails::where('id', $currentSponsorId)->orWhere('userid', $currentSponsorId)->first();
             if (!$upline) break;
 
-            // For Level 2 to 15 (Level 1 is direct referral, handled separately)
+            // For Level 2 to 15 (Level 1 direct referral 5% is already credited instantly)
             if ($levelDepth >= 2 && $levelDepth <= 15) {
                 if (isset($allLevelConfigs[$levelDepth])) {
                     $config = $allLevelConfigs[$levelDepth];
@@ -129,11 +129,18 @@ class StackingDetailController extends Controller
                     $ratePct = (float)$config->cps;
 
                     $uplineTeamBiz = (float)($upline->total_level_investment + $upline->total_direct_investment);
-                    $uplineDirects = (int)($upline->active_direct);
+                    
+                    // Count active directs dynamically if active_direct is not set
+                    $actualDirectCount = (int)$upline->active_direct;
+                    if ($actualDirectCount < $reqDirects) {
+                        $actualDirectCount = \App\UserDetails::where(function($q) use ($upline) {
+                            $q->where('sponsorid', $upline->id)->orWhere('sponsorid', $upline->userid);
+                        })->where('userstate', '>', 0)->count();
+                    }
 
-                    // Check qualification:
-                    $isQualified = ($uplineDirects >= $reqDirects && $uplineTeamBiz >= $reqTeamBiz);
-                    $isActiveUser = ($upline->userstatus == 1 && $upline->userstate > 0 && $upline->capping != 1 && $upline->level_status != 0);
+                    // Check qualification criteria for Level unlock
+                    $isQualified = ($actualDirectCount >= $reqDirects && $uplineTeamBiz >= $reqTeamBiz);
+                    $isActiveUser = ($upline->userstatus == 1 || $upline->userstate > 0) && ($upline->capping != 1) && ($upline->level_status != 0);
 
                     if ($isQualified && $isActiveUser && $ratePct > 0) {
                         $commissionUsdt = ($amount * $ratePct) / 100;
@@ -152,7 +159,7 @@ class StackingDetailController extends Controller
                                 'status'         => 0,
                                 'created_at'     => now(),
                             ]);
-                            \Log::info("Level {$levelDepth} income of \${$finalUsdt} credited to User {$upline->userid} from User {$stakingUser->userid}");
+                            \Log::info("INSTANT Level {$levelDepth} Income of \${$finalUsdt} credited to User {$upline->userid} from User {$stakingUser->userid} on Stake \${$amount}");
                         }
                     }
                 }
