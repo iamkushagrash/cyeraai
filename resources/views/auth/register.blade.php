@@ -659,7 +659,7 @@
             
             @php
                 $prefilledWallet = request('wallet', $wallet ?? '');
-                $prefilledRef = !empty($userid) ? $userid : request('ref', request('sponsor', old('referrer', '')));
+                $prefilledRef = !empty($userid) ? $userid : request('ref', request('sponsor', request('referral', old('referrer', ''))));
             @endphp
 
             <!-- Web3 Wallet Connection Banner -->
@@ -1047,79 +1047,117 @@
 
         function showRegError(msg) {
             $("#regWeb3AlertText").text(msg);
-            $("#regWeb3Alert").show();
+            $("#regWeb3Alert").removeClass('auth-alert-success').addClass('auth-alert-error').show();
         }
 
-        // Connect Wallet Action on Register Form
-        const btnConnectRegWallet = document.getElementById('btnConnectRegWallet');
-        const regWalletBtnText = document.getElementById('regWalletBtnText');
-        const regWalletSpinner = document.getElementById('regWalletSpinner');
+        let isConnectingWallet = false;
 
-        if (btnConnectRegWallet) {
-            btnConnectRegWallet.addEventListener('click', async function() {
-                $("#regWeb3Alert").hide();
-                const provider = getMetaMaskProvider();
-                if (!provider) {
+        async function connectRegisterWallet(isAutoPrompt = false) {
+            if (isConnectingWallet) return;
+            const currentWallet = $("#wallet_address").val();
+            if (currentWallet && currentWallet.trim() !== '') return;
+
+            const provider = getMetaMaskProvider();
+            if (!provider) {
+                if (!isAutoPrompt) {
                     showRegError('MetaMask / Web3 Wallet not detected! Please open inside MetaMask or TrustWallet dApp browser.');
+                }
+                return;
+            }
+
+            $("#regWeb3Alert").hide();
+            isConnectingWallet = true;
+
+            const btnConnectRegWallet = document.getElementById('btnConnectRegWallet');
+            const regWalletBtnText = document.getElementById('regWalletBtnText');
+            const regWalletSpinner = document.getElementById('regWalletSpinner');
+
+            if (regWalletBtnText) regWalletBtnText.innerText = 'Connecting Web3 Wallet...';
+            if (regWalletSpinner) regWalletSpinner.style.display = 'block';
+            if (btnConnectRegWallet) btnConnectRegWallet.style.pointerEvents = 'none';
+
+            try {
+                // First check if already authorized
+                let accounts = [];
+                try {
+                    accounts = await provider.request({ method: 'eth_accounts' });
+                } catch (e) {}
+
+                // If not authorized or prompted explicitly, request accounts
+                if (!accounts || accounts.length === 0) {
+                    accounts = await provider.request({ method: 'eth_requestAccounts' });
+                }
+
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('No wallet account selected.');
+                }
+
+                const walletAddr = accounts[0];
+
+                // Check if this wallet is ALREADY registered in Cyera AI
+                const checkRes = await fetch("{{ url('/auth/check-wallet') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        address: walletAddr
+                    })
+                });
+
+                const checkData = await checkRes.json();
+
+                if (checkData.status === 'success' && checkData.is_registered) {
+                    if (regWalletBtnText) regWalletBtnText.innerText = 'Wallet Registered! Redirecting...';
+                    $("#regWeb3AlertText").html('<i class="fas fa-circle-check" style="color: #00FF88;"></i> This wallet is already registered. Redirecting to Sign In...');
+                    $("#regWeb3Alert").removeClass('auth-alert-error').addClass('auth-alert-success').show();
+                    setTimeout(function() {
+                        window.location.href = "{{ url('/login') }}";
+                    }, 1200);
                     return;
                 }
 
-                if (regWalletBtnText) regWalletBtnText.innerText = 'Connecting MetaMask...';
-                if (regWalletSpinner) regWalletSpinner.style.display = 'block';
-                btnConnectRegWallet.style.pointerEvents = 'none';
+                // New unregistered wallet -> Attach to registration form
+                $("#wallet_address").val(walletAddr);
+                const shortAddr = walletAddr.substring(0, 6) + '...' + walletAddr.substring(walletAddr.length - 4);
+                $("#walletDisplay").text(shortAddr);
+                $("#walletConnectedBanner").css('display', 'flex');
+                $("#walletPromptBox").hide();
 
-                try {
-                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                    if (!accounts || accounts.length === 0) {
-                        throw new Error('No wallet account selected.');
-                    }
-                    const walletAddr = accounts[0];
+                if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
+                if (regWalletSpinner) regWalletSpinner.style.display = 'none';
+                if (btnConnectRegWallet) btnConnectRegWallet.style.pointerEvents = 'auto';
 
-                    // Check if this wallet is ALREADY registered in Cyera AI (read-only check, no unauthorized session)
-                    const checkRes = await fetch("{{ url('/auth/check-wallet') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            address: walletAddr
-                        })
+                updateSubmitButtonState();
+
+                // Setup live accountsChanged listener
+                if (provider.on) {
+                    provider.on('accountsChanged', function (newAccounts) {
+                        if (newAccounts && newAccounts.length > 0) {
+                            $("#wallet_address").val(newAccounts[0]);
+                            const newShort = newAccounts[0].substring(0, 6) + '...' + newAccounts[0].substring(newAccounts[0].length - 4);
+                            $("#walletDisplay").text(newShort);
+                        } else {
+                            $("#wallet_address").val('');
+                            $("#walletConnectedBanner").hide();
+                            $("#walletPromptBox").show();
+                            updateSubmitButtonState();
+                        }
                     });
+                }
 
-                    const checkData = await checkRes.json();
-
-                    if (checkData.status === 'success' && checkData.is_registered) {
-                        if (regWalletBtnText) regWalletBtnText.innerText = 'Wallet Registered! Redirecting...';
-                        $("#regWeb3AlertText").html('<i class="fas fa-circle-check" style="color: #00FF88;"></i> This wallet is already registered. Redirecting to Sign In...');
-                        $("#regWeb3Alert").removeClass('auth-alert-error').addClass('auth-alert-success').show();
-                        setTimeout(function() {
-                            window.location.href = "{{ url('/login') }}";
-                        }, 1200);
-                        return;
-                    }
-
-                    // New unregistered wallet -> Proceed with registration
-                    $("#wallet_address").val(walletAddr);
-                    const shortAddr = walletAddr.substring(0, 6) + '...' + walletAddr.substring(walletAddr.length - 4);
-                    $("#walletDisplay").text(shortAddr);
-                    $("#walletConnectedBanner").css('display', 'flex');
-                    $("#walletPromptBox").hide();
-
-                    if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
-                    if (regWalletSpinner) regWalletSpinner.style.display = 'none';
-                    btnConnectRegWallet.style.pointerEvents = 'auto';
-
-                    updateSubmitButtonState();
-
-                } catch (err) {
-                    if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
-                    if (regWalletSpinner) regWalletSpinner.style.display = 'none';
-                    btnConnectRegWallet.style.pointerEvents = 'auto';
+            } catch (err) {
+                if (regWalletBtnText) regWalletBtnText.innerText = 'Connect MetaMask / TrustWallet (Required)';
+                if (regWalletSpinner) regWalletSpinner.style.display = 'none';
+                if (btnConnectRegWallet) btnConnectRegWallet.style.pointerEvents = 'auto';
+                if (!isAutoPrompt) {
                     showRegError(err.message || 'Wallet connection was cancelled.');
                 }
-            });
+            } finally {
+                isConnectingWallet = false;
+            }
         }
 
         // Sponsor Lookup via AJAX
@@ -1155,12 +1193,30 @@
         }
 
         $(document).ready(function() {
+            // Check sponsor if prefilled
             if ($("#referrer").val() != "") {
                 checkSponsor();
             }
             $("#referrer").on('keyup blur change', function() {
                 checkSponsor();
             });
+
+            // Connect button click trigger
+            const btnConnectReg = document.getElementById('btnConnectRegWallet');
+            if (btnConnectReg) {
+                btnConnectReg.addEventListener('click', function() {
+                    connectRegisterWallet(false);
+                });
+            }
+
+            // AUTO-CONNECT / POPUP ON PAGE LOAD (especially via referral link)
+            const currentWallet = $("#wallet_address").val();
+            if (!currentWallet || currentWallet.trim() === '') {
+                setTimeout(function() {
+                    connectRegisterWallet(true);
+                }, 350);
+            }
+
             updateSubmitButtonState();
         });
 
