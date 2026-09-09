@@ -345,89 +345,115 @@
                 }
 
                 const provider = getMetaMaskProvider();
-                if (!provider) {
+                if (!provider && !IS_DEMO_MODE) {
                     showStakeAlert('Please open inside MetaMask or TrustWallet to execute on-chain stake.');
                     return;
                 }
 
                 try {
-                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                    if (!accounts || accounts.length === 0) {
-                        showStakeAlert('Please select a Web3 account.');
-                        return;
-                    }
-                    userAccount = accounts[0];
+                    let txHash = '';
 
-                    // Strictly switch network to BSC Mainnet (56 / 0x38)
-                    let currentChain = await provider.request({ method: 'eth_chainId' });
-                    if (currentChain !== BSC_CHAIN_ID) {
-                        try {
-                            await provider.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: BSC_CHAIN_ID }],
-                            });
-                        } catch (switchError) {
-                            if (switchError.code === 4902 || switchError?.data?.originalError?.code === 4902) {
+                    if (IS_DEMO_MODE) {
+                        if (provider) {
+                            try {
+                                const accs = await provider.request({ method: 'eth_accounts' });
+                                if (accs && accs.length > 0) userAccount = accs[0];
+                            } catch (e) {}
+                        }
+                        if (!userAccount) {
+                            userAccount = "{{ Session::get('user.walletaddress', '') }}" || "0x1111111111111111111111111111111111111111";
+                        }
+                        showModal('Step 1: Approving USDT Token (Demo Mode)', 'Simulating instant USDT approval...');
+                        setModalStep(1, 'active');
+                        await new Promise(r => setTimeout(r, 600));
+                        setModalStep(1, 'done');
+
+                        showModal('Step 2: Executing Staking Deposit (Demo Mode)', 'Simulating staking investment...');
+                        setModalStep(2, 'active');
+                        await new Promise(r => setTimeout(r, 600));
+                        const randBytes = new Uint8Array(32);
+                        window.crypto.getRandomValues(randBytes);
+                        txHash = '0x' + Array.from(randBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+                        setModalStep(2, 'done');
+                    } else {
+                        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                        if (!accounts || accounts.length === 0) {
+                            showStakeAlert('Please select a Web3 account.');
+                            return;
+                        }
+                        userAccount = accounts[0];
+
+                        // Strictly switch network to BSC Mainnet (56 / 0x38)
+                        let currentChain = await provider.request({ method: 'eth_chainId' });
+                        if (currentChain !== BSC_CHAIN_ID) {
+                            try {
                                 await provider.request({
-                                    method: 'wallet_addEthereumChain',
-                                    params: [{
-                                        chainId: BSC_CHAIN_ID,
-                                        chainName: 'BNB Smart Chain Mainnet',
-                                        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                        rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                                        blockExplorerUrls: ['https://bscscan.com/']
-                                    }],
+                                    method: 'wallet_switchEthereumChain',
+                                    params: [{ chainId: BSC_CHAIN_ID }],
                                 });
-                            } else {
-                                showStakeAlert('Please switch your wallet network to BNB Smart Chain (BSC Mainnet).');
-                                return;
+                            } catch (switchError) {
+                                if (switchError.code === 4902 || switchError?.data?.originalError?.code === 4902) {
+                                    await provider.request({
+                                        method: 'wallet_addEthereumChain',
+                                        params: [{
+                                            chainId: BSC_CHAIN_ID,
+                                            chainName: 'BNB Smart Chain Mainnet',
+                                            nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                            rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                            blockExplorerUrls: ['https://bscscan.com/']
+                                        }],
+                                    });
+                                } else {
+                                    showStakeAlert('Please switch your wallet network to BNB Smart Chain (BSC Mainnet).');
+                                    return;
+                                }
                             }
                         }
+
+                        // Re-verify chain after switch
+                        currentChain = await provider.request({ method: 'eth_chainId' });
+                        if (currentChain !== BSC_CHAIN_ID) {
+                            showStakeAlert('Network mismatch! Please switch MetaMask to BNB Smart Chain Mainnet (BSC).');
+                            return;
+                        }
+
+                        const ethersProvider = new ethers.BrowserProvider(provider);
+                        const signer = await ethersProvider.getSigner();
+
+                        const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, signer);
+                        const splitterContract = new ethers.Contract(SPLITTER_ADDRESS, SPLITTER_ABI, signer);
+
+                        const amountWei = ethers.parseUnits(amount.toString(), 18);
+
+                        // Open Status Modal & Trigger Wallet Approval Popup
+                        showModal('Step 1: Approving USDT Token', 'Please confirm the USDT approval transaction in your wallet popup...');
+                        setModalStep(1, 'active');
+
+                        // 1. Trigger Approval in Wallet
+                        let allowance = 0n;
+                        try {
+                            allowance = await usdtContract.allowance(userAccount, SPLITTER_ADDRESS);
+                        } catch (allowErr) {
+                            console.warn('Allowance check, triggering direct approve:', allowErr);
+                        }
+
+                        if (allowance < amountWei) {
+                            const approveTx = await usdtContract.approve(SPLITTER_ADDRESS, amountWei);
+                            await approveTx.wait();
+                        }
+
+                        setModalStep(1, 'done');
+
+                        // 2. Execute On-Chain Splitter Invest
+                        showModal('Step 2: Executing Staking Deposit', 'Please confirm the staking investment transaction in your wallet popup...');
+                        setModalStep(2, 'active');
+
+                        const investTx = await splitterContract.invest(amountWei);
+                        const receipt = await investTx.wait();
+
+                        txHash = receipt.hash;
+                        setModalStep(2, 'done');
                     }
-
-                    // Re-verify chain after switch
-                    currentChain = await provider.request({ method: 'eth_chainId' });
-                    if (currentChain !== BSC_CHAIN_ID) {
-                        showStakeAlert('Network mismatch! Please switch MetaMask to BNB Smart Chain Mainnet (BSC).');
-                        return;
-                    }
-
-                    const ethersProvider = new ethers.BrowserProvider(provider);
-                    const signer = await ethersProvider.getSigner();
-
-                    const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, signer);
-                    const splitterContract = new ethers.Contract(SPLITTER_ADDRESS, SPLITTER_ABI, signer);
-
-                    const amountWei = ethers.parseUnits(amount.toString(), 18);
-
-                    // Open Status Modal & Trigger Wallet Approval Popup
-                    showModal('Step 1: Approving USDT Token', 'Please confirm the USDT approval transaction in your wallet popup...');
-                    setModalStep(1, 'active');
-
-                    // 1. Trigger Approval in Wallet
-                    let allowance = 0n;
-                    try {
-                        allowance = await usdtContract.allowance(userAccount, SPLITTER_ADDRESS);
-                    } catch (allowErr) {
-                        console.warn('Allowance check, triggering direct approve:', allowErr);
-                    }
-
-                    if (allowance < amountWei) {
-                        const approveTx = await usdtContract.approve(SPLITTER_ADDRESS, amountWei);
-                        await approveTx.wait();
-                    }
-
-                    setModalStep(1, 'done');
-
-                    // 2. Execute On-Chain Splitter Invest
-                    showModal('Step 2: Executing Staking Deposit', 'Please confirm the staking investment transaction in your wallet popup...');
-                    setModalStep(2, 'active');
-
-                    const investTx = await splitterContract.invest(amountWei);
-                    const receipt = await investTx.wait();
-
-                    const txHash = receipt.hash;
-                    setModalStep(2, 'done');
 
                     // 3. Post to Backend for Full 10-Step Audit & Activation
                     showModal('Step 3: Synchronizing Ledger & Ranks', 'Recording transaction & activating yield accumulation...');
