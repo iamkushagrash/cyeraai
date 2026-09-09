@@ -113,17 +113,17 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/Transaction/transactionStatus/{id}','CpsIncomeController@paymentStatus');
+Route::get('/Transaction/transactionStatus/{id}', 'CpsIncomeController@paymentStatus');
 
-Route::get('/getSponsor/{sponsorid}','Auth\RegisterController@getSponsor');
-Route::get('/register/{userid}','Auth\RegisterController@reffer');
+Route::get('/getSponsor/{sponsorid}', 'Auth\RegisterController@getSponsor');
+Route::get('/register/{userid}', 'Auth\RegisterController@reffer');
 
-Route::get('/bonanza','ProfileStoreController@bonanza');
-Route::get('/first','ProfileStoreController@businessCalculation');
+Route::get('/bonanza', 'ProfileStoreController@bonanza');
+Route::get('/first', 'ProfileStoreController@businessCalculation');
 
 
 //Clear Cache
-Route::get('/clear-cache', function() {
+Route::get('/clear-cache', function () {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('config:clear');
     $exitCode = Artisan::call('view:clear');
@@ -132,7 +132,7 @@ Route::get('/clear-cache', function() {
 
 
 //Admin
-Route::group(['middleware' => ['auth','adminverification']], function () {
+Route::group(['middleware' => ['auth', 'adminverification']], function () {
     Route::get('/Main/Dashboard', 'HomeController@adminindexabhi');
     Route::get('/Main/DashboardToday', 'HomeController@adminindexabhitoday');
     Route::get('/Main/DashboardAllTime', 'HomeController@adminindexabhialltime');
@@ -167,7 +167,7 @@ Route::group(['middleware' => ['auth','adminverification']], function () {
     Route::post('/Main/UserIdOneClickSearch', 'LoanTransactionsController@searchUserbyUserIdOneClick');
     Route::get('/Main/UserOneClick/{userid}', 'LoanTransactionsController@searchUserOneClick');
     Route::post('/Main/EditUserOneClick', 'LoanTransactionsController@MemberUpdateOneClick');
-    
+
     Route::get('/Main/Lock/{userid}', 'UserDetailsController@MemberLock');
     Route::get('/Main/Unlock/{userid}', 'UserDetailsController@MemberUnlock');
     Route::post('/Main/UserPermissions/{userid}', 'UserDetailsController@updateUserPermission');
@@ -257,8 +257,8 @@ Route::group(['middleware' => ['auth','adminverification']], function () {
     Route::get('/Main/PendingWithdrawOTP', 'TransactionDetailController@userPendingWithdrawOTP');
 
     Route::get('/Main/Support', 'SupportQueryController@adminsupport');
-    Route::get('/Main/TicketView/{title}/{id}','SupportQueryController@viewTicketAdmin');
-    Route::post('/Main/ReplyTicket','SupportQueryController@postReplyAdmin');
+    Route::get('/Main/TicketView/{title}/{id}', 'SupportQueryController@viewTicketAdmin');
+    Route::post('/Main/ReplyTicket', 'SupportQueryController@postReplyAdmin');
 
     Route::get('/Main/AdminLoanRemove', 'LevelDetailsController@showAdminLoanRemovePage');
     Route::post('/Main/AdminLoanRemove', 'LevelDetailsController@findUserLoanRemove');
@@ -314,14 +314,14 @@ Route::group(['middleware' => ['auth','adminverification']], function () {
 
 
 //User
-Route::group(['middleware' => ['auth','userverification']], function () {
+Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::get('/User/Dashboard', 'HomeController@userindex');
     Route::get('/User/Documentation', 'HomeController@documentation');
     Route::get('/User/ArbitrageDashboard', 'HomeController@userarbitrageindex');
 
     Route::get('/User/EditProfile', 'UserDetailsController@showEditData');
     Route::post('/User/EditProfile', 'UserDetailsController@userUpdate');
-    Route::get('/User/resendProfileOtp','AssetDetailChangesController@resendProfileEditOtpWeb');
+    Route::get('/User/resendProfileOtp', 'AssetDetailChangesController@resendProfileEditOtpWeb');
 
     Route::get('/User/ChangePassword', 'UserDetailsController@showChangePass');
     Route::post('/User/ChangePassword', 'UserDetailsController@UserChangePass');
@@ -330,13 +330,13 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     Route::get('/User/AllTeam', 'AssetDetailChangesController@getTotal');
     Route::get('/User/TeamSummary', 'UserDetailsController@userTeamSummary');
     Route::get('/User/Treeview', 'ArbitrageController@getTreeView');
-    Route::get('/User/Treeview/children/{parentId}','ArbitrageController@getTreeChildren')->name('user.tree.children');
+    Route::get('/User/Treeview/children/{parentId}', 'ArbitrageController@getTreeChildren')->name('user.tree.children');
 
     //New Registration & Referral
     Route::get('/User/NewRegistration', 'AssetDetailController@userNewRegistrationPage');
     Route::post('/User/NewRegistration', 'AssetDetailController@userNewRegistration');
     Route::get('/User/Referral', 'AssetDetailController@userReferralPage');
-    Route::get('/getSponsorNew/{sponsorid}','AssetDetailController@getSponsor');
+    Route::get('/getSponsorNew/{sponsorid}', 'AssetDetailController@getSponsor');
 
 
     //Transaction using hash System
@@ -344,8 +344,8 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     Route::post('/User/BuyCAI', 'TransactionDetailController@submitTransaction');*/
 
     // Transaction using NP
-    Route::get('/User/Deposit','CpsIncomeController@showPage');
-    Route::post('/User/Deposit','CpsIncomeController@submitTransaction');
+    Route::get('/User/Deposit', 'CpsIncomeController@showPage');
+    Route::post('/User/Deposit', 'CpsIncomeController@submitTransaction');
 
     // Deposit History
     Route::get('/User/DepositHistory', 'BonusRewardController@userDepositHistory');
@@ -353,7 +353,7 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     // Stack 
     Route::get('/User/Stake', 'WalletTransferController@stakePage');
     Route::post('/User/getUser', 'WalletTransferController@getUserDetail');
-    Route::post('/User/Stake', 'WalletTransferController@stakeCAI');
+    Route::post('/User/Stake', 'WalletTransferController@stakemwt');
     Route::get('/User/StakingHistory', 'BonusRewardController@userUpgradeHistory');
     Route::get('/User/StakingTxnHistory', 'BonusRewardController@userUpgradeTxnHistory');
 
@@ -367,7 +367,7 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     //Income
     Route::get('/User/IncomeOverview', 'BonusRewardController@userIncomeOverview');
     Route::post('/User/IncomeOverview', 'BonusRewardController@userIncomeOverview');
-    
+
     Route::get('/User/StakingReward', 'BonusRewardController@userStakingReport');
     Route::post('/User/StakingReward', 'BonusRewardController@userStakingReport');
     Route::get('/User/DirectBonus', 'BonusRewardController@userDirectReport');
@@ -382,21 +382,25 @@ Route::group(['middleware' => ['auth','userverification']], function () {
     Route::post('/User/ClubReward', 'BonusRewardController@userClubReward');
     Route::get('/User/LifetimeAchievementReward', 'BonusRewardController@userLifetimeReward');
     Route::post('/User/LifetimeAchievementReward', 'BonusRewardController@userLifetimeReward');
+    Route::get('/User/PoolIncome', 'PoolIncomeController@showPoolIncomePage');
+    Route::get('/User/RankIncome', 'RankIncomeController@userRankIncome');
+    Route::post('/User/RankIncome', 'RankIncomeController@userRankIncome');
+
 
     //Withdraw
     Route::get('/User/WithdrawRequest', 'WithdrawInfoController@withdrawPage');
     Route::post('/User/WithdrawRequest', 'WithdrawInfoController@withdrawRequest');
     Route::get('/User/WithdrawalHistory', 'BonusRewardController@withdrawHistoryUser');
-    Route::get('/User/resendWithdrawOtp','AssetDetailChangesController@resendWithdrawOtpWeb');
+    Route::get('/User/resendWithdrawOtp', 'AssetDetailChangesController@resendWithdrawOtpWeb');
 
     Route::post('/User/WithdrawLifetimeReward', 'WithdrawInfoController@withdrawLifetimeIncome');
     Route::post('/User/WithdrawClubReward', 'WithdrawInfoController@withdrawClubIncome');
 
     //Support
-    Route::post('/User/CreateTicket','SupportQueryController@UserCreateTicket');
-    Route::get('/User/ViewTicket','SupportQueryController@viewUserTicket');
-    Route::get('/User/TicketView/{title}/{id}','SupportQueryController@viewTicketSingleUser');
-    Route::post('/User/ReplyTicket','SupportQueryController@postReplyUser');
+    Route::post('/User/CreateTicket', 'SupportQueryController@UserCreateTicket');
+    Route::get('/User/ViewTicket', 'SupportQueryController@viewUserTicket');
+    Route::get('/User/TicketView/{title}/{id}', 'SupportQueryController@viewTicketSingleUser');
+    Route::post('/User/ReplyTicket', 'SupportQueryController@postReplyUser');
 
 
     //Route::get('/User/WinterBlastBonanza','HomeController@bonanzaList');
@@ -446,7 +450,7 @@ Route::group(['middleware' => ['auth','subadminverification']], function () {
     Route::post('/Main/UserIdOneClickSearch', 'LoanTransactionsController@searchUserbyUserIdOneClick');
     Route::get('/Main/UserOneClick/{userid}', 'LoanTransactionsController@searchUserOneClick');
     Route::post('/Main/EditUserOneClick', 'LoanTransactionsController@MemberUpdateOneClick');
-    
+
     Route::get('/Main/Lock/{userid}', 'UserDetailsController@MemberLock');
     Route::get('/Main/Unlock/{userid}', 'UserDetailsController@MemberUnlock');
     Route::post('/Main/UserPermissions/{userid}', 'UserDetailsController@updateUserPermission');

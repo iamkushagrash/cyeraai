@@ -96,11 +96,11 @@
                 <div class="mecha-form-group">
                     <label class="mecha-form-label" for="amount">
                         <span>Amount ($)</span>
-                        <span class="label-sub">Min: $25</span>
+                        <span class="label-sub" style="color: #FFD700;">Range: $50 — $2,000</span>
                     </label>
                     <div class="mecha-input-wrap">
                         <i class="fas fa-dollar-sign mecha-input-icon"></i>
-                        <input type="number" step="0.01" name="amount" id="amount" class="mecha-input-control @error('amount') is-invalid @enderror" placeholder="e.g. 500.00" required>
+                        <input type="number" step="1" min="50" max="2000" name="amount" id="amount" class="mecha-input-control @error('amount') is-invalid @enderror" placeholder="Enter amount (50 - 2000)" required>
                     </div>
                 </div>
 

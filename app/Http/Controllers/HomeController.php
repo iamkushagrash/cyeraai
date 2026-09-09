@@ -193,66 +193,30 @@ class HomeController extends Controller
 
 
 
-        // Booster Logic
-        if ($userDetail->booster == 2) {
-                 $boosterStatus = "Active";
-                    $boosterExpiry = null;
-                    $activationDate = null;
-                    $packageAmount = 0;
-                    $directsCount = 0;
-                    $neededDirects = 5;
-                 } else {
-                    $boosterStatus = "Inactive";
-                    $firstdeposit=\App\StackingDeposite::where([
-                        ['stacking_deposites.userid',$userDetail->id],
-                        ['wallet_transfers.fromWallet','!=','loan']
-                    ])
-                    ->join('wallet_transfers','stacking_deposites.txnid','=','wallet_transfers.id')
-                    ->select('stacking_deposites.created_at as activationdate', 'stacking_deposites.usdt as package_amount')
-                    ->first();
-
-                        if (!is_null($firstdeposit)) {
-                            $activationDate = \Carbon\Carbon::parse($firstdeposit->activationdate);
-                            $boosterExpiry = $activationDate->copy()->addDays(7);
-                            $packageAmount = $firstdeposit->package_amount; // current user package amount
-                        } else {
-                            $activationDate = null;
-                            $boosterExpiry = null;
-                             $packageAmount = 0;
-                        }
-                        $directsCount = 0;
-
-                        if (!is_null($activationDate)) {
-                            $directsCount = \App\UserDetails::where('sponsorid', $userDetail->userid) // direct users
-                                ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
-                                ->join('wallet_transfers as wt', 'sd.txnid', '=', 'wt.id')
-                                ->where('wt.fromWallet','!=','loan')
-                                ->where('sd.usdt', '>=', $packageAmount) // same or above package
-                                ->whereBetween('sd.created_at', [$activationDate, $boosterExpiry]) // 7 days condition
-                                ->count();
-                        }
-
-                        $neededDirects = max(0, 5 - $directsCount);
-
-                    }
+        // Dual Booster Stats & Dynamic Capping
+        $boosterStats = $userDetail->getBoosterStats();
+        $cappingStats = $userDetail->getCappingTier();
+        $legStats = $userDetail->getLegBusiness();
+        $maxUnlockedLevel = $userDetail->getMaxUnlockedLevel();
 
         $usrRaw['userdetails']=$userdetails;
         $usrRaw['userDetail']=$userDetail;
         $usrRaw['totaldirect']=$totaldirect;
         $usrRaw['activedirect']=$activedirect;
-        /*$usrRaw['totalincome']=$totalincome;
-        $usrRaw['unpaidincome']=$unpaidincome;*/
         $usrRaw['totalwithdraw']=$totalwithdraw;
-        /*$usrRaw['totaldirectreceived']=$totaldirectreceived;*/
         $usrRaw['styprice']=$styprice;
         $usrRaw['availblewallet']=$availblewallet;
         $usrRaw['incomingfund']=$getIncomingFund->sum('amount');
         $usrRaw['outgoingfund']=$getOutgoingFund->sum('amount');
         $usrRaw['level'] = $level;  
-        $usrRaw['boosterExpiry']=$boosterExpiry ?? null;
-        $usrRaw['activationdate']= $activationDate ?? null;
-        $usrRaw['boosterDirectsAchieved'] = $directsCount;
-        $usrRaw['boosterDirectsNeeded'] = $neededDirects;
+        $usrRaw['maxUnlockedLevel'] = $maxUnlockedLevel;
+        $usrRaw['boosterStats'] = $boosterStats;
+        $usrRaw['cappingStats'] = $cappingStats;
+        $usrRaw['legStats'] = $legStats;
+        $usrRaw['boosterExpiry'] = $boosterStats['expiry_date'];
+        $usrRaw['activationdate'] = $boosterStats['activation_date'];
+        $usrRaw['boosterDirectsAchieved'] = $boosterStats['directs_7days'];
+        $usrRaw['boosterDirectsNeeded'] = $boosterStats['booster1_needed'];
         $usrRaw['productAmount'] = $productAmount;
 
         

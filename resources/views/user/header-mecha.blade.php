@@ -27,7 +27,6 @@
                     <span class="price-crypto-label">CAI</span>
                     <span class="price-crypto-val">${{ number_format((float)$caiLivePrice, 2) }}</span>
                 </div>
-                <span class="price-growth-chip"><i class="fas fa-arrow-trend-up"></i> +4.2%</span>
             </div>
         </div>
     </header>

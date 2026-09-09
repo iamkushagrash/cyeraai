@@ -79,6 +79,10 @@ class WalletTransferController extends BaseController
    }
 
    public function stakeMWTApi(Request $request){
+       return $this->stakeCAIApi($request);
+   }
+
+   public function stakeCAIApi(Request $request){
         set_time_limit(0);
         $datareg=$this->findUserName($request->userid);
         $regex=['required','exists:users,'.$datareg['type']];

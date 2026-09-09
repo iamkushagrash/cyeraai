@@ -8,125 +8,254 @@ use App\StackingDeposite;
 
 class StackingDetailController extends Controller
 {
-    public function cappingCalculation($userid,$amount){
-        $getAllDeposite=\App\StackingDeposite::where([['userid',$userid],['status','>',0]])->get();
-        $totalAmount=0;
-        foreach($getAllDeposite as $deposit){
-            if($amount>0){
-                if(Crypt::decrypt($deposit->capamount)<=$amount){
-                    $remainingAmount=Crypt::decrypt($deposit->capamount)-$amount;
-                    $totalAmount+=Crypt::decrypt($deposit->capamount);
-                    $amount=$amount-Crypt::decrypt($deposit->capamount);
-                    $updateUserDetailUserstate=\App\UserDetails::where('id',$userid);
-                    $updateUserDetailUserstate->decrement('userstate');
-                    /*$updateUserDetailUserstate->save();*/
-                    $updateCapping=\App\StackingDeposite::where('id',$deposit->id)->update([
-                        'capamount'  =>   Crypt::encrypt(0),
-                        'status'  =>   0,
+    /**
+     * Capping calculation: Deducts commission from user's active deposits' remaining capping.
+     */
+    public function cappingCalculation($userid, $amount) {
+        $getAllDeposite = \App\StackingDeposite::where([['userid', $userid], ['status', '>', 0]])->get();
+        $totalAmount = 0;
+        
+        foreach ($getAllDeposite as $deposit) {
+            if ($amount > 0) {
+                $remCap = (float)Crypt::decrypt($deposit->capamount);
+                if ($remCap <= $amount) {
+                    $totalAmount += $remCap;
+                    $amount = $amount - $remCap;
+                    
+                    \App\UserDetails::where('id', $userid)->decrement('userstate');
+                    
+                    \App\StackingDeposite::where('id', $deposit->id)->update([
+                        'capamount' => Crypt::encrypt(0),
+                        'status'    => 0,
                     ]);
-                }else{
-                    $remainingAmount=Crypt::decrypt($deposit->capamount)-$amount;
-                    $updateCapping=\App\StackingDeposite::where('id',$deposit->id)->update([
-                        'capamount'  =>   Crypt::encrypt($remainingAmount),
+                } else {
+                    $remainingAmount = $remCap - $amount;
+                    \App\StackingDeposite::where('id', $deposit->id)->update([
+                        'capamount' => Crypt::encrypt($remainingAmount),
                     ]);
-                    $totalAmount+=$amount;
-                    $amount=0;
+                    $totalAmount += $amount;
+                    $amount = 0;
                 }
-                \Log::info('userid '. $deposit->userid.' remaining Capping Amount is '.Crypt::decrypt($deposit->capamount));
+                \Log::info('userid ' . $deposit->userid . ' remaining Capping is ' . Crypt::decrypt($deposit->fresh()->capamount));
             }
         }
         return $totalAmount;
     }
 
-    public function cappingUpdate($userid){
-        $getAllPlan=\App\StackingDeposite::where([['userid',$userid],['istatus',0]])->get();
-        foreach($getAllPlan as $plan){
-            $updateCapping=\App\StackingDeposite::where('id',$plan->id)->update([
-                'capamount'  =>  Crypt::encrypt(Crypt::decrypt($plan->capamount)+(3*$plan->usdt)),
-                'istatus'  =>  1,
-            ]);
-        }
-    }
+    /**
+     * Check and upgrade user's capping multiplier based on qualifications:
+     * 2X: Default
+     * 3X: Self >= $200 + 5 Directs (100+) + Power Leg >= 5K & Weaker Leg >= 5K
+     * 5X: Self >= $500 + 15 Directs (100+) + Power Leg >= 25K & Weaker Leg >= 25K
+     * 10X: Self >= $1000 + 15 Directs (200+) + Power Leg >= 50K & Weaker Leg >= 50K
+     */
+    public function checkAndUpgradeCapping($userid) {
+        $userDetail = \App\UserDetails::where('id', $userid)->first();
+        if (!$userDetail) return;
 
-    public function boosterCheckForUser($id){
-        $userDetail=\App\UserDetails::where('id',$id)->first();
-        //\Log::info('created_at check created_at='.$userDetail->created_at.' check date='.date('Y-m-d',strtotime('- 7 days',strtotime(now()))).' Answer is '.$userDetail->created_at >= date('Y-m-d',strtotime('- 7 days',strtotime(now()))));
-        \Log::info('is null loan status '.is_null($userDetail->userLoanStatus()));
-        if(!is_null($userDetail->stackingDeposite()->first()) && $userDetail->active_direct>=4 && ($userDetail->stackingDeposite()->first()->created_at >= date('Y-m-d',strtotime('- 7 days',strtotime(now()))) && (is_null($userDetail->userLoanStatus()) || $userDetail->userLoanStatus()->status==0))){
-        \Log::info('inside if');
-            $m=0;
-            foreach($userDetail->totalDirect()->get() as $direct){
-                \Log::info('self '.$userDetail->stackingDeposite()->max('usdt'));
-                \Log::info('direct '.$direct->stackingDeposite()->max('usdt'));
-                \Log::info('loan Status '.is_null($direct->userLoanStatus()));
-                if(($direct->stackingDeposite()->max('usdt')>=$userDetail->stackingDeposite()->max('usdt')) && (is_null($direct->userLoanStatus()) || $direct->userLoanStatus()->status==0)){
-                    $m++;
-                }
-            }\Log::info('m '.$m);
-            if($m>=5){
-                if (!is_null($userDetail->stackingDeposite()->whereNotIn('staketype', [3, 4])->first())) {
-                    $userUpdate=\App\UserDetails::where('id',$id)->update([
-                        'booster'  =>  2,
+        $cappingStats = $userDetail->getCappingTier();
+        $newMultiplier = $cappingStats['multiplier'];
+
+        // Update all active deposits to at least this multiplier
+        $activeDeposits = \App\StackingDeposite::where([['userid', $userid], ['status', 1]])->get();
+        foreach ($activeDeposits as $deposit) {
+            $totalCapExpected = $deposit->usdt * $newMultiplier;
+            $currentCap = (float)Crypt::decrypt($deposit->capamount);
+            
+            // If current cap is less than new multiplier * deposit, upgrade it
+            if ($currentCap < $totalCapExpected && $deposit->istatus < $newMultiplier) {
+                $diff = $totalCapExpected - ($deposit->usdt * ($deposit->istatus ?: 2));
+                if ($diff > 0) {
+                    \App\StackingDeposite::where('id', $deposit->id)->update([
+                        'capamount' => Crypt::encrypt($currentCap + $diff),
+                        'istatus'   => $newMultiplier,
                     ]);
                 }
             }
         }
     }
 
-    public function businessUpdate(){
-        $getAllStakingDeposit=\App\StackingDeposite::where([['batchstatus',0],['staketype','<',2]])->get();
-        //dd(count($getAllStakingDeposit));
-        foreach($getAllStakingDeposit as $staking){
-            //dd($staking);
-            $userDetail=\App\UserDetails::where('id',$staking->userid)->first();
-            $status=0;
-            //dd($userDetail->id);
-            //dd($userDetail->stackingDeposite()->where('staketype', 1)->where('batchstatus', 1)->exists());
-            if($userDetail->stackingDeposite()->where('staketype', 1)->where('batchstatus', 1)->exists()){
-                $status=1;
+    /**
+     * Booster check for user:
+     * Booster 1: 5 Directs ($100+) in 7 days -> booster = 2 (1.0% daily CPS)
+     * Booster 2: 15 Directs ($100+) in 7 days -> booster = 3 (1.5% daily CPS)
+     */
+    public function boosterCheckForUser($id) {
+        $userDetail = \App\UserDetails::where('id', $id)->first();
+        if (!$userDetail) return;
+
+        $boosterStats = $userDetail->getBoosterStats();
+        
+        // If Booster 2 qualified
+        if ($boosterStats['booster2_active']) {
+            if ($userDetail->booster != 3) {
+                \App\UserDetails::where('id', $id)->update(['booster' => 3]);
+                \Log::info("User ID {$id} unlocked Booster 2 (1.5% Daily ROI)");
             }
-            $selfLeadership=\App\LeadershipInfo::firstOrNew(['userid' =>$userDetail->userid,'leaderdate'  =>date("Y-m-d"),'sponsorid' =>$userDetail->sponsorid]);
-            $selfLeadership->save();
-            $selfLeadership->increment('total_investment',$staking->usdt);
-            $selfLeadership->increment('total_self_investment',$staking->usdt);
-            $selfLeadership->save();
-            //$cappingFunction=new StackingDetailController();
-            $guiderLeadership=\App\LeadershipInfo::firstOrNew(['userid' =>$userDetail->sponsorid,'leaderdate'  =>date("Y-m-d"),'sponsorid' =>$userDetail->guiderDetails()->first()->sponsorid]);
-            $guiderLeadership->save();
-            $guiderLeadership->increment('total_investment',$staking->usdt);
-            $guiderLeadership->increment('total_direct_investment',$staking->usdt);
-            $guiderLeadership->save();
-            $guiderUpdate=\App\UserDetails::where('userid',$userDetail->sponsorid);
-            $guiderUpdate->increment('current_direct_investment',$staking->usdt);
-            $guiderUpdate->increment('total_direct_investment',$staking->usdt);
-            $guiderUpdate->increment('current_investment',$staking->usdt);
-            $guiderUpdate->increment('total_investment',$staking->usdt);
-            if($status==0){
-                $this->boosterCheckForUser($guiderUpdate->first()->id);
-                if($guiderUpdate->first()->active_direct==0){
-                    $this->cappingUpdate($guiderUpdate->first()->id);
+        } 
+        // If Booster 1 qualified
+        elseif ($boosterStats['booster1_active']) {
+            if ($userDetail->booster != 2 && $userDetail->booster != 3) {
+                \App\UserDetails::where('id', $id)->update(['booster' => 2]);
+                \Log::info("User ID {$id} unlocked Booster 1 (1.0% Daily ROI)");
+            }
+        }
+    }
+
+    /**
+     * Distribute Level 2 to Level 15 Unilevel Income on Staking/Investment.
+     * Level 1 is already handled by 5% Direct Referral income.
+     */
+    public function distributeLevelIncomeOnStaking($stakingDepositId, $stakingUserId, $amount) {
+        $profileStore = \App\ProfileStore::where('id', 1)->first();
+        $stakingUser = \App\UserDetails::where('id', $stakingUserId)->first();
+        if (!$stakingUser) return;
+
+        $allLevelConfigs = \App\LevelDetails::where('status', 1)->get()->keyBy('open_level');
+        
+        $currentSponsorId = $stakingUser->sponsorid;
+        $levelDepth = 1;
+
+        while ($currentSponsorId > 0 && $levelDepth <= 15) {
+            $upline = \App\UserDetails::where('userid', $currentSponsorId)->first();
+            if (!$upline) break;
+
+            // For Level 2 to 15 (Level 1 is direct referral, handled separately)
+            if ($levelDepth >= 2 && $levelDepth <= 15) {
+                if (isset($allLevelConfigs[$levelDepth])) {
+                    $config = $allLevelConfigs[$levelDepth];
+                    $reqDirects = (int)$config->direct_count;
+                    $reqTeamBiz = (float)$config->min_amount;
+                    $ratePct = (float)$config->cps;
+
+                    $uplineTeamBiz = (float)($upline->total_level_investment + $upline->total_direct_investment);
+                    $uplineDirects = (int)($upline->active_direct);
+
+                    // Check qualification:
+                    $isQualified = ($uplineDirects >= $reqDirects && $uplineTeamBiz >= $reqTeamBiz);
+                    $isActiveUser = ($upline->userstatus == 1 && $upline->userstate > 0 && $upline->capping != 1 && $upline->level_status != 0);
+
+                    if ($isQualified && $isActiveUser && $ratePct > 0) {
+                        $commissionUsdt = ($amount * $ratePct) / 100;
+                        $finalUsdt = $this->cappingCalculation($upline->id, $commissionUsdt);
+
+                        if ($finalUsdt > 0) {
+                            \App\LevelIncome::create([
+                                'userid'         => $upline->id,
+                                'fromuser'       => $stakingUser->id,
+                                'amount'         => $finalUsdt / $profileStore->price,
+                                'remaining'      => $finalUsdt / $profileStore->price,
+                                'amt_usdt'       => $finalUsdt,
+                                'remaining_usdt' => $finalUsdt,
+                                'txnid'          => $stakingDepositId,
+                                'description'    => 'l',
+                                'status'         => 0,
+                                'created_at'     => now(),
+                            ]);
+                            \Log::info("Level {$levelDepth} income of \${$finalUsdt} credited to User {$upline->userid} from User {$stakingUser->userid}");
+                        }
+                    }
                 }
-                $guiderUpdate->increment('active_direct');
-                $guiderUpdate->increment('active_downline');
             }
-            $guiderid=$guiderUpdate->first()->sponsorid;
-            while($guiderid>0){
-                $guiderUpdate=\App\UserDetails::where('userid',$guiderid);
-                $guiderUpdate->increment('current_level_investment',$staking->usdt);
-                $guiderUpdate->increment('total_level_investment',$staking->usdt);
-                $guiderUpdate->increment('current_investment',$staking->usdt);
-                $guiderUpdate->increment('total_investment',$staking->usdt);
-                if($status==0)
+
+            // Move up to next sponsor in tree
+            $currentSponsorId = $upline->sponsorid;
+            $levelDepth++;
+        }
+    }
+
+    /**
+     * Batch / Realtime Business & Tree Turnover update pipeline.
+     */
+    public function businessUpdate() {
+        $getAllStakingDeposit = \App\StackingDeposite::where([['batchstatus', 0], ['staketype', '<', 2]])->get();
+        
+        foreach ($getAllStakingDeposit as $staking) {
+            $userDetail = \App\UserDetails::where('id', $staking->userid)->first();
+            if (!$userDetail) continue;
+
+            $status = 0;
+            if ($userDetail->stackingDeposite()->where('staketype', 1)->where('batchstatus', 1)->exists()) {
+                $status = 1;
+            }
+
+            // Self business
+            $selfLeadership = \App\LeadershipInfo::firstOrNew([
+                'userid'      => $userDetail->userid,
+                'leaderdate'  => date("Y-m-d"),
+                'sponsorid'   => $userDetail->sponsorid
+            ]);
+            $selfLeadership->save();
+            $selfLeadership->increment('total_investment', $staking->usdt);
+            $selfLeadership->increment('total_self_investment', $staking->usdt);
+            $selfLeadership->save();
+
+            // Direct Sponsor business
+            $guiderUpdate = \App\UserDetails::where('userid', $userDetail->sponsorid)->first();
+            if ($guiderUpdate) {
+                $guiderLeadership = \App\LeadershipInfo::firstOrNew([
+                    'userid'      => $userDetail->sponsorid,
+                    'leaderdate'  => date("Y-m-d"),
+                    'sponsorid'   => $guiderUpdate->sponsorid
+                ]);
+                $guiderLeadership->save();
+                $guiderLeadership->increment('total_investment', $staking->usdt);
+                $guiderLeadership->increment('total_direct_investment', $staking->usdt);
+                $guiderLeadership->save();
+
+                $guiderUpdate->increment('current_direct_investment', $staking->usdt);
+                $guiderUpdate->increment('total_direct_investment', $staking->usdt);
+                $guiderUpdate->increment('current_investment', $staking->usdt);
+                $guiderUpdate->increment('total_investment', $staking->usdt);
+
+                if ($status == 0) {
+                    $guiderUpdate->increment('active_direct');
                     $guiderUpdate->increment('active_downline');
-                $guiderid=$guiderUpdate->first()->sponsorid;
-                $guideridLeadership=\App\LeadershipInfo::firstOrNew(['userid' =>$guiderUpdate->first()->userid,'leaderdate'  =>date("Y-m-d"),'sponsorid' =>$guiderUpdate->first()->sponsorid]);
-                $guideridLeadership->save();
-                $guideridLeadership->increment('total_investment',$staking->usdt);
-                $guideridLeadership->increment('total_level_investment',$staking->usdt);
-                $guideridLeadership->save();
+                }
+
+                // Check Booster, Capping & Rank upgrades for Sponsor
+                $this->boosterCheckForUser($guiderUpdate->id);
+                $this->checkAndUpgradeCapping($guiderUpdate->id);
+                \App\Http\Controllers\RankIncomeController::checkAndSyncUserRank($guiderUpdate->id);
+
+                // Tree Upline Loop
+                $currentGuiderId = $guiderUpdate->sponsorid;
+                while ($currentGuiderId > 0) {
+                    $upline = \App\UserDetails::where('userid', $currentGuiderId)->first();
+                    if (!$upline) break;
+
+                    $upline->increment('current_level_investment', $staking->usdt);
+                    $upline->increment('total_level_investment', $staking->usdt);
+                    $upline->increment('current_investment', $staking->usdt);
+                    $upline->increment('total_investment', $staking->usdt);
+
+                    if ($status == 0) {
+                        $upline->increment('active_downline');
+                    }
+
+                    $uplineLeadership = \App\LeadershipInfo::firstOrNew([
+                        'userid'      => $upline->userid,
+                        'leaderdate'  => date("Y-m-d"),
+                        'sponsorid'   => $upline->sponsorid
+                    ]);
+                    $uplineLeadership->save();
+                    $uplineLeadership->increment('total_investment', $staking->usdt);
+                    $uplineLeadership->increment('total_level_investment', $staking->usdt);
+                    $uplineLeadership->save();
+
+                    // Check Capping and Rank upgrades for Upline
+                    $this->checkAndUpgradeCapping($upline->id);
+                    \App\Http\Controllers\RankIncomeController::checkAndSyncUserRank($upline->id);
+
+                    $currentGuiderId = $upline->sponsorid;
+                }
             }
-            $stackingUpdate=\App\StackingDeposite::where('id',$staking->id)->update([
-                'batchstatus'   => 1,
+
+            // Distribute Level Income (Levels 2 to 15)
+            $this->distributeLevelIncomeOnStaking($staking->id, $staking->userid, $staking->usdt);
+
+            \App\StackingDeposite::where('id', $staking->id)->update([
+                'batchstatus' => 1,
             ]);
         }
     }

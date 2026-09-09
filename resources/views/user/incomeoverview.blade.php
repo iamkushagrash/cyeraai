@@ -12,7 +12,9 @@
     $teamDevelopmentIncome = $data['userDetail']->levelIncome()->where('description','r')->sum('amt_usdt');
     $clubIncome = $data['userDetail']->clubIncome()->sum('amt_usdt');
     $lifetimeIncome = $data['userDetail']->lifetimeIncome()->sum('amount');
-    $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome;
+    $rankIncome = $data['userDetail']->rankIncome()->sum('amt_usdt');
+    $poolIncome = (float)\App\PoolIncome::where('userid', $data['userDetail']->id)->sum('amt_usdt');
+    $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome + $rankIncome + $poolIncome;
     $totalWithdraw = !empty($data['totalwithdraw']->amount) ? round((float)$data['totalwithdraw']->amount, 2) : 0.00;
     $remainingCap = !is_null($data['userDetail']->remainingCapping()) ? round((float)$data['userDetail']->remainingCapping(), 2) : 0.00;
 
@@ -100,6 +102,22 @@
         </div>
         <div class="mecha-metric-val">${{ number_format($lifetimeIncome, 2) }}</div>
         <div class="mecha-metric-sub">Lifetime Rank Bonus</div>
+    </div>
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/RankIncome') }}'" style="cursor: pointer;">
+        <div class="mecha-metric-lbl">
+            <span>RANK INCOME</span>
+            <i class="fas fa-crown" style="color: #F59E0B;"></i>
+        </div>
+        <div class="mecha-metric-val gold">${{ number_format($rankIncome, 2) }}</div>
+        <div class="mecha-metric-sub">V1 to V8 Weekly Rewards</div>
+    </div>
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/PoolIncome') }}'" style="cursor: pointer;">
+        <div class="mecha-metric-lbl">
+            <span>GLOBAL POOL</span>
+            <i class="fas fa-layer-group" style="color: #A78BFA;"></i>
+        </div>
+        <div class="mecha-metric-val" style="color: #A78BFA;">${{ number_format($poolIncome, 2) }}</div>
+        <div class="mecha-metric-sub">5% Global Dividend</div>
     </div>
 </div>
 

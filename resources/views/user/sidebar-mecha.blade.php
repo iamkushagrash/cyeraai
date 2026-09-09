@@ -30,6 +30,23 @@
                 <i class="fas fa-gear"></i>
             </button>
 
+@php
+    $sideUid = Session::get('user.id');
+    $sideUserDetail = \App\UserDetails::where('id', $sideUid)->first();
+    $sidePortfolio = (float)\App\StackingDeposite::where('userid', $sideUid)->where('status', 1)->sum('usdt');
+    $isSideUserActive = $sideUserDetail ? ($sideUserDetail->userstatus == 1 || $sideUserDetail->userstate > 0 || $sidePortfolio > 0) : false;
+    $sideCaiPrice = (float)(\App\ProfileStore::where('id', 1)->value('price') ?? 1.25);
+    if ($sideCaiPrice <= 0) $sideCaiPrice = 1.25;
+    $sideClaimableUsdt = (float)\App\CpsIncome::where('userid', $sideUid)->where('status', 0)->sum('remaining_usdt');
+    $sideClaimableCai = $sideCaiPrice > 0 ? $sideClaimableUsdt / $sideCaiPrice : 0;
+
+    $sideDirectIncome = (float)\App\BonusReward::where('userid', $sideUid)->where('status', '!=', 3)->sum('amt_usdt');
+    $sideStakingIncome = (float)\App\CpsIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideLevelIncome = (float)\App\LevelIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideClubIncome = (float)\App\ClubIncome::where('userid', $sideUid)->sum('amt_usdt');
+    $sideTotalEarned = $sideDirectIncome + $sideStakingIncome + $sideLevelIncome + $sideClubIncome;
+@endphp
+
             <!-- Top Row: Crowned Lion Medallion & Info Stack -->
             <div class="brand-card-top-row">
                 <div class="mecha-emblem-dial">
@@ -38,7 +55,24 @@
 
                 <div class="brand-info-col">
                     <div class="mecha-brand-title">CYERA AI</div>
-                    <div class="mecha-brand-subtitle">— CAI ECOSYSTEM —</div>
+                    
+@php
+    $sideRankName = ($sideUserDetail && $sideUserDetail->rank_name && $sideUserDetail->rank_name !== 'None') 
+        ? $sideUserDetail->rank_name 
+        : (($sideUserDetail && $sideUserDetail->getRankQualification()['current_rank'] !== 'None') ? $sideUserDetail->getRankQualification()['current_rank'] : 'NO RANK');
+@endphp
+                    <!-- User ID, Rank & Active/Inactive Status Badge -->
+                    <div style="display: flex; align-items: center; justify-content: flex-start; gap: 3.5px; margin: 3px 0 2px; max-width: 100%; flex-wrap: nowrap; overflow: visible;">
+                        <span style="font-size: 7.8px; font-weight: 800; color: #FFE082; letter-spacing: 0.2px; white-space: nowrap;">{{ Session::get('user.userid') ?? 'CAI1234567' }}</span>
+                        <span class="strip-status-pill" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; background: rgba(245, 158, 11, 0.18); border: 1px solid #F59E0B; color: #FDE68A; font-weight: 800; line-height: 1.2; white-space: nowrap;">
+                            <i class="fas fa-crown" style="font-size: 5.5px;"></i> {{ $sideRankName }}
+                        </span>
+                        @if($isSideUserActive)
+                            <span class="strip-status-pill active" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; line-height: 1.2; white-space: nowrap;"><i class="fas fa-circle-check" style="font-size: 5.5px;"></i> ACTIVE</span>
+                        @else
+                            <span class="strip-status-pill inactive" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; line-height: 1.2; white-space: nowrap;"><i class="fas fa-circle-xmark" style="font-size: 5.5px;"></i> INACTIVE</span>
+                        @endif
+                    </div>
 
                     <!-- Connected Wallet Capsule -->
                     <div class="header-wallet-capsule">
@@ -59,20 +93,6 @@
                     </div>
                 </div>
             </div>
-@php
-    $sideUid = Session::get('user.id');
-    $sidePortfolio = (float)\App\StackingDeposite::where('userid', $sideUid)->where('status', 1)->sum('usdt');
-    $sideCaiPrice = (float)(\App\ProfileStore::where('id', 1)->value('price') ?? 1.25);
-    if ($sideCaiPrice <= 0) $sideCaiPrice = 1.25;
-    $sideClaimableUsdt = (float)\App\CpsIncome::where('userid', $sideUid)->where('status', 0)->sum('remaining_usdt');
-    $sideClaimableCai = $sideCaiPrice > 0 ? $sideClaimableUsdt / $sideCaiPrice : 0;
-
-    $sideDirectIncome = (float)\App\BonusReward::where('userid', $sideUid)->where('status', '!=', 3)->sum('amt_usdt');
-    $sideStakingIncome = (float)\App\CpsIncome::where('userid', $sideUid)->sum('amt_usdt');
-    $sideLevelIncome = (float)\App\LevelIncome::where('userid', $sideUid)->sum('amt_usdt');
-    $sideClubIncome = (float)\App\ClubIncome::where('userid', $sideUid)->sum('amt_usdt');
-    $sideTotalEarned = $sideDirectIncome + $sideStakingIncome + $sideLevelIncome + $sideClubIncome;
-@endphp
 
             <!-- Bottom Row: 3 Mini Stat Boxes Grid -->
             <div class="header-3stat-grid">
@@ -239,7 +259,15 @@
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/ClubReward') }}" class="mecha-sub-link {{ request()->is('User/ClubReward*') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Club & Pool Rewards</div>
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Club Rewards</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/PoolIncome') }}" class="mecha-sub-link {{ request()->is('User/PoolIncome*') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Global Pool (5.0%)</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/RankIncome') }}" class="mecha-sub-link {{ request()->is('User/RankIncome*') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot"></span> Rank Income (V1-V8)</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/LifetimeAchievementReward') }}" class="mecha-sub-link {{ request()->is('User/LifetimeAchievementReward*') ? 'active' : '' }}">
@@ -248,6 +276,7 @@
                     </a>
                 </div>
             </div>
+
 
             <!-- Wallet & Exchange (Dropdown) -->
             <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') ? 'open' : '' }}">
