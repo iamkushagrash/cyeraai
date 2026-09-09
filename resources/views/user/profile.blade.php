@@ -67,10 +67,7 @@
 
             <!-- Right: Action Pills -->
             <div style="display: flex; gap: 8px; align-items: center;">
-                <a href="{{ url('/User/Stake') }}" class="mecha-btn-gold" style="height: 34px; padding: 0 14px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fas fa-bolt"></i> STAKE
-                </a>
-                <a href="{{ url('/User/ChangePassword') }}" class="mecha-btn-outline" style="height: 34px; padding: 0 12px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                <a href="{{ url('/User/ChangePassword') }}" class="mecha-btn-outline" style="height: 32px; padding: 0 12px; font-size: 0.75rem; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                     <i class="fas fa-key"></i> SECURITY
                 </a>
             </div>
