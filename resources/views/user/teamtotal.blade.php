@@ -532,7 +532,7 @@
 
         <div class="toolbar-search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="totalMemberSearchInput" class="toolbar-search-input" placeholder="Search downline by ID, name...">
+            <input type="text" id="totalMemberSearchInput" class="toolbar-search-input" placeholder="Search downline by User ID, wallet, level...">
         </div>
     </div>
 
@@ -543,8 +543,6 @@
             @php
                 $st = strtolower($row->status ?? '');
                 $isActive = ($st == '1' || str_contains($st, 'active') || str_contains($st, 'paid'));
-                $displayName = $row->name ?: 'Member';
-                $initial = strtoupper(substr($displayName, 0, 1));
                 $stakedAmount = (float)($row->current ?? $row->shares ?? 0);
                 
                 $levelPerc = 0;
@@ -557,7 +555,8 @@
                     $levelPerc = round($row->leveluser ?? 0);
                 }
                 
-                $searchContent = strtolower(($row->userid ?? '').' '.($row->name ?? '').' '.($row->doj ?? '').' '.($isActive ? 'active' : 'inactive').' '.$stakedAmount.' level '.($row->level ?? ''));
+                $mWallet = $row->walletaddress ?? $row->bep20address ?? '';
+                $searchContent = strtolower(($row->userid ?? '').' '.($mWallet ?? '').' '.($row->doj ?? '').' '.($isActive ? 'active' : 'inactive').' '.$stakedAmount.' level '.($row->level ?? ''));
             @endphp
 
             <div class="member-cyber-card" data-search="{{ $searchContent }}">
@@ -565,19 +564,16 @@
                 <div class="card-member-head">
                     <div class="head-user-block">
                         <div class="member-avatar-orb">
-                            {{ $initial }}
+                            <i class="fas fa-user" style="font-size: 0.85rem;"></i>
                             <span class="avatar-status-dot {{ $isActive ? 'dot-active' : 'dot-inactive' }}"></span>
                         </div>
                         <div class="member-name-stack">
-                            <span class="member-full-name" title="{{ $row->name }}">{{ $displayName }}</span>
-                            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 3px;">
-                                <div class="member-id-pill" onclick="copyUserId('{{ $row->userid }}')" title="Click to copy User ID">
+                            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                                <div class="member-id-pill" onclick="copyUserId('{{ $row->userid }}')" title="Click to copy User ID" style="font-size: 0.82rem; font-weight: 800; color: #FFD700; padding: 3px 8px;">
+                                    <i class="fas fa-id-badge" style="font-size: 9px;"></i>
                                     <span>{{ $row->userid }}</span>
-                                    <i class="fas fa-copy"></i>
+                                    <i class="fas fa-copy" style="font-size: 9px;"></i>
                                 </div>
-                                @php
-                                    $mWallet = $row->walletaddress ?? $row->bep20address ?? '';
-                                @endphp
                                 @if(!empty($mWallet))
                                 <div class="member-id-pill" onclick="copyUserId('{{ $mWallet }}')" title="BEP-20 Wallet: {{ $mWallet }} (Click to copy)" style="background: rgba(0, 255, 136, 0.08); border-color: rgba(0, 255, 136, 0.3); color: #00FF88;">
                                     <i class="fas fa-wallet" style="font-size: 8px;"></i>

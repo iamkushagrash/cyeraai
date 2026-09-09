@@ -75,7 +75,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name'           => ['required', 'string', 'max:255'],
+            'name'           => ['nullable', 'string', 'max:255'],
             'email'          => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'referrer'       => ['required', 'string'],
             'contact'        => ['nullable'],
@@ -85,9 +85,34 @@ class RegisterController extends Controller
             'referrer.required'       => 'Sponsor ID is required for registration.',
             'wallet_address.required' => 'Web3 Wallet connection is required to register.',
             'wallet_address.regex'    => 'Invalid BEP-20 Web3 wallet address format.',
-            'name.required'           => 'Full name is required.',
             'email.unique'            => 'This email address is already registered.',
-        ]);
+        ])->after(function ($validator) use ($data) {
+            // Check Sponsor ID validity
+            if (!empty($data['referrer'])) {
+                $ref = trim($data['referrer']);
+                $guiderUser = User::where('uuid', $ref)
+                    ->orWhereRaw('LOWER(uuid) = ?', [strtolower($ref)])
+                    ->orWhere('email', $ref)
+                    ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
+                    ->first();
+
+                if (is_null($guiderUser)) {
+                    $validator->errors()->add('referrer', 'Invalid Sponsor ID. Please verify and enter a valid Sponsor code.');
+                }
+            }
+
+            // Check if wallet address is already registered
+            if (!empty($data['wallet_address'])) {
+                $walletLower = strtolower(trim($data['wallet_address']));
+                $existingAsset = AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$walletLower])
+                    ->orWhereRaw('LOWER(bep20addr) = ?', [$walletLower])
+                    ->first();
+
+                if ($existingAsset) {
+                    $validator->errors()->add('wallet_address', 'This Web3 Wallet is already registered. Please proceed to Sign In.');
+                }
+            }
+        });
     }
 
     /**
@@ -108,26 +133,14 @@ class RegisterController extends Controller
                 ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
                 ->first();
 
-            if (is_null($guiderUser)) {
-                return redirect()->back()->with('warning', 'Referrer User ID is invalid. Please register with a valid Sponsor ID.')->withInput();
-            }
-
-            $guiderDetail = UserDetails::where('userid', $guiderUser->id)->first();
-            $guiderid = $guiderDetail ? $guiderDetail->id : $guiderUser->id;
-        }
-
-        // Check if wallet address is already registered in AssetDetail
-        if (!empty($data['wallet_address'])) {
-            $walletLower = strtolower($data['wallet_address']);
-            $existingAsset = AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$walletLower])
-                ->orWhereRaw('LOWER(bep20addr) = ?', [$walletLower])
-                ->first();
-            if ($existingAsset) {
-                return redirect()->back()->with('warning', 'This Web3 Wallet is already registered. Please proceed to Sign In.')->withInput();
+            if ($guiderUser) {
+                $guiderDetail = UserDetails::where('userid', $guiderUser->id)->first();
+                $guiderid = $guiderDetail ? $guiderDetail->id : $guiderUser->id;
             }
         }
 
         $walletLower = !empty($data['wallet_address']) ? strtolower($data['wallet_address']) : '';
+        $userName = !empty($data['name']) ? $data['name'] : ('Cyera_' . (!empty($data['wallet_address']) ? substr($data['wallet_address'], 2, 6) : rand(1000, 9999)));
         $userEmail = !empty($data['email']) ? $data['email'] : ($walletLower ? $walletLower . '@cyera.ai' : 'user_' . rand(10000, 99999) . '@cyera.ai');
         $userContact = !empty($data['contact']) ? $data['contact'] : '';
         $defaultPassword = 'CY@' . rand(100000, 999999);
@@ -135,7 +148,7 @@ class RegisterController extends Controller
 
         $randomId = $this->randomid();
         $user = User::create([
-            'usersname'         => $data['name'],
+            'usersname'         => $userName,
             'email'             => $userEmail,
             'contact'           => $userContact,
             'ccode'             => !empty($data['countrycode']) ? $data['countrycode'] : '+91',
@@ -193,7 +206,7 @@ class RegisterController extends Controller
         $details['uid'] = $newDetail->id;
         $details['email'] = $user->email;
         $details['contact'] = $userContact;
-        $details['name'] = $data['name'];
+        $details['name'] = $userName;
         $details['referrerid'] = $data['referrer'];
         $details['uniqueid'] = $randomId;
         $details['view'] = 'welcomeMail';

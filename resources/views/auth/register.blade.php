@@ -650,6 +650,27 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="auth-alert-banner auth-alert-error">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="auth-alert-banner auth-alert-error" style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span>Registration Failed:</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.82rem; list-style-type: disc; color: #FFFFFF;">
+                        @foreach ($errors->all() as $errorMsg)
+                            <li>{{ $errorMsg }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div id="regWeb3Alert" class="auth-alert-banner auth-alert-error" style="display: none;">
                 <i class="fas fa-circle-exclamation"></i>
                 <span id="regWeb3AlertText"></span>
@@ -658,8 +679,8 @@
             @if(!session('success'))
             
             @php
-                $prefilledWallet = request('wallet', $wallet ?? '');
-                $prefilledRef = !empty($userid) ? $userid : request('ref', request('sponsor', request('referral', old('referrer', ''))));
+                $prefilledWallet = old('wallet_address', request('wallet', $wallet ?? ''));
+                $prefilledRef = old('referrer', !empty($userid) ? $userid : request('ref', request('sponsor', request('referral', ''))));
             @endphp
 
             <!-- Web3 Wallet Connection Banner -->
@@ -667,6 +688,13 @@
                 <i class="fas fa-circle-check" style="color: #00FF88;"></i>
                 <span>Linked BEP-20 Wallet: <strong id="walletDisplay">{{ !empty($prefilledWallet) ? substr($prefilledWallet, 0, 6) . '...' . substr($prefilledWallet, -4) : '' }}</strong></span>
             </div>
+
+            @error('wallet_address')
+                <div class="auth-alert-banner auth-alert-error" style="margin-top: -6px;">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
 
             <div class="wallet-prompt-banner" id="walletPromptBox" style="{{ empty($prefilledWallet) ? 'display: flex;' : 'display: none;' }}">
                 <button type="button" class="btn-submit-gold" id="btnConnectRegWallet" style="height: 46px; font-size: 0.92rem; background: linear-gradient(135deg, #F5A623 0%, #D48806 100%);">
@@ -708,38 +736,7 @@
                     @enderror
                 </div>
 
-                <!-- Full Name -->
-                <div class="form-field-group">
-                    <label class="field-label" for="name">
-                        <span><i class="fas fa-user label-icon"></i> Full Name</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-signature"></i>
-                        </div>
-                        <input type="text" name="name" id="name" class="input-control-styled" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
-                    </div>
-                    @error('name')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
 
-                <!-- Email Address (Optional) -->
-                <div class="form-field-group">
-                    <label class="field-label" for="email">
-                        <span><i class="fas fa-envelope label-icon"></i> Email Address <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-at"></i>
-                        </div>
-                        <input type="email" name="email" id="email" class="input-control-styled" placeholder="Enter your email address (Optional)" value="{{ old('email') }}" autocomplete="email">
-                    </div>
-                    @error('email')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
 
                 <!-- Contact & Country Code (Optional) -->
                 <div class="form-field-group">
