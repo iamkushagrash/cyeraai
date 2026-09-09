@@ -1,20 +1,16 @@
 @php 
     $isRoot = $isRoot ?? false;
     $isActive = (strtolower($user->status ?? '') == 'active' || $user->status == '1');
-    $w = $user->walletaddress ?? $user->bep20address ?? '';
+    $initial = strtoupper(substr($user->name ?? $user->userid ?? 'U', 0, 1));
 @endphp
 
 <div class="user-node {{ $isRoot ? 'root' : '' }}" data-user-id="{{ $user->id }}">
-    <div class="node-head-row" style="justify-content: center; gap: 6px;">
-        <span class="node-avatar-circle" style="width: 22px; height: 22px; font-size: 0.65rem;"><i class="fas fa-user"></i></span>
-        <span class="node-uid-badge" style="margin: 0; font-size: 0.78rem; font-weight: 800;">{{ $user->userid }}</span>
+    <div class="node-head-row">
+        <span class="node-avatar-circle">{{ $initial }}</span>
+        <span class="node-user-name" title="{{ $user->name }}">{{ $user->name ?: 'Community Member' }}</span>
     </div>
 
-    @if(!empty($w))
-    <span style="font-family: monospace; font-size: 0.65rem; color: #00FF88; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 6px; padding: 2px 6px; margin: 4px 0; display: inline-block;">
-        {{ substr($w, 0, 6) }}...{{ substr($w, -4) }}
-    </span>
-    @endif
+    <span class="node-uid-badge">{{ $user->userid }}</span>
 
     <div class="node-stats-grid">
         <div class="node-stat-item">

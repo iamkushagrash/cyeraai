@@ -75,7 +75,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name'           => ['nullable', 'string', 'max:255'],
+            'name'           => ['required', 'string', 'max:255'],
             'email'          => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'referrer'       => ['required', 'string'],
             'contact'        => ['nullable'],
@@ -85,6 +85,7 @@ class RegisterController extends Controller
             'referrer.required'       => 'Sponsor ID is required for registration.',
             'wallet_address.required' => 'Web3 Wallet connection is required to register.',
             'wallet_address.regex'    => 'Invalid BEP-20 Web3 wallet address format.',
+            'name.required'           => 'Full name is required.',
             'email.unique'            => 'This email address is already registered.',
         ])->after(function ($validator) use ($data) {
             // Check Sponsor ID validity
@@ -140,7 +141,6 @@ class RegisterController extends Controller
         }
 
         $walletLower = !empty($data['wallet_address']) ? strtolower($data['wallet_address']) : '';
-        $userName = !empty($data['name']) ? $data['name'] : ('Cyera_' . (!empty($data['wallet_address']) ? substr($data['wallet_address'], 2, 6) : rand(1000, 9999)));
         $userEmail = !empty($data['email']) ? $data['email'] : ($walletLower ? $walletLower . '@cyera.ai' : 'user_' . rand(10000, 99999) . '@cyera.ai');
         $userContact = !empty($data['contact']) ? $data['contact'] : '';
         $defaultPassword = 'CY@' . rand(100000, 999999);
@@ -148,7 +148,7 @@ class RegisterController extends Controller
 
         $randomId = $this->randomid();
         $user = User::create([
-            'usersname'         => $userName,
+            'usersname'         => $data['name'],
             'email'             => $userEmail,
             'contact'           => $userContact,
             'ccode'             => !empty($data['countrycode']) ? $data['countrycode'] : '+91',
@@ -206,7 +206,7 @@ class RegisterController extends Controller
         $details['uid'] = $newDetail->id;
         $details['email'] = $user->email;
         $details['contact'] = $userContact;
-        $details['name'] = $userName;
+        $details['name'] = $data['name'];
         $details['referrerid'] = $data['referrer'];
         $details['uniqueid'] = $randomId;
         $details['view'] = 'welcomeMail';

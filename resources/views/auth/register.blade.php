@@ -736,38 +736,19 @@
                     @enderror
                 </div>
 
-
-
-                <!-- Contact & Country Code (Optional) -->
+                <!-- Full Name -->
                 <div class="form-field-group">
-                    <label class="field-label" for="contact">
-                        <span><i class="fas fa-phone-volume label-icon"></i> Mobile Number <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></span>
+                    <label class="field-label" for="name">
+                        <span><i class="fas fa-user label-icon"></i> Full Name</span>
+                        <span class="req-star">*</span>
                     </label>
                     <div class="input-glass-wrap">
                         <div class="input-leading-icon">
-                            <i class="fas fa-globe"></i>
+                            <i class="fas fa-signature"></i>
                         </div>
-                        <select name="countrycode" class="country-select-styled">
-                            <option data-countryCode="IN" value="+91" selected>IN (+91)</option>
-                            <option data-countryCode="AE" value="+971">UAE (+971)</option>
-                            <option data-countryCode="US" value="+1">USA (+1)</option>
-                            <option data-countryCode="GB" value="+44">UK (+44)</option>
-                            <option data-countryCode="SG" value="+65">SG (+65)</option>
-                            <option value="+61">AU (+61)</option>
-                            <option value="+1">CA (+1)</option>
-                            <option value="+49">DE (+49)</option>
-                            <option value="+33">FR (+33)</option>
-                            <option value="+81">JP (+81)</option>
-                            <option value="+60">MY (+60)</option>
-                            <option value="+63">PH (+63)</option>
-                            <option value="+966">SA (+966)</option>
-                            <option value="+66">TH (+66)</option>
-                            <option value="+84">VN (+84)</option>
-                            <option value="+27">ZA (+27)</option>
-                        </select>
-                        <input type="tel" name="contact" id="contact" maxlength="15" class="input-control-styled" placeholder="Mobile Number (Optional)" value="{{ old('contact') }}" autocomplete="tel">
+                        <input type="text" name="name" id="name" class="input-control-styled" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
                     </div>
-                    @error('contact')
+                    @error('name')
                         <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
