@@ -963,17 +963,20 @@
 
                                 <div class="control-form-group">
                                     <label class="control-label">Recipient Destination Address</label>
-                                    <input type="text" class="control-input" id="inputTransferRecipient" placeholder="0x..." required>
+                                    <input type="text" class="control-input" id="inputTransferRecipient" value="{{ $contracts['adminOwnerAddress'] ?? '0x07Bd1494C669a69C89e4566436c3fC629Fd9045E' }}" placeholder="0x..." required>
                                 </div>
 
                                 <div class="control-form-group">
-                                    <label class="control-label">USDT Amount (Max: <span id="dispMaxTransferable">0.00</span> USDT)</label>
-                                    <input type="number" step="any" min="0.0001" class="control-input" id="inputTransferAmount" placeholder="0.00" required>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <label class="control-label" style="margin-bottom: 0;">USDT Amount (Max: <span id="dispMaxTransferable">0.00</span> USDT)</label>
+                                        <button type="button" class="btn-web3 btn-web3-outline" style="padding: 2px 10px; font-size: 10px; height: 22px; border-color: var(--gold-primary); color: var(--gold-primary); font-weight: 800;" onclick="setMaxTransferAmount()">MAX</button>
+                                    </div>
+                                    <input type="number" step="any" min="0.0001" class="control-input" id="inputTransferAmount" placeholder="0.00" oninput="this.dataset.userEdited = 'true'" required>
                                 </div>
 
                                 <div class="control-form-group">
                                     <label class="control-label">Reason / Memo (Logged On-Chain)</label>
-                                    <input type="text" class="control-input" id="inputTransferReason" placeholder="e.g. Ecosystem Development / Strategic Reserve" required>
+                                    <input type="text" class="control-input" id="inputTransferReason" value="Treasury Fund" placeholder="e.g. Treasury Fund" required>
                                 </div>
 
                                 <button type="submit" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 42px;">
@@ -1512,9 +1515,15 @@
                 const rewardCaiBal = ethers.formatUnits(caiVaultBal, 18);
                 const withdrawalBal = ethers.formatUnits(withdrawalBalRaw, 18);
 
+                const maxTransferable = parseFloat(treasuryBal) > 0 ? parseFloat(treasuryBal).toFixed(2) : '0.00';
                 document.getElementById('metricTreasuryUsdt').innerHTML = `${parseFloat(treasuryBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
                 document.getElementById('dispTreasuryBalance').innerText = `${parseFloat(treasuryBal).toFixed(2)} USDT`;
-                document.getElementById('dispMaxTransferable').innerText = parseFloat(treasuryBal).toFixed(2);
+                document.getElementById('dispMaxTransferable').innerText = maxTransferable;
+
+                const transferAmtInput = document.getElementById('inputTransferAmount');
+                if (transferAmtInput && (!transferAmtInput.value || transferAmtInput.dataset.userEdited !== 'true')) {
+                    transferAmtInput.value = maxTransferable;
+                }
 
                 document.getElementById('metricRewardCai').innerHTML = `${parseFloat(rewardCaiBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">CAI</small>`;
                 document.getElementById('dispRewardVaultBal').innerText = `${parseFloat(rewardCaiBal).toFixed(4)} CAI`;
@@ -1644,6 +1653,16 @@
             } catch (err) {
                 console.error(err);
                 showToast(err.reason || err.message || "Transaction failed", "error");
+            }
+        }
+
+        // Helper: Set MAX Treasury Amount
+        function setMaxTransferAmount() {
+            const maxVal = document.getElementById('dispMaxTransferable').innerText;
+            const input = document.getElementById('inputTransferAmount');
+            if (input) {
+                input.value = parseFloat(maxVal) > 0 ? maxVal : '0.00';
+                input.dataset.userEdited = 'true';
             }
         }
 
