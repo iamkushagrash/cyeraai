@@ -111,11 +111,15 @@ Route::get('/terms', function () {
 
 Auth::routes();
 
-// Web3 dApp Authentication (1-Click MetaMask & Auto-Register with Cryptographic Proof)
+// Web3 dApp Authentication & Multi-Account Switch Guard
 Route::post('/auth/check-wallet', 'Auth\Web3AuthController@checkWallet');
 Route::post('/auth/web3-nonce', 'Auth\Web3AuthController@getNonce');
 Route::post('/auth/web3-login', 'Auth\Web3AuthController@web3Login');
 Route::post('/auth/web3-register', 'Auth\Web3AuthController@web3Register');
+Route::any('/auth/web3-logout', 'Auth\Web3AuthController@web3Logout');
+Route::get('/auth/session-status', 'Auth\Web3AuthController@sessionStatus');
+Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
+
 
 Route::get('/home', 'HomeController@index')->name('home');
 

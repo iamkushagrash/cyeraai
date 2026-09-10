@@ -49,11 +49,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             overflow-x: hidden;
             overflow-y: auto;
             position: relative;
-            padding: 40px 16px 48px 16px;
+            padding: 24px 16px;
         }
 
         /* Master Container */
@@ -65,7 +65,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            margin: 0 auto;
+            margin: auto;
             animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
@@ -920,6 +920,55 @@
             }
         });
     }
+
+    // Auto-detect connected wallet & listen for live account changes on login page
+    (function initLoginWeb3Watcher() {
+        const provider = getMetaMaskProvider();
+        if (!provider) return;
+
+        async function checkConnectedAccount() {
+            try {
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                if (accounts && accounts.length > 0) {
+                    detectedWalletAddress = accounts[0];
+                    const shortAddr = detectedWalletAddress.substring(0, 6) + '...' + detectedWalletAddress.substring(detectedWalletAddress.length - 4);
+                    if (web3BtnText && !btnConnectWeb3.style.pointerEvents.includes('none')) {
+                        web3BtnText.innerText = 'Connect: ' + shortAddr;
+                    }
+
+                    // If auto-connect parameter is present in URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('auto_connect') === '1') {
+                        triggerWeb3Login(detectedWalletAddress, provider);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        checkConnectedAccount();
+
+        if (typeof provider.on === 'function') {
+            provider.on('accountsChanged', function (accounts) {
+                if (accounts && accounts.length > 0) {
+                    detectedWalletAddress = accounts[0];
+                    const shortAddr = detectedWalletAddress.substring(0, 6) + '...' + detectedWalletAddress.substring(detectedWalletAddress.length - 4);
+                    if (web3BtnText) {
+                        web3BtnText.innerText = 'Connect: ' + shortAddr;
+                    }
+                    if (web3Alert) web3Alert.style.display = 'none';
+                } else {
+                    detectedWalletAddress = null;
+                    if (web3BtnText) {
+                        web3BtnText.innerText = 'Connect MetaMask / TrustWallet';
+                    }
+                }
+            });
+
+            provider.on('chainChanged', function () {
+                window.location.reload();
+            });
+        }
+    })();
     </script>
 </body>
 </html>

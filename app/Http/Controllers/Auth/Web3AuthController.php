@@ -411,4 +411,58 @@ class Web3AuthController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Web3 Log out & flush session (supports AJAX / JSON and direct GET/POST)
+     */
+    public function web3Logout(Request $request)
+    {
+        Auth::logout();
+        Session::flush();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Logged out successfully.',
+                'redirect' => url('/login')
+            ]);
+        }
+
+        return redirect('/login');
+    }
+
+    /**
+     * Get active session identity & wallet address
+     */
+    public function sessionStatus(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'unauthenticated',
+                'is_logged_in' => false,
+                'wallet_address' => null
+            ]);
+        }
+
+        $authUserId = Session::get('user.id') ?? $user->id;
+        $assetObj = AssetDetail::where('userid', $authUserId)->first();
+        $wallet = '';
+        if ($assetObj && !empty($assetObj->usdtbep20addr)) {
+            $wallet = $assetObj->usdtbep20addr;
+        } elseif ($assetObj && !empty($assetObj->bep20addr)) {
+            $wallet = $assetObj->bep20addr;
+        } else {
+            $wallet = $user->email;
+        }
+
+        return response()->json([
+            'status' => 'authenticated',
+            'is_logged_in' => true,
+            'user_id' => $user->id,
+            'uuid' => $user->uuid,
+            'wallet_address' => strtolower($wallet)
+        ]);
+    }
 }
+

@@ -32,3 +32,7 @@
     </header>
 </div>
 
+<!-- Global Web3 Account Switch & Multi-Wallet Sync Guard -->
+@include('user.web3-guard')
+
+
