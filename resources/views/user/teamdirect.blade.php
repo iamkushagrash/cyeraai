@@ -499,9 +499,6 @@
                 <div class="mecha-card-subtitle">All partners sponsored directly by your User ID</div>
             </div>
         </div>
-        <a href="{{ url('/User/NewRegistration') }}" class="mecha-btn-gold" style="width: auto; height: 30px; padding: 0 12px; font-size: 10px;">
-            <i class="fas fa-user-plus"></i> NEW REGISTRATION
-        </a>
     </div>
 
     <!-- Controls Toolbar (Single Compact Row) -->

@@ -125,7 +125,8 @@
                     foreach ($activeDeposits as $dep) {
                         try {
                             $totalRemainingCapping += (float) \Crypt::decrypt($dep->capamount);
-                        } catch (\Exception $e) {}
+                        } catch (\Exception $e) {
+                        }
                     }
                     $cappingConsumed = max(0, $maxCapping - $totalRemainingCapping);
                     $filledPct = ($maxCapping > 0) ? ($cappingConsumed / $maxCapping) * 100 : 0;
@@ -179,6 +180,27 @@
                 $cpsUsdDynamic = $cpsCaiTotal * $caiPrice;
 
                 $readyToReleaseCai = $claimableCai + ($caiPrice > 0 ? (($directRemaining + $levelRemaining + $poolRemaining + $rankRemaining) / $caiPrice) : 0.00);
+
+                // Real-time Streaming Daily Staking Yield Parameters (04:30 AM Cycle)
+                $userBooster = (int) ($data['userDetail']->booster ?? 1);
+                $dailyRoiRate = 0.50;
+                if ($userBooster == 3) {
+                    $dailyRoiRate = 1.50;
+                } elseif ($userBooster == 2) {
+                    $dailyRoiRate = 1.00;
+                }
+                $dailyExpectedRoiUsdt = ($totalInvested > 0 && !$isCapCompleted && $data['userDetail']->userstatus == 1) ? (($totalInvested * $dailyRoiRate) / 100) : 0.00;
+                $dailyExpectedRoiCai = ($caiPrice > 0) ? ($dailyExpectedRoiUsdt / $caiPrice) : 0.00;
+
+                $nowKolkata = \Carbon\Carbon::now('Asia/Kolkata');
+                $cronToday = \Carbon\Carbon::today('Asia/Kolkata')->setTime(4, 30, 0);
+                if ($nowKolkata->greaterThanOrEqualTo($cronToday)) {
+                    $lastCronMs = $cronToday->timestamp * 1000;
+                    $nextCronMs = $cronToday->copy()->addDay()->timestamp * 1000;
+                } else {
+                    $lastCronMs = $cronToday->copy()->subDay()->timestamp * 1000;
+                    $nextCronMs = $cronToday->timestamp * 1000;
+                }
 
                 // Fund Wallet Balance (Account Deposit)
                 $fundWalletDeposit = \App\AccountDeposit::where('userid', $uid)->first();
@@ -374,12 +396,15 @@
                             <!-- Top Tier: Status & Rank (Left) + Fund Wallet (Right) -->
                             <div class="hero-strip-top-row">
                                 <div class="strip-item-status">
-                                    <span class="strip-col-lbl"><i class="fas fa-shield-halved" style="color: #FFD700;"></i> STATUS & RANK</span>
+                                    <span class="strip-col-lbl"><i class="fas fa-shield-halved"
+                                            style="color: #FFD700;"></i> STATUS & RANK</span>
                                     <div class="strip-val-wrap">
                                         @if($isUserActive)
-                                            <span class="strip-status-pill active"><i class="fas fa-circle-check"></i> ACTIVE</span>
+                                            <span class="strip-status-pill active"><i class="fas fa-circle-check"></i>
+                                                ACTIVE</span>
                                         @else
-                                            <span class="strip-status-pill inactive"><i class="fas fa-circle-xmark"></i> INACTIVE</span>
+                                            <span class="strip-status-pill inactive"><i class="fas fa-circle-xmark"></i>
+                                                INACTIVE</span>
                                         @endif
                                         <span class="strip-status-pill rank-pill" title="Current Rank">
                                             <i class="fas fa-crown"></i> {{ $userRankName }}
@@ -388,9 +413,11 @@
                                 </div>
 
                                 <div class="strip-item-fund">
-                                    <span class="strip-col-lbl"><i class="fas fa-wallet" style="color: #00FF88;"></i> FUND WALLET</span>
+                                    <span class="strip-col-lbl"><i class="fas fa-wallet" style="color: #00FF88;"></i>
+                                        FUND WALLET</span>
                                     <div class="strip-val-wrap">
-                                        <span class="strip-col-val fund-val">${{ number_format($fundWalletBalance, 2) }}</span>
+                                        <span
+                                            class="strip-col-val fund-val">${{ number_format($fundWalletBalance, 2) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -398,12 +425,14 @@
                             <!-- Bottom Tier: Ready to Claim ROI (Left) + Claim ROI Action (Right) -->
                             <div class="hero-strip-bottom-row">
                                 <div class="strip-item-claim-info">
-                                    <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i> READY TO CLAIM ROI</span>
+                                    <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i>
+                                        READY TO CLAIM ROI</span>
                                     <div class="strip-val-wrap">
                                         <span class="strip-roi-amount-cai">
                                             {{ number_format($claimableCai, 2) }} <span class="unit-cai">CAI</span>
                                         </span>
-                                        <span class="strip-roi-amount-usd">(${{ number_format($claimableUsdDynamic, 2) }})</span>
+                                        <span
+                                            class="strip-roi-amount-usd">(${{ number_format($claimableUsdDynamic, 2) }})</span>
                                     </div>
                                 </div>
 
@@ -501,7 +530,38 @@
                         </button>
                     </div>
                 </div>
+                <!-- 2. Real-Time Streaming Daily Yield Accrual (Live Ticking since 04:30 AM) -->
+                <div class="hud-live-yield-standalone" onclick="window.location.href='{{ url('/User/RoiIncome') }}'">
+                    <div class="live-yield-header-bar">
+                        <div class="live-yield-title-wrap">
+                            <span class="pulse-green-dot"></span>
+                            <span class="live-yield-title-txt">LIVE ACCRUING YIELD (TODAY)</span>
+                            <span class="live-yield-rate-tag">{{ $dailyRoiRate }}% / DAY</span>
+                        </div>
+                        <div class="live-yield-cron-timer" title="Next Cron Payout at 04:30 AM">
+                            <i class="fas fa-clock" style="color: #FFD700; font-size: 7.5px;"></i>
+                            <span>Next Credit in:</span>
+                            <strong id="dashCronCountdownTxt">--h : --m : --s</strong>
+                        </div>
+                    </div>
 
+                    <div class="live-yield-grid-row">
+                        <div class="live-yield-col-accrued">
+
+                            <div class="live-yield-val-wrap">
+                                <span class="live-yield-val-usd" id="dashLiveAccruedUsd">$0.0000</span>
+                                <span class="live-yield-val-cai">(<span id="dashLiveAccruedCai">0.0000</span>
+                                    CAI)</span>
+                            </div>
+                        </div>
+                        <div class="live-yield-col-target">
+                            <span class="live-yield-lbl">24H Expected ROI</span>
+                            <div class="live-yield-target-val">
+                                <strong>${{ number_format($dailyExpectedRoiUsdt, 2) }}</strong> <small>USDT</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- ============================================================
                  3A. GLOBAL TURNOVER POOLS — SECTION DIVIDER & 2X2 STANDALONE CARDS
                  ============================================================ -->
@@ -510,7 +570,7 @@
                     $wQual = $poolQualifications['weekly'];
                     $mQual = $poolQualifications['monthly'];
 
-                    // Global Eligible Achievers Counts
+                    // Global Eligible Achievers Counts & Real-time Pools Calculation
                     // 1. Daily Pool: Active sponsors (self >= $100) of members who staked TODAY
                     $todayDeposits = \App\StackingDeposite::where('status', 1)
                         ->where('created_at', '>=', \Carbon\Carbon::today())
@@ -521,16 +581,36 @@
                         $stakedUser = \App\UserDetails::where('id', $dep->userid)->orWhere('userid', $dep->userid)->first();
                         if ($stakedUser && $stakedUser->sponsorid > 0) {
                             $sponsor = \App\UserDetails::where('id', $stakedUser->sponsorid)->orWhere('userid', $stakedUser->sponsorid)->first();
-                            if ($sponsor && $sponsor->userstatus == 1 && $sponsor->capping != 1 && (float)$sponsor->current_self_investment >= 100) {
+                            if ($sponsor && $sponsor->userstatus == 1 && $sponsor->capping != 1 && (float) $sponsor->current_self_investment >= 100) {
                                 $dailySponsorMap[$sponsor->id] = true;
                             }
                         }
                     }
                     $globalDailyEligible = count($dailySponsorMap);
+                    $todayDepositsVolume = (float) $todayDeposits->sum('usdt');
+                    $todayDailyPoolFund = ($todayDepositsVolume * 1.5) / 100;
+                    $todayDailyPerUserShare = ($globalDailyEligible > 0 && $todayDailyPoolFund > 0) ? ($todayDailyPoolFund / $globalDailyEligible) : 0;
 
+                    // 2. Weekly Pool (1.5%)
                     $globalWeeklyEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('active_direct', '>=', 5)->count();
+                    $thisWeekDepositsVolume = (float) \App\StackingDeposite::where('status', 1)
+                        ->where('created_at', '>=', \Carbon\Carbon::now()->startOfWeek())
+                        ->sum('usdt');
+                    $thisWeekPoolFund = ($thisWeekDepositsVolume * 1.5) / 100;
+                    $thisWeekPerUserShare = ($globalWeeklyEligible > 0 && $thisWeekPoolFund > 0) ? ($thisWeekPoolFund / $globalWeeklyEligible) : 0;
+
+                    // 3. Monthly Directs Pool (2.0%)
                     $globalMonthlyDirEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('active_direct', '>=', 15)->count();
+                    $thisMonthDepositsVolume = (float) \App\StackingDeposite::where('status', 1)
+                        ->where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())
+                        ->sum('usdt');
+                    $thisMonthDirPoolFund = ($thisMonthDepositsVolume * 2.0) / 100;
+                    $thisMonthDirPerUserShare = ($globalMonthlyDirEligible > 0 && $thisMonthDirPoolFund > 0) ? ($thisMonthDirPoolFund / $globalMonthlyDirEligible) : 0;
+
+                    // 4. Monthly Team Volume Pool (2.0%)
                     $globalMonthlyVolEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('total_investment', '>=', 10000)->count();
+                    $thisMonthVolPoolFund = ($thisMonthDepositsVolume * 2.0) / 100;
+                    $thisMonthVolPerUserShare = ($globalMonthlyVolEligible > 0 && $thisMonthVolPoolFund > 0) ? ($thisMonthVolPoolFund / $globalMonthlyVolEligible) : 0;
 
                     // Pool Distribution Countdown Timestamps (Milliseconds)
                     $dailyPoolEndMs = \Carbon\Carbon::now()->endOfDay()->timestamp * 1000;
@@ -543,7 +623,8 @@
                 <!-- 1. Central Section Header with Left and Right Lines -->
                 <div class="hud-section-divider-bar">
                     <div class="hud-divider-line left"></div>
-                    <div class="hud-divider-title-chip" onclick="window.location.href='{{ url('/User/PoolIncome') }}'" style="cursor: pointer;">
+                    <div class="hud-divider-title-chip" onclick="window.location.href='{{ url('/User/PoolIncome') }}'"
+                        style="cursor: pointer;">
                         <div class="hud-divider-icon">
                             <i class="fas fa-layer-group"></i>
                         </div>
@@ -556,7 +637,8 @@
                 <!-- 2. Standalone 2x2 Grid of Pool Cards -->
                 <div class="pool-grid-2x2">
                     <!-- Card 1: Daily Pool (1.5%) -->
-                    <div class="pool-standalone-card-2x2 {{ $dQual['is_qualified'] ? 'qualified' : '' }}" onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
+                    <div class="pool-standalone-card-2x2 {{ $dQual['is_qualified'] ? 'qualified' : '' }}"
+                        onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
                         <!-- 1. Top Bar: Icon + Status Badge -->
                         <div class="pool-card-top-bar">
                             <div class="pool-card-icon-bubble">
@@ -573,11 +655,28 @@
                             <div class="pool-card-dividend-pill">1.5% DAILY DIVIDEND</div>
                         </div>
 
-                        <!-- 3. Telemetry: 2 Clean Rows (Eligible Achievers + Live Countdown) -->
+                        <!-- 3. Telemetry: Pool Fund, Est Share, Eligible, Countdown -->
                         <div class="pool-card-telemetry-box">
                             <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl fund">
+                                    <i class="fas fa-coins" style="color: #FFD700;"></i> Pool Fund
+                                </span>
+                                <span class="pool-telemetry-val fund">
+                                    ${{ number_format($todayDailyPoolFund, 2) }}
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl share">
+                                    <i class="fas fa-hand-holding-dollar" style="color: #00FF88;"></i> Est. Share
+                                </span>
+                                <span class="pool-telemetry-val share">
+                                    ${{ number_format($todayDailyPerUserShare, 2) }} <small
+                                        style="font-size:7px; color:#A0AEC0;">/usr</small>
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl eligible">
-                                    <i class="fas fa-users"></i> Eligible
+                                    <i class="fas fa-users" style="color: #00D2FF;"></i> Eligible
                                 </span>
                                 <span class="pool-telemetry-val eligible">
                                     <strong>{{ $globalDailyEligible }}</strong> Users
@@ -585,9 +684,10 @@
                             </div>
                             <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl timer">
-                                    <i class="fas fa-clock"></i> Ends In
+                                    <i class="fas fa-clock" style="color: #FFB300;"></i> Ends In
                                 </span>
-                                <span class="pool-telemetry-val timer pool-countdown-val" data-pool-timer="{{ $dailyPoolEndMs }}">
+                                <span class="pool-telemetry-val timer pool-countdown-val"
+                                    data-pool-timer="{{ $dailyPoolEndMs }}">
                                     --h : --m : --s
                                 </span>
                             </div>
@@ -595,12 +695,15 @@
 
                         <!-- 4. Target Progress & Status -->
                         <div class="pool-card-body-block">
-                            <div class="pool-card-val-row" style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <div class="pool-card-val-row"
+                                style="display: flex; align-items: baseline; justify-content: space-between;">
                                 <span class="pool-card-val-text">${{ number_format($dQual['current_self'], 0) }}</span>
                                 <span class="pool-card-target-text">/ $100 Self</span>
                             </div>
                             <div class="pool-card-progress-track">
-                                <div class="pool-card-progress-bar-fill" style="width: {{ $dQual['progress_pct'] }}%; background: linear-gradient(90deg, #F5A623, #00FF88);"></div>
+                                <div class="pool-card-progress-bar-fill"
+                                    style="width: {{ $dQual['progress_pct'] }}%; background: linear-gradient(90deg, #F5A623, #00FF88);">
+                                </div>
                             </div>
                             @if($dQual['is_qualified'])
                                 <div class="pool-card-status-note qualified">
@@ -608,7 +711,8 @@
                                 </div>
                             @elseif($dQual['current_self'] < 100)
                                 <div class="pool-card-status-note">
-                                    <i class="fas fa-lock"></i> Need <strong>${{ number_format(max(0, 100 - $dQual['current_self']), 0) }}</strong> Self
+                                    <i class="fas fa-lock"></i> Need
+                                    <strong>${{ number_format(max(0, 100 - $dQual['current_self']), 0) }}</strong> Self
                                 </div>
                             @else
                                 <div class="pool-card-status-note">
@@ -619,7 +723,8 @@
                     </div>
 
                     <!-- Card 2: Weekly Pool (1.5%) -->
-                    <div class="pool-standalone-card-2x2 {{ $wQual['is_qualified'] ? 'qualified' : '' }}" onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
+                    <div class="pool-standalone-card-2x2 {{ $wQual['is_qualified'] ? 'qualified' : '' }}"
+                        onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
                         <!-- 1. Top Bar -->
                         <div class="pool-card-top-bar">
                             <div class="pool-card-icon-bubble">
@@ -636,11 +741,28 @@
                             <div class="pool-card-dividend-pill">1.5% PROTOCOL POOL</div>
                         </div>
 
-                        <!-- 3. Telemetry: 2 Clean Rows -->
+                        <!-- 3. Telemetry: Pool Fund, Est Share, Eligible, Countdown -->
                         <div class="pool-card-telemetry-box">
                             <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl fund">
+                                    <i class="fas fa-coins" style="color: #FFD700;"></i> Pool Fund
+                                </span>
+                                <span class="pool-telemetry-val fund">
+                                    ${{ number_format($thisWeekPoolFund, 2) }}
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl share">
+                                    <i class="fas fa-hand-holding-dollar" style="color: #00FF88;"></i> Est. Share
+                                </span>
+                                <span class="pool-telemetry-val share">
+                                    ${{ number_format($thisWeekPerUserShare, 2) }} <small
+                                        style="font-size:7px; color:#A0AEC0;">/usr</small>
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl eligible">
-                                    <i class="fas fa-users"></i> Eligible
+                                    <i class="fas fa-users" style="color: #00D2FF;"></i> Eligible
                                 </span>
                                 <span class="pool-telemetry-val eligible">
                                     <strong>{{ $globalWeeklyEligible }}</strong> Users
@@ -648,9 +770,10 @@
                             </div>
                             <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl timer">
-                                    <i class="fas fa-clock"></i> Ends In
+                                    <i class="fas fa-clock" style="color: #FFB300;"></i> Ends In
                                 </span>
-                                <span class="pool-telemetry-val timer pool-countdown-val" data-pool-timer="{{ $weeklyPoolEndMs }}">
+                                <span class="pool-telemetry-val timer pool-countdown-val"
+                                    data-pool-timer="{{ $weeklyPoolEndMs }}">
                                     --d : --h : --m
                                 </span>
                             </div>
@@ -658,12 +781,15 @@
 
                         <!-- 4. Body -->
                         <div class="pool-card-body-block">
-                            <div class="pool-card-val-row" style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <div class="pool-card-val-row"
+                                style="display: flex; align-items: baseline; justify-content: space-between;">
                                 <span class="pool-card-val-text">{{ $wQual['current_directs'] }}</span>
                                 <span class="pool-card-target-text">/ 5 Directs ($100+)</span>
                             </div>
                             <div class="pool-card-progress-track">
-                                <div class="pool-card-progress-bar-fill" style="width: {{ $wQual['progress_pct'] }}%; background: linear-gradient(90deg, #F5A623, #00FF88);"></div>
+                                <div class="pool-card-progress-bar-fill"
+                                    style="width: {{ $wQual['progress_pct'] }}%; background: linear-gradient(90deg, #F5A623, #00FF88);">
+                                </div>
                             </div>
                             @if($wQual['is_qualified'])
                                 <div class="pool-card-status-note qualified">
@@ -671,14 +797,16 @@
                                 </div>
                             @else
                                 <div class="pool-card-status-note">
-                                    <i class="fas fa-lock"></i> Need <strong>{{ max(0, 5 - $wQual['current_directs']) }}</strong> Directs
+                                    <i class="fas fa-lock"></i> Need
+                                    <strong>{{ max(0, 5 - $wQual['current_directs']) }}</strong> Directs
                                 </div>
                             @endif
                         </div>
                     </div>
 
                     <!-- Card 3: Monthly Pool Directs (2.0%) -->
-                    <div class="pool-standalone-card-2x2 {{ $mQual['is_qualified'] ? 'qualified' : '' }}" onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
+                    <div class="pool-standalone-card-2x2 {{ $mQual['is_qualified'] ? 'qualified' : '' }}"
+                        onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
                         <!-- 1. Top Bar -->
                         <div class="pool-card-top-bar">
                             <div class="pool-card-icon-bubble">
@@ -695,11 +823,28 @@
                             <div class="pool-card-dividend-pill">2.0% DIRECTS POOL</div>
                         </div>
 
-                        <!-- 3. Telemetry: 2 Clean Rows -->
+                        <!-- 3. Telemetry: Pool Fund, Est Share, Eligible, Countdown -->
                         <div class="pool-card-telemetry-box">
                             <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl fund">
+                                    <i class="fas fa-coins" style="color: #FFD700;"></i> Pool Fund
+                                </span>
+                                <span class="pool-telemetry-val fund">
+                                    ${{ number_format($thisMonthDirPoolFund, 2) }}
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl share">
+                                    <i class="fas fa-hand-holding-dollar" style="color: #00FF88;"></i> Est. Share
+                                </span>
+                                <span class="pool-telemetry-val share">
+                                    ${{ number_format($thisMonthDirPerUserShare, 2) }} <small
+                                        style="font-size:7px; color:#A0AEC0;">/usr</small>
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl eligible">
-                                    <i class="fas fa-users"></i> Eligible
+                                    <i class="fas fa-users" style="color: #00D2FF;"></i> Eligible
                                 </span>
                                 <span class="pool-telemetry-val eligible">
                                     <strong>{{ $globalMonthlyDirEligible }}</strong> Users
@@ -707,9 +852,10 @@
                             </div>
                             <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl timer">
-                                    <i class="fas fa-clock"></i> Ends In
+                                    <i class="fas fa-clock" style="color: #FFB300;"></i> Ends In
                                 </span>
-                                <span class="pool-telemetry-val timer pool-countdown-val" data-pool-timer="{{ $monthlyPoolEndMs }}">
+                                <span class="pool-telemetry-val timer pool-countdown-val"
+                                    data-pool-timer="{{ $monthlyPoolEndMs }}">
                                     --d : --h : --m
                                 </span>
                             </div>
@@ -717,12 +863,15 @@
 
                         <!-- 4. Body -->
                         <div class="pool-card-body-block">
-                            <div class="pool-card-val-row" style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <div class="pool-card-val-row"
+                                style="display: flex; align-items: baseline; justify-content: space-between;">
                                 <span class="pool-card-val-text">{{ $mQual['current_directs'] }}</span>
                                 <span class="pool-card-target-text">/ 15 Directs ($100+)</span>
                             </div>
                             <div class="pool-card-progress-track">
-                                <div class="pool-card-progress-bar-fill" style="width: {{ min(100, round(($mQual['current_directs'] / 15) * 100)) }}%; background: linear-gradient(90deg, #F5A623, #00FF88);"></div>
+                                <div class="pool-card-progress-bar-fill"
+                                    style="width: {{ min(100, round(($mQual['current_directs'] / 15) * 100)) }}%; background: linear-gradient(90deg, #F5A623, #00FF88);">
+                                </div>
                             </div>
                             @if($mQual['current_directs'] >= 15)
                                 <div class="pool-card-status-note qualified">
@@ -730,14 +879,16 @@
                                 </div>
                             @else
                                 <div class="pool-card-status-note">
-                                    <i class="fas fa-lock"></i> Need <strong>{{ max(0, 15 - $mQual['current_directs']) }}</strong> Directs
+                                    <i class="fas fa-lock"></i> Need
+                                    <strong>{{ max(0, 15 - $mQual['current_directs']) }}</strong> Directs
                                 </div>
                             @endif
                         </div>
                     </div>
 
                     <!-- Card 4: Monthly Pool Volume (2.0%) -->
-                    <div class="pool-standalone-card-2x2 {{ $legsDone ? 'qualified' : '' }}" onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
+                    <div class="pool-standalone-card-2x2 {{ $legsDone ? 'qualified' : '' }}"
+                        onclick="window.location.href='{{ url('/User/PoolIncome') }}'">
                         <!-- 1. Top Bar -->
                         <div class="pool-card-top-bar">
                             <div class="pool-card-icon-bubble">
@@ -754,11 +905,28 @@
                             <div class="pool-card-dividend-pill">2.0% TEAM VOLUME</div>
                         </div>
 
-                        <!-- 3. Telemetry: 2 Clean Rows -->
+                        <!-- 3. Telemetry: Pool Fund, Est Share, Eligible, Countdown -->
                         <div class="pool-card-telemetry-box">
                             <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl fund">
+                                    <i class="fas fa-coins" style="color: #FFD700;"></i> Pool Fund
+                                </span>
+                                <span class="pool-telemetry-val fund">
+                                    ${{ number_format($thisMonthVolPoolFund, 2) }}
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
+                                <span class="pool-telemetry-lbl share">
+                                    <i class="fas fa-hand-holding-dollar" style="color: #00FF88;"></i> Est. Share
+                                </span>
+                                <span class="pool-telemetry-val share">
+                                    ${{ number_format($thisMonthVolPerUserShare, 2) }} <small
+                                        style="font-size:7px; color:#A0AEC0;">/usr</small>
+                                </span>
+                            </div>
+                            <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl eligible">
-                                    <i class="fas fa-users"></i> Eligible
+                                    <i class="fas fa-users" style="color: #00D2FF;"></i> Eligible
                                 </span>
                                 <span class="pool-telemetry-val eligible">
                                     <strong>{{ $globalMonthlyVolEligible }}</strong> Users
@@ -766,9 +934,10 @@
                             </div>
                             <div class="pool-telemetry-row-item">
                                 <span class="pool-telemetry-lbl timer">
-                                    <i class="fas fa-clock"></i> Ends In
+                                    <i class="fas fa-clock" style="color: #FFB300;"></i> Ends In
                                 </span>
-                                <span class="pool-telemetry-val timer pool-countdown-val" data-pool-timer="{{ $monthlyPoolEndMs }}">
+                                <span class="pool-telemetry-val timer pool-countdown-val"
+                                    data-pool-timer="{{ $monthlyPoolEndMs }}">
                                     --d : --h : --m
                                 </span>
                             </div>
@@ -776,12 +945,15 @@
 
                         <!-- 4. Body -->
                         <div class="pool-card-body-block">
-                            <div class="pool-card-val-row" style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <div class="pool-card-val-row"
+                                style="display: flex; align-items: baseline; justify-content: space-between;">
                                 <span class="pool-card-val-text">${{ number_format($mQual['current_power'], 0) }}</span>
                                 <span class="pool-card-target-text">/ $5K Power</span>
                             </div>
                             <div class="pool-card-progress-track">
-                                <div class="pool-card-progress-bar-fill" style="width: {{ min(100, round((min($mQual['current_power'] / 5000, $mQual['current_weaker'] / 5000)) * 100)) }}%; background: linear-gradient(90deg, #F5A623, #00FF88);"></div>
+                                <div class="pool-card-progress-bar-fill"
+                                    style="width: {{ min(100, round((min($mQual['current_power'] / 5000, $mQual['current_weaker'] / 5000)) * 100)) }}%; background: linear-gradient(90deg, #F5A623, #00FF88);">
+                                </div>
                             </div>
                             @if($legsDone)
                                 <div class="pool-card-status-note qualified">
@@ -789,7 +961,8 @@
                                 </div>
                             @else
                                 <div class="pool-card-status-note">
-                                    <i class="fas fa-lock"></i> Weak: <strong>${{ number_format($mQual['current_weaker'], 0) }}</strong> / $5K
+                                    <i class="fas fa-lock"></i> Weak:
+                                    <strong>${{ number_format($mQual['current_weaker'], 0) }}</strong> / $5K
                                 </div>
                             @endif
                         </div>
@@ -812,8 +985,11 @@
                     <div class="hud-divider-line right"></div>
                 </div>
 
-                <!-- 2. High-Tech Staking Yield Claim Banner -->
-                <div class="hud-claim-roi-standalone" onclick="window.location.href='{{ url('/User/RoiWithdrawRequest') }}'">
+
+
+                <!-- 3. High-Tech Staking Yield Claim Banner -->
+                <div class="hud-claim-roi-standalone"
+                    onclick="window.location.href='{{ url('/User/RoiWithdrawRequest') }}'">
                     <div class="claim-standalone-left">
                         <div class="claim-standalone-icon">
                             <i class="fas fa-bolt-lightning"></i>
@@ -821,12 +997,16 @@
                         <div class="claim-standalone-info">
                             <div class="claim-standalone-lbl">AVAILABLE STAKING YIELD</div>
                             <div class="claim-standalone-val-row">
-                                <span class="claim-standalone-cai">{{ ($claimableCai < 1 && $claimableCai > 0) ? number_format($claimableCai, 4) : number_format($claimableCai, 2) }} <small>CAI</small></span>
-                                <span class="claim-standalone-usd">≈ ${{ number_format($claimableUsdDynamic, 2) }}</span>
+                                <span
+                                    class="claim-standalone-cai">{{ ($claimableCai < 1 && $claimableCai > 0) ? number_format($claimableCai, 4) : number_format($claimableCai, 2) }}
+                                    <small>CAI</small></span>
+                                <span class="claim-standalone-usd">≈
+                                    ${{ number_format($claimableUsdDynamic, 2) }}</span>
                             </div>
                         </div>
                     </div>
-                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-claim-standalone" onclick="event.stopPropagation();">
+                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-claim-standalone"
+                        onclick="event.stopPropagation();">
                         <i class="fas fa-bolt"></i> CLAIM
                     </a>
                 </div>
@@ -847,7 +1027,9 @@
                         </div>
                         <div class="stream-card-body">
                             <div class="stream-card-val-row">
-                                <span class="stream-card-val val-cyan">{{ ($cpsCaiTotal < 1 && $cpsCaiTotal > 0) ? number_format($cpsCaiTotal, 4) : number_format($cpsCaiTotal, 2) }} <small>CAI</small></span>
+                                <span
+                                    class="stream-card-val val-cyan">{{ ($cpsCaiTotal < 1 && $cpsCaiTotal > 0) ? number_format($cpsCaiTotal, 4) : number_format($cpsCaiTotal, 2) }}
+                                    <small>CAI</small></span>
                                 <span class="stream-card-usd">≈ ${{ number_format($cpsUsdDynamic, 2) }}</span>
                             </div>
                         </div>
@@ -874,7 +1056,8 @@
                     </a>
 
                     <!-- 3. Level Income -->
-                    <a href="{{ url('/User/StakingReferralReward') }}" class="income-stream-standalone-card stream-level">
+                    <a href="{{ url('/User/StakingReferralReward') }}"
+                        class="income-stream-standalone-card stream-level">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-purple">
                                 <i class="fas fa-network-wired"></i>
@@ -887,7 +1070,8 @@
                         </div>
                         <div class="stream-card-body">
                             <div class="stream-card-val-row">
-                                <span class="stream-card-val val-purple">${{ number_format($levelIncomeTotal, 2) }}</span>
+                                <span
+                                    class="stream-card-val val-purple">${{ number_format($levelIncomeTotal, 2) }}</span>
                                 <span class="stream-card-usd">USDT</span>
                             </div>
                         </div>
@@ -914,7 +1098,8 @@
                     </a>
 
                     <!-- 5. Rank & Milestone Reward (Spans full 2 columns) -->
-                    <a href="{{ url('/User/RankIncome') }}" class="income-stream-standalone-card stream-rank stream-card-full-span">
+                    <a href="{{ url('/User/RankIncome') }}"
+                        class="income-stream-standalone-card stream-rank stream-card-full-span">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-amber">
                                 <i class="fas fa-crown"></i>
@@ -1094,7 +1279,8 @@
                             <div class="capping-progress-section">
                                 <div class="capping-meta-row">
                                     <div class="cap-meta-item earned">
-                                        <span class="cap-meta-lbl"><i class="fas fa-arrow-trend-up"></i> CAPPING USED</span>
+                                        <span class="cap-meta-lbl"><i class="fas fa-arrow-trend-up"></i> CAPPING
+                                            USED</span>
                                         <span class="cap-meta-val"><strong id="cappingEarnedTxt"
                                                 data-target="{{ $cappingConsumed }}">$0</strong>
                                             <small>USDT</small></span>
@@ -1812,7 +1998,53 @@
             setTimeout(animateCappingProgress, 1200);
             initBoosterCountdown();
             initPoolCountdowns();
+            initRealtimeStreamingYield();
         });
+
+        /* ============================================================
+           REAL-TIME STREAMING YIELD ACCRUAL ENGINE (04:30 AM CRON CYCLE)
+           ============================================================ */
+        function initRealtimeStreamingYield() {
+            const dailyExpectedCai = {{ (float) $dailyExpectedRoiCai }};
+            const dailyExpectedUsd = {{ (float) $dailyExpectedRoiUsdt }};
+            const cycleStartMs = {{ $lastCronMs }};
+            const cycleEndMs = {{ $nextCronMs }};
+
+            const liveUsdEl = document.getElementById('dashLiveAccruedUsd');
+            const liveCaiEl = document.getElementById('dashLiveAccruedCai');
+            const countdownEl = document.getElementById('dashCronCountdownTxt');
+
+            if (!liveUsdEl && !liveCaiEl) return;
+
+            function updateStream() {
+                const now = Date.now();
+                const elapsedSec = Math.max(0, (now - cycleStartMs) / 1000);
+                const fraction = Math.min(1.0, elapsedSec / 86400);
+
+                const currentAccruedUsd = dailyExpectedUsd * fraction;
+                const currentAccruedCai = dailyExpectedCai * fraction;
+
+                if (liveUsdEl) {
+                    liveUsdEl.innerText = '$' + currentAccruedUsd.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+                }
+                if (liveCaiEl) {
+                    liveCaiEl.innerText = currentAccruedCai.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+                }
+                if (countdownEl) {
+                    const diff = Math.max(0, cycleEndMs - now);
+                    const totalSec = Math.floor(diff / 1000);
+                    const hours = Math.floor((totalSec % 86400) / 3600);
+                    const mins = Math.floor((totalSec % 3600) / 60);
+                    const secs = totalSec % 60;
+                    const pad = (n) => String(n).padStart(2, '0');
+                    countdownEl.innerText = `${pad(hours)}h : ${pad(mins)}m : ${pad(secs)}s`;
+                }
+
+                requestAnimationFrame(updateStream);
+            }
+
+            requestAnimationFrame(updateStream);
+        }
 
         /* ============================================================
            REAL-TIME LIVE POOL COUNTDOWN TIMERS ENGINE

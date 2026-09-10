@@ -500,11 +500,164 @@
         opacity: 0.35;
         cursor: not-allowed;
     }
+
+    /* Real-time Streaming Banner */
+    .cps-streaming-banner {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.10) 0%, rgba(13, 17, 26, 0.95) 50%, rgba(245, 166, 35, 0.08) 100%);
+        border: 1px solid rgba(0, 255, 136, 0.35);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 255, 136, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .streaming-banner-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .streaming-badge-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.68rem;
+        font-weight: 800;
+        color: #00FF88;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .pulse-dot-green {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #00FF88;
+        box-shadow: 0 0 8px #00FF88;
+        animation: pulseGreenBreathe 1.5s infinite alternate;
+    }
+
+    @keyframes pulseGreenBreathe {
+        0% { transform: scale(0.8); opacity: 0.6; }
+        100% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00FF88; }
+    }
+
+    .streaming-cron-countdown {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #FFE082;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(245, 166, 35, 0.25);
+        padding: 2px 6px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .streaming-banner-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .stream-accruing-box {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .stream-accruing-lbl {
+        font-size: 0.60rem;
+        font-weight: 700;
+        color: #94A3B8;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+    }
+
+    .stream-accruing-num {
+        font-family: 'Space Mono', monospace;
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: #00FF88;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.45);
+        line-height: 1.1;
+        letter-spacing: 0.2px;
+    }
+
+    .stream-accruing-sub {
+        font-size: 0.65rem;
+        color: #FFE082;
+        font-weight: 700;
+        margin-top: 1px;
+    }
+
+    .stream-rate-box {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        min-width: 0;
+    }
+
+    .stream-rate-lbl {
+        font-size: 0.60rem;
+        font-weight: 700;
+        color: #94A3B8;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+
+    .stream-rate-val {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        line-height: 1.1;
+    }
+
+    .stream-rate-val strong {
+        color: #FFD700;
+    }
 </style>
 
 @php
+    $uid = Session::get('user.id');
+    $userDetail = \App\UserDetails::where('id', $uid)->first();
+    $activeDeposits = \App\StackingDeposite::where([['userid', $uid], ['status', '>', 0]])->get();
+    $totalActiveStake = (float) $activeDeposits->sum('usdt');
+
+    $userBooster = (int) ($userDetail->booster ?? 1);
+    $dailyRoiRate = 0.50;
+    if ($userBooster == 3) {
+        $dailyRoiRate = 1.50;
+    } elseif ($userBooster == 2) {
+        $dailyRoiRate = 1.00;
+    }
+
     $caiLivePrice = (float)(\App\ProfileStore::where('id', 1)->value('price') ?? 1.0);
     if ($caiLivePrice <= 0) $caiLivePrice = 1.0;
+
+    $dailyExpectedRoiUsdt = ($totalActiveStake > 0 && ($userDetail->capping ?? 0) != 1 && ($userDetail->userstatus ?? 0) == 1) ? (($totalActiveStake * $dailyRoiRate) / 100) : 0.00;
+    $dailyExpectedRoiCai = ($caiLivePrice > 0) ? ($dailyExpectedRoiUsdt / $caiLivePrice) : 0.00;
+
+    $nowKolkata = \Carbon\Carbon::now('Asia/Kolkata');
+    $cronToday = \Carbon\Carbon::today('Asia/Kolkata')->setTime(4, 30, 0);
+    if ($nowKolkata->greaterThanOrEqualTo($cronToday)) {
+        $lastCronMs = $cronToday->timestamp * 1000;
+        $nextCronMs = $cronToday->copy()->addDay()->timestamp * 1000;
+    } else {
+        $lastCronMs = $cronToday->copy()->subDay()->timestamp * 1000;
+        $nextCronMs = $cronToday->timestamp * 1000;
+    }
 
     $totalCaiEarned = 0;
     $totalPrincipal = 0;
@@ -513,6 +666,9 @@
             $totalCaiEarned += (float)($r->amount ?? 0);
             $totalPrincipal = max($totalPrincipal, (float)($r->principalusdt ?? 0));
         }
+    }
+    if ($totalActiveStake > 0) {
+        $totalPrincipal = $totalActiveStake;
     }
     $totalLiveUsdt = $totalCaiEarned * $caiLivePrice;
 @endphp
@@ -525,9 +681,37 @@
             <div class="cps-head-text">
                 <div class="cps-title-row">
                     <h2 class="cps-head-title">CPS REWARDS</h2>
-                    <span class="cps-rate-pill">0.5% – 1.5%</span>
+                    <span class="cps-rate-pill">{{ $dailyRoiRate }}% / DAY</span>
                 </div>
                 <div class="cps-head-subtitle">Daily staking yield accrual history</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Streaming Yield Accrual Banner (04:30 AM Cycle) -->
+    <div class="cps-streaming-banner">
+        <div class="streaming-banner-top">
+            <div class="streaming-badge-wrap">
+                <span class="pulse-dot-green"></span>
+                <span>Live Accruing Yield (24H Cycle)</span>
+            </div>
+            <div class="streaming-cron-countdown" title="Next Cron Payout at 04:30 AM">
+                <i class="fas fa-clock" style="color: #FFD700; font-size: 0.65rem;"></i>
+                <span>Payout in: </span>
+                <strong id="cronCountdownTxt">--h : --m : --s</strong>
+            </div>
+        </div>
+
+        <div class="streaming-banner-grid">
+            <div class="stream-accruing-box">
+                <span class="stream-accruing-lbl">Accrued Since 04:30 AM</span>
+                <span class="stream-accruing-num" id="liveAccruedUsdTxt">$0.0000</span>
+                <span class="stream-accruing-sub">(<span id="liveAccruedCaiTxt">0.0000</span> CAI)</span>
+            </div>
+            <div class="stream-rate-box">
+                <span class="stream-rate-lbl">24H Expected ROI</span>
+                <span class="stream-rate-val"><strong>${{ number_format($dailyExpectedRoiUsdt, 2) }}</strong> <small style="color:#8E99A8; font-size:0.68rem;">/ 24h</small></span>
+                <span style="font-size: 0.64rem; color: #00FF88; font-weight: 800; margin-top: 1px;">Rate: {{ $dailyRoiRate }}% Daily</span>
             </div>
         </div>
     </div>
@@ -823,6 +1007,48 @@
 
         // Initialize view
         filterAndPaginate();
+
+        // Live Streaming Yield Accrual Engine (04:30 AM Cycle)
+        (function initStreamingYield() {
+            const dailyExpectedUsd = {{ (float)$dailyExpectedRoiUsdt }};
+            const dailyExpectedCai = {{ (float)$dailyExpectedRoiCai }};
+            const cycleStartMs = {{ $lastCronMs }};
+            const cycleEndMs = {{ $nextCronMs }};
+
+            const liveUsdEl = document.getElementById('liveAccruedUsdTxt');
+            const liveCaiEl = document.getElementById('liveAccruedCaiTxt');
+            const countdownEl = document.getElementById('cronCountdownTxt');
+
+            function update() {
+                const now = Date.now();
+                const elapsedSec = Math.max(0, (now - cycleStartMs) / 1000);
+                const fraction = Math.min(1.0, elapsedSec / 86400);
+
+                const currentUsd = dailyExpectedUsd * fraction;
+                const currentCai = dailyExpectedCai * fraction;
+
+                if (liveUsdEl) {
+                    liveUsdEl.innerText = '$' + currentUsd.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+                }
+                if (liveCaiEl) {
+                    liveCaiEl.innerText = currentCai.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+                }
+
+                if (countdownEl) {
+                    const diff = Math.max(0, cycleEndMs - now);
+                    const totalSec = Math.floor(diff / 1000);
+                    const hours = Math.floor((totalSec % 86400) / 3600);
+                    const mins = Math.floor((totalSec % 3600) / 60);
+                    const secs = totalSec % 60;
+                    const pad = (n) => String(n).padStart(2, '0');
+                    countdownEl.innerText = `${pad(hours)}h : ${pad(mins)}m : ${pad(secs)}s`;
+                }
+
+                requestAnimationFrame(update);
+            }
+
+            requestAnimationFrame(update);
+        })();
     });
 </script>
 @endpush

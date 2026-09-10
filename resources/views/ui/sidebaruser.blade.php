@@ -73,7 +73,6 @@
                         <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </div>
                     <div class="dropdown-content">
-                        <a href="/User/NewRegistration" class="dropdown-link"><i class="fas fa-user-plus"></i>New Registration</a>
                         <a href="/User/DirectTeam" class="dropdown-link"><i class="fas fa-users"></i>Direct Members</a>
                         <a href="/User/AllTeam" class="dropdown-link"><i class="fas fa-list-alt"></i>Team Detail</a>
                         <a href="/User/Treeview" class="dropdown-link"><i class="fas fa-project-diagram"></i>Tree View</a>

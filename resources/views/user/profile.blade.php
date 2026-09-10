@@ -8,8 +8,6 @@
 @php
     $userUuid = $profile->uuid ?? Session::get('user.userid', 'CAI000000');
     $userName = $profile->usersname ?? Session::get('user.name', 'Cyera Member');
-    $userEmail = $profile->email ?? Session::get('user.email', 'member@cyera.ai');
-    $userContact = ($profile->ccode ?? '+91') . ' ' . ($profile->contact ?? 'N/A');
     $userDoj = !empty($profile->doj) ? date('d M Y', strtotime($profile->doj)) : date('d M Y');
     $sponsorId = $profile->guiderid ?? Session::get('user.sponsorid', 'Root Sponsor');
     $sponsorName = $profile->guidername ?? 'Cyera Network';
@@ -106,16 +104,16 @@
                     <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userName }}</span>
                 </div>
 
-                <!-- Email -->
+                <!-- User ID -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-envelope" style="color: #FFD700; width: 14px;"></i> Email</span>
-                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $userEmail }}</span>
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-id-badge" style="color: #FFD700; width: 14px;"></i> User ID</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">{{ $userUuid }}</span>
                 </div>
 
-                <!-- Mobile -->
+                <!-- Registration Date -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-phone" style="color: #FFD700; width: 14px;"></i> Mobile</span>
-                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userContact }}</span>
+                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="far fa-calendar-check" style="color: #FFD700; width: 14px;"></i> Joined</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userDoj }}</span>
                 </div>
 
                 <!-- Sponsor -->

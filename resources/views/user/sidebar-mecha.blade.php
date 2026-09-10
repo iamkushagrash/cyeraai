@@ -194,7 +194,7 @@
             </div>
 
             <!-- My Team (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/NewRegistration*') || request()->is('User/DirectTeam*') || request()->is('User/AllTeam*') || request()->is('User/Treeview*') || request()->is('User/SearchTeamBusiness*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/DirectTeam*') || request()->is('User/AllTeam*') || request()->is('User/Treeview*') || request()->is('User/SearchTeamBusiness*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
@@ -210,10 +210,6 @@
                 <div class="mecha-submenu">
                     <a href="{{ url('/User/Referral') }}" class="mecha-sub-link {{ request()->is('User/Referral') ? 'active' : '' }}">
                         <div class="sub-left-txt"><span class="sub-dot"></span> Invite &amp; QR Hub</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/NewRegistration') }}" class="mecha-sub-link {{ request()->is('User/NewRegistration') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> New Registration</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/DirectTeam') }}" class="mecha-sub-link {{ request()->is('User/DirectTeam') ? 'active' : '' }}">

@@ -116,7 +116,7 @@
     .legend-dot.active { background: #00FF88; box-shadow: 0 0 8px #00FF88; }
     .legend-dot.inactive { background: #F43F5E; box-shadow: 0 0 8px #F43F5E; }
 
-    /* Scrollable Interactive Canvas */
+    /* Interactive Canvas Stage */
     .tree-scroll-container {
         position: relative;
         background-color: #05070D;
@@ -126,17 +126,48 @@
         background-size: 24px 24px;
         border: 1px solid rgba(245, 166, 35, 0.20);
         border-radius: 12px;
-        overflow: auto;
+        overflow: hidden;
         min-height: 480px;
+        height: 520px;
         width: 100%;
-        padding: 36px 20px;
-        overscroll-behavior: contain;
         cursor: grab;
         text-align: center;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: pan-y;
+        position: relative;
     }
 
     .tree-scroll-container:active {
         cursor: grabbing;
+    }
+
+    .tree-viewport-stage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 30px;
+        transform-origin: 50% 30px;
+        will-change: transform;
+    }
+
+    .tree-zoom-badge {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #FFD700;
+        background: rgba(245, 166, 35, 0.12);
+        border: 1px solid rgba(245, 166, 35, 0.3);
+        padding: 4px 8px;
+        border-radius: 8px;
+        min-width: 48px;
+        text-align: center;
+        line-height: 1.2;
     }
 
     .tree {
@@ -144,7 +175,6 @@
         min-width: max-content;
         position: relative;
         margin: 0 auto;
-        transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
     }
 
     .tree ul {
@@ -252,43 +282,41 @@
     }
 
     .node-avatar-circle {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        background: rgba(245, 166, 35, 0.15);
-        border: 1px solid rgba(245, 166, 35, 0.4);
-        color: #FFD700;
-        font-size: 9px;
-        font-weight: 800;
+        background: linear-gradient(135deg, #FFD700, #F5A623);
+        color: #000;
+        font-weight: 900;
+        font-size: 0.7rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
     }
 
     .node-user-name {
         font-family: 'Outfit', sans-serif;
-        font-size: 0.84rem;
+        font-size: 0.78rem;
         font-weight: 800;
         color: #FFFFFF;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 110px;
-        line-height: 1.2;
+        max-width: 100px;
     }
 
     .node-uid-badge {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.68rem;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.64rem;
         font-weight: 700;
-        color: #00E5FF;
-        background: rgba(0, 229, 255, 0.08);
-        border: 1px solid rgba(0, 229, 255, 0.25);
-        padding: 1px 5px;
-        border-radius: 4px;
-        margin: 0 auto;
-        letter-spacing: 0.3px;
+        color: #00D2FF;
+        background: rgba(0, 210, 255, 0.1);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        padding: 2px 6px;
+        border-radius: 6px;
+        align-self: center;
+        letter-spacing: 0.5px;
     }
 
     /* Node Stats Matrix (Package & Biz) */
@@ -296,51 +324,61 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 4px;
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(0, 0, 0, 0.45);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 6px;
         padding: 4px;
-        margin-top: 2px;
+        margin: 2px 0;
     }
 
     .node-stat-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1px;
     }
 
     .node-stat-label {
-        font-size: 0.58rem;
+        font-size: 0.52rem;
         font-weight: 700;
         color: #64748B;
         text-transform: uppercase;
     }
 
     .node-stat-value {
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.72rem;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.68rem;
         font-weight: 800;
+        line-height: 1.1;
     }
 
     .node-stat-value.pkg { color: #00FF88; }
-    .node-stat-value.biz { color: #00E5FF; }
+    .node-stat-value.biz { color: #00D2FF; }
 
     /* Node Status Badge */
     .node-status-pill {
-        font-size: 0.62rem;
+        font-size: 0.56rem;
         font-weight: 800;
-        letter-spacing: 0.4px;
-        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 3px;
-        margin-top: 1px;
+        align-self: center;
+        letter-spacing: 0.4px;
     }
 
-    .node-status-pill.active { color: #00FF88; }
-    .node-status-pill.inactive { color: #FB7185; }
+    .node-status-pill.active {
+        background: rgba(0, 255, 136, 0.12);
+        color: #00FF88;
+        border: 1px solid rgba(0, 255, 136, 0.35);
+    }
+
+    .node-status-pill.inactive {
+        background: rgba(244, 63, 94, 0.12);
+        color: #F43F5E;
+        border: 1px solid rgba(244, 63, 94, 0.35);
+    }
 
     /* Sleek Toggle Button */
     .toggle-arrow {
@@ -348,35 +386,34 @@
         bottom: -11px;
         left: 50%;
         transform: translateX(-50%);
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
+        width: 22px;
+        height: 22px;
         background: linear-gradient(135deg, #FFD700, #F5A623);
-        border: 2px solid #05070D;
-        color: #000000;
-        font-size: 8.5px;
+        border: 2px solid #06080F;
+        border-radius: 50%;
+        color: #000;
+        font-size: 8px;
         font-weight: 900;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        z-index: 3;
+        z-index: 10;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
         transition: all 0.2s ease;
     }
 
     .toggle-arrow:hover {
         transform: translateX(-50%) scale(1.15);
-        box-shadow: 0 0 14px rgba(255, 215, 0, 0.8);
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.9);
     }
 
     /* Footer Hint */
     .tree-footer-hint {
-        text-align: center;
         margin-top: 12px;
         font-size: 0.72rem;
         color: #64748B;
-        font-weight: 600;
+        text-align: center;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -405,10 +442,11 @@
             <button type="button" class="tree-tool-btn" onclick="zoomIn()" title="Zoom In">
                 <i class="fas fa-search-plus"></i>
             </button>
+            <span class="tree-zoom-badge" id="zoomBadge">100%</span>
             <button type="button" class="tree-tool-btn" onclick="zoomOut()" title="Zoom Out">
                 <i class="fas fa-search-minus"></i>
             </button>
-            <button type="button" class="tree-tool-btn" onclick="resetZoom()" title="Reset Zoom">
+            <button type="button" class="tree-tool-btn" onclick="resetZoom()" title="Reset View & Center">
                 <i class="fas fa-crosshairs"></i> Reset
             </button>
         </div>
@@ -430,110 +468,213 @@
         </div>
     </div>
 
-    <!-- Scrollable Tree Canvas -->
+    <!-- Interactive Tree Canvas -->
     <div class="tree-scroll-container" id="treeScrollContainer">
-        <div class="tree" id="mainTree">
-            <ul>
-                <li>
-                    @php
-                        $isRootActive = (strtolower($rootUser->status ?? '') == 'active' || $rootUser->status == '1');
-                        $rootInitial = strtoupper(substr($rootUser->name ?? $rootUser->userid ?? 'U', 0, 1));
-                    @endphp
-                    <div class="user-node root" data-user-id="{{ $rootUser->id }}">
-                        <div class="node-head-row">
-                            <span class="node-avatar-circle">{{ $rootInitial }}</span>
-                            <span class="node-user-name" title="{{ $rootUser->name }}">{{ $rootUser->name ?: 'Root Leader' }}</span>
-                        </div>
-
-                        <span class="node-uid-badge">{{ $rootUser->userid }}</span>
-
-                        <div class="node-stats-grid">
-                            <div class="node-stat-item">
-                                <span class="node-stat-label">PKG</span>
-                                <span class="node-stat-value pkg">${{ number_format((float)($rootUser->package ?? 0), 0) }}</span>
+        <div class="tree-viewport-stage" id="treeViewportStage">
+            <div class="tree" id="mainTree">
+                <ul>
+                    <li>
+                        @php
+                            $isRootActive = (strtolower($rootUser->status ?? '') == 'active' || $rootUser->status == '1');
+                            $rootInitial = strtoupper(substr($rootUser->name ?? $rootUser->userid ?? 'U', 0, 1));
+                        @endphp
+                        <div class="user-node root" data-user-id="{{ $rootUser->id }}">
+                            <div class="node-head-row">
+                                <span class="node-avatar-circle">{{ $rootInitial }}</span>
+                                <span class="node-user-name" title="{{ $rootUser->name }}">{{ $rootUser->name ?: 'Root Leader' }}</span>
                             </div>
-                            <div class="node-stat-item">
-                                <span class="node-stat-label">BIZ</span>
-                                <span class="node-stat-value biz">${{ number_format((float)($rootUser->teamtotal ?? 0), 0) }}</span>
+
+                            <span class="node-uid-badge">{{ $rootUser->userid }}</span>
+
+                            <div class="node-stats-grid">
+                                <div class="node-stat-item">
+                                    <span class="node-stat-label">PKG</span>
+                                    <span class="node-stat-value pkg">${{ number_format((float)($rootUser->package ?? 0), 0) }}</span>
+                                </div>
+                                <div class="node-stat-item">
+                                    <span class="node-stat-label">BIZ</span>
+                                    <span class="node-stat-value biz">${{ number_format((float)($rootUser->teamtotal ?? 0), 0) }}</span>
+                                </div>
                             </div>
+
+                            <span class="node-status-pill {{ $isRootActive ? 'active' : 'inactive' }}">
+                                <i class="fas fa-circle" style="font-size: 5px;"></i> {{ $isRootActive ? 'ACTIVE' : 'INACTIVE' }}
+                            </span>
+
+                            <div class="toggle-arrow" onclick="loadChildren(event, this, {{ $rootUser->id }})" title="Expand Downline">▼</div>
                         </div>
-
-                        <span class="node-status-pill {{ $isRootActive ? 'active' : 'inactive' }}">
-                            <i class="fas fa-circle" style="font-size: 5px;"></i> {{ $isRootActive ? 'ACTIVE' : 'INACTIVE' }}
-                        </span>
-
-                        <div class="toggle-arrow" onclick="loadChildren(event, this, {{ $rootUser->id }})" title="Expand Downline">▼</div>
-                    </div>
-                    <ul class="children-container" data-loaded="0" style="display: none;"></ul>
-                </li>
-            </ul>
+                        <ul class="children-container" data-loaded="0" style="display: none;"></ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <div class="tree-footer-hint">
-        <i class="fas fa-hand-pointer"></i> Drag or scroll to explore tree canvas. Click <span style="color:#FFD700; font-weight:800;">▼</span> to dynamically expand downline members.
+        <i class="fas fa-hand-pointer"></i> Drag or pinch to explore tree. Click <span style="color:#FFD700; font-weight:800;">▼</span> to dynamically expand downlines.
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    let currentZoom = 1;
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    const minScale = 0.35;
+    const maxScale = 2.2;
+
+    const container = document.getElementById('treeScrollContainer');
+    const stage = document.getElementById('treeViewportStage');
+    const zoomBadge = document.getElementById('zoomBadge');
+
+    function updateTransform(smooth = false) {
+        if (!stage) return;
+        stage.style.transition = smooth ? 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
+        stage.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
+        if (zoomBadge) {
+            zoomBadge.innerText = Math.round(scale * 100) + '%';
+        }
+    }
 
     function zoomIn() {
-        if (currentZoom < 1.8) {
-            currentZoom += 0.15;
-            applyZoom();
+        if (scale < maxScale) {
+            scale = Math.min(maxScale, Number((scale + 0.15).toFixed(2)));
+            updateTransform(true);
         }
     }
 
     function zoomOut() {
-        if (currentZoom > 0.4) {
-            currentZoom -= 0.15;
-            applyZoom();
+        if (scale > minScale) {
+            scale = Math.max(minScale, Number((scale - 0.15).toFixed(2)));
+            updateTransform(true);
         }
     }
 
     function resetZoom() {
-        currentZoom = 1;
-        applyZoom();
+        scale = 1;
+        panX = 0;
+        panY = 0;
+        updateTransform(true);
     }
 
-    function applyZoom() {
-        const tree = document.getElementById('mainTree');
-        if (tree) {
-            tree.style.transform = `scale(${currentZoom})`;
-            tree.style.transformOrigin = 'top center';
-        }
-    }
-
-    // Drag to Pan inside Tree Canvas
-    const container = document.getElementById('treeScrollContainer');
-    let isDown = false;
-    let startX, startY, scrollLeft, scrollTop;
+    // Mouse Drag Panning (Desktop)
+    let isMouseDown = false;
+    let startMouseX = 0;
+    let startMouseY = 0;
+    let startPanX = 0;
+    let startPanY = 0;
 
     if (container) {
         container.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.user-node') || e.target.closest('.toggle-arrow')) return;
-            isDown = true;
-            startX = e.pageX - container.offsetLeft;
-            startY = e.pageY - container.offsetTop;
-            scrollLeft = container.scrollLeft;
-            scrollTop = container.scrollTop;
+            if (e.target.closest('.toggle-arrow')) return;
+            isMouseDown = true;
+            startMouseX = e.clientX;
+            startMouseY = e.clientY;
+            startPanX = panX;
+            startPanY = panY;
+            container.style.cursor = 'grabbing';
         });
 
-        container.addEventListener('mouseleave', () => { isDown = false; });
-        container.addEventListener('mouseup', () => { isDown = false; });
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            panX = startPanX + (e.clientX - startMouseX);
+            panY = startPanY + (e.clientY - startMouseY);
+            updateTransform(false);
+        });
 
-        container.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
+        window.addEventListener('mouseup', () => {
+            if (isMouseDown) {
+                isMouseDown = false;
+                if (container) container.style.cursor = 'grab';
+            }
+        });
+
+        // Wheel Zoom
+        container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const y = e.pageY - container.offsetTop;
-            const walkX = (x - startX) * 1.5;
-            const walkY = (y - startY) * 1.5;
-            container.scrollLeft = scrollLeft - walkX;
-            container.scrollTop = scrollTop - walkY;
+            const delta = e.deltaY < 0 ? 0.1 : -0.1;
+            const newScale = Math.min(maxScale, Math.max(minScale, Number((scale + delta).toFixed(2))));
+            if (newScale !== scale) {
+                scale = newScale;
+                updateTransform(false);
+            }
+        }, { passive: false });
+
+        // Touch Gestures (Mobile - 1 Finger Pan, 2 Finger Pinch Zoom, Natural Vertical Scroll)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let initialPanX = 0;
+        let initialPanY = 0;
+        let initialPinchDistance = null;
+        let initialScale = 1;
+        let gestureType = null; // 'pan' | 'scroll' | 'pinch'
+
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                if (e.target.closest('.toggle-arrow')) return;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                initialPanX = panX;
+                initialPanY = panY;
+                gestureType = null;
+            } else if (e.touches.length === 2) {
+                gestureType = 'pinch';
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && gestureType === 'pinch') {
+                if (e.cancelable) e.preventDefault();
+                const currentDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                if (initialPinchDistance) {
+                    const factor = currentDist / initialPinchDistance;
+                    scale = Math.min(maxScale, Math.max(minScale, Number((initialScale * factor).toFixed(2))));
+                    updateTransform(false);
+                }
+            } else if (e.touches.length === 1) {
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                const dx = currentX - touchStartX;
+                const dy = currentY - touchStartY;
+
+                // Determine user intent:
+                if (!gestureType) {
+                    if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+                        gestureType = 'pan'; // Horizontal/diagonal intent -> Pan tree canvas
+                    } else if (Math.abs(dy) > 7) {
+                        gestureType = 'scroll'; // Vertical swipe intent -> Let outer page scroll smoothly
+                    }
+                }
+
+                if (gestureType === 'pan') {
+                    if (e.cancelable) e.preventDefault();
+                    panX = initialPanX + dx;
+                    panY = initialPanY + dy;
+                    updateTransform(false);
+                }
+            }
+        }, { passive: false });
+
+        container.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                gestureType = null;
+                initialPinchDistance = null;
+            } else if (e.touches.length === 1) {
+                gestureType = null;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                initialPanX = panX;
+                initialPanY = panY;
+            }
         });
     }
 
@@ -567,5 +708,10 @@
                 btn.innerHTML = '!';
             });
     }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTransform(false);
+    });
 </script>
 @endpush

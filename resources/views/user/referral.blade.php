@@ -111,13 +111,6 @@
                 </a>
             </div>
         </div>
-
-        <!-- Direct Action: Register Downline Manually -->
-        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 215, 0, 0.15); display: flex; flex-direction: column; gap: 8px;">
-            <a href="{{ url('/User/NewRegistration') }}" class="mecha-btn-secondary" style="height: 44px; font-size: 11px;">
-                <i class="fas fa-user-plus" style="color: #B34BFE;"></i> REGISTER DOWNLINE PARTNER DIRECTLY
-            </a>
-        </div>
     </div>
 
     <!-- 3. Referral Program Benefits Card -->

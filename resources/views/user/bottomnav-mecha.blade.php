@@ -36,7 +36,7 @@
     </a>
 
     <!-- 4. TEAM -->
-    <a href="{{ url('/User/DirectTeam') }}" class="hud-nav-tab {{ request()->is('User/DirectTeam*') || request()->is('User/AllTeam*') || request()->is('User/Treeview*') || request()->is('User/NewRegistration*') ? 'active' : '' }}" id="nav-team">
+    <a href="{{ url('/User/DirectTeam') }}" class="hud-nav-tab {{ request()->is('User/DirectTeam*') || request()->is('User/AllTeam*') || request()->is('User/Treeview*') ? 'active' : '' }}" id="nav-team">
         <div class="tab-ico-wrap">
             <svg viewBox="0 0 24 24" class="nav-svg-icon" fill="none">
                 <circle cx="12" cy="7" r="3.2" stroke="currentColor" stroke-width="1.9" fill="currentColor" fill-opacity="0.25"/>
