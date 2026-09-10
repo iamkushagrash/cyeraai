@@ -117,12 +117,31 @@
             </div>
 
             <!-- Quick Preset Amount Buttons -->
-            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 14px;">
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 12px;">
                 <button type="button" class="preset-amt-btn" data-amt="50">$50</button>
                 <button type="button" class="preset-amt-btn active" data-amt="100">$100</button>
                 <button type="button" class="preset-amt-btn" data-amt="250">$250</button>
                 <button type="button" class="preset-amt-btn" data-amt="500">$500</button>
                 <button type="button" class="preset-amt-btn" data-amt="1000">$1K</button>
+            </div>
+
+            <!-- Verified Genuine USDT Security Assurance Badge -->
+            <div style="background: rgba(10, 13, 25, 0.7); border: 1px solid rgba(0, 255, 136, 0.22); border-radius: 8px; padding: 7px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+                    <i class="fas fa-shield-check" style="color: #00FF88; font-size: 13px; flex-shrink: 0;"></i>
+                    <div style="min-width: 0;">
+                        <div style="font-size: 8.5px; color: #E2E8F0; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                            <span>Official Binance-Peg BSC-USD</span>
+                            <span style="background: rgba(0, 255, 136, 0.15); color: #00FF88; font-size: 7.5px; padding: 1px 4px; border-radius: 4px;">VERIFIED</span>
+                        </div>
+                        <div style="font-family: monospace; font-size: 8px; color: #94A3B8; margin-top: 1px;">
+                            0x55d398326f99059fF775485246999027B3197955
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 8px; color: #F59E0B; text-align: right; flex-shrink: 0; line-height: 1.2;">
+                    <i class="fas fa-ban" style="margin-right: 2px;"></i> No Wrapped/Fake<br>Tokens Accepted
+                </div>
             </div>
 
             <!-- Action Button -->

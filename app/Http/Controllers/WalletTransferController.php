@@ -540,40 +540,67 @@ class WalletTransferController extends Controller
             }
         }
 
-        // 3. Decode & Verify Exact Amount from Event Logs if expectedAmount is provided
-        if (!is_null($expectedAmount) && $expectedAmount > 0) {
-            $investedTopic0 = '0x9bce88ff835d9d8831ccf5c7e04a2533f68510314393b3a54f990dea62e7134e';
-            $transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-            $amountFound = null;
+        // 3. Decode & Strictly Verify Official USDT Token Contract and Event Logs
+        $officialUsdtContract = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
+        $investedTopic0 = '0x9bce88ff835d9d8831ccf5c7e04a2533f68510314393b3a54f990dea62e7134e';
+        $transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+        
+        $validUsdtTransferFound = false;
+        $amountFound = null;
 
-            foreach ($receipt['logs'] as $log) {
-                if (isset($log['topics'][0])) {
-                    if (strtolower($log['topics'][0]) === strtolower($investedTopic0)) {
-                        // Invested event data: first 32 bytes (64 hex chars) is amountUSDT
-                        $cleanData = ltrim($log['data'], '0x');
-                        $amountHex = substr($cleanData, 0, 64);
-                        $weiDec = $this->hexToDecBc($amountHex);
-                        $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
-                        break;
-                    } elseif (strtolower($log['topics'][0]) === strtolower($transferTopic0)) {
-                        // Check if transfer recipient is splitter
+        foreach ($receipt['logs'] as $log) {
+            $logContract = strtolower($log['address'] ?? '');
+            
+            if (isset($log['topics'][0])) {
+                $topic0 = strtolower($log['topics'][0]);
+
+                // Verify Official Invested Event from Splitter Contract
+                if ($topic0 === strtolower($investedTopic0) && $logContract === strtolower($expectedContract)) {
+                    // Invested event data: first 32 bytes (64 hex chars) is amountUSDT
+                    $cleanData = ltrim($log['data'], '0x');
+                    $amountHex = substr($cleanData, 0, 64);
+                    $weiDec = $this->hexToDecBc($amountHex);
+                    $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
+                } 
+                // Verify Official Tether USD (0x55d3...7955) Transfer Event to Splitter
+                elseif ($topic0 === strtolower($transferTopic0)) {
+                    if ($logContract === $officialUsdtContract) {
                         if (isset($log['topics'][2]) && str_contains(strtolower($log['topics'][2]), ltrim(strtolower($expectedContract), '0x'))) {
+                            $validUsdtTransferFound = true;
                             $cleanData = ltrim($log['data'], '0x');
                             $amountHex = substr($cleanData, 0, 64);
                             $weiDec = $this->hexToDecBc($amountHex);
-                            $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
+                            $transferAmount = (float)bcdiv($weiDec, '1000000000000000000', 4);
+                            if (is_null($amountFound)) {
+                                $amountFound = $transferAmount;
+                            }
                         }
                     }
                 }
             }
+        }
 
-            if (!is_null($amountFound)) {
-                if (abs($amountFound - $expectedAmount) > 0.05) {
-                    return [
-                        'valid' => false,
-                        'message' => 'On-chain transaction amount ($' . number_format($amountFound, 2) . ' USDT) does not match the requested stake amount ($' . number_format($expectedAmount, 2) . ' USDT).'
-                    ];
-                }
+        // Strict Enforcement: Must have valid official USDT token transfer to splitter
+        if (!$validUsdtTransferFound && is_null($amountFound)) {
+            return [
+                'valid' => false,
+                'message' => 'Invalid or unverified token detected. Only genuine Binance-Peg BSC-USD (Tether USDT 0x55d3...7955) is accepted. Wrapped or custom tokens are strictly rejected.'
+            ];
+        }
+
+        if (!is_null($expectedAmount) && $expectedAmount > 0) {
+            if (is_null($amountFound)) {
+                return [
+                    'valid' => false,
+                    'message' => 'Unable to verify staking deposit amount from blockchain receipt.'
+                ];
+            }
+
+            if (abs($amountFound - $expectedAmount) > 0.05) {
+                return [
+                    'valid' => false,
+                    'message' => 'On-chain transaction amount ($' . number_format($amountFound, 2) . ' USDT) does not match the requested stake amount ($' . number_format($expectedAmount, 2) . ' USDT).'
+                ];
             }
         }
 
