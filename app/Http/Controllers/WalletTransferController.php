@@ -535,10 +535,20 @@ class WalletTransferController extends Controller
             return ['valid' => false, 'message' => 'Transaction has reverted or failed on BSC blockchain.'];
         }
 
-        // Check Target Contract
-        if (!isset($receipt['to']) || strtolower($receipt['to']) !== strtolower($expectedContract)) {
+        // Check Target Contract (Direct Interaction or Internal Contract Execution via AA/Bundler/Relayer)
+        $interactedWithContract = (isset($receipt['to']) && strtolower($receipt['to']) === strtolower($expectedContract));
+        if (!$interactedWithContract && isset($receipt['logs']) && is_array($receipt['logs'])) {
+            foreach ($receipt['logs'] as $log) {
+                if (isset($log['address']) && strtolower($log['address']) === strtolower($expectedContract)) {
+                    $interactedWithContract = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$interactedWithContract) {
             \Log::warning("verifyBscTransaction: Target contract mismatch. Expected $expectedContract, got " . ($receipt['to'] ?? 'null'));
-            return ['valid' => false, 'message' => 'Transaction was not sent to the official Cyera Staking Splitter contract.'];
+            return ['valid' => false, 'message' => 'Transaction was not sent to or did not interact with the official Cyera Staking Splitter contract.'];
         }
 
         // Check Event Logs
@@ -546,15 +556,29 @@ class WalletTransferController extends Controller
             return ['valid' => false, 'message' => 'No token transfer or staking execution logs found in transaction receipt.'];
         }
 
-        // Check Sender if provided
-        if (!empty($expectedSender) && isset($receipt['from'])) {
-            if (strtolower($receipt['from']) !== strtolower($expectedSender)) {
+        // Check Sender if provided (Direct from address or Smart Account/User address in event topics)
+        if (!empty($expectedSender)) {
+            $senderMatches = false;
+            $cleanSender = ltrim(strtolower($expectedSender), '0x');
+            
+            if (isset($receipt['from']) && strtolower($receipt['from']) === strtolower($expectedSender)) {
+                $senderMatches = true;
+            } elseif (isset($receipt['logs']) && is_array($receipt['logs'])) {
+                foreach ($receipt['logs'] as $log) {
+                    if (isset($log['topics'][1]) && str_contains(strtolower($log['topics'][1]), $cleanSender)) {
+                        $senderMatches = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$senderMatches) {
                 \Log::warning("verifyBscTransaction: Sender mismatch. Expected $expectedSender, got " . ($receipt['from'] ?? 'null'));
                 return ['valid' => false, 'message' => 'Transaction was not broadcast from your authenticated wallet address.'];
             }
         }
 
-        // 2. Check Block Timestamp (Freshness Check: Max 30 minutes old)
+        // 2. Check Block Timestamp (Freshness Check: Max 60 minutes old)
         if (isset($receipt['blockNumber'])) {
             $payloadBlock = json_encode([
                 'jsonrpc' => '2.0',
@@ -579,8 +603,8 @@ class WalletTransferController extends Controller
                     $currentTimestamp = time();
                     $ageSeconds = $currentTimestamp - $blockTimestamp;
 
-                    // Reject if transaction was mined more than 30 minutes (1800s) ago
-                    if ($ageSeconds > 1800) {
+                    // Reject if transaction was mined more than 60 minutes (3600s) ago
+                    if ($ageSeconds > 3600) {
                         return [
                             'valid' => false,
                             'message' => 'This transaction was mined in an old block (' . round($ageSeconds / 60) . ' minutes ago). Old transactions cannot be reused for new stakes.'
@@ -606,7 +630,7 @@ class WalletTransferController extends Controller
 
                 // Verify Official Invested Event from Splitter Contract
                 if ($topic0 === strtolower($investedTopic0) && $logContract === strtolower($expectedContract)) {
-                    $cleanData = ltrim($log['data'], '0x');
+                    $cleanData = (substr($log['data'], 0, 2) === '0x' || substr($log['data'], 0, 2) === '0X') ? substr($log['data'], 2) : $log['data'];
                     $amountHex = substr($cleanData, 0, 64);
                     $weiDec = $this->hexToDecBc($amountHex);
                     $amountFound = (float)bcdiv($weiDec, '1000000000000000000', 4);
@@ -616,7 +640,7 @@ class WalletTransferController extends Controller
                     if ($logContract === $officialUsdtContract) {
                         if (isset($log['topics'][2]) && str_contains(strtolower($log['topics'][2]), ltrim(strtolower($expectedContract), '0x'))) {
                             $validUsdtTransferFound = true;
-                            $cleanData = ltrim($log['data'], '0x');
+                            $cleanData = (substr($log['data'], 0, 2) === '0x' || substr($log['data'], 0, 2) === '0X') ? substr($log['data'], 2) : $log['data'];
                             $amountHex = substr($cleanData, 0, 64);
                             $weiDec = $this->hexToDecBc($amountHex);
                             $transferAmount = (float)bcdiv($weiDec, '1000000000000000000', 4);
@@ -667,7 +691,13 @@ class WalletTransferController extends Controller
      */
     protected function hexToDecBc($hex)
     {
-        $hex = ltrim($hex, '0x');
+        if (substr($hex, 0, 2) === '0x' || substr($hex, 0, 2) === '0X') {
+            $hex = substr($hex, 2);
+        }
+        $hex = ltrim($hex, '0');
+        if ($hex === '') {
+            return '0';
+        }
         $dec = '0';
         $len = strlen($hex);
         for ($i = 0; $i < $len; $i++) {
