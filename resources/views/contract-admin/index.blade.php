@@ -849,10 +849,10 @@
 
                             <!-- Emergency Pause/Unpause -->
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="togglePause('splitter', true)">
+                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('splitter', true)">
                                     <i class="fas fa-pause"></i> Pause Splitter
                                 </button>
-                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="togglePause('splitter', false)">
+                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('splitter', false)">
                                     <i class="fas fa-play"></i> Unpause Splitter
                                 </button>
                             </div>
@@ -865,7 +865,7 @@
                                 <label class="control-label">Update 70% Treasury Claim Vault Destination</label>
                                 <div style="display: flex; gap: 8px;">
                                     <input type="text" class="control-input" id="inputNew70Vault" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap;">
+                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap; opacity: 0.5; cursor: not-allowed;" disabled>
                                         <i class="fas fa-check"></i> Update
                                     </button>
                                 </div>
@@ -877,7 +877,7 @@
                                 <label class="control-label">Update 30% Liquidity Treasury Wallet</label>
                                 <div style="display: flex; gap: 8px;">
                                     <input type="text" class="control-input" id="inputNew30Wallet" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap;">
+                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap; opacity: 0.5; cursor: not-allowed;" disabled>
                                         <i class="fas fa-check"></i> Update
                                     </button>
                                 </div>
@@ -890,7 +890,7 @@
                                 <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
                                     <input type="number" class="control-input" id="inputMinInv" placeholder="Min (e.g. 50)" required>
                                     <input type="number" class="control-input" id="inputMaxInv" placeholder="Max (e.g. 2000)" required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold">
+                                    <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>
                                         <i class="fas fa-sliders"></i> Apply
                                     </button>
                                 </div>
@@ -946,7 +946,7 @@
                                     <input type="text" class="control-input" id="inputRescueDestAddr" placeholder="Recipient Address (0x...)" required>
                                     <input type="number" step="any" class="control-input" id="inputRescueAmount" placeholder="Amount" required>
                                 </div>
-                                <button type="submit" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center;">
+                                <button type="submit" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled>
                                     <i class="fas fa-life-ring"></i> Execute Rescue
                                 </button>
                                 <p class="control-help" style="color: #F59E0B; margin-top: 6px;">Note: Treasury USDT cannot be extracted via rescue. It moves exclusively via authorized fund transfer.</p>
@@ -986,10 +986,10 @@
 
                             <!-- Emergency Pause/Unpause -->
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="togglePause('treasury', true)">
+                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('treasury', true)">
                                     <i class="fas fa-pause"></i> Pause Treasury
                                 </button>
-                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="togglePause('treasury', false)">
+                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('treasury', false)">
                                     <i class="fas fa-play"></i> Unpause Treasury
                                 </button>
                             </div>
@@ -1024,10 +1024,10 @@
                                     <input type="text" class="control-input" id="inputWhitelistAddr" placeholder="Wallet Address (0x...)" required>
                                 </div>
                                 <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(true)">
+                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitSingleWhitelist(true)">
                                         <i class="fas fa-check"></i> Whitelist
                                     </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(false)">
+                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitSingleWhitelist(false)">
                                         <i class="fas fa-ban"></i> Remove
                                     </button>
                                 </div>
@@ -1040,10 +1040,10 @@
                                 </div>
                                 <textarea class="control-input" id="inputBatchWhitelist" rows="4" placeholder="Enter addresses separated by comma or new line...&#10;0x1111...&#10;0x2222..." style="resize: vertical; margin-bottom: 8px;" required></textarea>
                                 <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(true)">
+                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitBatchWhitelist(true)">
                                         <i class="fas fa-plus"></i> Batch Enable
                                     </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(false)">
+                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitBatchWhitelist(false)">
                                         <i class="fas fa-minus"></i> Batch Remove
                                     </button>
                                 </div>
@@ -1076,7 +1076,7 @@
                                 <label class="control-label">Set Official PancakeSwap Pair</label>
                                 <div style="display: flex; gap: 8px;">
                                     <input type="text" class="control-input" id="inputPancakePair" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" id="btnSetPancakePair">
+                                    <button type="submit" class="btn-web3 btn-web3-gold" id="btnSetPancakePair" style="opacity: 0.5; cursor: not-allowed;" disabled>
                                         <i class="fas fa-check"></i> Set
                                     </button>
                                 </div>
@@ -1088,7 +1088,7 @@
                                     <i class="fas fa-lock"></i> Permanent Pair Lock
                                 </div>
                                 <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px;">Permanently freezes the official PancakeSwap pair address so it can never be changed.</p>
-                                <button type="button" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center;" onclick="handleLockPancakePair()" id="btnLockPair">
+                                <button type="button" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="handleLockPancakePair()" id="btnLockPair">
                                     <i class="fas fa-lock"></i> Permanently Lock Pair
                                 </button>
                             </div>
@@ -1098,8 +1098,8 @@
                                 <label class="control-label">Register Secondary AMM Pair (V3, ApeSwap, Biswap)</label>
                                 <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 8px;">
                                     <input type="text" class="control-input" id="inputAMMPairAddr" placeholder="AMM Pair (0x...)" required>
-                                    <button type="button" class="btn-web3 btn-web3-green" onclick="submitAMMPair(true)">Register</button>
-                                    <button type="button" class="btn-web3 btn-web3-red" onclick="submitAMMPair(false)">Unregister</button>
+                                    <button type="button" class="btn-web3 btn-web3-green" style="opacity: 0.5; cursor: not-allowed;" disabled onclick="submitAMMPair(true)">Register</button>
+                                    <button type="button" class="btn-web3 btn-web3-red" style="opacity: 0.5; cursor: not-allowed;" disabled onclick="submitAMMPair(false)">Unregister</button>
                                 </div>
                             </form>
                         </div>
@@ -1142,7 +1142,7 @@
                             <label class="control-label">Update Backend Signer</label>
                             <div style="display: flex; gap: 8px;">
                                 <input type="text" class="control-input" id="inputNewRewardSigner" placeholder="New Hot Signer (0x...)" required>
-                                <button type="submit" class="btn-web3 btn-web3-gold">Set</button>
+                                <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>Set</button>
                             </div>
                         </form>
 
@@ -1152,7 +1152,7 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
                                 <input type="text" class="control-input" id="inputEmDestReward" placeholder="To Address" required>
                                 <input type="number" step="any" class="control-input" id="inputEmAmtReward" placeholder="Amount CAI" required>
-                                <button type="submit" class="btn-web3 btn-web3-outline">Withdraw</button>
+                                <button type="submit" class="btn-web3 btn-web3-outline" style="opacity: 0.5; cursor: not-allowed;" disabled>Withdraw</button>
                             </div>
                         </form>
                     </div>
@@ -1189,7 +1189,7 @@
                             <label class="control-label">Update Backend Signer</label>
                             <div style="display: flex; gap: 8px;">
                                 <input type="text" class="control-input" id="inputNewWithdrawalSigner" placeholder="New Hot Signer (0x...)" required>
-                                <button type="submit" class="btn-web3 btn-web3-gold">Set</button>
+                                <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>Set</button>
                             </div>
                         </form>
 
@@ -1199,7 +1199,7 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
                                 <input type="text" class="control-input" id="inputEmDestWithdrawal" placeholder="To Address" required>
                                 <input type="number" step="any" class="control-input" id="inputEmAmtWithdrawal" placeholder="Amount USDT" required>
-                                <button type="submit" class="btn-web3 btn-web3-outline">Withdraw</button>
+                                <button type="submit" class="btn-web3 btn-web3-outline" style="opacity: 0.5; cursor: not-allowed;" disabled>Withdraw</button>
                             </div>
                         </form>
                     </div>
