@@ -367,11 +367,6 @@
                                 <!-- Sub-stats below Total Portfolio -->
                                 <div class="hero-port-substats">
                                     <div class="port-substat-row">
-                                        <span class="substat-lbl"><i class="fas fa-arrow-trend-up"
-                                                style="color: #FFD700; font-size: 7px;"></i> TOTAL INCOME:</span>
-                                        <span class="substat-val gold">${{ number_format($totalIncomeUsdt, 2) }}</span>
-                                    </div>
-                                    <div class="port-substat-row">
                                         <span class="substat-lbl"><i class="fas fa-bolt"
                                                 style="color: #00FF88; font-size: 7px;"></i> READY TO CLAIM:</span>
                                         <span class="substat-val gold">{{ number_format($claimableCai, 2) }} CAI <small
