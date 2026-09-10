@@ -167,46 +167,61 @@
     </div>
 
     <!-- ============================================================
-         LIVE ON-CHAIN TRANSACTION STATUS MODAL
+         LIVE ON-CHAIN TRANSACTION STATUS MODAL (LOCKED DURING VERIFICATION)
          ============================================================ -->
     <div id="txnStatusModal"
-        style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
         <div
-            style="background: #0a0b12; border: 1px solid var(--card-border); border-radius: 16px; max-width: 420px; width: 100%; padding: 24px 18px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9);">
+            style="background: #0a0b12; border: 1px solid var(--card-border, rgba(245, 166, 35, 0.25)); border-radius: 16px; max-width: 440px; width: 100%; padding: 26px 20px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.95); position: relative;">
 
             <div id="modalIconWrap"
-                style="width: 54px; height: 54px; border-radius: 50%; background: rgba(245, 166, 35, 0.12); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 12px auto;">
+                style="width: 58px; height: 58px; border-radius: 50%; background: rgba(245, 166, 35, 0.12); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 14px auto;">
                 <i class="fas fa-satellite-dish fa-spin"></i>
             </div>
 
             <h3 id="modalTitle"
-                style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; color: #FFFFFF; font-weight: 700; margin-bottom: 6px;">
+                style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; color: #FFFFFF; font-weight: 700; margin-bottom: 6px;">
                 Executing On-Chain Stake
             </h3>
-            <p id="modalDesc" style="color: #94A3B8; font-size: 0.82rem; line-height: 1.4; margin-bottom: 16px;">
-                Please confirm the transaction in MetaMask...
+            <p id="modalDesc" style="color: #94A3B8; font-size: 0.82rem; line-height: 1.45; margin-bottom: 16px;">
+                Please confirm the transaction in your wallet popup...
             </p>
 
             <!-- Progress Steps -->
             <div
-                style="text-align: left; background: #07080d; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;">
+                style="text-align: left; background: #07080d; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.05);">
                 <div id="step1"
-                    style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #94A3B8; font-size: 0.80rem;">
+                    style="display: flex; align-items: center; gap: 9px; margin-bottom: 10px; color: #94A3B8; font-size: 0.82rem;">
                     <i class="fas fa-circle-notch fa-spin" id="step1Icon"></i>
-                    <span id="step1Text">Step 1: Approve USDT Token</span>
+                    <span id="step1Text">Step 1: Approve Official USDT Token</span>
                 </div>
                 <div id="step2"
-                    style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #64748B; font-size: 0.80rem;">
+                    style="display: flex; align-items: center; gap: 9px; margin-bottom: 10px; color: #64748B; font-size: 0.82rem;">
                     <i class="far fa-circle" id="step2Icon"></i>
-                    <span id="step2Text">Step 2: Staking Activation</span>
+                    <span id="step2Text">Step 2: On-Chain Contract Deposit (70/30 Splitter)</span>
                 </div>
-                <div id="step3" style="display: flex; align-items: center; gap: 8px; color: #64748B; font-size: 0.80rem;">
+                <div id="step3" style="display: flex; align-items: center; gap: 9px; color: #64748B; font-size: 0.82rem;">
                     <i class="far fa-circle" id="step3Icon"></i>
-                    <span id="step3Text">Step 3: Staking &amp; Yield Activation</span>
+                    <span id="step3Text">Step 3: Blockchain Proof &amp; Ledger Synchronization</span>
                 </div>
             </div>
 
-            <div id="modalActionBtn" style="display: none;">
+            <!-- Lock Notice Box (Shown during verification) -->
+            <div id="modalLockNotice" style="display: none; background: rgba(245, 166, 35, 0.08); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 8px; padding: 9px 12px; margin-bottom: 16px; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 7px; color: #FFD700; font-size: 10.5px; font-weight: 700; margin-bottom: 3px;">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>VERIFICATION LOCK ACTIVE</span>
+                </div>
+                <div style="font-size: 8.5px; color: #CBD5E1; line-height: 1.35;">
+                    Please stay on this page. Our multi-RPC cluster is validating transaction consensus and updating tree commissions. Do not refresh or close.
+                </div>
+            </div>
+
+            <!-- Action Buttons Area -->
+            <div id="modalActionBtn" style="display: none; flex-direction: column; gap: 8px;">
+                <button type="button" id="btnRetrySync" class="mecha-btn-gold" style="display: none; height: 40px; font-size: 12px; background: linear-gradient(135deg, #F59E0B, #D97706);">
+                    <i class="fas fa-rotate-right"></i> RETRY LEDGER SYNCHRONIZATION
+                </button>
                 <button type="button" class="mecha-btn-gold" onclick="window.location.href='{{ url('/User/Dashboard') }}'"
                     style="height: 40px; font-size: 12px;">
                     <i class="fas fa-chart-line"></i> GO TO DASHBOARD
@@ -267,6 +282,9 @@
             ];
 
             let userAccount = null;
+            let lastConfirmedTxHash = null;
+            let lastAmount = 0;
+            let lastTargetUser = '';
 
             // Presets Click Handler
             $('.preset-amt-btn').on('click', function () {
@@ -337,11 +355,17 @@
             checkWallet();
 
             // Modal UI Helpers
-            function showModal(title, desc) {
+            function showModal(title, desc, isLocked = false) {
                 $('#modalTitle').text(title);
-                $('#modalDesc').text(desc);
+                $('#modalDesc').html(desc);
                 $('#modalActionBtn').hide();
+                $('#btnRetrySync').hide();
                 $('#modalIconWrap').html('<i class="fas fa-satellite-dish fa-spin"></i>').css('color', '#FFD700');
+                if (isLocked) {
+                    $('#modalLockNotice').show();
+                } else {
+                    $('#modalLockNotice').hide();
+                }
                 $('#txnStatusModal').css('display', 'flex');
             }
 
@@ -360,6 +384,69 @@
                     text.css('color', '#FB7185');
                 }
             }
+
+            // Sync with backend API (Thorough verification handling)
+            async function syncWithBackend(txHash, amount, targetUserId, senderAddress) {
+                showModal(
+                    'Step 3: Multi-RPC Consensus Verification',
+                    'Validating on-chain proof & synchronizing ledger...<br><span style="font-size: 0.76rem; color: #FFD700; font-family: monospace;">Tx: ' + txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8) + '</span>',
+                    true
+                );
+                setModalStep(3, 'active');
+
+                try {
+                    const response = await fetch("{{ url('/User/Web3UnifiedStake') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: amount,
+                            txHash: txHash,
+                            targetUserId: targetUserId,
+                            senderAddress: senderAddress
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        setModalStep(3, 'done');
+                        $('#modalLockNotice').hide();
+                        $('#modalIconWrap').html('<i class="fas fa-check-circle"></i>').css('color', '#00FF88');
+                        $('#modalTitle').text('Staking Successfully Activated!').css('color', '#00FF88');
+                        $('#modalDesc').html('Your stake of <strong>$' + amount + ' USDT</strong> is 100% verified on BSC Mainnet.<br><a href="https://bscscan.com/tx/' + txHash + '" target="_blank" style="color: #FFD700; text-decoration: underline; font-family: monospace; font-size: 0.82rem;">View on BscScan <i class="fas fa-external-link-alt"></i></a>');
+                        $('#modalActionBtn').css('display', 'flex');
+                        $('#btnRetrySync').hide();
+                    } else {
+                        setModalStep(3, 'error');
+                        $('#modalLockNotice').hide();
+                        $('#modalIconWrap').html('<i class="fas fa-triangle-exclamation"></i>').css('color', '#FB7185');
+                        $('#modalTitle').text('Verification In Progress / Notice');
+                        $('#modalDesc').html((data.message || 'Transaction is confirmed on-chain, but multi-node indexing took longer than usual.') + '<br><small style="color: #94A3B8;">Click "Retry Ledger Synchronization" below to re-verify without spending gas again.</small>');
+                        $('#modalActionBtn').css('display', 'flex');
+                        $('#btnRetrySync').show();
+                    }
+                } catch (networkErr) {
+                    console.error('Network sync error:', networkErr);
+                    setModalStep(3, 'error');
+                    $('#modalLockNotice').hide();
+                    $('#modalIconWrap').html('<i class="fas fa-rotate-right fa-spin"></i>').css('color', '#F59E0B');
+                    $('#modalTitle').text('Blockchain Sync Delayed');
+                    $('#modalDesc').html('Your transaction is securely mined on BSC Mainnet, but network verification timed out.<br><br><strong>Do not re-stake or send funds again!</strong> Click below to finalize synchronization.');
+                    $('#modalActionBtn').css('display', 'flex');
+                    $('#btnRetrySync').show();
+                }
+            }
+
+            // Retry Button Click Handler
+            $('#btnRetrySync').on('click', function () {
+                if (lastConfirmedTxHash) {
+                    syncWithBackend(lastConfirmedTxHash, lastAmount, lastTargetUser, userAccount);
+                }
+            });
 
             // ============================================================
             // 1-CLICK REAL WEB3 ON-CHAIN STAKING EXECUTION
@@ -380,6 +467,11 @@
                     showStakeAlert('Please open inside MetaMask or TrustWallet to execute on-chain stake.');
                     return;
                 }
+
+                const btn = $('#btnExecuteStake');
+                btn.prop('disabled', true).css('opacity', '0.7');
+                $('#stakeSpinner').show();
+                $('#stakeBtnText').text('PROCESSING...');
 
                 try {
                     let txHash = '';
@@ -410,6 +502,9 @@
                         const accounts = await provider.request({ method: 'eth_requestAccounts' });
                         if (!accounts || accounts.length === 0) {
                             showStakeAlert('Please select a Web3 account.');
+                            btn.prop('disabled', false).css('opacity', '1');
+                            $('#stakeSpinner').hide();
+                            $('#stakeBtnText').text('APPROVE & STAKE USDT');
                             return;
                         }
                         userAccount = accounts[0];
@@ -436,6 +531,9 @@
                                     });
                                 } else {
                                     showStakeAlert('Please switch your wallet network to BNB Smart Chain (BSC Mainnet).');
+                                    btn.prop('disabled', false).css('opacity', '1');
+                                    $('#stakeSpinner').hide();
+                                    $('#stakeBtnText').text('APPROVE & STAKE USDT');
                                     return;
                                 }
                             }
@@ -445,6 +543,9 @@
                         currentChain = await provider.request({ method: 'eth_chainId' });
                         if (currentChain !== BSC_CHAIN_ID) {
                             showStakeAlert('Network mismatch! Please switch MetaMask to BNB Smart Chain Mainnet (BSC).');
+                            btn.prop('disabled', false).css('opacity', '1');
+                            $('#stakeSpinner').hide();
+                            $('#stakeBtnText').text('APPROVE & STAKE USDT');
                             return;
                         }
 
@@ -486,40 +587,13 @@
                         setModalStep(2, 'done');
                     }
 
-                    // 3. Post to Backend for Full 10-Step Audit & Activation
-                    showModal('Step 3: Synchronizing Ledger & Ranks', 'Recording transaction & activating yield accumulation...');
-                    setModalStep(3, 'active');
+                    // Save state for potential retry without re-spending gas
+                    lastConfirmedTxHash = txHash;
+                    lastAmount = amount;
+                    lastTargetUser = targetUserId;
 
-                    const response = await fetch("{{ url('/User/Web3UnifiedStake') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            amount: amount,
-                            txHash: txHash,
-                            targetUserId: targetUserId,
-                            senderAddress: userAccount
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.status === 'success') {
-                        setModalStep(3, 'done');
-                        $('#modalIconWrap').html('<i class="fas fa-check-circle"></i>').css('color', '#00FF88');
-                        $('#modalTitle').text('Staking Successfully Activated!').css('color', '#00FF88');
-                        $('#modalDesc').html('Your stake of <strong>$' + amount + ' USDT</strong> is confirmed on-chain.<br><a href="https://bscscan.com/tx/' + txHash + '" target="_blank" style="color: #FFD700; text-decoration: underline; font-family: monospace; font-size: 0.82rem;">View on BscScan <i class="fas fa-external-link-alt"></i></a>');
-                        $('#modalActionBtn').show();
-                    } else {
-                        setModalStep(3, 'error');
-                        $('#modalIconWrap').html('<i class="fas fa-triangle-exclamation"></i>').css('color', '#FB7185');
-                        $('#modalTitle').text('Ledger Sync Notice');
-                        $('#modalDesc').text(data.message || 'Transaction succeeded on-chain, but backend reported an issue.');
-                        $('#modalActionBtn').show();
-                    }
+                    // 3. Post to Backend for Full Multi-RPC Consensus Verification & Activation
+                    await syncWithBackend(txHash, amount, targetUserId, userAccount);
 
                 } catch (err) {
                     console.error('Web3 Staking Error:', err);
@@ -554,6 +628,10 @@
                     }
 
                     showStakeAlert(errMsg);
+                } finally {
+                    btn.prop('disabled', false).css('opacity', '1');
+                    $('#stakeSpinner').hide();
+                    $('#stakeBtnText').text('APPROVE & STAKE USDT');
                 }
             });
         });

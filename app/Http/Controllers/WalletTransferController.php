@@ -474,9 +474,11 @@ class WalletTransferController extends Controller
 
         $rpcEndpoints = [
             "https://bsc.meowrpc.com",
-            "https://bsc-dataseed.binance.org/",
             "https://bsc-dataseed1.defibit.io/",
-            "https://bsc-dataseed1.ninicoin.io/"
+            "https://bsc-dataseed.binance.org/",
+            "https://bsc-dataseed1.ninicoin.io/",
+            "https://binance.llamarpc.com",
+            "https://1rpc.io/bnb"
         ];
 
         $payloadReceipt = json_encode([
@@ -489,14 +491,18 @@ class WalletTransferController extends Controller
         $receipt = null;
         $rpcUsed = '';
 
-        // Query with retry across RPC endpoints
-        for ($attempt = 1; $attempt <= 3; $attempt++) {
+        // Thorough multi-round query across BSC RPC endpoints with patience
+        $maxAttempts = 8;
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            \Log::info("verifyBscTransaction: [Attempt $attempt/$maxAttempts] Querying BSC RPCs for TxHash: $txHash");
+
             foreach ($rpcEndpoints as $rpcUrl) {
                 $ch = curl_init($rpcUrl);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadReceipt);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 $response = curl_exec($ch);
                 curl_close($ch);
@@ -506,18 +512,20 @@ class WalletTransferController extends Controller
                     if (isset($data['result']) && !empty($data['result'])) {
                         $receipt = $data['result'];
                         $rpcUsed = $rpcUrl;
+                        \Log::info("verifyBscTransaction: Found receipt on attempt $attempt via $rpcUrl for $txHash");
                         break 2;
                     }
                 }
             }
-            if ($attempt < 3) {
-                sleep(1);
+
+            if ($attempt < $maxAttempts) {
+                sleep(2);
             }
         }
 
         if (!$receipt) {
-            \Log::warning("verifyBscTransaction: Receipt not found on BSC RPCs for $txHash");
-            return ['valid' => false, 'message' => 'Transaction not found or not yet indexed on BSC blockchain. Please wait a moment and try again.'];
+            \Log::warning("verifyBscTransaction: Receipt not found after $maxAttempts attempts on BSC RPCs for $txHash");
+            return ['valid' => false, 'message' => 'Transaction not found or not yet indexed by BSC nodes after multiple verification attempts. Please ensure the transaction succeeded in MetaMask and retry syncing.'];
         }
 
         \Log::info("verifyBscTransaction: Receipt retrieved from $rpcUsed for $txHash", ['status' => $receipt['status'] ?? 'unknown']);
