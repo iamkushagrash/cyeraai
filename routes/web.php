@@ -12,10 +12,13 @@
 */
 
 Route::get('/', function () {
-    return redirect('/login');
+    return view('landing.cai-token');
 });
 Route::get('/index', function () {
-    return redirect('/login');
+    return view('landing.cai-token');
+});
+Route::get('/cai-token', function () {
+    return view('landing.cai-token');
 });
 Route::get('/about', function () {
     return view('front2.about');
