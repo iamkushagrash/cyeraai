@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         /*$schedule->call('App\Http\Controllers\TransactionInfoController@sftcTransactioncheck')->everyMinute()->timezone('Asia/Kolkata');*/
         //$schedule->call('App\Http\Controllers\TransactionInfoController@npGatewayTansactionStatus')->everyFiveMinute()->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\CpsIncomeController@ProductCpsGeneration')->daily()->at('00:00')->timezone('Asia/Kolkata');
-        $schedule->call('App\Http\Controllers\CpsIncomeController@cpsGeneration')->daily()->at('14:05')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\CpsIncomeController@cpsGeneration')->daily()->at('04:30')->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\LevelIncomeController@levelDistribution')->daily()->at('00:30')->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\ClubIncomeController@clubDistribution')->daily()->at('11:15')->timezone('Asia/Kolkata');
         // $schedule->call('App\Http\Controllers\AppUpdateController@AdminROITopupIncomeReturn')->daily()->at('10:45')->timezone('Asia/Kolkata');

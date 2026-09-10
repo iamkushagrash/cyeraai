@@ -355,7 +355,7 @@
 
                             </div>
 
-                            <!-- Right Column: Total Portfolio Value + Total Income + Ready To Release -->
+                            <!-- Right Column: Total Portfolio Value -->
                             <div class="col-right-portfolio">
                                 <div class="row-port-title">
                                     <span class="txt-port-title">TOTAL PORTFOLIO</span>
@@ -363,75 +363,55 @@
                                 </div>
                                 <div class="txt-port-big">${{ number_format($totalInvested, 2) }}</div>
                                 <div class="txt-port-unit">USDT STAKED VALUE</div>
-
-                                <!-- Sub-stats below Total Portfolio -->
-                                <div class="hero-port-substats">
-                                    <div class="port-substat-row">
-                                        <span class="substat-lbl"><i class="fas fa-bolt"
-                                                style="color: #00FF88; font-size: 7px;"></i> READY TO CLAIM:</span>
-                                        <span class="substat-val gold">{{ number_format($claimableCai, 2) }} CAI <small
-                                                style="color: #00FF88; font-weight: 700; font-size: 8.5px;">(${{ number_format($claimableUsdDynamic, 2) }})</small></span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
-                        <!-- Dedicated Bottom Strip: 4 Equal Grid Columns (Never Overlaps) -->
+                        <!-- Dedicated Bottom Strip: 2-Tier Clean HUD (Zero Overlap) -->
                         @php
                             $isUserActive = ($data['userDetail']->userstatus == 1 || $data['userDetail']->userstate > 0 || $totalInvested > 0);
                         @endphp
                         <div class="hero-bottom-strip">
-                            <!-- 1. Status & Rank -->
-                            <div class="strip-col-item">
-                                <span class="strip-col-lbl"><i class="fas fa-shield-halved" style="color: #FFD700;"></i>
-                                    STATUS & RANK</span>
-                                <div class="strip-val-wrap"
-                                    style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                                    @if($isUserActive)
-                                        <span class="strip-status-pill active"><i class="fas fa-circle-check"></i>
-                                            ACTIVE</span>
-                                    @else
-                                        <span class="strip-status-pill inactive"><i class="fas fa-circle-xmark"></i>
-                                            INACTIVE</span>
-                                    @endif
-                                    <span class="strip-status-pill"
-                                        style="background: rgba(245, 158, 11, 0.2); border: 1px solid #F59E0B; color: #FDE68A; font-weight: 800;"
-                                        title="Current Rank">
-                                        <i class="fas fa-crown" style="color: #F59E0B;"></i> {{ $userRankName }}
-                                    </span>
+                            <!-- Top Tier: Status & Rank (Left) + Fund Wallet (Right) -->
+                            <div class="hero-strip-top-row">
+                                <div class="strip-item-status">
+                                    <span class="strip-col-lbl"><i class="fas fa-shield-halved" style="color: #FFD700;"></i> STATUS & RANK</span>
+                                    <div class="strip-val-wrap">
+                                        @if($isUserActive)
+                                            <span class="strip-status-pill active"><i class="fas fa-circle-check"></i> ACTIVE</span>
+                                        @else
+                                            <span class="strip-status-pill inactive"><i class="fas fa-circle-xmark"></i> INACTIVE</span>
+                                        @endif
+                                        <span class="strip-status-pill rank-pill" title="Current Rank">
+                                            <i class="fas fa-crown"></i> {{ $userRankName }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="strip-item-fund">
+                                    <span class="strip-col-lbl"><i class="fas fa-wallet" style="color: #00FF88;"></i> FUND WALLET</span>
+                                    <div class="strip-val-wrap">
+                                        <span class="strip-col-val fund-val">${{ number_format($fundWalletBalance, 2) }}</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- 2. Fund Wallet -->
-                            <div class="strip-col-item">
-                                <span class="strip-col-lbl"><i class="fas fa-wallet" style="color: #00FF88;"></i> FUND
-                                    WALLET</span>
-                                <div class="strip-val-wrap">
-                                    <span
-                                        class="strip-col-val fund-val">${{ number_format($fundWalletBalance, 2) }}</span>
+                            <!-- Bottom Tier: Ready to Claim ROI (Left) + Claim ROI Action (Right) -->
+                            <div class="hero-strip-bottom-row">
+                                <div class="strip-item-claim-info">
+                                    <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i> READY TO CLAIM ROI</span>
+                                    <div class="strip-val-wrap">
+                                        <span class="strip-roi-amount-cai">
+                                            {{ number_format($claimableCai, 2) }} <span class="unit-cai">CAI</span>
+                                        </span>
+                                        <span class="strip-roi-amount-usd">(${{ number_format($claimableUsdDynamic, 2) }})</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- 3. Ready to Claim ROI (Staking Yield) -->
-                            <div class="strip-col-item">
-                                <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i>
-                                    READY TO CLAIM ROI</span>
-                                <div class="strip-val-wrap">
-                                    <span class="strip-col-val roi-val"
-                                        style="color: #FFD700; font-size: 11px; font-weight: 900; font-family: 'Space Mono', monospace;">
-                                        {{ number_format($claimableCai, 2) }} <span
-                                            style="font-size: 9.5px; color: #FFD700;">CAI</span>
-                                        <span
-                                            style="color: #00FF88; font-size: 9.5px; font-weight: 800; margin-left: 2px;">(${{ number_format($claimableUsdDynamic, 2) }})</span>
-                                    </span>
+                                <div class="strip-item-claim-action">
+                                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-solid-gold-claim">
+                                        <i class="fas fa-bolt"></i> CLAIM ROI
+                                    </a>
                                 </div>
-                            </div>
-
-                            <!-- 4. Claim Action Button -->
-                            <div class="strip-col-item strip-col-action">
-                                <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-solid-gold-claim">
-                                    <i class="fas fa-bolt"></i> CLAIM ROI
-                                </a>
                             </div>
                         </div>
                     </div>
