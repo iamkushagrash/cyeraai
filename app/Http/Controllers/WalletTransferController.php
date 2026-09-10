@@ -230,10 +230,19 @@ class WalletTransferController extends Controller
 
         $amount = floatval($request->amount);
         $txHash = strtolower($request->txHash);
+        
+        \Log::info("Web3UnifiedStake: Incoming Request", [
+            'amount' => $amount,
+            'txHash' => $txHash,
+            'targetUserId' => $request->targetUserId,
+            'senderAddress' => $request->senderAddress,
+            'session_user_id' => \Session::get('user.id')
+        ]);
+
         $currentUserId = \Session::get('user.id');
 
         if (!$currentUserId && \Auth::check()) {
-            $currentDetail = \App\UserDetails::where('userid', \Auth::id())->first();
+            $currentDetail = \App\UserDetails::where('userid', \Auth::id())->orWhere('id', \Auth::id())->first();
             if ($currentDetail) {
                 $currentUserId = $currentDetail->id;
             }
@@ -253,28 +262,32 @@ class WalletTransferController extends Controller
         }
 
         if (!$currentUserId) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthenticated session. Please connect wallet again.'], 401);
+            \Log::warning("Web3UnifiedStake: Unauthenticated Session for TxHash: $txHash");
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated session. Please refresh and connect wallet again.'], 401);
         }
 
         // Check for duplicate TxHash in database
         $duplicateTxn = \App\TransactionInfo::whereRaw('LOWER(transaction_hash) = ?', [$txHash])->first();
         if ($duplicateTxn) {
+            \Log::warning("Web3UnifiedStake: Duplicate TxHash detected: $txHash");
             return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been processed in Cyera AI.'], 400);
         }
 
-        // Determine target user (Self or Specified Downline UUID)
+        // Determine target user (Self or Specified Downline UUID/ID)
         $targetUserDetail = null;
-        if (!empty($request->targetUserId)) {
-            $userObj = \App\User::where('uuid', $request->targetUserId)->first();
+        if (!empty($request->targetUserId) && strtolower(trim($request->targetUserId)) !== 'self') {
+            $targetInput = trim($request->targetUserId);
+            $userObj = \App\User::where('uuid', $targetInput)->orWhere('id', $targetInput)->first();
             if ($userObj) {
-                $targetUserDetail = \App\UserDetails::where('userid', $userObj->id)->first();
+                $targetUserDetail = \App\UserDetails::where('userid', $userObj->id)->orWhere('id', $userObj->id)->first();
             }
         }
         if (!$targetUserDetail) {
-            $targetUserDetail = \App\UserDetails::where('id', $currentUserId)->first();
+            $targetUserDetail = \App\UserDetails::where('id', $currentUserId)->orWhere('userid', $currentUserId)->first();
         }
 
         if (!$targetUserDetail) {
+            \Log::warning("Web3UnifiedStake: Target user account not found for currentUserId: $currentUserId");
             return response()->json(['status' => 'error', 'message' => 'Target user account not found.'], 404);
         }
 
@@ -283,9 +296,10 @@ class WalletTransferController extends Controller
         $splitterAddress = env('INVESTMENT_SPLITTER_ADDRESS', '0x2A1CEBf5Afe686763E915838457ccBC344901ebD');
         $senderAddr = !empty($request->senderAddress) ? strtolower($request->senderAddress) : null;
 
-        // Comprehensive On-Chain BSC Mainnet Receipt, Freshness (Max 30 mins) & Amount Verification
+        // Comprehensive On-Chain BSC Mainnet Receipt, Freshness & Amount Verification
         $verifyResult = $this->verifyBscTransaction($txHash, $splitterAddress, $senderAddr, $amount);
         if (!$verifyResult['valid']) {
+            \Log::warning("Web3UnifiedStake: BSC On-Chain Verification Failed: " . $verifyResult['message']);
             return response()->json([
                 'status' => 'error',
                 'message' => $verifyResult['message']
@@ -394,7 +408,7 @@ class WalletTransferController extends Controller
             ]);
 
             // 5% Direct Referral Commission to Sponsor
-            $guiderDetail = \App\UserDetails::where('userid', $targetUserDetail->sponsorid)->first();
+            $guiderDetail = \App\UserDetails::where('userid', $targetUserDetail->sponsorid)->orWhere('id', $targetUserDetail->sponsorid)->first();
             if ($guiderDetail && ($guiderDetail->userstate || !is_null($guiderDetail->userLoanStatus()))) {
                 $dirAmt = $amount * 5 / 100; // 5% Direct Commission
                 $dirAmt = $cappingFunction->cappingCalculation($guiderDetail->id, $dirAmt);
@@ -418,6 +432,7 @@ class WalletTransferController extends Controller
             $cappingFunction->businessUpdate();
 
             \DB::commit();
+            \Log::info("Web3UnifiedStake: Success! Staking activated for UserID: $targetUserId, Amount: $$amount");
 
             return response()->json([
                 'status'  => 'success',
@@ -442,7 +457,7 @@ class WalletTransferController extends Controller
     }
 
     /**
-     * Verifies transaction receipt directly against official BSC Mainnet JSON-RPC:
+     * Verifies transaction receipt directly against official BSC Mainnet JSON-RPCs with multi-RPC fallback:
      * 1. Status == 0x1 (Success)
      * 2. Interaction directed to CyeraInvestmentSplitter
      * 3. Freshness Check (Mined within last 30 minutes to prevent old txn replay)
@@ -453,10 +468,17 @@ class WalletTransferController extends Controller
     {
         $isDemo = env('DEMO_MODE', false) || env('TEST_MODE', false) || config('app.demo_mode', false);
         if ($isDemo) {
+            \Log::info("verifyBscTransaction: DEMO_MODE active, bypassing on-chain check for $txHash");
             return ['valid' => true, 'message' => 'Demo mode active: On-chain check simulated.'];
         }
 
-        // 1. Fetch Transaction Receipt
+        $rpcEndpoints = [
+            "https://bsc.meowrpc.com",
+            "https://bsc-dataseed.binance.org/",
+            "https://bsc-dataseed1.defibit.io/",
+            "https://bsc-dataseed1.ninicoin.io/"
+        ];
+
         $payloadReceipt = json_encode([
             'jsonrpc' => '2.0',
             'method' => 'eth_getTransactionReceipt',
@@ -464,24 +486,41 @@ class WalletTransferController extends Controller
             'id' => 1
         ]);
 
-        $ch = curl_init("https://bsc-dataseed.binance.org/");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadReceipt);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 8);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $receipt = null;
+        $rpcUsed = '';
 
-        if (!$response) {
-            return ['valid' => false, 'message' => 'Failed to reach BSC blockchain node. Please retry in a moment.'];
+        // Query with retry across RPC endpoints
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            foreach ($rpcEndpoints as $rpcUrl) {
+                $ch = curl_init($rpcUrl);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadReceipt);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                if ($response) {
+                    $data = json_decode($response, true);
+                    if (isset($data['result']) && !empty($data['result'])) {
+                        $receipt = $data['result'];
+                        $rpcUsed = $rpcUrl;
+                        break 2;
+                    }
+                }
+            }
+            if ($attempt < 3) {
+                sleep(1);
+            }
         }
 
-        $data = json_decode($response, true);
-        if (!isset($data['result']) || empty($data['result'])) {
-            return ['valid' => false, 'message' => 'Transaction not found on BSC blockchain. Please ensure transaction is confirmed on BscScan.'];
+        if (!$receipt) {
+            \Log::warning("verifyBscTransaction: Receipt not found on BSC RPCs for $txHash");
+            return ['valid' => false, 'message' => 'Transaction not found or not yet indexed on BSC blockchain. Please wait a moment and try again.'];
         }
 
-        $receipt = $data['result'];
+        \Log::info("verifyBscTransaction: Receipt retrieved from $rpcUsed for $txHash", ['status' => $receipt['status'] ?? 'unknown']);
 
         // Check Status (0x1 = Confirmed Success)
         if (!isset($receipt['status']) || $receipt['status'] !== '0x1') {
@@ -490,6 +529,7 @@ class WalletTransferController extends Controller
 
         // Check Target Contract
         if (!isset($receipt['to']) || strtolower($receipt['to']) !== strtolower($expectedContract)) {
+            \Log::warning("verifyBscTransaction: Target contract mismatch. Expected $expectedContract, got " . ($receipt['to'] ?? 'null'));
             return ['valid' => false, 'message' => 'Transaction was not sent to the official Cyera Staking Splitter contract.'];
         }
 
@@ -498,9 +538,10 @@ class WalletTransferController extends Controller
             return ['valid' => false, 'message' => 'No token transfer or staking execution logs found in transaction receipt.'];
         }
 
-        // Check Sender
+        // Check Sender if provided
         if (!empty($expectedSender) && isset($receipt['from'])) {
             if (strtolower($receipt['from']) !== strtolower($expectedSender)) {
+                \Log::warning("verifyBscTransaction: Sender mismatch. Expected $expectedSender, got " . ($receipt['from'] ?? 'null'));
                 return ['valid' => false, 'message' => 'Transaction was not broadcast from your authenticated wallet address.'];
             }
         }
@@ -514,11 +555,12 @@ class WalletTransferController extends Controller
                 'id' => 2
             ]);
 
-            $chBlock = curl_init("https://bsc-dataseed.binance.org/");
+            $chBlock = curl_init($rpcUsed ?: "https://bsc.meowrpc.com");
             curl_setopt($chBlock, CURLOPT_POSTFIELDS, $payloadBlock);
             curl_setopt($chBlock, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
             curl_setopt($chBlock, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($chBlock, CURLOPT_TIMEOUT, 8);
+            curl_setopt($chBlock, CURLOPT_TIMEOUT, 6);
+            curl_setopt($chBlock, CURLOPT_SSL_VERIFYPEER, false);
             $resBlock = curl_exec($chBlock);
             curl_close($chBlock);
 
@@ -556,7 +598,6 @@ class WalletTransferController extends Controller
 
                 // Verify Official Invested Event from Splitter Contract
                 if ($topic0 === strtolower($investedTopic0) && $logContract === strtolower($expectedContract)) {
-                    // Invested event data: first 32 bytes (64 hex chars) is amountUSDT
                     $cleanData = ltrim($log['data'], '0x');
                     $amountHex = substr($cleanData, 0, 64);
                     $weiDec = $this->hexToDecBc($amountHex);
@@ -579,6 +620,12 @@ class WalletTransferController extends Controller
                 }
             }
         }
+
+        \Log::info("verifyBscTransaction: Decoded", [
+            'validUsdtTransferFound' => $validUsdtTransferFound,
+            'amountFound' => $amountFound,
+            'expectedAmount' => $expectedAmount
+        ]);
 
         // Strict Enforcement: Must have valid official USDT token transfer to splitter
         if (!$validUsdtTransferFound && is_null($amountFound)) {

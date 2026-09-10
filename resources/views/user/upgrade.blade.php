@@ -9,7 +9,18 @@
         $caiPrice = (float) ($price->price ?? 1.25);
         $splitterContract = env('INVESTMENT_SPLITTER_ADDRESS', '0x2A1CEBf5Afe686763E915838457ccBC344901ebD');
         $usdtContract = env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955');
-        $currentUuid = Session::get('user.userid', 'CYERA');
+        
+        $currentUuid = '';
+        if (Session::has('user.uuid') && !empty(Session::get('user.uuid'))) {
+            $currentUuid = Session::get('user.uuid');
+        } elseif (Session::has('user.userid')) {
+            $uObj = \App\User::where('id', Session::get('user.userid'))->orWhere('uuid', Session::get('user.userid'))->first();
+            if ($uObj) $currentUuid = $uObj->uuid;
+        } elseif (Session::has('user.id')) {
+            $uObj = \App\User::where('id', Session::get('user.id'))->first();
+            if ($uObj) $currentUuid = $uObj->uuid;
+        }
+        if (!$currentUuid) $currentUuid = 'Self';
     @endphp
 
     <!-- Mini Stats Grid (Compact) -->
