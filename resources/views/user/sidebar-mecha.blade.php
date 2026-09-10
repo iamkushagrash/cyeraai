@@ -110,7 +110,7 @@
                         <span class="stat-mini-icon-circle"><i class="fas fa-bolt"></i></span>
                         <span class="stat-mini-lbl">CLAIMABLE</span>
                     </div>
-                    <div class="stat-mini-val">{{ number_format($sideClaimableCai, 2) }} CAI</div>
+                    <div class="stat-mini-val">{{ ($sideClaimableCai < 1 && $sideClaimableCai > 0) ? number_format($sideClaimableCai, 4) : number_format($sideClaimableCai, 2) }} CAI</div>
                     <div class="stat-mini-sub" style="color: #00FF88;">≈ ${{ number_format($sideClaimableUsdt, 2) }}</div>
                 </div>
 
@@ -236,7 +236,7 @@
             </div>
 
             <!-- Income & Rewards (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/IncomeOverview*') || request()->is('User/StakingReward*') || request()->is('User/DirectBonus*') || request()->is('User/StakingReferralReward*') || request()->is('User/TeamDevelopmentReward*') || request()->is('User/ClubReward*') || request()->is('User/LifetimeAchievementReward*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/IncomeOverview*') || request()->is('User/StakingReward*') || request()->is('User/DirectBonus*') || request()->is('User/StakingReferralReward*') || request()->is('User/PoolIncome*') || request()->is('User/RankIncome*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
@@ -266,14 +266,6 @@
                         <div class="sub-left-txt"><span class="sub-dot"></span> Staking Referral Reward</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
-                    <a href="{{ url('/User/TeamDevelopmentReward') }}" class="mecha-sub-link {{ request()->is('User/TeamDevelopmentReward*') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Team Development</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/ClubReward') }}" class="mecha-sub-link {{ request()->is('User/ClubReward*') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Club Rewards</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
                     <a href="{{ url('/User/PoolIncome') }}" class="mecha-sub-link {{ request()->is('User/PoolIncome*') ? 'active' : '' }}">
                         <div class="sub-left-txt"><span class="sub-dot"></span> Global Pool (5.0%)</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
@@ -282,16 +274,12 @@
                         <div class="sub-left-txt"><span class="sub-dot"></span> Rank Income (V1-V8)</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
-                    <a href="{{ url('/User/LifetimeAchievementReward') }}" class="mecha-sub-link {{ request()->is('User/LifetimeAchievementReward*') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Achievement Rewards</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
                 </div>
             </div>
 
 
             <!-- Wallet & Exchange (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') || request()->is('User/RoiWithdrawRequest*') || request()->is('User/RoiWithdrawalHistory*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
@@ -306,11 +294,19 @@
                 </div>
                 <div class="mecha-submenu">
                     <a href="{{ url('/User/WithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/WithdrawRequest') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Request Withdraw</div>
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00FF88;"></span> Working Withdraw</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/WithdrawalHistory') }}" class="mecha-sub-link {{ request()->is('User/WithdrawalHistory') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Withdrawal History</div>
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00FF88;"></span> Working History</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/RoiWithdrawRequest') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #FFD700;"></span> Staking ROI Claim</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/RoiWithdrawalHistory') }}" class="mecha-sub-link {{ request()->is('User/RoiWithdrawalHistory') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #FFD700;"></span> ROI Claim History</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                 </div>

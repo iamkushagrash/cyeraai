@@ -59,12 +59,12 @@
         /* Master Container */
         .auth-master-shell {
             width: 100%;
-            max-width: 440px;
+            max-width: 380px;
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 14px;
             margin: auto;
             animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -85,13 +85,13 @@
             background: #060609;
             backdrop-filter: blur(32px);
             -webkit-backdrop-filter: blur(32px);
-            border-radius: var(--radius-card);
+            border-radius: 20px;
             border: 1px solid var(--card-border);
             box-shadow: 
                 0 32px 64px -16px rgba(0, 0, 0, 0.98),
                 0 0 35px rgba(245, 166, 35, 0.12),
                 inset 0 1px 1px rgba(255, 255, 255, 0.12);
-            padding: 36px 30px 32px 30px;
+            padding: 24px 20px 20px 20px;
             position: relative;
             overflow: hidden;
         }
@@ -113,7 +113,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 26px;
+            margin-bottom: 16px;
             position: relative;
         }
 
@@ -121,7 +121,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             transition: transform 0.3s ease;
             text-decoration: none;
         }
@@ -131,7 +131,7 @@
         }
 
         .inside-logo-img {
-            height: 46px;
+            height: 38px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0 0 16px rgba(245, 166, 35, 0.5));
@@ -140,22 +140,22 @@
         .inside-live-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
+            gap: 5px;
+            padding: 3px 10px;
             border-radius: 20px;
             background: rgba(245, 166, 35, 0.1);
             border: 1px solid rgba(245, 166, 35, 0.32);
-            font-size: 0.70rem;
+            font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 0.8px;
             color: #FFD700;
             text-transform: uppercase;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
 
         .live-dot-pulse {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: #FFD700;
             box-shadow: 0 0 8px #FFD700;
@@ -169,17 +169,17 @@
 
         .card-auth-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.65rem;
+            font-size: 1.35rem;
             font-weight: 800;
             letter-spacing: -0.3px;
             background: linear-gradient(135deg, #FFFFFF 0%, #FFF3C4 60%, var(--gold-primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .card-auth-subtitle {
-            font-size: 0.86rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
@@ -364,22 +364,22 @@
         /* Primary Submit Button */
         .btn-submit-gold {
             width: 100%;
-            height: 52px;
+            height: 44px;
             border: none;
             outline: none;
-            border-radius: var(--radius-btn);
+            border-radius: 12px;
             background: var(--gold-gradient);
             color: #060912;
             font-family: 'Outfit', sans-serif;
-            font-size: 1.02rem;
+            font-size: 0.94rem;
             font-weight: 800;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
-            box-shadow: 0 10px 26px var(--gold-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 20px var(--gold-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
@@ -411,9 +411,9 @@
 
         .btn-spinner-icon {
             display: none;
-            width: 22px;
-            height: 22px;
-            border: 2.5px solid #060912;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #060912;
             border-top-color: transparent;
             border-radius: 50%;
             animation: spinCircle 0.8s linear infinite;
@@ -427,10 +427,10 @@
         .auth-divider-line {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin: 22px 0 18px 0;
+            gap: 12px;
+            margin: 16px 0 14px 0;
             color: var(--text-muted);
-            font-size: 0.76rem;
+            font-size: 0.72rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
@@ -447,19 +447,19 @@
         /* Secondary Button (Create Account) */
         .btn-action-secondary {
             width: 100%;
-            height: 48px;
-            border-radius: var(--radius-btn);
+            height: 40px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(245, 166, 35, 0.35);
             color: #FFD700;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.86rem;
             font-weight: 600;
             text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 7px;
             transition: all 0.25s ease;
         }
 
@@ -474,17 +474,17 @@
         /* Clean Footer */
         .auth-footer-block {
             text-align: center;
-            font-size: 0.78rem;
+            font-size: 0.70rem;
             color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .footer-nav-links {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 14px;
         }
 
         .footer-nav-links a {
@@ -499,17 +499,17 @@
 
         @media (max-width: 480px) {
             body {
-                padding: 16px 12px;
+                padding: 14px 10px;
             }
             .auth-card-unified {
-                padding: 28px 20px 24px 20px;
-                border-radius: 20px;
+                padding: 22px 18px 18px 18px;
+                border-radius: 18px;
             }
             .card-auth-title {
-                font-size: 1.45rem;
+                font-size: 1.25rem;
             }
             .inside-logo-img {
-                height: 40px;
+                height: 34px;
             }
         }
     </style>
@@ -570,20 +570,20 @@
                  1. PRIMARY WEB3 CONNECT SECTION
                  ============================================================ -->
             <div id="web3ConnectSection">
-                <button type="button" class="btn-submit-gold" id="btnConnectWeb3" style="font-size: 1.05rem; padding: 0 20px; margin-bottom: 16px;">
-                    <i class="fas fa-wallet" style="font-size: 1.2rem;"></i>
+                <button type="button" class="btn-submit-gold" id="btnConnectWeb3" style="font-size: 0.94rem; padding: 0 16px; margin-bottom: 10px;">
+                    <i class="fas fa-wallet" style="font-size: 1.05rem;"></i>
                     <span id="web3BtnText">Connect MetaMask / TrustWallet</span>
                     <div class="btn-spinner-icon" id="web3Spinner" style="display: none;"></div>
                 </button>
 
-                <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; color: var(--text-muted); font-size: 0.82rem;">
+                <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; color: var(--text-muted); font-size: 0.74rem;">
                     <span><i class="fab fa-ethereum" style="color: #F5A623;"></i> BNB Chain (BEP-20)</span>
                     <span>•</span>
                     <span><i class="fas fa-shield-halved" style="color: #00FF88;"></i> Cryptographically Verified</span>
                 </div>
 
                 <!-- Create Account Link -->
-                <a href="{{ url('/register') }}{{ request('ref') ? '?ref='.request('ref') : '' }}" class="btn-action-secondary" style="margin-bottom: 6px;">
+                <a href="{{ url('/register') }}{{ request('ref') ? '?ref='.request('ref') : '' }}" class="btn-action-secondary">
                     <i class="fas fa-user-plus"></i> Create New Account / Register
                 </a>
             </div>

@@ -6,43 +6,32 @@
 
 @section('content')
 @php
-    $directIncome = $data['userDetail']->bonusReward()->where('status','!=',3)->sum('amt_usdt');
-    $stakingIncome = $data['userDetail']->stackingIncome()->sum('amt_usdt');
-    $stakingReferralIncome = $data['userDetail']->levelIncome()->where('description','l')->sum('amt_usdt');
-    $teamDevelopmentIncome = $data['userDetail']->levelIncome()->where('description','r')->sum('amt_usdt');
-    $clubIncome = $data['userDetail']->clubIncome()->sum('amt_usdt');
-    $lifetimeIncome = $data['userDetail']->lifetimeIncome()->sum('amount');
-    $rankIncome = $data['userDetail']->rankIncome()->sum('amt_usdt');
-    $poolIncome = (float)\App\PoolIncome::where('userid', $data['userDetail']->id)->sum('amt_usdt');
-    $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $teamDevelopmentIncome + $clubIncome + $rankIncome + $poolIncome;
+    $directIncome = (float) $data['userDetail']->bonusReward()->where('status', '!=', 3)->sum('amt_usdt');
+    $stakingIncome = (float) $data['userDetail']->stackingIncome()->sum('amt_usdt');
+    $stakingReferralIncome = (float) $data['userDetail']->levelIncome()->where('description', 'l')->sum('amt_usdt');
+    $rankIncome = (float) $data['userDetail']->rankIncome()->sum('amt_usdt');
+    $poolIncome = (float) \App\PoolIncome::where('userid', $data['userDetail']->id)->sum('amt_usdt');
+    
+    $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $rankIncome + $poolIncome;
     $totalWithdraw = !empty($data['totalwithdraw']->amount) ? round((float)$data['totalwithdraw']->amount, 2) : 0.00;
     $remainingCap = !is_null($data['userDetail']->remainingCapping()) ? round((float)$data['userDetail']->remainingCapping(), 2) : 0.00;
 
-    $clubBiz = $data['userDetail']->clubBusiness();
-    $achievedClub = !empty($clubBiz['achieved']) ? $clubBiz['achieved'] : null;
-    $nextClub = !empty($clubBiz['next']) ? $clubBiz['next'] : null;
-    $nextClubMin = !empty($nextClub->business_min) ? (float)$nextClub->business_min : 1000.0;
-    $clubFirst = (float)($clubBiz['first'] ?? 0);
-    $clubRest = (float)($clubBiz['rest'] ?? 0);
-
-    $lifetimeBiz = $data['userDetail']->lifetimeAchievementBusiness();
-    $achievedLifetime = (!empty($lifetimeBiz['achieved']) && method_exists($lifetimeBiz['achieved'], 'last') && !is_null($lifetimeBiz['achieved']->last())) ? $lifetimeBiz['achieved']->last() : null;
-    $nextLifetime = !empty($lifetimeBiz['next']) ? $lifetimeBiz['next'] : null;
-    $nextLifetimeMin = !empty($nextLifetime->business_min) ? (float)$nextLifetime->business_min : 5000.0;
-    $lifetimeFirst = (float)($lifetimeBiz['first'] ?? 0);
-    $lifetimeSecond = (float)($lifetimeBiz['second'] ?? 0);
-    $lifetimeRest = (float)($lifetimeBiz['rest'] ?? 0);
+    $cappingStats = $data['userDetail']->getCappingTier();
+    $tierMultiplier = $cappingStats['multiplier'] ?: 2;
+    $tierLabel = $tierMultiplier . 'X';
+    $legStats = $data['userDetail']->getLegBusiness();
+    $rankQual = $data['userDetail']->getRankQualification();
 @endphp
 
-<!-- Income Streams Grid -->
+<!-- Top Summary Cards -->
 <div class="mecha-stat-grid-2" style="margin-bottom: 12px;">
     <div class="mecha-metric-box">
         <div class="mecha-metric-lbl">
-            <span>TOTAL EARNINGS</span>
+            <span>TOTAL REWARDS EARNED</span>
             <i class="fas fa-hand-holding-dollar" style="color: #FFD700;"></i>
         </div>
         <div class="mecha-metric-val gold">${{ number_format($totalIncomeUsdt, 2) }}</div>
-        <div class="mecha-metric-sub">Cumulative All Incomes</div>
+        <div class="mecha-metric-sub">Cumulative across 5 Active Streams</div>
     </div>
     <div class="mecha-metric-box">
         <div class="mecha-metric-lbl">
@@ -50,94 +39,82 @@
             <i class="fas fa-money-bill-transfer" style="color: #00FF88;"></i>
         </div>
         <div class="mecha-metric-val green">${{ number_format($totalWithdraw, 2) }}</div>
-        <div class="mecha-metric-sub">Settled On-Chain</div>
+        <div class="mecha-metric-sub">Settled On-Chain (BEP-20)</div>
     </div>
 </div>
 
-<div class="row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-    <div class="mecha-metric-box">
+<!-- 5 Active Income Streams Grid -->
+<div class="mecha-section-title" style="font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 8px 4px;">
+    Active Ecosystem Reward Streams
+</div>
+
+<div class="row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;">
+    <!-- 1. Daily Staking Yield -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/StakingReward') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(255,215,0,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span>STAKING REWARD</span>
+            <span style="color: #FFE082;">1. DAILY STAKING ROI</span>
             <i class="fas fa-coins" style="color: #FFE082;"></i>
         </div>
-        <div class="mecha-metric-val">${{ number_format($stakingIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Daily Yield</div>
+        <div class="mecha-metric-val" style="color: #FFE082;">${{ number_format($stakingIncome, 2) }}</div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>0.5% Daily Accrual</span>
+            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
+        </div>
     </div>
-    <div class="mecha-metric-box">
+
+    <!-- 2. Direct Referral Bonus -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/DirectBonus') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(0,229,255,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span>DIRECT BONUS</span>
+            <span style="color: #00E5FF;">2. DIRECT REFERRAL</span>
             <i class="fas fa-money-bill-wave" style="color: #00E5FF;"></i>
         </div>
-        <div class="mecha-metric-val">${{ number_format($directIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Sponsor Bonus</div>
+        <div class="mecha-metric-val" style="color: #00E5FF;">${{ number_format($directIncome, 2) }}</div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>5% Instant Sponsor Bonus</span>
+            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
+        </div>
     </div>
-    <div class="mecha-metric-box">
+
+    <!-- 3. Staking Referral Reward -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/StakingReferralReward') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(179,75,254,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span>STAKING REFERRAL</span>
+            <span style="color: #B34BFE;">3. STAKING REFERRAL</span>
             <i class="fas fa-users" style="color: #B34BFE;"></i>
         </div>
-        <div class="mecha-metric-val">${{ number_format($stakingReferralIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Downline ROI Share</div>
-    </div>
-    <div class="mecha-metric-box">
-        <div class="mecha-metric-lbl">
-            <span>TEAM DEVELOPMENT</span>
-            <i class="fas fa-chart-line" style="color: #00FF88;"></i>
+        <div class="mecha-metric-val" style="color: #B34BFE;">${{ number_format($stakingReferralIncome, 2) }}</div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>15-Level Tree Turnover</span>
+            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
         </div>
-        <div class="mecha-metric-val">${{ number_format($teamDevelopmentIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Matching Rewards</div>
     </div>
-    <div class="mecha-metric-box">
+
+    <!-- 4. Global Pool (5.0%) -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/PoolIncome') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(167,139,250,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span>CLUB REWARD</span>
-            <i class="fas fa-trophy" style="color: #FFD700;"></i>
-        </div>
-        <div class="mecha-metric-val gold">${{ number_format($clubIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Pool Dividend</div>
-    </div>
-    <div class="mecha-metric-box">
-        <div class="mecha-metric-lbl">
-            <span>ACHIEVEMENT</span>
-            <i class="fas fa-award" style="color: #FF8C00;"></i>
-        </div>
-        <div class="mecha-metric-val">${{ number_format($lifetimeIncome, 2) }}</div>
-        <div class="mecha-metric-sub">Lifetime Rank Bonus</div>
-    </div>
-    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/RankIncome') }}'" style="cursor: pointer;">
-        <div class="mecha-metric-lbl">
-            <span>RANK INCOME</span>
-            <i class="fas fa-crown" style="color: #F59E0B;"></i>
-        </div>
-        <div class="mecha-metric-val gold">${{ number_format($rankIncome, 2) }}</div>
-        <div class="mecha-metric-sub">V1 to V8 Weekly Rewards</div>
-    </div>
-    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/PoolIncome') }}'" style="cursor: pointer;">
-        <div class="mecha-metric-lbl">
-            <span>GLOBAL POOL</span>
+            <span style="color: #A78BFA;">4. GLOBAL POOL (5%)</span>
             <i class="fas fa-layer-group" style="color: #A78BFA;"></i>
         </div>
         <div class="mecha-metric-val" style="color: #A78BFA;">${{ number_format($poolIncome, 2) }}</div>
-        <div class="mecha-metric-sub">5% Global Dividend</div>
-    </div>
-</div>
-
-<!-- Booster Status Pill -->
-<div class="mecha-hud-card" style="margin-bottom: 12px; padding: 12px 14px;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="mecha-page-icon-box" style="width: 36px; height: 36px; font-size: 15px;">
-                <i class="fas fa-rocket"></i>
-            </div>
-            <div>
-                <div style="font-size: 11px; font-weight: 800; color: #FFF;">2X BOOSTER ACCELERATOR</div>
-                <div style="font-size: 9px; color: #94A3B8;">Double yield booster tier status</div>
-            </div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Daily / Weekly / Monthly</span>
+            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
         </div>
-        @if($data['userDetail']->booster == 2)
-            <span class="mecha-badge-green"><i class="fas fa-bolt"></i> ACTIVE</span>
-        @else
-            <span class="mecha-badge-red"><i class="fas fa-circle-xmark"></i> INACTIVE</span>
-        @endif
+    </div>
+
+    <!-- 5. Rank Income (V1-V8) Full Width -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/RankIncome') }}'" style="grid-column: span 2; cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
+        <div class="mecha-metric-lbl">
+            <span style="color: #F59E0B;">5. RANK INCOME (V1 TO V8 LEADERSHIP)</span>
+            <i class="fas fa-crown" style="color: #F59E0B;"></i>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div class="mecha-metric-val gold">${{ number_format($rankIncome, 2) }}</div>
+            <div style="font-size: 11px; font-weight: 700; color: #94A3B8;">Current Rank: <span style="color: #00FF88;">{{ $rankQual['current_rank'] ?: 'None' }}</span></div>
+        </div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <span>Weekly Leadership Turnover Dividend Pool</span>
+            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
+        </div>
     </div>
 </div>
 
@@ -145,23 +122,23 @@
 <div class="mecha-hud-card" style="margin-bottom: 12px;">
     <div class="mecha-card-header">
         <div class="mecha-card-title-wrap">
-            <i class="fas fa-circle-notch"></i>
+            <i class="fas fa-shield-halved" style="color: #FFD700;"></i>
             <div>
-                <h2 class="mecha-card-title">CAPPING STATUS & LIMITS</h2>
-                <div class="mecha-card-subtitle">Maximum potential income vs earned reward</div>
+                <h2 class="mecha-card-title">DYNAMIC CAPPING & LIMITS</h2>
+                <div class="mecha-card-subtitle">Active multiplier tier: <strong style="color: #00FF88;">{{ $tierLabel }}</strong></div>
             </div>
         </div>
-        <span class="mecha-card-badge">LIVE METRICS</span>
+        <span class="mecha-card-badge">TIER: {{ $tierLabel }}</span>
     </div>
 
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0;">
-        <div style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
+        <div style="position: relative; width: 180px; height: 180px; margin: 0 auto;">
             <canvas id="doughnutChart"></canvas>
         </div>
 
-        <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 16px; border-top: 1px solid rgba(229, 168, 35, 0.2); padding-top: 12px;">
+        <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 14px; border-top: 1px solid rgba(229, 168, 35, 0.2); padding-top: 12px;">
             <div style="text-align: center;">
-                <div style="font-size: 8.5px; font-weight: 800; color: #94A3B8;">EARNED REWARD</div>
+                <div style="font-size: 8.5px; font-weight: 800; color: #94A3B8;">TOTAL EARNED</div>
                 <div style="font-size: 13px; font-weight: 900; color: #00FF88;">${{ number_format($totalIncomeUsdt, 2) }}</div>
             </div>
             <div style="text-align: center;">
@@ -172,54 +149,14 @@
     </div>
 </div>
 
-<!-- Club Rewards Progress Card -->
+<!-- Leg Turnover Breakdown -->
 <div class="mecha-hud-card" style="margin-bottom: 12px;">
     <div class="mecha-card-header">
         <div class="mecha-card-title-wrap">
-            <i class="fas fa-trophy"></i>
+            <i class="fas fa-sitemap" style="color: #00E5FF;"></i>
             <div>
-                <h2 class="mecha-card-title">CLUB REWARD QUALIFICATION</h2>
-                <div class="mecha-card-subtitle">
-                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ !is_null($achievedClub) ? $achievedClub->clubname . ' ($' . round($achievedClub->business_min) . ')' : 'Not Achieved' }}</span>
-                </div>
-            </div>
-        </div>
-        <span class="mecha-card-badge">NEXT: {{ !is_null($nextClub) ? $nextClub->clubname : 'Diamond' }}</span>
-    </div>
-
-    <!-- Power Leg Progress -->
-    <div style="margin-top: 10px;">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 5px;">
-            <span style="color: #FFE082;">POWER LEG (${{ number_format($clubFirst, 2) }})</span>
-            <span id="goldLabel" style="color: #FFD700;">0%</span>
-        </div>
-        <div style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.25);">
-            <div id="goldProgressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); box-shadow: 0 0 8px #FFD700; transition: width 0.8s ease;"></div>
-        </div>
-    </div>
-
-    <!-- Other Legs Progress -->
-    <div style="margin-top: 14px;">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 5px;">
-            <span style="color: #00E5FF;">OTHER LEGS (${{ number_format($clubRest, 2) }})</span>
-            <span id="blueLabel" style="color: #00E5FF;">0%</span>
-        </div>
-        <div style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 229, 255, 0.25);">
-            <div id="blueProgressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00FF88, #00E5FF); box-shadow: 0 0 8px #00E5FF; transition: width 0.8s ease;"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Lifetime Achievement Leg Breakdown -->
-<div class="mecha-hud-card" style="margin-bottom: 12px;">
-    <div class="mecha-card-header">
-        <div class="mecha-card-title-wrap">
-            <i class="fas fa-sitemap"></i>
-            <div>
-                <h2 class="mecha-card-title">LIFETIME REWARD LEG ANALYSIS</h2>
-                <div class="mecha-card-subtitle">
-                    Achieved: <span style="color: #00FF88; font-weight: 700;">{{ !is_null($achievedLifetime) ? $achievedLifetime->rewardname : 'None' }}</span>
-                </div>
+                <h2 class="mecha-card-title">TEAM LEG TURNOVER ANALYSIS</h2>
+                <div class="mecha-card-subtitle">Power Leg & Weaker Leg Volume for Pool & Rank Qualifications</div>
             </div>
         </div>
         <a href="{{ url('/User/Treeview') }}" class="mecha-btn-outline" style="padding: 4px 10px; font-size: 9px; height: auto;">
@@ -227,48 +164,23 @@
         </a>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0;">
-        <div class="stat-mini-box" style="padding: 8px 4px;">
-            <div class="stat-mini-lbl" style="color: #00FF88;">POWER LEG</div>
-            <div class="stat-mini-val" style="color: #00FF88;">${{ number_format($lifetimeFirst, 2) }}</div>
-            <div class="stat-mini-sub">40% Target</div>
-        </div>
-        <div class="stat-mini-box" style="padding: 8px 4px;">
-            <div class="stat-mini-lbl" style="color: #FFD700;">SECOND LEG</div>
-            <div class="stat-mini-val" style="color: #FFD700;">${{ number_format($lifetimeSecond, 2) }}</div>
-            <div class="stat-mini-sub">30% Target</div>
-        </div>
-        <div class="stat-mini-box" style="padding: 8px 4px;">
-            <div class="stat-mini-lbl" style="color: #00E5FF;">REST LEGS</div>
-            <div class="stat-mini-val" style="color: #00E5FF;">${{ number_format($lifetimeRest, 2) }}</div>
-            <div class="stat-mini-sub">30% Target</div>
-        </div>
-    </div>
-
-    <!-- Lifetime Progress Bars -->
-    <div style="margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; margin-bottom: 4px;">
-            <span style="color: #00FF88;">Leg 1 (Power)</span>
-            <span id="goldLabel1" style="color: #00FF88;">0%</span>
-        </div>
-        <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
-            <div id="goldProgressFill1" style="width: 0%; height: 100%; background: #00FF88; transition: width 0.8s ease;"></div>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px;">
+        <div class="mecha-metric-box" style="background: rgba(255, 215, 0, 0.04); border-color: rgba(255, 215, 0, 0.2);">
+            <div class="mecha-metric-lbl">
+                <span style="color: #FFD700;"><i class="fas fa-crown"></i> POWER LEG</span>
+                <span class="mecha-badge-green" style="font-size: 8px; padding: 2px 6px;">STRONG</span>
+            </div>
+            <div class="mecha-metric-val gold">${{ number_format($legStats['power'] ?? 0, 2) }}</div>
+            <div class="mecha-metric-sub">Highest Downline Leg Volume</div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; margin-bottom: 4px;">
-            <span style="color: #FFD700;">Leg 2 (Second)</span>
-            <span id="blueLabel1" style="color: #FFD700;">0%</span>
-        </div>
-        <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
-            <div id="blueProgressFill1" style="width: 0%; height: 100%; background: #FFD700; transition: width 0.8s ease;"></div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; margin-bottom: 4px;">
-            <span style="color: #00E5FF;">Leg 3+ (Rest)</span>
-            <span id="blueLabel2" style="color: #00E5FF;">0%</span>
-        </div>
-        <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
-            <div id="blueProgressFill2" style="width: 0%; height: 100%; background: #00E5FF; transition: width 0.8s ease;"></div>
+        <div class="mecha-metric-box" style="background: rgba(0, 255, 136, 0.04); border-color: rgba(0, 255, 136, 0.2);">
+            <div class="mecha-metric-lbl">
+                <span style="color: #00FF88;"><i class="fas fa-bolt"></i> WEAKER LEG</span>
+                <span class="mecha-badge-cyan" style="font-size: 8px; padding: 2px 6px;">TARGET</span>
+            </div>
+            <div class="mecha-metric-val green">${{ number_format($legStats['weaker'] ?? 0, 2) }}</div>
+            <div class="mecha-metric-sub">Combined Other Legs Volume</div>
         </div>
     </div>
 </div>
@@ -307,35 +219,5 @@
             }
         }
     });
-
-    // Club Rewards Progress Calculations
-    const total1 = {{ $nextClubMin }};
-    const current1 = {{ $clubFirst }};
-    const current2 = {{ $clubRest }};
-
-    const percent1 = total1 > 0 ? Math.min(100, Math.max(0, (current1 / (total1 * 0.4)) * 100)) : 0;
-    const percent2 = total1 > 0 ? Math.min(100, Math.max(0, (current2 / (total1 * 0.6)) * 100)) : 0;
-
-    document.getElementById('goldProgressFill').style.width = percent1.toFixed(1) + '%';
-    document.getElementById('goldLabel').textContent = percent1.toFixed(1) + '%';
-    document.getElementById('blueProgressFill').style.width = percent2.toFixed(1) + '%';
-    document.getElementById('blueLabel').textContent = percent2.toFixed(1) + '%';
-
-    // Lifetime Rewards Calculations
-    const totalLifetime = {{ $nextLifetimeMin }};
-    const current11 = {{ $lifetimeFirst }};
-    const current22 = {{ $lifetimeSecond }};
-    const current33 = {{ $lifetimeRest }};
-
-    const p11 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current11 / (totalLifetime * 0.4)) * 100)) : 0;
-    const p22 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current22 / (totalLifetime * 0.3)) * 100)) : 0;
-    const p33 = totalLifetime > 0 ? Math.min(100, Math.max(0, (current33 / (totalLifetime * 0.3)) * 100)) : 0;
-
-    document.getElementById('goldProgressFill1').style.width = p11.toFixed(1) + '%';
-    document.getElementById('goldLabel1').textContent = p11.toFixed(1) + '%';
-    document.getElementById('blueProgressFill1').style.width = p22.toFixed(1) + '%';
-    document.getElementById('blueLabel1').textContent = p22.toFixed(1) + '%';
-    document.getElementById('blueProgressFill2').style.width = p33.toFixed(1) + '%';
-    document.getElementById('blueLabel2').textContent = p33.toFixed(1) + '%';
 </script>
 @endpush

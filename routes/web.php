@@ -399,11 +399,16 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::post('/User/RankIncome', 'RankIncomeController@userRankIncome');
 
 
-    //Withdraw
-    Route::get('/User/WithdrawRequest', 'WithdrawInfoController@withdrawPage');
-    Route::post('/User/WithdrawRequest', 'WithdrawInfoController@withdrawRequest');
-    Route::get('/User/WithdrawalHistory', 'BonusRewardController@withdrawHistoryUser');
+    // 1. Working Incomes Withdrawal & History
+    Route::get('/User/WithdrawRequest', 'WithdrawInfoController@withdrawWorkingPage');
+    Route::post('/User/WithdrawRequest', 'WithdrawInfoController@withdrawWorkingRequest');
+    Route::get('/User/WithdrawalHistory', 'WithdrawInfoController@withdrawWorkingHistory');
     Route::get('/User/resendWithdrawOtp', 'AssetDetailChangesController@resendWithdrawOtpWeb');
+
+    // 2. Staking ROI (CPS) Withdrawal & History
+    Route::get('/User/RoiWithdrawRequest', 'WithdrawInfoController@withdrawRoiPage');
+    Route::post('/User/RoiWithdrawRequest', 'WithdrawInfoController@withdrawRoiRequest');
+    Route::get('/User/RoiWithdrawalHistory', 'WithdrawInfoController@withdrawRoiHistory');
 
     Route::post('/User/WithdrawLifetimeReward', 'WithdrawInfoController@withdrawLifetimeIncome');
     Route::post('/User/WithdrawClubReward', 'WithdrawInfoController@withdrawClubIncome');

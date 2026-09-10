@@ -1,7 +1,7 @@
 @extends('layouts.user-mecha')
 
 @section('title', 'Web3 Staking & Upgrade - Cyera AI')
-@section('page-title', 'On-Chain Staking / Upgrade')
+@section('page-title', 'On-Chain Staking')
 @section('page-icon', 'fas fa-cubes')
 
 @section('content')
@@ -12,44 +12,44 @@
         $currentUuid = Session::get('user.userid', 'CYERA');
     @endphp
 
-    <!-- Mini Stats Grid -->
-    <div class="mecha-stat-grid-2">
-        <div class="mecha-metric-box">
-            <div class="mecha-metric-lbl">
-                <span>NETWORK & PROTOCOL</span>
-                <i class="fab fa-ethereum" style="color: #FFD700;"></i>
+    <!-- Mini Stats Grid (Compact) -->
+    <div class="mecha-stat-grid-2" style="margin-bottom: 10px; gap: 8px;">
+        <div class="mecha-metric-box" style="padding: 8px 10px;">
+            <div class="mecha-metric-lbl" style="font-size: 8px; margin-bottom: 2px;">
+                <span>NETWORK &amp; PROTOCOL</span>
+                <i class="fab fa-ethereum" style="color: #FFD700; font-size: 11px;"></i>
             </div>
-            <div class="mecha-metric-val gold" style="font-size: 1.3rem;">BNB SMART CHAIN</div>
-            <div class="mecha-metric-sub">Binance Smart Chain (BEP-20)</div>
+            <div class="mecha-metric-val gold" style="font-size: 13px; font-weight: 800; line-height: 1.2;">BNB SMART CHAIN</div>
+            <div class="mecha-metric-sub" style="font-size: 7.5px; margin-top: 1px;">BEP-20 • BSC Mainnet</div>
         </div>
-        <div class="mecha-metric-box">
-            <div class="mecha-metric-lbl">
-                <span>CAI LIVE VALUATION</span>
-                <i class="fas fa-chart-line" style="color: #00FF88;"></i>
+        <div class="mecha-metric-box" style="padding: 8px 10px;">
+            <div class="mecha-metric-lbl" style="font-size: 8px; margin-bottom: 2px;">
+                <span>ORACLE VALUATION</span>
+                <i class="fas fa-chart-line" style="color: #00FF88; font-size: 11px;"></i>
             </div>
-            <div class="mecha-metric-val green">${{ number_format($caiPrice, 2) }}</div>
-            <div class="mecha-metric-sub">Real-Time Oracle Valuation</div>
+            <div class="mecha-metric-val green" style="font-size: 14px; font-weight: 800; line-height: 1.2;">${{ number_format($caiPrice, 2) }} <small style="font-size: 9px; color: #FFF;">/ CAI</small></div>
+            <div class="mecha-metric-sub" style="font-size: 7.5px; margin-top: 1px; color: #00FF88;">Live Price Feed</div>
         </div>
     </div>
 
-    <div class="mecha-hud-card" style="max-width: 720px; margin: 0 auto; position: relative;">
-        <div class="mecha-card-header">
-            <div class="mecha-card-title-wrap">
-                <i class="fas fa-bolt" style="color: #FFD700;"></i>
+    <div class="mecha-hud-card" style="padding: 14px 14px; position: relative;">
+        <div class="mecha-card-header" style="padding-bottom: 8px; margin-bottom: 10px;">
+            <div class="mecha-card-title-wrap" style="gap: 8px;">
+                <i class="fas fa-bolt" style="color: #FFD700; font-size: 13px;"></i>
                 <div>
-                    <h2 class="mecha-card-title">1-CLICK WEB3 ON-CHAIN STAKING</h2>
-                    <div class="mecha-card-subtitle">Direct decentralized investment via Web3 Smart Contract</div>
+                    <h2 class="mecha-card-title" style="font-size: 12px; letter-spacing: 1px;">WEB3 ON-CHAIN STAKING</h2>
+                    <div class="mecha-card-subtitle" style="font-size: 8.5px;">Direct decentralized investment via Web3 Smart Contract</div>
                 </div>
             </div>
             <span class="mecha-card-badge"
-                style="background: rgba(0, 255, 136, 0.15); color: #00FF88; border-color: rgba(0, 255, 136, 0.3);">
-                <i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i> BSC MAINNET
+                style="background: rgba(0, 255, 136, 0.12); color: #00FF88; border-color: rgba(0, 255, 136, 0.3); font-size: 8.5px; padding: 2px 6px;">
+                <i class="fas fa-circle" style="font-size: 5px; margin-right: 3px;"></i> BSC MAINNET
             </span>
         </div>
 
         <!-- Alert Container -->
         <div id="stakeAlert"
-            style="display: none; padding: 14px 18px; border-radius: 12px; font-size: 0.88rem; font-weight: 500; margin-bottom: 20px;">
+            style="display: none; padding: 10px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px;">
         </div>
 
         @php
@@ -62,26 +62,26 @@
 
         <!-- Connected dApp Account Bar (Single Authenticated Wallet) -->
         <div
-            style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.18); border-radius: 14px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
+            style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.18); border-radius: 8px; padding: 7px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
                 <div
-                    style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0, 255, 136, 0.1); color: #00FF88; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                    style="width: 28px; height: 28px; border-radius: 6px; background: rgba(0, 255, 136, 0.1); color: #00FF88; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <div>
+                <div style="min-width: 0; flex: 1;">
                     <div
-                        style="font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                        style="font-size: 8px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
                         Authenticated Wallet</div>
                     <div id="connectedWalletDisplay"
-                        style="font-family: monospace; font-size: 0.90rem; color: #00FF88; font-weight: 700;">
+                        style="font-family: monospace; font-size: 11px; color: #00FF88; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         {{ !empty($userWallet) ? substr($userWallet, 0, 6) . '...' . substr($userWallet, -4) : 'Connected' }}
                     </div>
                 </div>
             </div>
             <div
-                style="display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: #00FF88; font-weight: 600; background: rgba(0, 255, 136, 0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0, 255, 136, 0.25);">
+                style="display: flex; align-items: center; gap: 4px; font-size: 9px; color: #00FF88; font-weight: 700; background: rgba(0, 255, 136, 0.1); padding: 2px 7px; border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.25); flex-shrink: 0;">
                 <span
-                    style="width: 6px; height: 6px; border-radius: 50%; background: #00FF88; box-shadow: 0 0 6px #00FF88;"></span>
+                    style="width: 5px; height: 5px; border-radius: 50%; background: #00FF88; box-shadow: 0 0 5px #00FF88;"></span>
                 <span>ACTIVE</span>
             </div>
         </div>
@@ -91,47 +91,47 @@
             @csrf
 
             <!-- Target Beneficiary User ID -->
-            <div class="mecha-form-group">
-                <label class="mecha-form-label" for="targetUserId">
+            <div class="mecha-form-group" style="margin-bottom: 10px; gap: 4px;">
+                <label class="mecha-form-label" for="targetUserId" style="font-size: 9.5px;">
                     <span>Beneficiary User ID</span>
-                    <span class="label-sub" style="color: #FFD700;">Account receiving the active stake</span>
+                    <span class="label-sub" style="color: #FFD700; font-size: 8px;">Target Account</span>
                 </label>
                 <div class="mecha-input-wrap">
-                    <i class="fas fa-user-shield mecha-input-icon"></i>
+                    <i class="fas fa-user-shield mecha-input-icon" style="left: 10px; font-size: 11px;"></i>
                     <input type="text" id="targetUserId" class="mecha-input-control" name="targetUserId"
-                        value="{{ $currentUuid }}" placeholder="Enter User ID (Default: Self)" required>
+                        value="{{ $currentUuid }}" placeholder="Enter User ID (Default: Self)" style="height: 38px; padding-left: 32px; font-size: 12px;" required>
                 </div>
             </div>
 
             <!-- Staking Amount Input -->
-            <div class="mecha-form-group">
-                <label class="mecha-form-label" for="stakeAmount">
+            <div class="mecha-form-group" style="margin-bottom: 10px; gap: 4px;">
+                <label class="mecha-form-label" for="stakeAmount" style="font-size: 9.5px;">
                     <span>Staking Amount (USDT)</span>
-                    <span class="label-sub" style="color: #00FF88;">Min: $50 — Max: $2,000 USD</span>
+                    <span class="label-sub" style="color: #00FF88; font-size: 8px;">Min: $50 — Max: $2,000</span>
                 </label>
                 <div class="mecha-input-wrap">
-                    <i class="fas fa-dollar-sign mecha-input-icon"></i>
+                    <i class="fas fa-dollar-sign mecha-input-icon" style="left: 10px; font-size: 11px;"></i>
                     <input type="number" step="10" min="50" max="2000" id="stakeAmount" class="mecha-input-control"
-                        name="amount" placeholder="Enter Amount (e.g. 100)" value="100" required>
+                        name="amount" placeholder="Enter Amount (e.g. 100)" value="100" style="height: 38px; padding-left: 32px; font-size: 12px;" required>
                 </div>
             </div>
 
             <!-- Quick Preset Amount Buttons -->
-            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 14px;">
                 <button type="button" class="preset-amt-btn" data-amt="50">$50</button>
                 <button type="button" class="preset-amt-btn active" data-amt="100">$100</button>
                 <button type="button" class="preset-amt-btn" data-amt="250">$250</button>
                 <button type="button" class="preset-amt-btn" data-amt="500">$500</button>
-                <button type="button" class="preset-amt-btn" data-amt="1000">$1,000</button>
+                <button type="button" class="preset-amt-btn" data-amt="1000">$1K</button>
             </div>
 
             <!-- Action Button -->
             <button type="button" id="btnExecuteStake" class="mecha-btn-gold"
-                style="height: 54px; font-size: 1.05rem; letter-spacing: 0.5px;">
+                style="height: 42px; font-size: 12px; letter-spacing: 0.8px; font-weight: 900;">
                 <i class="fas fa-bolt"></i>
-                <span id="stakeBtnText">APPROVE & STAKE USDT ON BSC</span>
+                <span id="stakeBtnText">APPROVE &amp; STAKE USDT</span>
                 <div class="btn-spinner-icon" id="stakeSpinner"
-                    style="display: none; width: 22px; height: 22px; border-width: 3px;"></div>
+                    style="display: none; width: 16px; height: 16px; border-width: 2px;"></div>
             </button>
         </form>
     </div>
@@ -142,43 +142,43 @@
     <div id="txnStatusModal"
         style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
         <div
-            style="background: #0a0b12; border: 1px solid var(--card-border); border-radius: 20px; max-width: 460px; width: 100%; padding: 32px 26px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9);">
+            style="background: #0a0b12; border: 1px solid var(--card-border); border-radius: 16px; max-width: 420px; width: 100%; padding: 24px 18px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9);">
 
             <div id="modalIconWrap"
-                style="width: 68px; height: 68px; border-radius: 50%; background: rgba(245, 166, 35, 0.12); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 18px auto;">
+                style="width: 54px; height: 54px; border-radius: 50%; background: rgba(245, 166, 35, 0.12); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 12px auto;">
                 <i class="fas fa-satellite-dish fa-spin"></i>
             </div>
 
             <h3 id="modalTitle"
-                style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; color: #FFFFFF; font-weight: 700; margin-bottom: 8px;">
+                style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; color: #FFFFFF; font-weight: 700; margin-bottom: 6px;">
                 Executing On-Chain Stake
             </h3>
-            <p id="modalDesc" style="color: #94A3B8; font-size: 0.90rem; line-height: 1.5; margin-bottom: 22px;">
+            <p id="modalDesc" style="color: #94A3B8; font-size: 0.82rem; line-height: 1.4; margin-bottom: 16px;">
                 Please confirm the transaction in MetaMask...
             </p>
 
             <!-- Progress Steps -->
             <div
-                style="text-align: left; background: #07080d; border-radius: 12px; padding: 14px 18px; margin-bottom: 22px;">
+                style="text-align: left; background: #07080d; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;">
                 <div id="step1"
-                    style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #94A3B8; font-size: 0.85rem;">
+                    style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #94A3B8; font-size: 0.80rem;">
                     <i class="fas fa-circle-notch fa-spin" id="step1Icon"></i>
                     <span id="step1Text">Step 1: Approve USDT Token</span>
                 </div>
                 <div id="step2"
-                    style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #64748B; font-size: 0.85rem;">
+                    style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #64748B; font-size: 0.80rem;">
                     <i class="far fa-circle" id="step2Icon"></i>
                     <span id="step2Text">Step 2: Staking Activation</span>
                 </div>
-                <div id="step3" style="display: flex; align-items: center; gap: 10px; color: #64748B; font-size: 0.85rem;">
+                <div id="step3" style="display: flex; align-items: center; gap: 8px; color: #64748B; font-size: 0.80rem;">
                     <i class="far fa-circle" id="step3Icon"></i>
-                    <span id="step3Text">Step 3: Staking & Yield Activation</span>
+                    <span id="step3Text">Step 3: Staking &amp; Yield Activation</span>
                 </div>
             </div>
 
             <div id="modalActionBtn" style="display: none;">
                 <button type="button" class="mecha-btn-gold" onclick="window.location.href='{{ url('/User/Dashboard') }}'"
-                    style="height: 46px;">
+                    style="height: 40px; font-size: 12px;">
                     <i class="fas fa-chart-line"></i> GO TO DASHBOARD
                 </button>
             </div>
@@ -189,12 +189,12 @@
         .preset-amt-btn {
             background: #0c0d16;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
+            border-radius: 6px;
             color: #94A3B8;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.92rem;
+            font-size: 0.80rem;
             font-weight: 700;
-            padding: 10px 0;
+            padding: 6px 0;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -209,7 +209,7 @@
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(245, 166, 35, 0.1));
             border-color: #FFD700;
             color: #FFD700;
-            box-shadow: 0 0 12px rgba(245, 166, 35, 0.25);
+            box-shadow: 0 0 10px rgba(245, 166, 35, 0.25);
         }
     </style>
 @endsection

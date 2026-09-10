@@ -105,9 +105,6 @@
                 $totalIncomeUsdt = $cpsIncome + $directIncome + $levelIncomeTotal + $totalPoolIncome + $totalRankIncome;
                 $readyToReleaseUsdt = $cpsRemaining + $directRemaining + $levelRemaining + $poolRemaining + $rankRemaining;
 
-                // Total Invested by user
-                $totalInvested = (float) \App\StackingDeposite::where('userid', $uid)->where('status', 1)->sum('usdt');
-
                 // Dynamic Capping & Leg Stats
                 $cappingStats = $data['cappingStats'] ?? $data['userDetail']->getCappingTier();
                 $boosterStats = $data['boosterStats'] ?? $data['userDetail']->getBoosterStats();
@@ -115,11 +112,47 @@
                 $poolQualifications = $data['poolQualifications'] ?? $data['userDetail']->getPoolQualifications();
 
                 $tierMultiplier = $cappingStats['multiplier'] ?: 2;
-
                 $tierLabel = $tierMultiplier . 'X';
-                $maxCapping = $totalInvested > 0 ? ($totalInvested * $tierMultiplier) : 0.00;
-                $filledPct = ($maxCapping > 0) ? ($totalIncomeUsdt / $maxCapping) * 100 : 0;
-                $filledPct = min(100, max(0, round($filledPct)));
+
+                // Active remaining capping across staking deposits
+                $activeDeposits = \App\StackingDeposite::where([['userid', $uid], ['status', '>', 0]])->get();
+                $isCapCompleted = false;
+
+                if ($activeDeposits->isNotEmpty()) {
+                    $totalInvested = (float) $activeDeposits->sum('usdt');
+                    $maxCapping = $totalInvested > 0 ? ($totalInvested * $tierMultiplier) : 0.00;
+                    $totalRemainingCapping = 0;
+                    foreach ($activeDeposits as $dep) {
+                        try {
+                            $totalRemainingCapping += (float) \Crypt::decrypt($dep->capamount);
+                        } catch (\Exception $e) {}
+                    }
+                    $cappingConsumed = max(0, $maxCapping - $totalRemainingCapping);
+                    $filledPct = ($maxCapping > 0) ? ($cappingConsumed / $maxCapping) * 100 : 0;
+                    $filledPct = min(100, max(0, round($filledPct)));
+                    if ($totalRemainingCapping <= 0.01 && $maxCapping > 0) {
+                        $isCapCompleted = true;
+                        $filledPct = 100;
+                        $cappingConsumed = $maxCapping;
+                    }
+                } else {
+                    // Check if user had previous deposits that have reached 0 capping (status 0)
+                    $lastDeposit = \App\StackingDeposite::where('userid', $uid)->orderBy('id', 'desc')->first();
+                    if ($lastDeposit) {
+                        $totalInvested = (float) $lastDeposit->usdt;
+                        $maxCapping = $totalInvested * $tierMultiplier;
+                        $totalRemainingCapping = 0;
+                        $cappingConsumed = $maxCapping;
+                        $filledPct = 100;
+                        $isCapCompleted = true;
+                    } else {
+                        $totalInvested = 0.00;
+                        $maxCapping = 0.00;
+                        $totalRemainingCapping = 0;
+                        $cappingConsumed = 0.00;
+                        $filledPct = 0;
+                    }
+                }
 
                 // CAI Live Price & Dynamic Runtime ROI Calculations
                 $profileStore = \App\ProfileStore::where('id', 1)->first();
@@ -401,7 +434,7 @@
 
                             <!-- 4. Claim Action Button -->
                             <div class="strip-col-item strip-col-action">
-                                <a href="{{ url('/User/WithdrawRequest') }}" class="btn-solid-gold-claim">
+                                <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-solid-gold-claim">
                                     <i class="fas fa-bolt"></i> CLAIM ROI
                                 </a>
                             </div>
@@ -459,7 +492,7 @@
                     </a>
 
                     <!-- 4. CLAIM ROI (Neon Cyan / Electric Energy) -->
-                    <a href="{{ url('/User/WithdrawRequest') }}" class="action-card claim-roi" id="btn-claim-roi">
+                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="action-card claim-roi" id="btn-claim-roi">
                         <div class="action-card-corner-glow"></div>
                         <div class="action-badge-icon">
                             <i class="fas fa-bolt"></i>
@@ -788,167 +821,142 @@
                     </div>
                 </div>
 
-
                 <!-- ============================================================
-                 3B. REWARDS & EARNINGS HUB (CPS, DIRECT, LEVEL, POOL, RANK)
+                 3B. REWARDS & EARNINGS — SECTION DIVIDER & 5 INCOME STREAMS
                  ============================================================ -->
-                <div class="hud-incomes-matrix-wrap">
-                    <div class="hud-incomes-matrix-card">
-                        <!-- Main Card Header -->
-                        <div class="incomes-matrix-header">
-                            <div class="matrix-header-left">
-                                <div class="matrix-badge-icon">
-                                    <i class="fas fa-sack-dollar"></i>
-                                </div>
-                                <div>
-                                    <div class="matrix-main-title">REWARDS &amp; EARNINGS HUB</div>
-                                    <div class="matrix-sub-title">5-Stream Automated Yield &amp; Commission Protocols
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="matrix-total-pill">
-                                <span class="matrix-pulse-dot"></span>
-                                <span class="matrix-total-lbl">TOTAL EARNED:</span>
-                                <span class="matrix-total-val">${{ number_format($totalIncomeUsdt, 2) }} USDT</span>
-                            </div>
+                <!-- 1. Central Section Header with Left & Right Lines -->
+                <div class="hud-section-divider-bar">
+                    <div class="hud-divider-line left"></div>
+                    <div class="hud-divider-title-chip">
+                        <div class="hud-divider-icon">
+                            <i class="fas fa-sack-dollar"></i>
                         </div>
+                        <span class="hud-divider-title-text">REWARDS &amp; EARNINGS</span>
+                        <span class="hud-divider-badge">${{ number_format($totalIncomeUsdt, 2) }} TOTAL</span>
+                    </div>
+                    <div class="hud-divider-line right"></div>
+                </div>
 
-                        <!-- Top Dual Summary Banner: Total Lifetime & Ready To Claim -->
-                        <div class="incomes-dual-summary-banner">
-                            <!-- Box 1: Total Lifetime Earned -->
-                            <div class="summary-banner-box earned-box">
-                                <div class="banner-box-left">
-                                    <span class="banner-lbl"><i class="fas fa-chart-line"></i> TOTAL LIFETIME
-                                        EARNED</span>
-                                    <div class="banner-val-row">
-                                        <span class="banner-val">${{ number_format($totalIncomeUsdt, 2) }}</span>
-                                        <span class="banner-unit">USDT</span>
-                                    </div>
-                                    <span class="banner-badge-desc">5 Active Streams Combined</span>
-                                </div>
-                                <div class="banner-box-icon"><i class="fas fa-wallet"></i></div>
-                            </div>
-
-                            <!-- Box 2: Ready To Claim ROI -->
-                            <div class="summary-banner-box release-box">
-                                <div class="banner-box-left">
-                                    <span class="banner-lbl"><i class="fas fa-bolt-lightning"></i> READY TO CLAIM
-                                        ROI</span>
-                                    <div class="banner-val-row">
-                                        <span class="banner-val val-gold">{{ number_format($claimableCai, 2) }} <small
-                                                class="val-currency">CAI</small></span>
-                                        <span
-                                            class="banner-sub-usd">(${{ number_format($claimableUsdDynamic, 2) }})</span>
-                                    </div>
-                                    <span class="banner-badge-desc">Staking Yield Available</span>
-                                </div>
-                                <a href="{{ url('/User/WithdrawRequest') }}" class="banner-claim-btn">
-                                    <i class="fas fa-bolt"></i> CLAIM
-                                </a>
-                            </div>
+                <!-- 2. High-Tech Staking Yield Claim Banner -->
+                <div class="hud-claim-roi-standalone" onclick="window.location.href='{{ url('/User/RoiWithdrawRequest') }}'">
+                    <div class="claim-standalone-left">
+                        <div class="claim-standalone-icon">
+                            <i class="fas fa-bolt-lightning"></i>
                         </div>
-
-                        <!-- 5 Streams Responsive Grid -->
-                        <div class="incomes-5stream-grid">
-                            <!-- 1. CPS Daily Yield -->
-                            <a href="{{ url('/User/StakingReward') }}" class="income-stream-card stream-cps">
-                                <div class="stream-top-row">
-                                    <div class="stream-icon-box icon-cyan">
-                                        <i class="fas fa-bolt-lightning"></i>
-                                    </div>
-                                    <span class="stream-tag-pill pill-cyan">0.5% - 1.5% DAILY</span>
-                                </div>
-                                <div class="stream-title-text">ROI STAKING YIELD</div>
-                                <div class="stream-amount-row">
-                                    <span class="stream-amt val-cyan">{{ number_format($cpsCaiTotal, 2) }}
-                                        <small>CAI</small></span>
-                                    <span class="stream-usd-tag">≈ ${{ number_format($cpsUsdDynamic, 2) }}</span>
-                                </div>
-                                <div class="stream-footer-row">
-                                    <span class="stream-sub">Daily Yield &amp; Boosters</span>
-                                    <span class="stream-arrow"><i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </a>
-
-                            <!-- 2. Direct Referral Bonus -->
-                            <a href="{{ url('/User/DirectBonus') }}" class="income-stream-card stream-direct">
-                                <div class="stream-top-row">
-                                    <div class="stream-icon-box icon-gold">
-                                        <i class="fas fa-user-plus"></i>
-                                    </div>
-                                    <span class="stream-tag-pill pill-gold">5% DIRECT</span>
-                                </div>
-                                <div class="stream-title-text">DIRECT BONUS</div>
-                                <div class="stream-amount-row">
-                                    <span class="stream-amt val-gold">${{ number_format($directIncome, 2) }}</span>
-                                    <span class="stream-usd-tag">USDT</span>
-                                </div>
-                                <div class="stream-footer-row">
-                                    <span class="stream-sub">Direct Sponsor Reward</span>
-                                    <span class="stream-arrow"><i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </a>
-
-                            <!-- 3. Level Income -->
-                            <a href="{{ url('/User/StakingReferralReward') }}" class="income-stream-card stream-level">
-                                <div class="stream-top-row">
-                                    <div class="stream-icon-box icon-purple">
-                                        <i class="fas fa-network-wired"></i>
-                                    </div>
-                                    <span class="stream-tag-pill pill-purple">15 LEVELS</span>
-                                </div>
-                                <div class="stream-title-text">LEVEL INCOME</div>
-                                <div class="stream-amount-row">
-                                    <span
-                                        class="stream-amt val-purple">${{ number_format($levelIncomeTotal, 2) }}</span>
-                                    <span class="stream-usd-tag">USDT</span>
-                                </div>
-                                <div class="stream-footer-row">
-                                    <span class="stream-sub">Team Unilevel Bonus</span>
-                                    <span class="stream-arrow"><i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </a>
-
-                            <!-- 4. Global Pool Income -->
-                            <a href="{{ url('/User/PoolIncome') }}" class="income-stream-card stream-pool">
-                                <div class="stream-top-row">
-                                    <div class="stream-icon-box icon-green">
-                                        <i class="fas fa-layer-group"></i>
-                                    </div>
-                                    <span class="stream-tag-pill pill-green">5% TURNOVER</span>
-                                </div>
-                                <div class="stream-title-text">GLOBAL POOL</div>
-                                <div class="stream-amount-row">
-                                    <span class="stream-amt val-green">${{ number_format($totalPoolIncome, 2) }}</span>
-                                    <span class="stream-usd-tag">USDT</span>
-                                </div>
-                                <div class="stream-footer-row">
-                                    <span class="stream-sub">Daily, Weekly &amp; Monthly</span>
-                                    <span class="stream-arrow"><i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </a>
-
-                            <!-- 5. Rank & Milestone Reward -->
-                            <a href="{{ url('/User/RankIncome') }}"
-                                class="income-stream-card stream-rank stream-card-span">
-                                <div class="stream-top-row">
-                                    <div class="stream-icon-box icon-amber">
-                                        <i class="fas fa-crown"></i>
-                                    </div>
-                                    <span class="stream-tag-pill pill-amber">CAREER RANKS</span>
-                                </div>
-                                <div class="stream-title-text">RANK &amp; MILESTONES</div>
-                                <div class="stream-amount-row">
-                                    <span class="stream-amt val-amber">${{ number_format($totalRankIncome, 2) }}</span>
-                                    <span class="stream-usd-tag">USDT</span>
-                                </div>
-                                <div class="stream-footer-row">
-                                    <span class="stream-sub">Achievement Rewards</span>
-                                    <span class="stream-arrow"><i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </a>
+                        <div class="claim-standalone-info">
+                            <div class="claim-standalone-lbl">AVAILABLE STAKING YIELD</div>
+                            <div class="claim-standalone-val-row">
+                                <span class="claim-standalone-cai">{{ ($claimableCai < 1 && $claimableCai > 0) ? number_format($claimableCai, 4) : number_format($claimableCai, 2) }} <small>CAI</small></span>
+                                <span class="claim-standalone-usd">≈ ${{ number_format($claimableUsdDynamic, 2) }}</span>
+                            </div>
                         </div>
                     </div>
+                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-claim-standalone" onclick="event.stopPropagation();">
+                        <i class="fas fa-bolt"></i> CLAIM
+                    </a>
+                </div>
+
+                <!-- 3. Standalone 5 Streams Grid -->
+                <div class="incomes-standalone-grid">
+                    <!-- 1. CPS Daily Yield -->
+                    <a href="{{ url('/User/StakingReward') }}" class="income-stream-standalone-card stream-cps">
+                        <div class="stream-card-top">
+                            <div class="stream-icon-bubble icon-cyan">
+                                <i class="fas fa-bolt-lightning"></i>
+                            </div>
+                            <span class="stream-status-pill pill-cyan">0.5% - 1.5% DAILY</span>
+                        </div>
+                        <div class="stream-card-heading">
+                            <div class="stream-card-title">ROI STAKING YIELD</div>
+                            <div class="stream-card-sub">Daily Yield &amp; Boosters</div>
+                        </div>
+                        <div class="stream-card-body">
+                            <div class="stream-card-val-row">
+                                <span class="stream-card-val val-cyan">{{ ($cpsCaiTotal < 1 && $cpsCaiTotal > 0) ? number_format($cpsCaiTotal, 4) : number_format($cpsCaiTotal, 2) }} <small>CAI</small></span>
+                                <span class="stream-card-usd">≈ ${{ number_format($cpsUsdDynamic, 2) }}</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 2. Direct Referral Bonus -->
+                    <a href="{{ url('/User/DirectBonus') }}" class="income-stream-standalone-card stream-direct">
+                        <div class="stream-card-top">
+                            <div class="stream-icon-bubble icon-gold">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <span class="stream-status-pill pill-gold">5% DIRECT</span>
+                        </div>
+                        <div class="stream-card-heading">
+                            <div class="stream-card-title">DIRECT BONUS</div>
+                            <div class="stream-card-sub">Direct Sponsor Reward</div>
+                        </div>
+                        <div class="stream-card-body">
+                            <div class="stream-card-val-row">
+                                <span class="stream-card-val val-gold">${{ number_format($directIncome, 2) }}</span>
+                                <span class="stream-card-usd">USDT</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 3. Level Income -->
+                    <a href="{{ url('/User/StakingReferralReward') }}" class="income-stream-standalone-card stream-level">
+                        <div class="stream-card-top">
+                            <div class="stream-icon-bubble icon-purple">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <span class="stream-status-pill pill-purple">15 LEVELS</span>
+                        </div>
+                        <div class="stream-card-heading">
+                            <div class="stream-card-title">LEVEL INCOME</div>
+                            <div class="stream-card-sub">Team Unilevel Bonus</div>
+                        </div>
+                        <div class="stream-card-body">
+                            <div class="stream-card-val-row">
+                                <span class="stream-card-val val-purple">${{ number_format($levelIncomeTotal, 2) }}</span>
+                                <span class="stream-card-usd">USDT</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 4. Global Pool Income -->
+                    <a href="{{ url('/User/PoolIncome') }}" class="income-stream-standalone-card stream-pool">
+                        <div class="stream-card-top">
+                            <div class="stream-icon-bubble icon-green">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <span class="stream-status-pill pill-green">5% PROTOCOL</span>
+                        </div>
+                        <div class="stream-card-heading">
+                            <div class="stream-card-title">GLOBAL POOL</div>
+                            <div class="stream-card-sub">Daily, Weekly &amp; Monthly</div>
+                        </div>
+                        <div class="stream-card-body">
+                            <div class="stream-card-val-row">
+                                <span class="stream-card-val val-green">${{ number_format($totalPoolIncome, 2) }}</span>
+                                <span class="stream-card-usd">USDT</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 5. Rank & Milestone Reward (Spans full 2 columns) -->
+                    <a href="{{ url('/User/RankIncome') }}" class="income-stream-standalone-card stream-rank stream-card-full-span">
+                        <div class="stream-card-top">
+                            <div class="stream-icon-bubble icon-amber">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <span class="stream-status-pill pill-amber">V1 - V8 RANKS</span>
+                        </div>
+                        <div class="stream-card-heading">
+                            <div class="stream-card-title">RANK &amp; MILESTONES</div>
+                            <div class="stream-card-sub">Weekly Leadership &amp; Turnover Rewards</div>
+                        </div>
+                        <div class="stream-card-body">
+                            <div class="stream-card-val-row">
+                                <span class="stream-card-val val-amber">${{ number_format($totalRankIncome, 2) }}</span>
+                                <span class="stream-card-usd">USDT</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
 
                 <!-- ============================================================
@@ -1111,10 +1119,9 @@
                             <div class="capping-progress-section">
                                 <div class="capping-meta-row">
                                     <div class="cap-meta-item earned">
-                                        <span class="cap-meta-lbl"><i class="fas fa-arrow-trend-up"></i> TOTAL
-                                            EARNED</span>
+                                        <span class="cap-meta-lbl"><i class="fas fa-arrow-trend-up"></i> CAPPING USED</span>
                                         <span class="cap-meta-val"><strong id="cappingEarnedTxt"
-                                                data-target="{{ $totalIncomeUsdt }}">$0</strong>
+                                                data-target="{{ $cappingConsumed }}">$0</strong>
                                             <small>USDT</small></span>
                                     </div>
                                     <div class="capping-pct-center">

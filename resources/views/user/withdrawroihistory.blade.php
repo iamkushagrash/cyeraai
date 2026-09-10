@@ -1,42 +1,42 @@
 @extends('layouts.user-mecha')
 
-@section('title', 'Working Income Withdrawal History - Cyera AI')
-@section('page-title', 'Working Income Withdrawal History')
-@section('page-icon', 'fas fa-clock-rotate-left')
+@section('title', 'Staking ROI Withdrawal History - Cyera AI')
+@section('page-title', 'Staking ROI Withdrawal History')
+@section('page-icon', 'fas fa-bolt-lightning')
 
 @section('content')
 <style>
-    .working-history-card-wrap {
+    .roi-history-card-wrap {
         display: flex;
         flex-direction: column;
         gap: 10px;
         margin-top: 12px;
     }
 
-    .working-txn-card {
+    .roi-txn-card {
         background: linear-gradient(160deg, #0A0D15 0%, #05070B 100%);
-        border: 1px solid rgba(0, 255, 136, 0.22);
+        border: 1px solid rgba(245, 166, 35, 0.22);
         border-radius: 14px;
         padding: 12px 14px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 14px rgba(0, 255, 136, 0.05);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 14px rgba(245, 166, 35, 0.05);
         transition: transform 0.2s ease, border-color 0.2s ease;
         position: relative;
         overflow: hidden;
     }
 
-    .working-txn-card:hover {
-        border-color: rgba(0, 255, 136, 0.5);
+    .roi-txn-card:hover {
+        border-color: rgba(245, 166, 35, 0.5);
         transform: translateY(-2px);
     }
 
-    .working-txn-card::before {
+    .roi-txn-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         width: 3px;
         height: 100%;
-        background: linear-gradient(180deg, #00FF88 0%, #00E5FF 100%);
+        background: linear-gradient(180deg, #FFD700 0%, #F5A623 100%);
     }
 
     .txn-card-head {
@@ -58,9 +58,9 @@
         font-family: monospace;
         font-size: 10px;
         font-weight: 800;
-        color: #00FF88;
-        background: rgba(0, 255, 136, 0.12);
-        border: 1px solid rgba(0, 255, 136, 0.3);
+        color: #FFD700;
+        background: rgba(245, 166, 35, 0.12);
+        border: 1px solid rgba(245, 166, 35, 0.3);
         padding: 2px 6px;
         border-radius: 4px;
     }
@@ -75,8 +75,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: rgba(0, 255, 136, 0.04);
-        border: 1px solid rgba(0, 255, 136, 0.15);
+        background: rgba(245, 166, 35, 0.04);
+        border: 1px solid rgba(245, 166, 35, 0.15);
         border-radius: 10px;
         padding: 10px 12px;
         margin-bottom: 10px;
@@ -103,11 +103,18 @@
         line-height: 1.2;
     }
 
-    .txn-stream-badge {
+    .txn-cai-badge {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
         text-align: right;
+    }
+
+    .txn-cai-val {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #FFD700;
     }
 
     .txn-meta-grid {
@@ -176,21 +183,21 @@
     }
 
     .search-input-wrap input:focus {
-        border-color: #00FF88;
-        box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        border-color: #FFD700;
+        box-shadow: 0 0 10px rgba(245, 166, 35, 0.2);
     }
 </style>
 
 <div class="mecha-hud-card">
     <div class="mecha-card-header">
         <div class="mecha-card-title-wrap">
-            <i class="fas fa-users-gear" style="color: #00FF88;"></i>
+            <i class="fas fa-bolt" style="color: #FFD700;"></i>
             <div>
-                <h2 class="mecha-card-title">WORKING INCOME PAYOUT TRANSACTIONS</h2>
-                <div class="mecha-card-subtitle">Complete ledger of all Direct, Level, Pool, and Rank reward payouts</div>
+                <h2 class="mecha-card-title">STAKING ROI PAYOUT TRANSACTIONS</h2>
+                <div class="mecha-card-subtitle">Complete ledger of all CPS Staking Yield redemptions</div>
             </div>
         </div>
-        <span class="mecha-card-badge" style="background: rgba(0, 255, 136, 0.15); color: #00FF88; border-color: rgba(0, 255, 136, 0.4);">
+        <span class="mecha-card-badge" style="background: rgba(255, 215, 0, 0.15); color: #FFD700; border-color: rgba(255, 215, 0, 0.4);">
             {{ count($history) }} TOTAL
         </span>
     </div>
@@ -199,15 +206,15 @@
     <div class="history-filter-bar">
         <div class="search-input-wrap">
             <i class="fas fa-magnifying-glass"></i>
-            <input type="text" id="workingSearchInput" placeholder="Search by amount, status, date..." onkeyup="filterWorkingCards()">
+            <input type="text" id="roiSearchInput" placeholder="Search by amount, status, date..." onkeyup="filterRoiCards()">
         </div>
         <div style="font-size: 10px; color: #8C9BAE; font-weight: 700; white-space: nowrap;">
-            <span id="visibleWorkingCardCount">{{ count($history) }}</span> / {{ count($history) }}
+            <span id="visibleCardCount">{{ count($history) }}</span> / {{ count($history) }}
         </div>
     </div>
 
     <!-- Card Grid Container -->
-    <div class="working-history-card-wrap" id="workingCardsContainer">
+    <div class="roi-history-card-wrap" id="roiCardsContainer">
         @php $i = 1; @endphp
         @forelse($history as $row)
             @php
@@ -215,7 +222,7 @@
                 $isPaid = in_array($statusStr, ['success', 'paid', '1', 'completed', 'confirmed']);
                 $isPending = in_array($statusStr, ['pending', 'processing', '0']) || str_contains($statusStr, 'pending');
             @endphp
-            <div class="working-txn-card" data-search="{{ strtolower($row->amountusdt . ' ' . $row->net_amount . ' ' . $row->currency . ' ' . $row->created_at . ' ' . ($isPaid ? 'paid' : ($isPending ? 'pending' : 'failed'))) }}">
+            <div class="roi-txn-card" data-search="{{ strtolower($row->amountsftc . ' ' . $row->amountusdt . ' ' . $row->net_amount . ' ' . $row->currency . ' ' . $row->created_at . ' ' . ($isPaid ? 'paid' : ($isPending ? 'pending' : 'failed'))) }}">
                 <!-- Card Header -->
                 <div class="txn-card-head">
                     <div class="txn-head-left">
@@ -233,21 +240,19 @@
                     </div>
                 </div>
 
-                <!-- Main Highlight Banner (Net Payout & Stream) -->
+                <!-- Main Highlight Banner (Net Payout & CAI Burned) -->
                 <div class="txn-main-banner">
                     <div class="txn-primary-metric">
                         <span class="txn-metric-lbl">Net USDT Payable</span>
                         <span class="txn-metric-val">${{ number_format((float)$row->net_amount, 2) }}</span>
                     </div>
-                    <div class="txn-stream-badge">
-                        <span class="txn-metric-lbl">Payout Network</span>
-                        <span style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 800; color: #00E5FF; text-transform: uppercase;">
-                            {{ $row->currency ?: 'USDT (BEP-20)' }}
-                        </span>
+                    <div class="txn-cai-badge">
+                        <span class="txn-metric-lbl">CAI Burned</span>
+                        <span class="txn-cai-val">{{ number_format((float)$row->amountsftc, 4) }} <small style="font-size: 10px; color: #FFE082;">CAI</small></span>
                     </div>
                 </div>
 
-                <!-- 3 Meta Items Grid (Gross, Fee, Net) -->
+                <!-- 3 Meta Items Grid (Gross, Fee, Network) -->
                 <div class="txn-meta-grid">
                     <div class="txn-meta-item">
                         <span class="lbl">Gross ($)</span>
@@ -258,18 +263,16 @@
                         <span class="val" style="color: #FF4D7D;">-${{ number_format((float)$row->deduction, 2) }}</span>
                     </div>
                     <div class="txn-meta-item">
-                        <span class="lbl">Status</span>
-                        <span class="val" style="color: {{ $isPaid ? '#00FF88' : ($isPending ? '#FFD700' : '#FF4D7D') }};">
-                            {{ $isPaid ? 'Completed' : ($isPending ? 'Processing' : 'Failed') }}
-                        </span>
+                        <span class="lbl">Network</span>
+                        <span class="val" style="color: #00E5FF; text-transform: uppercase;">{{ $row->currency ?: 'USDT' }}</span>
                     </div>
                 </div>
             </div>
         @empty
             <div style="text-align: center; padding: 40px 16px; background: rgba(255,255,255,0.01); border: 1px dashed rgba(255,255,255,0.08); border-radius: 14px;">
-                <i class="fas fa-receipt" style="font-size: 32px; color: rgba(0, 255, 136, 0.3); margin-bottom: 10px;"></i>
-                <div style="font-size: 13px; font-weight: 700; color: #E2E8F0;">No Working Withdrawals Yet</div>
-                <div style="font-size: 10.5px; color: #64748B; margin-top: 4px;">Your direct, level, pool, and rank payouts will appear here once submitted.</div>
+                <i class="fas fa-receipt" style="font-size: 32px; color: rgba(255, 215, 0, 0.3); margin-bottom: 10px;"></i>
+                <div style="font-size: 13px; font-weight: 700; color: #E2E8F0;">No Staking ROI Claims Yet</div>
+                <div style="font-size: 10.5px; color: #64748B; margin-top: 4px;">Your daily yield redemption history will appear here once submitted.</div>
             </div>
         @endforelse
     </div>
@@ -278,9 +281,9 @@
 
 @push('scripts')
 <script>
-    function filterWorkingCards() {
-        const query = document.getElementById('workingSearchInput').value.toLowerCase().trim();
-        const cards = document.querySelectorAll('#workingCardsContainer .working-txn-card');
+    function filterRoiCards() {
+        const query = document.getElementById('roiSearchInput').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('#roiCardsContainer .roi-txn-card');
         let visibleCount = 0;
 
         cards.forEach(card => {
@@ -293,7 +296,7 @@
             }
         });
 
-        const countEl = document.getElementById('visibleWorkingCardCount');
+        const countEl = document.getElementById('visibleCardCount');
         if (countEl) countEl.innerText = visibleCount;
     }
 </script>

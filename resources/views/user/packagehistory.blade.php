@@ -59,7 +59,7 @@
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-lbl">CAI TOKENS</span>
-                                        <span class="metric-val val-gold">{{ number_format((float)$row->amount, 2) }} <small>CAI</small></span>
+                                        <span class="metric-val val-gold">{{ ((float)$row->amount < 1 && (float)$row->amount > 0) ? number_format((float)$row->amount, 4) : number_format((float)$row->amount, 2) }} <small>CAI</small></span>
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-lbl">YIELD RATE</span>

@@ -503,14 +503,18 @@
 </style>
 
 @php
-    $totalEarned = 0;
+    $caiLivePrice = (float)(\App\ProfileStore::where('id', 1)->value('price') ?? 1.0);
+    if ($caiLivePrice <= 0) $caiLivePrice = 1.0;
+
+    $totalCaiEarned = 0;
     $totalPrincipal = 0;
     if (isset($roiamount)) {
         foreach($roiamount as $r) {
-            $totalEarned += (float)($r->amountusdt ?? 0);
+            $totalCaiEarned += (float)($r->amount ?? 0);
             $totalPrincipal = max($totalPrincipal, (float)($r->principalusdt ?? 0));
         }
     }
+    $totalLiveUsdt = $totalCaiEarned * $caiLivePrice;
 @endphp
 
 <div class="cps-hud-card">
@@ -532,15 +536,21 @@
     <div class="cps-summary-grid">
         <div class="cps-summary-pill gold">
             <span class="cps-summary-lbl"><i class="fas fa-wallet" style="color: #FFD700;"></i> EARNED</span>
-            <span class="cps-summary-val gold">${{ number_format($totalEarned, 2) }}</span>
+            <span class="cps-summary-val gold">
+                {{ ($totalCaiEarned < 1 && $totalCaiEarned > 0) ? number_format($totalCaiEarned, 4) : number_format($totalCaiEarned, 2) }}
+                <span style="font-size: 0.65rem; color: #FFE082;">CAI</span>
+            </span>
+            <span style="font-size: 0.62rem; color: #00FF88; font-weight: 700; margin-top: 1px;">≈ ${{ number_format($totalLiveUsdt, 2) }}</span>
         </div>
         <div class="cps-summary-pill cyan">
             <span class="cps-summary-lbl"><i class="fas fa-layer-group" style="color: #00D2FF;"></i> STAKED</span>
             <span class="cps-summary-val cyan">${{ number_format($totalPrincipal, 2) }}</span>
+            <span style="font-size: 0.62rem; color: #8E99A8; font-weight: 700; margin-top: 1px;">POOL DEPOSIT</span>
         </div>
         <div class="cps-summary-pill neutral">
             <span class="cps-summary-lbl"><i class="fas fa-receipt" style="color: #A0AEC0;"></i> PAYOUTS</span>
             <span class="cps-summary-val">{{ count($roiamount ?? []) }}</span>
+            <span style="font-size: 0.62rem; color: #8E99A8; font-weight: 700; margin-top: 1px;">CYCLES</span>
         </div>
     </div>
 
@@ -569,7 +579,9 @@
             @php
                 $st = strtolower($row->status ?? '');
                 $isCredit = ($st === 'credit' || $st === 'success' || $st === 'paid' || $st === '0' || $st === '1');
-                $searchContent = strtolower(($row->amountusdt ?? '') . ' ' . ($row->principalusdt ?? '') . ' ' . ($row->created_at ?? '') . ' ' . ($row->status ?? '') . ' ' . ($row->amount ?? ''));
+                $caiAmount = (float)($row->amount ?? 0);
+                $liveUsdtVal = $caiAmount * $caiLivePrice;
+                $searchContent = strtolower(($row->amountusdt ?? '') . ' ' . ($row->principalusdt ?? '') . ' ' . ($row->created_at ?? '') . ' ' . ($row->status ?? '') . ' ' . ($row->amount ?? '') . ' ' . $liveUsdtVal);
             @endphp
             <div class="reward-cyber-card cps-card-item" data-search="{{ $searchContent }}">
                 <!-- Card Header -->
@@ -588,13 +600,17 @@
                     <div class="reward-amount-block">
                         <span class="reward-lbl">REWARD ACCRUED</span>
                         <span class="reward-val">
-                            ${{ number_format((float)$row->amountusdt, 2) }}
-                            <small>USDT</small>
+                            {{ ($caiAmount < 1 && $caiAmount > 0) ? number_format($caiAmount, 4) : number_format($caiAmount, 2) }}
+                            <small style="color: #FFD700; font-weight: 800;">CAI</small>
+                        </span>
+                        <span style="font-size: 0.65rem; color: #00FF88; font-weight: 700; margin-top: 2px;">
+                            ≈ ${{ number_format($liveUsdtVal, 2) }} <span style="font-size: 0.58rem; color: #8E99A8;">USDT</span>
                         </span>
                     </div>
                     <div class="reward-principal-block">
                         <span class="reward-lbl">STAKING POOL</span>
                         <span class="principal-val">${{ number_format((float)$row->principalusdt, 2) }}</span>
+                        <span style="font-size: 0.60rem; color: #8E99A8; font-weight: 700; text-transform: uppercase;">DEPOSIT</span>
                     </div>
                 </div>
 
@@ -604,8 +620,8 @@
                         <i class="far fa-calendar-check"></i>
                         <span>{{ $row->created_at }}</span>
                     </div>
-                    <div class="footer-token-conv">
-                        ≈ {{ number_format((float)$row->amount, 4) }} CAI
+                    <div class="footer-token-conv" title="Live Oracle Valuation">
+                        <i class="fas fa-bolt" style="font-size: 0.55rem; color: #FFD700;"></i> 1 CAI = ${{ number_format($caiLivePrice, 2) }}
                     </div>
                 </div>
             </div>
