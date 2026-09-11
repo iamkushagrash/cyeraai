@@ -1075,9 +1075,9 @@
                             <form onsubmit="handleSetPancakePair(event)" class="control-form-group">
                                 <label class="control-label">Set Official PancakeSwap Pair</label>
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="control-input" id="inputPancakePair" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" id="btnSetPancakePair" style="opacity: 0.5; cursor: not-allowed;" disabled>
-                                        <i class="fas fa-check"></i> Set
+                                    <input type="text" class="control-input" id="inputPancakePair" value="0x62e0b6c229a096f9b5ff4e03c58907187e0ab749" placeholder="0x..." required>
+                                    <button type="submit" class="btn-web3 btn-web3-gold" id="btnSetPancakePair" style="white-space: nowrap;">
+                                        <i class="fas fa-check"></i> Set Pair
                                     </button>
                                 </div>
                             </form>
