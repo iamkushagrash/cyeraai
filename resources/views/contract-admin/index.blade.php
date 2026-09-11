@@ -1016,7 +1016,7 @@
                         <!-- Left: Whitelist Controls -->
                         <div>
                             <!-- Single Whitelist Form -->
-                            <form onsubmit="handleSetWhitelist(event)" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
+                            <form onsubmit="event.preventDefault()" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
                                 <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">
                                     <i class="fas fa-user-check"></i> DEX Buy Whitelist (Single Wallet)
                                 </div>
@@ -1024,26 +1024,26 @@
                                     <input type="text" class="control-input" id="inputWhitelistAddr" placeholder="Wallet Address (0x...)" required>
                                 </div>
                                 <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitSingleWhitelist(true)">
+                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(true)">
                                         <i class="fas fa-check"></i> Whitelist
                                     </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitSingleWhitelist(false)">
+                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(false)">
                                         <i class="fas fa-ban"></i> Remove
                                     </button>
                                 </div>
                             </form>
 
                             <!-- Batch Whitelist Form -->
-                            <form onsubmit="handleBatchWhitelist(event)" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
+                            <form onsubmit="event.preventDefault()" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
                                 <div style="font-size: 11px; font-weight: 700; color: var(--green-neon); margin-bottom: 8px;">
                                     <i class="fas fa-users-viewfinder"></i> Batch Whitelist Upload (Multiple Wallets)
                                 </div>
                                 <textarea class="control-input" id="inputBatchWhitelist" rows="4" placeholder="Enter addresses separated by comma or new line...&#10;0x1111...&#10;0x2222..." style="resize: vertical; margin-bottom: 8px;" required></textarea>
                                 <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitBatchWhitelist(true)">
+                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(true)">
                                         <i class="fas fa-plus"></i> Batch Enable
                                     </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="submitBatchWhitelist(false)">
+                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(false)">
                                         <i class="fas fa-minus"></i> Batch Remove
                                     </button>
                                 </div>
