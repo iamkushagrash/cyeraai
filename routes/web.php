@@ -126,6 +126,9 @@ Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
 // Decentralized Web3 Smart Contract Owner Governance Portal
 Route::get('/dishi/yashi', 'ContractAdminController@index');
 
+// Cron Route: CAI Live Price Sync (5-min DEX Sync)
+Route::get('/cron/update-cai-price', 'PriceUpdateController@updateCaiPrice');
+
 
 Route::get('/home', 'HomeController@index')->name('home');
 
