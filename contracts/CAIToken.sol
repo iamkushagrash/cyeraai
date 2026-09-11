@@ -1,311 +1,304 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
-/**
- * @title CAIToken (Cyera Token)
- * @notice Fixed supply BEP-20 / ERC-20 token on BNB Smart Chain.
- * @dev Enforces AMM / PancakeSwap Whitelist Protection:
- *      - BUY (from any registered AMM Pair): Only whitelisted wallets can buy.
- *      - SELL (to any registered AMM Pair): Unrestricted, open to all token holders.
- *      - Primary PancakeSwap pair can be permanently locked after initialization.
- *      - Protection against unauthorized / alternate AMM pair bypassing.
- */
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IERC20 {
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
-    function totalSupply() external view returns (uint256);
+interface IERC20Rescue {
     function balanceOf(address account) external view returns (uint256);
-    function transfer(address to, uint256 value) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
-    function approve(address spender, uint256 value) external returns (bool);
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
+    function transfer(address to, uint256 amount) external returns (bool);
 }
 
-interface IERC20Metadata is IERC20 {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    function decimals() external view returns (uint8);
+interface IPancakeFactoryV2 {
+    function getPair(address tokenA, address tokenB)
+        external
+        view
+        returns (address pair);
+
+    function createPair(address tokenA, address tokenB)
+        external
+        returns (address pair);
 }
 
-abstract contract Context {
-    function _msgSender() internal view virtual returns (address) {
-        return msg.sender;
-    }
+interface IPancakeRouterV2 {
+    function factory() external view returns (address);
 }
 
 /**
- * @dev 2-Step Ownable contract. Ownership is intended to be assigned to a Admin Owner.
+ * @title CAIToken (Cyera)
+ * @notice Fixed-supply CAI token with restricted PancakeSwap buying.
+ *
+ * TOKEN RULES AFTER FINAL CONFIGURATION
+ * -------------------------------------
+ * User            -> User              Allowed
+ * User            -> Pancake Pair      Allowed (sell / liquidity add)
+ * Pancake Pair    -> User              Blocked (buy)
+ * Pancake Pair    -> Mining Contract   Allowed (30% investment auto-buy)
+ * Mining Contract -> Pancake Pair      Allowed (ROI auto-sell payout)
+ * Mining Contract -> User              Allowed
+ * User            -> Mining Contract   Allowed
+ * Burn                                 Allowed
+ *
+ * CONFIGURATION
+ * -------------
+ * 1. The complete fixed supply (300,000 CAI) is minted to the deployer.
+ * 2. The PancakeSwap V2 pair is fetched or created in the constructor.
+ * 3. The Mining Contract is configured exactly once.
+ * 4. Ownership is automatically renounced after configuration.
  */
-abstract contract Ownable2Step is Context {
-    address private _owner;
-    address private _pendingOwner;
+contract CAIToken is ERC20, ERC20Burnable, Ownable {
+    uint8 private constant TOKEN_DECIMALS = 18;
 
-    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    uint256 public constant MAX_SUPPLY = 300_000 * 10 ** TOKEN_DECIMALS;
 
-    constructor(address initialOwner) {
-        require(initialOwner != address(0), "Ownable: initial owner is the zero address");
-        _transferOwnership(initialOwner);
-    }
+    address public immutable usdt;
+    IPancakeRouterV2 public immutable pancakeRouter;
+    address public immutable pancakePair;
 
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
+    address public miningContract;
+    bool public configurationLocked;
 
-    function pendingOwner() public view virtual returns (address) {
-        return _pendingOwner;
-    }
+    error ZeroAddress();
+    error InvalidContract(address account);
+    error InvalidFactory(address factory);
+    error InvalidPair(address pair);
+    error InvalidMiningContract(address mining);
+    error ConfigurationAlreadyLocked();
+    error TransferNotAllowed(address from, address to);
+    error PancakeBuyBlocked(address recipient);
+    error MiningContractNotConfigured();
+    error NoUSDTToRecover();
+    error USDTTransferFailed();
 
-    modifier onlyOwner() {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
+    event MiningContractConfigured(
+        address indexed miningContract,
+        address indexed configuredBy
+    );
 
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        _pendingOwner = newOwner;
-        emit OwnershipTransferStarted(owner(), newOwner);
-    }
+    event FinalConfigurationLocked(
+        address indexed miningContract,
+        address indexed pancakePair
+    );
 
-    function acceptOwnership() public virtual {
-        require(pendingOwner() == _msgSender(), "Ownable2Step: caller is not the new owner");
-        _transferOwnership(_pendingOwner);
-        _pendingOwner = address(0);
-    }
-
-    function _transferOwnership(address newOwner) internal virtual {
-        address oldOwner = _owner;
-        _owner = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
-    }
-}
-
-abstract contract Pausable is Context {
-    event Paused(address account);
-    event Unpaused(address account);
-
-    bool private _paused;
-
-    constructor() {
-        _paused = false;
-    }
-
-    modifier whenNotPaused() {
-        require(!_paused, "Pausable: paused");
-        _;
-    }
-
-    modifier whenPaused() {
-        require(_paused, "Pausable: not paused");
-        _;
-    }
-
-    function paused() public view virtual returns (bool) {
-        return _paused;
-    }
-
-    function _pause() internal virtual whenNotPaused {
-        _paused = true;
-        emit Paused(_msgSender());
-    }
-
-    function _unpause() internal virtual whenPaused {
-        _paused = false;
-        emit Unpaused(_msgSender());
-    }
-}
-
-contract CAIToken is Context, IERC20, IERC20Metadata, Ownable2Step, Pausable {
-    mapping(address => uint256) private _balances;
-    mapping(address => mapping(address => uint256)) private _allowances;
-
-    uint256 private constant _TOTAL_SUPPLY = 300_000 * 10**18; // Exactly 300,000 CAI (Fixed)
-    string private constant _NAME = "Cyera";
-    string private constant _SYMBOL = "CAI";
-    uint8 private constant _DECIMALS = 18;
-
-    // Official PancakeSwap DEX Integration & Alternate AMM Protection
-    address public pancakePair;
-    bool public pancakePairLocked;
-    mapping(address => bool) public isAMMPair;
-    mapping(address => bool) public isWhitelisted;
-
-    // Events
-    event WhitelistUpdated(address indexed account, bool status);
-    event BatchWhitelistUpdated(uint256 totalUpdated, bool status);
-    event PancakePairUpdated(address indexed pair);
-    event PancakePairLocked(address indexed pair);
-    event AMMPairStatusUpdated(address indexed pair, bool isPair);
+    event USDTRecoveredToMining(
+        address indexed caller,
+        address indexed miningContract,
+        uint256 amount
+    );
 
     /**
-     * @param treasuryWallet The initial recipient of the entire 300,000 CAI supply.
-     * @param initialOwner The Admin Owner governance address.
+     * @param usdtAddress USDT token address on BSC.
+     * @param routerAddress PancakeSwap V2 Router address on BSC.
      */
-    constructor(address treasuryWallet, address initialOwner) Ownable2Step(initialOwner) {
-        require(treasuryWallet != address(0), "CAI: Treasury wallet cannot be zero address");
-        
-        _balances[treasuryWallet] = _TOTAL_SUPPLY;
-        emit Transfer(address(0), treasuryWallet, _TOTAL_SUPPLY);
-
-        // Auto-whitelist treasury and owner for seamless initial liquidity provisioning
-        isWhitelisted[treasuryWallet] = true;
-        isWhitelisted[initialOwner] = true;
-        emit WhitelistUpdated(treasuryWallet, true);
-        emit WhitelistUpdated(initialOwner, true);
-    }
-
-    function name() public pure override returns (string memory) {
-        return _NAME;
-    }
-
-    function symbol() public pure override returns (string memory) {
-        return _SYMBOL;
-    }
-
-    function decimals() public pure override returns (uint8) {
-        return _DECIMALS;
-    }
-
-    function totalSupply() public pure override returns (uint256) {
-        return _TOTAL_SUPPLY;
-    }
-
-    function balanceOf(address account) public view override returns (uint256) {
-        return _balances[account];
-    }
-
-    function transfer(address to, uint256 value) public override returns (bool) {
-        _transfer(_msgSender(), to, value);
-        return true;
-    }
-
-    function allowance(address tokenOwner, address spender) public view override returns (uint256) {
-        return _allowances[tokenOwner][spender];
-    }
-
-    function approve(address spender, uint256 value) public override returns (bool) {
-        _approve(_msgSender(), spender, value);
-        return true;
-    }
-
-    function transferFrom(address from, address to, uint256 value) public override returns (bool) {
-        _spendAllowance(from, _msgSender(), value);
-        _transfer(from, to, value);
-        return true;
-    }
-
-    /**
-     * @notice Set official PancakeSwap pair address (only before locking).
-     */
-    function setPancakePair(address _pair) external onlyOwner {
-        require(!pancakePairLocked, "CAI: PancakeSwap pair is permanently locked");
-        require(_pair != address(0), "CAI: Pair cannot be zero address");
-        
-        if (pancakePair != address(0)) {
-            isAMMPair[pancakePair] = false;
+    constructor(
+        address usdtAddress,
+        address routerAddress
+    )
+        ERC20("Cyera", "CAI")
+        Ownable(msg.sender)
+    {
+        if (
+            usdtAddress == address(0) ||
+            routerAddress == address(0)
+        ) {
+            revert ZeroAddress();
         }
 
-        pancakePair = _pair;
-        isAMMPair[_pair] = true;
-        emit PancakePairUpdated(_pair);
-        emit AMMPairStatusUpdated(_pair, true);
-    }
-
-    /**
-     * @notice Permanently lock the official PancakeSwap pair address.
-     */
-    function lockPancakePair() external onlyOwner {
-        require(pancakePair != address(0), "CAI: Pair address is not set yet");
-        require(!pancakePairLocked, "CAI: Pair is already locked");
-        pancakePairLocked = true;
-        emit PancakePairLocked(pancakePair);
-    }
-
-    /**
-     * @notice Register or unregister secondary AMM pairs (e.g. PancakeSwap V3, ApeSwap, Biswap)
-     *         to prevent unauthorized pair creation from bypassing buy whitelist protection.
-     */
-    function setAMMPair(address _pair, bool _isPair) external onlyOwner {
-        require(_pair != address(0), "CAI: Cannot set zero address as AMM pair");
-        if (_pair == pancakePair && pancakePairLocked && !_isPair) {
-            revert("CAI: Cannot unregister locked official PancakeSwap pair");
-        }
-        isAMMPair[_pair] = _isPair;
-        emit AMMPairStatusUpdated(_pair, _isPair);
-    }
-
-    /**
-     * @notice Add or remove a wallet from the buy whitelist.
-     */
-    function setWhitelist(address account, bool status) external onlyOwner {
-        require(account != address(0), "CAI: Cannot whitelist zero address");
-        isWhitelisted[account] = status;
-        emit WhitelistUpdated(account, status);
-    }
-
-    /**
-     * @notice Batch whitelist multiple wallets.
-     */
-    function setBatchWhitelist(address[] calldata accounts, bool status) external onlyOwner {
-        for (uint256 i = 0; i < accounts.length; i++) {
-            require(accounts[i] != address(0), "CAI: Cannot whitelist zero address");
-            isWhitelisted[accounts[i]] = status;
-        }
-        emit BatchWhitelistUpdated(accounts.length, status);
-    }
-
-    /**
-     * @dev Internal transfer logic enforcing AMM Whitelist on Buys & Pausable control.
-     *      - If `from` is a registered AMM Pair (Buy): `to` must be whitelisted.
-     *      - If `to` is a registered AMM Pair (Sell): Always allowed (unrestricted for all holders).
-     */
-    function _transfer(address from, address to, uint256 value) internal whenNotPaused {
-        require(from != address(0), "ERC20: transfer from the zero address");
-        require(to != address(0), "ERC20: transfer to the zero address");
-
-        // Enforce whitelist check on any registered AMM Pair Buys
-        if (isAMMPair[from]) {
-            require(isWhitelisted[to], "CAI: Buyer is not whitelisted for DEX purchases");
+        if (usdtAddress.code.length == 0) {
+            revert InvalidContract(usdtAddress);
         }
 
-        uint256 fromBalance = _balances[from];
-        require(fromBalance >= value, "ERC20: transfer amount exceeds balance");
-        unchecked {
-            _balances[from] = fromBalance - value;
-            _balances[to] += value;
+        if (routerAddress.code.length == 0) {
+            revert InvalidContract(routerAddress);
         }
 
-        emit Transfer(from, to, value);
+        usdt = usdtAddress;
+        pancakeRouter = IPancakeRouterV2(routerAddress);
+
+        address factoryAddress = IPancakeRouterV2(routerAddress).factory();
+
+        if (
+            factoryAddress == address(0) ||
+            factoryAddress.code.length == 0
+        ) {
+            revert InvalidFactory(factoryAddress);
+        }
+
+        IPancakeFactoryV2 factory = IPancakeFactoryV2(factoryAddress);
+
+        address pair = factory.getPair(address(this), usdtAddress);
+
+        if (pair == address(0)) {
+            pair = factory.createPair(
+                address(this),
+                usdtAddress
+            );
+        }
+
+        if (
+            pair == address(0) ||
+            pair.code.length == 0
+        ) {
+            revert InvalidPair(pair);
+        }
+
+        pancakePair = pair;
+
+        // The complete supply is minted once to the deployer.
+        // No external or public mint function exists.
+        _mint(msg.sender, MAX_SUPPLY);
     }
 
-    function _approve(address tokenOwner, address spender, uint256 value) internal {
-        require(tokenOwner != address(0), "ERC20: approve from the zero address");
-        require(spender != address(0), "ERC20: approve to the zero address");
-
-        _allowances[tokenOwner][spender] = value;
-        emit Approval(tokenOwner, spender, value);
+    /**
+     * @notice Returns 18 token decimals.
+     */
+    function decimals()
+        public
+        pure
+        override
+        returns (uint8)
+    {
+        return TOKEN_DECIMALS;
     }
 
-    function _spendAllowance(address tokenOwner, address spender, uint256 value) internal {
-        uint256 currentAllowance = allowance(tokenOwner, spender);
-        if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= value, "ERC20: insufficient allowance");
-            unchecked {
-                _approve(tokenOwner, spender, currentAllowance - value);
+    /**
+     * @notice Permanently configures the Mining Contract.
+     * @dev This function can execute only once. Ownership is
+     *      automatically renounced after successful configuration.
+     *
+     * The Mining Contract must already be deployed.
+     */
+    function setMiningContractAndRenounceOwnership(
+        address miningAddress
+    )
+        external
+        onlyOwner
+    {
+        if (configurationLocked) {
+            revert ConfigurationAlreadyLocked();
+        }
+
+        if (miningAddress == address(0)) {
+            revert ZeroAddress();
+        }
+
+        if (
+            miningAddress.code.length == 0 ||
+            miningAddress == address(this) ||
+            miningAddress == usdt ||
+            miningAddress == address(pancakeRouter) ||
+            miningAddress == pancakePair
+        ) {
+            revert InvalidMiningContract(miningAddress);
+        }
+
+        miningContract = miningAddress;
+        configurationLocked = true;
+
+        emit MiningContractConfigured(
+            miningAddress,
+            msg.sender
+        );
+
+        emit FinalConfigurationLocked(
+            miningAddress,
+            pancakePair
+        );
+
+        // No administrator remains after final configuration.
+        renounceOwnership();
+    }
+
+    /**
+     * @dev Controls every mint, burn and token transfer.
+     *
+     * Before final configuration:
+     * - Owner -> any address is allowed.
+     * - Any address -> owner is allowed.
+     * - Transfers not involving the owner are blocked.
+     *
+     * After final configuration:
+     * - Normal wallet transfers are allowed.
+     * - Selling to the official Pancake pair is allowed.
+     * - The official pair can send CAI only to the Mining Contract.
+     */
+    function _update(
+        address from,
+        address to,
+        uint256 amount
+    )
+        internal
+        override
+    {
+        // Constructor mint.
+        if (from == address(0)) {
+            super._update(from, to, amount);
+            return;
+        }
+
+        // Burns through burn() or burnFrom() are allowed.
+        if (to == address(0)) {
+            super._update(from, to, amount);
+            return;
+        }
+
+        // Before final locking, the current owner must participate
+        // in every normal transfer. This permits initial token
+        // distribution and liquidity preparation.
+        if (!configurationLocked) {
+            address currentOwner = owner();
+
+            if (
+                from != currentOwner &&
+                to != currentOwner
+            ) {
+                revert TransferNotAllowed(from, to);
             }
+
+            super._update(from, to, amount);
+            return;
         }
+
+        // Block purchases from the official PancakeSwap pair.
+        // The pair may transfer CAI only to the Mining Contract.
+        if (
+            from == pancakePair &&
+            to != miningContract
+        ) {
+            revert PancakeBuyBlocked(to);
+        }
+
+        // All other normal transfers are allowed.
+        super._update(from, to, amount);
     }
 
     /**
-     * @notice Emergency Pause / Unpause for all token transfers (Admin Owner only).
+     * @notice Emergency recovery of USDT to Mining Contract.
      */
-    function pause() external onlyOwner {
-        _pause();
-    }
+    function recoverUSDT() external {
+        address mining = miningContract;
 
-    function unpause() external onlyOwner {
-        _unpause();
+        if (!configurationLocked || mining == address(0)) {
+            revert MiningContractNotConfigured();
+        }
+
+        uint256 amount = IERC20Rescue(usdt).balanceOf(address(this));
+
+        if (amount == 0) {
+            revert NoUSDTToRecover();
+        }
+
+        bool success = IERC20Rescue(usdt).transfer(mining, amount);
+
+        if (!success) {
+            revert USDTTransferFailed();
+        }
+
+        emit USDTRecoveredToMining(
+            msg.sender,
+            mining,
+            amount
+        );
     }
 }

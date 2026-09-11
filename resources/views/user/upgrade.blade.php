@@ -7,7 +7,7 @@
 @section('content')
     @php
         $caiPrice = (float) ($price->price ?? 1.25);
-        $splitterContract = env('INVESTMENT_SPLITTER_ADDRESS', '0x2A1CEBf5Afe686763E915838457ccBC344901ebD');
+        $splitterContract = env('CYERA_MINING_ENGINE_ADDRESS', env('INVESTMENT_SPLITTER_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'));
         $usdtContract = env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955');
         
         $currentUuid = '';

@@ -408,15 +408,18 @@
                     <div class="cp-icon token"><i class="fas fa-coins"></i></div>
                     <div class="cp-meta">
                         <div class="cp-tag">CAI Token Contract</div>
-                        <div class="cp-addr">0x5cb5...af5f</div>
+                        <div class="cp-addr">0x4756...4eDB</div>
                     </div>
                 </div>
                 <div class="cp-actions">
-                    <button class="btn-cp-action" onclick="copyAddress('0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f', 'CAI Token Address')" title="Copy Token Address">
+                    <button class="btn-cp-action" onclick="copyAddress('0x4756618F389A46819008Aff01ad0f91A38154eDB', 'CAI Token Address')" title="Copy Token Address">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <a href="https://bscscan.com/token/0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAI Token on BscScan">
+                    <a href="https://bscscan.com/token/0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAI Token on BscScan">
                         <i class="fas fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <a href="https://dexscreener.com/bsc/0x4b33d9a80aeae68ad6d9ee84fd816db9a29d6a2c" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="Live Chart on DexScreener" style="color: #00FF88;">
+                        <i class="fas fa-chart-line"></i>
                     </a>
                 </div>
             </div>
@@ -426,15 +429,15 @@
                 <div class="cp-left">
                     <div class="cp-icon invest"><i class="fas fa-shield-halved"></i></div>
                     <div class="cp-meta">
-                        <div class="cp-tag">Investment Contract</div>
-                        <div class="cp-addr">0x2A1C...1ebD</div>
+                        <div class="cp-tag">Cyera Mining Engine</div>
+                        <div class="cp-addr">0xdd90...0217</div>
                     </div>
                 </div>
                 <div class="cp-actions">
-                    <button class="btn-cp-action" onclick="copyAddress('0x2A1CEBf5Afe686763E915838457ccBC344901ebD', 'Investment Contract Address')" title="Copy Investment Contract">
+                    <button class="btn-cp-action" onclick="copyAddress('0xdd905468F6F91f8c37eFB9e27E1f282734E60217', 'Mining Engine Address')" title="Copy Mining Engine Address">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <a href="https://bscscan.com/address/0x2A1CEBf5Afe686763E915838457ccBC344901ebD" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Investment Contract on BscScan">
+                    <a href="https://bscscan.com/address/0xdd905468F6F91f8c37eFB9e27E1f282734E60217" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
                         <i class="fas fa-arrow-up-right-from-square"></i>
                     </a>
                 </div>
@@ -629,13 +632,13 @@
                         <div class="vc-item">
                             <div class="vc-left">
                                 <div class="vc-title"><i class="fas fa-coins" style="color:#FFD700;margin-right:4px;"></i> CAI Token Contract</div>
-                                <div class="vc-hash" title="0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f">0x5cb5...af5f</div>
+                                <div class="vc-hash" title="0x4756618F389A46819008Aff01ad0f91A38154eDB">0x4756...4eDB</div>
                             </div>
                             <div class="vc-actions">
-                                <button class="btn-cp-action" onclick="copyAddress('0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f', 'CAI Token Address')" title="Copy Token Address">
+                                <button class="btn-cp-action" onclick="copyAddress('0x4756618F389A46819008Aff01ad0f91A38154eDB', 'CAI Token Address')" title="Copy Token Address">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/token/0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAI Token on BscScan">
+                                <a href="https://bscscan.com/token/0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAI Token on BscScan">
                                     <i class="fas fa-arrow-up-right-from-square"></i>
                                 </a>
                             </div>
@@ -643,14 +646,14 @@
 
                         <div class="vc-item">
                             <div class="vc-left">
-                                <div class="vc-title"><i class="fas fa-shield-halved" style="color:#00FF88;margin-right:4px;"></i> Investment Contract</div>
-                                <div class="vc-hash" title="0x2A1CEBf5Afe686763E915838457ccBC344901ebD">0x2A1C...1ebD</div>
+                                <div class="vc-title"><i class="fas fa-shield-halved" style="color:#00FF88;margin-right:4px;"></i> Cyera Mining Engine</div>
+                                <div class="vc-hash" title="0xdd905468F6F91f8c37eFB9e27E1f282734E60217">0xdd90...0217</div>
                             </div>
                             <div class="vc-actions">
-                                <button class="btn-cp-action" onclick="copyAddress('0x2A1CEBf5Afe686763E915838457ccBC344901ebD', 'Investment Contract Address')" title="Copy Investment Contract">
+                                <button class="btn-cp-action" onclick="copyAddress('0xdd905468F6F91f8c37eFB9e27E1f282734E60217', 'Mining Engine Address')" title="Copy Mining Engine Address">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/0x2A1CEBf5Afe686763E915838457ccBC344901ebD" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Investment Contract on BscScan">
+                                <a href="https://bscscan.com/address/0xdd905468F6F91f8c37eFB9e27E1f282734E60217" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
                                     <i class="fas fa-arrow-up-right-from-square"></i>
                                 </a>
                             </div>

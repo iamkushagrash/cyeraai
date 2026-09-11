@@ -11,12 +11,12 @@ class PriceUpdateController extends Controller
     /**
      * Official PancakeSwap V2 Pair Address for CAI/USDT on BSC Mainnet.
      */
-    const PAIR_ADDRESS = '0x62e0b6c229a096f9b5ff4e03c58907187e0ab749';
+    const PAIR_ADDRESS = '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c';
 
     /**
      * CAI Token Contract Address.
      */
-    const CAI_ADDRESS = '0x5cb5452DE7044E551137985cE1d7C2D42e7bAf5f';
+    const CAI_ADDRESS = '0x4756618F389A46819008Aff01ad0f91A38154eDB';
 
     /**
      * Fetch live CAI/USDT price from DEX (DexScreener API with On-chain RPC Fallback)

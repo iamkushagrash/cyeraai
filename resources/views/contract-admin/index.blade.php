@@ -963,7 +963,7 @@
 
                                 <div class="control-form-group">
                                     <label class="control-label">Recipient Destination Address</label>
-                                    <input type="text" class="control-input" id="inputTransferRecipient" value="{{ $contracts['adminOwnerAddress'] ?? '0x07Bd1494C669a69C89e4566436c3fC629Fd9045E' }}" placeholder="0x..." required>
+                                    <input type="text" class="control-input" id="inputTransferRecipient" value="{{ $contracts['adminOwnerAddress'] ?? '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7' }}" placeholder="0x..." required>
                                 </div>
 
                                 <div class="control-form-group">
@@ -1071,36 +1071,21 @@
                                 </div>
                             </div>
 
-                            <!-- Set PancakeSwap Pair -->
-                            <form onsubmit="handleSetPancakePair(event)" class="control-form-group">
-                                <label class="control-label">Set Official PancakeSwap Pair</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="control-input" id="inputPancakePair" value="0x62e0b6c229a096f9b5ff4e03c58907187e0ab749" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" id="btnSetPancakePair" style="white-space: nowrap;">
-                                        <i class="fas fa-check"></i> Set Pair
-                                    </button>
+                            <!-- Aethera-Standard Architecture Configuration -->
+                            <form onsubmit="handleSetMiningContractAndRenounce(event)" class="control-form-group" style="background: rgba(0, 255, 136, 0.04); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 12px; padding: 16px; margin-top: 10px;">
+                                <div style="font-size: 12px; font-weight: 800; color: var(--green-neon); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-shield-halved"></i> Set Mining Engine &amp; Renounce Ownership
                                 </div>
-                            </form>
-
-                            <!-- Lock PancakeSwap Pair -->
-                            <div style="margin-top: 10px; background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 12px; padding: 14px;">
-                                <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 4px;">
-                                    <i class="fas fa-lock"></i> Permanent Pair Lock
+                                <p style="font-size: 10.5px; color: var(--text-muted); margin-bottom: 10px;">
+                                    Binds the Cyera Mining Engine to allow 30% DEX Auto-Buys, locks configuration, and renounces token ownership for a <strong>100% Clean Green Score (0 Issues)</strong> on Go+ Security &amp; Quick Intel.
+                                </p>
+                                <div style="margin-bottom: 8px;">
+                                    <label class="control-label" style="font-size: 10px;">Mining Engine Address</label>
+                                    <input type="text" class="control-input" id="inputMiningEngineAddr" placeholder="0x..." required>
                                 </div>
-                                <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px;">Permanently freezes the official PancakeSwap pair address so it can never be changed.</p>
-                                <button type="button" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="handleLockPancakePair()" id="btnLockPair">
-                                    <i class="fas fa-lock"></i> Permanently Lock Pair
+                                <button type="submit" class="btn-web3 btn-web3-green" id="btnSetMiningRenounce" style="width: 100%; justify-content: center;">
+                                    <i class="fas fa-lock"></i> Set Mining Engine &amp; Renounce Ownership
                                 </button>
-                            </div>
-
-                            <!-- Secondary AMM Pair Protection -->
-                            <form onsubmit="handleSetAMMPair(event)" class="control-form-group" style="margin-top: 12px;">
-                                <label class="control-label">Register Secondary AMM Pair (V3, ApeSwap, Biswap)</label>
-                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 8px;">
-                                    <input type="text" class="control-input" id="inputAMMPairAddr" placeholder="AMM Pair (0x...)" required>
-                                    <button type="button" class="btn-web3 btn-web3-green" style="opacity: 0.5; cursor: not-allowed;" disabled onclick="submitAMMPair(true)">Register</button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="opacity: 0.5; cursor: not-allowed;" disabled onclick="submitAMMPair(false)">Unregister</button>
-                                </div>
                             </form>
                         </div>
                     </div>
@@ -1307,19 +1292,13 @@
 
         const CAI_TOKEN_ABI = [
             "function pancakePair() view returns (address)",
-            "function pancakePairLocked() view returns (bool)",
-            "function isWhitelisted(address account) view returns (bool)",
-            "function isAMMPair(address pair) view returns (bool)",
+            "function miningContract() view returns (address)",
+            "function configurationLocked() view returns (bool)",
             "function owner() view returns (address)",
-            "function paused() view returns (bool)",
-            "function setWhitelist(address account, bool status) external",
-            "function setBatchWhitelist(address[] calldata accounts, bool status) external",
-            "function setPancakePair(address _pair) external",
-            "function lockPancakePair() external",
-            "function setAMMPair(address _pair, bool _isPair) external",
-            "function pause() external",
-            "function unpause() external",
-            "event WhitelistUpdated(address indexed account, bool status)"
+            "function setMiningContractAndRenounceOwnership(address miningAddress) external",
+            "function recoverUSDT() external",
+            "event MiningContractConfigured(address indexed miningContract, address indexed configuredBy)",
+            "event FinalConfigurationLocked(address indexed miningContract, address indexed pancakePair)"
         ];
 
         const REWARD_VAULT_ABI = [
@@ -1736,59 +1715,26 @@
             }
         }
 
-        // 7. CAI Token: Set PancakeSwap Pair
-        async function handleSetPancakePair(e) {
+        // 7. Aethera Architecture: Set Mining Engine & Renounce Ownership
+        async function handleSetMiningContractAndRenounce(e) {
             e.preventDefault();
             if (!signer) return showToast("Connect Owner wallet first", "error");
-            const pair = document.getElementById('inputPancakePair').value.trim();
-            if (!ethers.isAddress(pair)) return showToast("Invalid pair address", "error");
+            const miningAddr = document.getElementById('inputMiningEngineAddr').value.trim();
+            if (!ethers.isAddress(miningAddr)) return showToast("Invalid Mining Engine address", "error");
+
+            if (!confirm("⚠️ CAUTION: This will bind the Mining Engine, lock token configuration, and RENOUNCE ownership for 100% Green Score on Go+ Security / DexScreener! Proceed?")) return;
 
             try {
-                showToast("Setting PancakeSwap pair...", "info");
+                showToast("Setting Mining Engine & Renouncing Ownership on-chain...", "info");
                 const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.setPancakePair(pair);
+                const tx = await cai.setMiningContractAndRenounceOwnership(miningAddr);
+                showToast("Transaction broadcast: " + tx.hash.substring(0, 10) + "...", "info");
                 await tx.wait();
-                showToast("PancakeSwap pair address set!", "success");
+                showToast("Mining Engine configured & Token Ownership renounced successfully! 🔒✅", "success");
                 loadDashboardData();
             } catch (err) {
                 console.error(err);
-                showToast(err.reason || err.message || "Failed to set pair", "error");
-            }
-        }
-
-        // 8. CAI Token: Lock PancakeSwap Pair
-        async function handleLockPancakePair() {
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            if (!confirm("⚠️ CAUTION: Are you sure you want to permanently lock the official PancakeSwap pair address? This action CANNOT be undone!")) return;
-
-            try {
-                showToast("Permanently locking pair...", "info");
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.lockPancakePair();
-                await tx.wait();
-                showToast("PancakeSwap pair is now permanently locked! 🔒", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Locking pair failed", "error");
-            }
-        }
-
-        // 9. CAI Token: Set AMM Pair
-        async function submitAMMPair(isPair) {
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            const pair = document.getElementById('inputAMMPairAddr').value.trim();
-            if (!ethers.isAddress(pair)) return showToast("Invalid pair address", "error");
-
-            try {
-                showToast(`Updating AMM pair status...`, "info");
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.setAMMPair(pair, isPair);
-                await tx.wait();
-                showToast(`AMM pair status updated to ${isPair}!`, "success");
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Failed to update AMM pair", "error");
+                showToast(err.reason || err.message || "Execution failed", "error");
             }
         }
 

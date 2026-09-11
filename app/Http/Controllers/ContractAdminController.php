@@ -14,17 +14,19 @@ class ContractAdminController extends Controller
     public function index()
     {
         $contracts = [
-            'adminOwnerAddress' => env('ADMIN_OWNER_ADDRESS', '0x07Bd1494C669a69C89e4566436c3fC629Fd9045E'),
-            'caiTreasuryWallet' => env('CAI_TREASURY_WALLET', '0x07Bd1494C669a69C89e4566436c3fC629Fd9045E'),
-            'liquidityTreasuryWallet' => env('LIQUIDITY_TREASURY_WALLET', '0x6A4139D4544Fd175888E5ca502f35B4Da0265a64'),
-            'backendSignerAddress' => env('BACKEND_SIGNER_ADDRESS', '0x6A3DE8Ab8Ee9bb3899066A9678B89F3735A2BBBD'),
+            'adminOwnerAddress' => env('ADMIN_OWNER_ADDRESS', '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
+            'caiTreasuryWallet' => env('CAI_TREASURY_WALLET', '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
+            'liquidityTreasuryWallet' => env('LIQUIDITY_TREASURY_WALLET', '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
+            'backendSignerAddress' => env('BACKEND_SIGNER_ADDRESS', '0x188525c9810749a8012Dd1eBfA4a28801bac0a6e'),
             
             'usdtTokenAddress' => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'caiTokenAddress' => env('CAI_TOKEN_ADDRESS', '0x5cb5452DE7044E551137985cE1d7C2D42e7Baf5f'),
+            'caiTokenAddress' => env('CAI_TOKEN_ADDRESS', '0x4756618F389A46819008Aff01ad0f91A38154eDB'),
+            'pancakePairAddress' => env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c'),
             'treasuryClaimVaultAddress' => env('TREASURY_CLAIM_VAULT_ADDRESS', '0x6893000Cc1f77A82fFe129C8089014752492A5F0'),
-            'investmentSplitterAddress' => env('INVESTMENT_SPLITTER_ADDRESS', '0x2A1CEBf5Afe686763E915838457ccBC344901ebD'),
+            'investmentSplitterAddress' => env('CYERA_MINING_ENGINE_ADDRESS', env('INVESTMENT_SPLITTER_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217')),
+            'miningEngineAddress' => env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'),
             'caiRewardClaimVaultAddress' => env('CAI_REWARD_CLAIM_VAULT_ADDRESS', '0x76Ea835c1D1ae5670D5287c41894C599252dEA6e'),
-            'usdtWithdrawalVaultAddress' => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x97deeA367462eCB14B81B32014315BCd58be3a1D'),
+            'usdtWithdrawalVaultAddress' => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b'),
             
             'bscMainnetRpc' => env('BSC_MAINNET_RPC', 'https://bsc-dataseed.binance.org/'),
             'bscTestnetRpc' => env('BSC_TESTNET_RPC', 'https://data-seed-prebsc-1-s1.binance.org:8545/'),
