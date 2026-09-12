@@ -10,6 +10,7 @@ use Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\SupportQueryController;
+use App\Helpers\Eip712Helper;
 
 class WithdrawInfoController extends Controller
 {
@@ -327,23 +328,21 @@ class WithdrawInfoController extends Controller
         $chainId = "56"; // BSC Mainnet
         $privateKey = env('SIGNER_PRIVATE_KEY', '38765232db1a84b6571252884f7168205f3207242cd31f99ab4e76ad76f5a67b');
 
-        // Execute sign script
-        $scriptPath = base_path('contracts/scripts/sign_usdt_withdrawal.js');
-        $cmd = "node " . escapeshellarg($scriptPath) . " "
-            . escapeshellarg($recipient) . " "
-            . escapeshellarg($amountWei) . " "
-            . escapeshellarg($withdrawalId) . " "
-            . escapeshellarg($expiry) . " "
-            . escapeshellarg($vaultAddress) . " "
-            . escapeshellarg($chainId) . " "
-            . escapeshellarg($privateKey);
-
-        $output = shell_exec($cmd);
-        $result = json_decode($output, true);
-
-        if (!$result || !isset($result['signature'])) {
-            \Log::error("Working Withdrawal Signature Generation Failed. Command output: " . $output);
-            return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization signature.'], 500);
+        // Generate Pure PHP EIP-712 cryptographic signature (No shell_exec needed)
+        try {
+            $signResult = Eip712Helper::signWithdrawal(
+                $recipient,
+                $amountWei,
+                $withdrawalId,
+                $expiry,
+                $vaultAddress,
+                $chainId,
+                $privateKey
+            );
+            $signature = $signResult['signature'];
+        } catch (\Exception $e) {
+            \Log::error("Working Withdrawal Signature Generation Failed: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization signature: ' . $e->getMessage()], 500);
         }
 
         return response()->json([
@@ -356,7 +355,7 @@ class WithdrawInfoController extends Controller
                 'amount_wei'    => $amountWei,
                 'withdrawal_id' => $withdrawalId,
                 'expiry'        => $expiry,
-                'signature'     => $result['signature'],
+                'signature'     => $signature,
                 'vault_address' => $vaultAddress,
             ]
         ]);

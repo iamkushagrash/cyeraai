@@ -12,6 +12,7 @@ use App\CpsIncome;
 use App\StackingDeposite;
 use App\CaiMiningLedger;
 use App\ProfileStore;
+use App\Helpers\Eip712Helper;
 
 class PortfolioMiningController extends Controller
 {
@@ -452,24 +453,22 @@ class PortfolioMiningController extends Controller
         $chainId = "56"; // BSC Mainnet
         $privateKey = env('SIGNER_PRIVATE_KEY', '7672820670408540bfcd0c7d34794935e4a3054455fa5c7f9cccdfdf4aca45c3');
 
-        // Execute signing helper
-        $scriptPath = base_path('contracts/scripts/sign_sell_portfolio.js');
-        $cmd = "node " . escapeshellarg($scriptPath) . " "
-            . escapeshellarg($walletAddress) . " "
-            . escapeshellarg($caiWei) . " "
-            . escapeshellarg($minUsdtWei) . " "
-            . escapeshellarg($nonce) . " "
-            . escapeshellarg($expiry) . " "
-            . escapeshellarg($miningContract) . " "
-            . escapeshellarg($chainId) . " "
-            . escapeshellarg($privateKey);
-
-        $output = shell_exec($cmd);
-        $result = json_decode($output, true);
-
-        if (!$result || !isset($result['signature'])) {
-            Log::error("SellPortfolio Signature Generation Failed. Command output: " . $output);
-            return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization signature.'], 500);
+        // Generate Pure PHP EIP-712 cryptographic signature (No shell_exec needed)
+        try {
+            $signResult = Eip712Helper::signSellPortfolio(
+                $walletAddress,
+                $caiWei,
+                $minUsdtWei,
+                $nonce,
+                $expiry,
+                $miningContract,
+                $chainId,
+                $privateKey
+            );
+            $signature = $signResult['signature'];
+        } catch (\Exception $e) {
+            Log::error("SellPortfolio Signature Generation Failed: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization signature: ' . $e->getMessage()], 500);
         }
 
         return response()->json([
@@ -482,7 +481,7 @@ class PortfolioMiningController extends Controller
                 'minUsdtOutWei'       => $minUsdtWei,
                 'nonce'               => $nonce,
                 'expiry'              => $expiry,
-                'signature'           => $result['signature'],
+                'signature'           => $signature,
                 'miningContract'      => $miningContract,
                 'livePrice'           => $livePrice,
                 'cappingBefore'       => $runtimeCapping,
