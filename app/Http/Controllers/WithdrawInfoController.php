@@ -85,8 +85,8 @@ class WithdrawInfoController extends Controller
 
         $workingBalance = $levelRemaining + $bonusRemaining + $poolRemaining + $rankRemaining;
 
-        if ($request->amountusdt <= 0) {
-            return redirect()->back()->with('warning', 'Please enter a valid withdrawal amount.');
+        if ($request->amountusdt < 1.0) {
+            return redirect()->back()->with('warning', 'Minimum withdrawal amount is $1.00 USDT.');
         }
 
         if ($workingBalance < $request->amountusdt) {
@@ -274,8 +274,8 @@ class WithdrawInfoController extends Controller
         }
 
         $grossAmount = (float) $request->amountusdt;
-        if ($grossAmount <= 0) {
-            return response()->json(['status' => 'error', 'message' => 'Please enter a valid withdrawal amount.'], 400);
+        if ($grossAmount < 1.0) {
+            return response()->json(['status' => 'error', 'message' => 'Minimum working income withdrawal limit is $1.00 USDT.'], 400);
         }
 
         // Available Working Balance Check

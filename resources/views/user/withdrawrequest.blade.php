@@ -82,7 +82,7 @@
                 <div class="mecha-input-wrap">
                     <i class="fas fa-dollar-sign mecha-input-icon" style="color: #00FF88;"></i>
                     <input type="number" class="mecha-input-control"
-                        id="amountusdt" name="amountusdt" min="0.01" placeholder="0.00" max="{{ $workingUsdt }}" step="any"
+                        id="amountusdt" name="amountusdt" min="1" placeholder="1.00" max="{{ $workingUsdt }}" step="any"
                         value="" autocomplete="off" required>
                     <button type="button" class="mecha-input-suffix-btn"
                         style="color: #00FF88; font-weight: 700;"
@@ -232,11 +232,11 @@
             const input = document.getElementById('amountusdt');
             const grossAmt = parseFloat(input.value) || 0;
 
-            if (grossAmt <= 0) {
+            if (grossAmt < 1.0) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'INVALID AMOUNT',
-                    text: 'Please enter a valid withdrawal amount.',
+                    title: 'MINIMUM $1.00 REQUIRED',
+                    text: 'Minimum working income withdrawal limit is $1.00 USDT.',
                     background: '#0A0D15',
                     color: '#FFF',
                     confirmButtonColor: '#00FF88'
