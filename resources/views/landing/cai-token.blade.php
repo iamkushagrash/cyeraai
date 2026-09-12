@@ -358,12 +358,17 @@
         <span class="nav-logo-txt">CYERA AI</span>
     </a>
     <ul class="nav-links">
+        <li><a href="#chart" style="color:#00FF88;"><i class="fas fa-chart-line"></i> Live Rate</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#ecosystem">Ecosystem</a></li>
         <li><a href="#roadmap">Roadmap</a></li>
         <li><a href="#technology">Technology</a></li>
     </ul>
-    <div class="nav-actions">
+    <div class="nav-actions" style="display:flex;align-items:center;gap:10px;">
+        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00FF88;font-size:0.75rem;font-family:'Space Mono',monospace;font-weight:700;">
+            <span class="pdot" style="margin:0;"></span>
+            <span id="navLivePrice">$0.9991</span>
+        </span>
         <a href="{{ url('/login') }}" class="btn-launch"><i class="fas fa-wallet"></i> Connect Wallet</a>
     </div>
 </nav>
@@ -452,8 +457,120 @@
             <div class="stat-item"><div class="stat-num">LIVE</div><div class="stat-lbl">Protocol Status</div></div>
         </div>
     </div>
-    <div class="scroll-down" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-down" onclick="document.getElementById('chart').scrollIntoView({behavior:'smooth'})">
         <i class="fas fa-chevron-down" style="font-size:16px;"></i>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================
+     LIVE DEX MARKET & TRADINGVIEW CANDLESTICK CHART
+     ============================================================ -->
+<section class="sec-pad" id="chart" style="padding: 42px 16px; background: radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.05) 0%, transparent 70%);">
+    <div class="container">
+        <div class="reveal" style="text-align: center; margin-bottom: 24px;">
+            <div class="sec-eyebrow" style="margin: 0 auto 10px;"><i class="fas fa-chart-line"></i> DEX Real-Time Market</div>
+            <h2 class="sec-title" style="text-align: center;">Live <span>CAI / USDT</span> Market Chart</h2>
+            <p class="sec-desc" style="margin: 0 auto; text-align: center;">Direct real-time streaming price, on-chain liquidity, and TradingView candlestick charting from PancakeSwap V2 pool.</p>
+        </div>
+
+        <div class="reveal" style="background: rgba(10, 13, 25, 0.9); border: 1px solid rgba(245, 166, 35, 0.3); border-radius: 16px; padding: 16px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
+            <!-- Header Telemetry Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center;">
+                        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI" style="width: 24px; height: 24px; object-fit: contain;">
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; font-weight: 800; color: #FFF; letter-spacing: 0.5px;">CAI / USDT</span>
+                            <span style="font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.35); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP V2</span>
+                        </div>
+                        <div style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace; margin-top: 2px;">
+                            Pool: <a href="https://bscscan.com/address/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" style="color: #FFD700; text-decoration: none;">0x4B33...6A2c <i class="fas fa-external-link-alt" style="font-size: 9px;"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <div>
+                        <div style="font-size: 0.62rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600; text-align: right;">Live DEX Rate</div>
+                        <div id="landingLivePrice" style="font-size: 1.25rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88; line-height: 1.1; text-align: right;">
+                            $0.9991
+                        </div>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 6px 12px; text-align: center;">
+                        <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Change</div>
+                        <div id="landing24hChange" style="font-size: 0.85rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88;">
+                            <i class="fas fa-arrow-trend-up"></i> +0.00%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 14px;">
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
+                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Volume</div>
+                    <div id="landing24hVol" style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
+                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Pool Liquidity</div>
+                    <div id="landingLiquidity" style="font-size: 0.82rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
+                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Token Standard</div>
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">BEP-20 (BSC)</div>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
+                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Capped Supply</div>
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAI</div>
+                </div>
+            </div>
+
+            <!-- TradingView Candlestick Chart Container (100% Mobile Responsive) -->
+            <div style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
+                <style>
+                    #landing-chart-frame {
+                        position: relative;
+                        width: 100%;
+                        height: 480px;
+                    }
+                    @media (max-width: 768px) {
+                        #landing-chart-frame {
+                            height: 380px;
+                        }
+                    }
+                    #landing-chart-frame iframe {
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        top: 0;
+                        left: 0;
+                        border: 0;
+                    }
+                </style>
+                <div id="landing-chart-frame">
+                    <iframe src="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c?embed=1&theme=dark&trades=0&info=0" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="https://pancakeswap.finance/swap?outputCurrency=0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" class="btn-primary" style="padding: 8px 16px; font-size: 0.78rem;">
+                        <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
+                    </a>
+                    <a href="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" class="btn-ghost" style="padding: 8px 16px; font-size: 0.78rem;">
+                        <i class="fas fa-chart-line"></i> Open Full DexScreener
+                    </a>
+                </div>
+                <div style="font-size: 0.70rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
+                    Decentralized Liquidity Pool
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -777,6 +894,58 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
         const t = document.querySelector(a.getAttribute('href'));
         if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
+});
+
+// === REAL-TIME DEXSCREENER TELEMETRY POLLING ===
+async function fetchLandingDexTelemetry() {
+    try {
+        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.pairs || data.pairs.length === 0) return;
+
+        const pair = data.pairs[0];
+        const priceUsd = parseFloat(pair.priceUsd) || 0;
+        const change24h = parseFloat(pair.priceChange?.h24) || 0;
+        const vol24h = parseFloat(pair.volume?.h24) || 0;
+        const liquidityUsd = parseFloat(pair.liquidity?.usd) || 0;
+
+        // Nav price
+        const navEl = document.getElementById('navLivePrice');
+        if (navEl && priceUsd > 0) navEl.innerText = '$' + priceUsd.toFixed(4);
+
+        // Section live rate
+        const priceEl = document.getElementById('landingLivePrice');
+        if (priceEl && priceUsd > 0) priceEl.innerText = '$' + priceUsd.toFixed(4);
+
+        // 24H change
+        const changeEl = document.getElementById('landing24hChange');
+        if (changeEl) {
+            if (change24h >= 0) {
+                changeEl.style.color = '#00FF88';
+                changeEl.innerHTML = `<i class="fas fa-arrow-trend-up"></i> +${change24h.toFixed(2)}%`;
+            } else {
+                changeEl.style.color = '#FF4D7D';
+                changeEl.innerHTML = `<i class="fas fa-arrow-trend-down"></i> ${change24h.toFixed(2)}%`;
+            }
+        }
+
+        // 24h Vol
+        const volEl = document.getElementById('landing24hVol');
+        if (volEl) volEl.innerText = '$' + vol24h.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Liquidity
+        const liqEl = document.getElementById('landingLiquidity');
+        if (liqEl) liqEl.innerText = '$' + liquidityUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    } catch (e) {
+        console.debug('Landing Dex Polling Error:', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchLandingDexTelemetry();
+    setInterval(fetchLandingDexTelemetry, 20000);
 });
 </script>
 </body>
