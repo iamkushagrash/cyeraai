@@ -10,7 +10,150 @@
     <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="{{asset('css/cyera-dashboard.css')}}" rel="stylesheet">
+    <link href="{{asset('css/cyera-dashboard.css')}}?v={{ time() }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Instant High-Priority Cyber SweetAlert2 Theme Overrides */
+        .swal2-container,
+        div:where(.swal2-container) {
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            background: rgba(2, 3, 6, 0.88) !important;
+            z-index: 999999 !important;
+            padding: 12px !important;
+        }
+
+        .swal2-popup,
+        div:where(.swal2-container) .swal2-popup,
+        .mecha-swal-popup {
+            background: linear-gradient(180deg, #0D111A 0%, #040508 100%) !important;
+            background-color: #080A10 !important;
+            border: 1px solid rgba(245, 166, 35, 0.45) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 166, 35, 0.2), inset 0 1px 1px rgba(255, 215, 0, 0.18) !important;
+            color: #FFFFFF !important;
+            font-family: 'Inter', sans-serif !important;
+            padding: 22px 18px 20px 18px !important;
+            width: 92% !important;
+            max-width: 380px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }
+
+        .swal2-title,
+        div:where(.swal2-container) .swal2-title,
+        .mecha-swal-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 1.05rem !important;
+            font-weight: 800 !important;
+            color: #FFD700 !important;
+            letter-spacing: 0.4px !important;
+            text-transform: uppercase !important;
+            padding: 0 !important;
+            margin: 8px 0 10px 0 !important;
+            text-align: center !important;
+            text-shadow: 0 0 14px rgba(255, 215, 0, 0.3) !important;
+        }
+
+        .swal2-html-container,
+        div:where(.swal2-container) .swal2-html-container,
+        .mecha-swal-html {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 0.80rem !important;
+            color: #94A3B8 !important;
+            line-height: 1.5 !important;
+            padding: 0 !important;
+            margin: 4px 0 14px 0 !important;
+            width: 100% !important;
+            overflow: visible !important;
+        }
+
+        .swal2-actions,
+        div:where(.swal2-container) .swal2-actions,
+        .mecha-swal-actions {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px !important;
+            width: 100% !important;
+            margin: 12px 0 0 0 !important;
+            padding: 0 !important;
+        }
+
+        .swal2-confirm,
+        div:where(.swal2-container) .swal2-confirm,
+        .mecha-swal-confirm {
+            flex: 1 !important;
+            min-height: 40px !important;
+            background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%) !important;
+            color: #000000 !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 800 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.4px !important;
+            text-transform: uppercase !important;
+            border-radius: 8px !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35) !important;
+            cursor: pointer !important;
+            outline: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+        }
+
+        .swal2-confirm:active,
+        .mecha-swal-confirm:active {
+            transform: scale(0.98) !important;
+        }
+
+        .swal2-cancel,
+        div:where(.swal2-container) .swal2-cancel,
+        .mecha-swal-cancel {
+            flex: 1 !important;
+            min-height: 40px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: #8E99A8 !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.4px !important;
+            text-transform: uppercase !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            cursor: pointer !important;
+            outline: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: background 0.15s ease, color 0.15s ease !important;
+        }
+
+        .swal2-cancel:hover,
+        .mecha-swal-cancel:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+        }
+
+        .mecha-wallet-choice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(245, 166, 35, 0.04);
+            border: 1px solid rgba(245, 166, 35, 0.22);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mecha-wallet-choice-item:hover {
+            background: rgba(245, 166, 35, 0.12) !important;
+            border-color: rgba(245, 166, 35, 0.55) !important;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 
 <body>
@@ -156,28 +299,26 @@
                 }
 
                 // CAI Live Price & Dynamic Runtime ROI Calculations
-                $profileStore = \App\ProfileStore::where('id', 1)->first();
-                $caiPrice = $profileStore ? (float) $profileStore->price : 1.00;
+                $caiPrice = \App\ProfileStore::getLivePrice();
                 if ($caiPrice <= 0)
                     $caiPrice = 1.00;
 
-                // Claimable CPS ROI in CAI tokens and dynamic live USD value
-                $claimableCai = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
-                $claimableUsdtRaw = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
-                if ($claimableCai <= 0 && $claimableUsdtRaw > 0) {
-                    $claimableCai = $claimableUsdtRaw;
+                // Claimable CPS ROI in USDT and dynamic live CAI tokens
+                $claimableUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('amt_usdt');
+                if ($claimableUsdt <= 0) {
+                    $claimableUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
                 }
-                $claimableUsdDynamic = $claimableCai * $caiPrice;
-                $claimableUsdt = $claimableUsdDynamic;
-                $claimableUsdVal = $claimableUsdDynamic;
+                $claimableCai = ($caiPrice > 0) ? ($claimableUsdt / $caiPrice) : $claimableUsdt;
+                $claimableUsdDynamic = $claimableUsdt;
+                $claimableUsdVal = $claimableUsdt;
 
-                // Total CPS in CAI tokens and dynamic USD
-                $cpsCaiTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amount');
-                $cpsUsdtRaw = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
-                if ($cpsCaiTotal <= 0 && $cpsUsdtRaw > 0) {
-                    $cpsCaiTotal = $cpsUsdtRaw;
+                // Total CPS in USDT and dynamic CAI tokens
+                $cpsUsdtTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
+                if ($cpsUsdtTotal <= 0) {
+                    $cpsUsdtTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amount');
                 }
-                $cpsUsdDynamic = $cpsCaiTotal * $caiPrice;
+                $cpsCaiTotal = ($caiPrice > 0) ? ($cpsUsdtTotal / $caiPrice) : $cpsUsdtTotal;
+                $cpsUsdDynamic = $cpsUsdtTotal;
 
                 $readyToReleaseCai = $claimableCai + ($caiPrice > 0 ? (($directRemaining + $levelRemaining + $poolRemaining + $rankRemaining) / $caiPrice) : 0.00);
 
@@ -338,7 +479,7 @@
                                     <span class="tag-live-green">LIVE</span>
                                 </div>
                                 <div class="txt-price-big">
-                                    ${{ number_format($caiPrice, 2) }}
+                                    ${{ number_format($caiPrice, 6) }}
                                 </div>
                                 <div class="txt-price-growth">
                                     <i class="fas fa-arrow-trend-up"></i> +4.20% <span
@@ -422,25 +563,23 @@
                                 </div>
                             </div>
 
-                            <!-- Bottom Tier: Ready to Claim ROI (Left) + Claim ROI Action (Right) -->
+                            <!-- Bottom Tier: Unmined Daily ROI (Left) + Mine & Sell CAI Action (Right) -->
                             <div class="hero-strip-bottom-row">
                                 <div class="strip-item-claim-info">
                                     <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i>
-                                        READY TO CLAIM ROI</span>
+                                        UNMINED DAILY ROI</span>
                                     <div class="strip-val-wrap">
-                                        <span class="strip-roi-amount-cai">
-                                            {{ number_format($claimableCai, 2) }} <span class="unit-cai">CAI</span>
+                                        <span class="strip-roi-amount-cai"
+                                            style="color: #FFD700; font-family: 'Space Mono', monospace;">
+                                            ${{ number_format($claimableUsdt, 2) }} <span class="unit-cai"
+                                                style="color: #FFF;">USDT</span>
                                         </span>
-                                        <span
-                                            class="strip-roi-amount-usd">(${{ number_format($claimableUsdDynamic, 2) }})</span>
+                                        <span class="strip-roi-amount-usd"
+                                            style="color: #FFFFFF; font-family: 'Space Mono', monospace;">(≈
+                                            {{ number_format($claimableCai, 2) }} CAI)</span>
                                     </div>
                                 </div>
 
-                                <div class="strip-item-claim-action">
-                                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-solid-gold-claim">
-                                        <i class="fas fa-bolt"></i> CLAIM ROI
-                                    </a>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -465,7 +604,7 @@
                         </div>
                     </a>
 
-                    <!-- 2. WITHDRAW (Neon Green) -->
+                    <!-- 2. WITHDRAW (Green / Mint) -->
                     <a href="{{ url('/User/WithdrawRequest') }}" class="action-card withdraw" id="btn-withdraw">
                         <div class="action-card-corner-glow"></div>
                         <div class="action-badge-icon">
@@ -480,8 +619,8 @@
                         </div>
                     </a>
 
-                    <!-- 3. INVITE (Neon Purple) -->
-                    <a href="{{ url('/User/Referral') }}" class="action-card invite" id="btn-invite">
+                    <!-- 3. INVITE (Purple / Indigo) -->
+                    <a href="{{ url('/User/DirectUsers') }}" class="action-card invite" id="btn-invite">
                         <div class="action-card-corner-glow"></div>
                         <div class="action-badge-icon">
                             <i class="fas fa-user-plus"></i>
@@ -495,16 +634,16 @@
                         </div>
                     </a>
 
-                    <!-- 4. CLAIM ROI (Neon Cyan / Electric Energy) -->
-                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="action-card claim-roi" id="btn-claim-roi">
+                    <!-- 4. TEAM / GENEALOGY (Cyan / Network Theme) -->
+                    <a href="{{ url('/User/Treeview') }}" class="action-card claim-roi" id="btn-team-genealogy">
                         <div class="action-card-corner-glow"></div>
                         <div class="action-badge-icon">
-                            <i class="fas fa-bolt"></i>
+                            <i class="fas fa-sitemap" style="color: #00D2FF;"></i>
                         </div>
                         <div class="action-content">
-                            <h3>CLAIM ROI</h3>
+                            <h3>TEAM</h3>
                             <div class="action-sub-row">
-                                <span class="action-sub-txt">Claim Yield</span>
+                                <span class="action-sub-txt">Genealogy</span>
                                 <span class="action-arrow">→</span>
                             </div>
                         </div>
@@ -535,19 +674,18 @@
                     <div class="live-yield-header-bar">
                         <div class="live-yield-title-wrap">
                             <span class="pulse-green-dot"></span>
-                            <span class="live-yield-title-txt">LIVE ACCRUING YIELD (TODAY)</span>
-                            <span class="live-yield-rate-tag">{{ $dailyRoiRate }}% / DAY</span>
+                            <span class="live-yield-title-txt" style="font-size: 0.72rem; font-weight: 800; color: #00FF88; letter-spacing: 0.5px;">LIVE ACCRUING YIELD (TODAY)</span>
+                            <span class="live-yield-rate-tag" style="font-size: 0.65rem; font-weight: 800; color: #FFE082; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.4); padding: 2px 6px; border-radius: 4px;">{{ $dailyRoiRate }}% / DAY</span>
                         </div>
-                        <div class="live-yield-cron-timer" title="Next Cron Payout at 04:30 AM">
-                            <i class="fas fa-clock" style="color: #FFD700; font-size: 7.5px;"></i>
-                            <span>Next Credit in:</span>
-                            <strong id="dashCronCountdownTxt">--h : --m : --s</strong>
+                        <div class="live-yield-cron-timer" title="Next Cron Payout at 04:30 AM" style="background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(245, 166, 35, 0.35); padding: 4px 10px; border-radius: 7px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-clock" style="color: #FFD700; font-size: 11px;"></i>
+                            <span style="font-size: 0.70rem; color: #8E99A8; font-weight: 600;">Next Credit:</span>
+                            <strong id="dashCronCountdownTxt" style="font-size: 0.88rem; font-family: 'Space Mono', monospace; color: #FFD700; font-weight: 800; letter-spacing: 0.5px;">--h : --m : --s</strong>
                         </div>
                     </div>
 
                     <div class="live-yield-grid-row">
                         <div class="live-yield-col-accrued">
-
                             <div class="live-yield-val-wrap">
                                 <span class="live-yield-val-usd" id="dashLiveAccruedUsd">$0.0000</span>
                                 <span class="live-yield-val-cai">(<span id="dashLiveAccruedCai">0.0000</span>
@@ -562,6 +700,183 @@
                         </div>
                     </div>
                 </div>
+                @php
+                    // Dynamic Mining & Protocol Holdings Calculations for 1-Click Engine
+                    $unminedRoiUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('amt_usdt');
+                    $unminedRoiCai = ($caiPrice > 0) ? ($unminedRoiUsdt / $caiPrice) : 0;
+                    $protocolHoldingCai = (float) ($data['userDetail']->cai_balance ?? 0);
+                    $protocolHoldingUsdt = $protocolHoldingCai * $caiPrice;
+                    $activeDynamicCapping = $totalRemainingCapping;
+                    $eligibleSellUsdt = min($protocolHoldingUsdt, $activeDynamicCapping);
+                    $eligibleSellCai = ($caiPrice > 0 && $eligibleSellUsdt > 0) ? min($protocolHoldingCai, round($eligibleSellUsdt / $caiPrice, 6)) : 0;
+                    $excessReserveCai = max(0, round($protocolHoldingCai - $eligibleSellCai, 6));
+
+                    $miningEngineContract = env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217');
+                    $pancakePairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c');
+                @endphp
+
+                <!-- ============================================================
+                     3. DECENTRALIZED CAI MINING & DEX SWAP (PURE GOLDEN & BLACK THEME)
+                     ============================================================ -->
+                <div class="hud-mining-engine-section" style="margin: 0 8px 12px 8px;">
+                    <div
+                        style="background: linear-gradient(180deg, rgba(8, 10, 16, 0.98) 0%, rgba(3, 4, 8, 1) 100%); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 12px; padding: 10px 12px; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 215, 0, 0.08); position: relative; font-family: 'Inter', sans-serif;">
+
+                        <!-- Clean Section Header (Zero Overlap, Fully Responsive) -->
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 7px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
+                            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                                <div
+                                    style="width: 26px; height: 26px; border-radius: 6px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.35); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div style="min-width: 0; flex: 1;">
+                                    <div
+                                        style="font-size: 0.74rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px; line-height: 1.2; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                                        CAI MINING &amp; DEX SWAP
+                                    </div>
+                                    <div
+                                        style="font-size: 0.60rem; color: #8E99A8; font-weight: 500; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                                        <span>1 CAI = <strong id="dashLiveHeaderPrice"
+                                                style="color: #FFD700; font-family: 'Space Mono', monospace;">${{ number_format($caiPrice, 6) }}</strong></span>
+                                        <span
+                                            style="font-family: 'Space Mono', monospace; font-size: 0.50rem; padding: 0 3px; border-radius: 2px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 700;">LIVE</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="{{ url('/User/MiningHistory') }}"
+                                style="height: 24px; padding: 0 8px; font-size: 0.65rem; border-radius: 6px; background: rgba(245, 166, 35, 0.12); border: 1px solid rgba(245, 166, 35, 0.4); color: #FFD700; font-weight: 800; font-family: 'Inter', sans-serif; text-decoration: none; display: inline-flex; align-items: center; flex-shrink: 0; white-space: nowrap;">
+                                History →
+                            </a>
+                        </div>
+
+                        <!-- 2-Card Direct Grid -->
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
+
+                            <!-- STEP 1: 1-CLICK MINE ALL CAI -->
+                            <div
+                                style="background: rgba(245, 166, 35, 0.03); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 9px; padding: 9px 11px; display: flex; flex-direction: column; justify-content: space-between; gap: 7px;">
+                                <div>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                        <span
+                                            style="font-size: 0.68rem; font-weight: 800; color: #FFD700; text-transform: uppercase; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;">
+                                            STEP 1: MINE TO PROTOCOL
+                                        </span>
+                                        <span
+                                            style="font-size: 0.58rem; color: #00FF88; background: rgba(0, 255, 136, 0.1); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 700; font-family: 'Inter', sans-serif;">
+                                            0% Cap Minus
+                                        </span>
+                                    </div>
+
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Unmined ROI:</span>
+                                        <span
+                                            style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;"
+                                            id="dashUnminedUsdtTxt">
+                                            ${{ number_format($unminedRoiUsdt, 2) }} <small
+                                                style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">USDT</small>
+                                        </span>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Yield in CAI:</span>
+                                        <span
+                                            style="font-size: 0.74rem; font-weight: 700; color: #FFE082; font-family: 'Space Mono', monospace;"
+                                            id="dashUnminedCaiYieldTxt">
+                                            ≈ {{ number_format($unminedRoiCai, 4) }} CAI
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button type="button" onclick="executeDashAutoMine()" id="btnDashMineAll"
+                                    style="width: 100%; height: 32px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000000; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.72rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; box-shadow: 0 3px 10px rgba(245, 166, 35, 0.25); text-transform: uppercase; letter-spacing: 0.3px;"
+                                    @if($unminedRoiUsdt <= 0) disabled
+                                        style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 32px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.72rem; border-radius: 6px; font-family: 'Inter', sans-serif;"
+                                    @endif>
+                                    <span id="btnDashMineAllTxt">MINE ALL
+                                        (${{ number_format($unminedRoiUsdt, 2) }})</span>
+                                </button>
+                            </div>
+
+                            <!-- STEP 2: 1-CLICK SELL ON PANCAKESWAP DEX -->
+                            <div
+                                style="background: rgba(245, 166, 35, 0.03); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 9px; padding: 9px 11px; display: flex; flex-direction: column; justify-content: space-between; gap: 7px;">
+                                <div>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                        <span
+                                            style="font-size: 0.68rem; font-weight: 800; color: #FFD700; text-transform: uppercase; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;">
+                                            STEP 2: SELL ON DEX
+                                        </span>
+                                        <span
+                                            style="font-size: 0.58rem; color: #FFD700; background: rgba(255, 215, 0, 0.1); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(255, 215, 0, 0.3); font-weight: 700; font-family: 'Inter', sans-serif;">
+                                            Capping Guard
+                                        </span>
+                                    </div>
+
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Protocol CAI:</span>
+                                        <span
+                                            style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;"
+                                            id="dashProtocolCaiTxt">
+                                            {{ number_format($protocolHoldingCai, 4) }} <small
+                                                style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAI</small>
+                                            <small
+                                                style="font-size: 0.66rem; color: #8E99A8;">(${{ number_format($protocolHoldingUsdt, 2) }})</small>
+                                        </span>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Max Sellable:</span>
+                                        <span
+                                            style="font-size: 0.74rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;"
+                                            id="dashSellableLimitTxt">
+                                            ${{ number_format($eligibleSellUsdt, 2) }} USDT <small
+                                                style="color: #8E99A8;">({{ number_format($eligibleSellCai, 2) }} CAI)</small>
+                                        </span>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Est. Wallet Receive:</span>
+                                        <span
+                                            style="font-size: 0.78rem; font-weight: 800; color: #00FF88; font-family: 'Space Mono', monospace;"
+                                            id="dashEstWalletUsdtTxt">
+                                            ≈ ${{ number_format($eligibleSellUsdt, 2) }} <small style="font-size: 0.60rem; color: #A0AEC0;">USDT</small>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button type="button" onclick="executeDashAutoSellOnDex()" id="btnDashSellAll"
+                                    style="width: 100%; height: 32px; background: linear-gradient(135deg, #F5A623 0%, #D97706 100%); color: #000000; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.72rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; box-shadow: 0 3px 10px rgba(245, 166, 35, 0.25); text-transform: uppercase; letter-spacing: 0.3px;"
+                                    @if($eligibleSellUsdt <= 0) disabled
+                                        style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 32px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.72rem; border-radius: 6px; font-family: 'Inter', sans-serif;"
+                                    @endif>
+                                    <span id="btnDashSellAllTxt">SELL ALL ELIGIBLE
+                                        (${{ number_format($eligibleSellUsdt, 2) }})</span>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        @if($excessReserveCai > 0)
+                            <div
+                                style="margin-top: 7px; background: rgba(245, 166, 35, 0.06); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 7px; padding: 5px 8px; font-size: 0.64rem; color: #FFE082; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 6px; line-height: 1.35;">
+                                <i class="fas fa-shield-halved"
+                                    style="flex-shrink: 0; color: #FFD700; font-size: 10px;"></i>
+                                <span><strong>Capping Hold:</strong> {{ number_format($excessReserveCai, 4) }} CAI
+                                    (~${{ number_format($excessReserveCai * $caiPrice, 2) }}) exceeds capping limit and
+                                    remains safely held in protocol.</span>
+                            </div>
+                        @endif
+
+                    </div>
+                </div>
+
                 <!-- ============================================================
                  3A. GLOBAL TURNOVER POOLS — SECTION DIVIDER & 2X2 STANDALONE CARDS
                  ============================================================ -->
@@ -970,8 +1285,11 @@
                 </div>
 
                 <!-- ============================================================
-                 3B. REWARDS & EARNINGS — SECTION DIVIDER & 5 INCOME STREAMS
+                 3B. REWARDS & EARNINGS — 4 WORKING INCOME STREAMS
                  ============================================================ -->
+                @php
+                    $workingIncomeSum = (float) ($directIncome + $levelIncomeTotal + $totalPoolIncome + $totalRankIncome);
+                @endphp
                 <!-- 1. Central Section Header with Left & Right Lines -->
                 <div class="hud-section-divider-bar">
                     <div class="hud-divider-line left"></div>
@@ -979,63 +1297,15 @@
                         <div class="hud-divider-icon">
                             <i class="fas fa-sack-dollar"></i>
                         </div>
-                        <span class="hud-divider-title-text">REWARDS &amp; EARNINGS</span>
-                        <span class="hud-divider-badge">${{ number_format($totalIncomeUsdt, 2) }} TOTAL</span>
+                        <span class="hud-divider-title-text">WORKING REWARDS</span>
+                        <span class="hud-divider-badge">${{ number_format($workingIncomeSum, 2) }} TOTAL</span>
                     </div>
                     <div class="hud-divider-line right"></div>
                 </div>
 
-
-
-                <!-- 3. High-Tech Staking Yield Claim Banner -->
-                <div class="hud-claim-roi-standalone"
-                    onclick="window.location.href='{{ url('/User/RoiWithdrawRequest') }}'">
-                    <div class="claim-standalone-left">
-                        <div class="claim-standalone-icon">
-                            <i class="fas fa-bolt-lightning"></i>
-                        </div>
-                        <div class="claim-standalone-info">
-                            <div class="claim-standalone-lbl">AVAILABLE STAKING YIELD</div>
-                            <div class="claim-standalone-val-row">
-                                <span
-                                    class="claim-standalone-cai">{{ ($claimableCai < 1 && $claimableCai > 0) ? number_format($claimableCai, 4) : number_format($claimableCai, 2) }}
-                                    <small>CAI</small></span>
-                                <span class="claim-standalone-usd">≈
-                                    ${{ number_format($claimableUsdDynamic, 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="btn-claim-standalone"
-                        onclick="event.stopPropagation();">
-                        <i class="fas fa-bolt"></i> CLAIM
-                    </a>
-                </div>
-
-                <!-- 3. Standalone 5 Streams Grid -->
+                <!-- 2. Standalone 4 Working Streams Grid (2x2) -->
                 <div class="incomes-standalone-grid">
-                    <!-- 1. CPS Daily Yield -->
-                    <a href="{{ url('/User/StakingReward') }}" class="income-stream-standalone-card stream-cps">
-                        <div class="stream-card-top">
-                            <div class="stream-icon-bubble icon-cyan">
-                                <i class="fas fa-bolt-lightning"></i>
-                            </div>
-                            <span class="stream-status-pill pill-cyan">0.5% - 1.5% DAILY</span>
-                        </div>
-                        <div class="stream-card-heading">
-                            <div class="stream-card-title">ROI STAKING YIELD</div>
-                            <div class="stream-card-sub">Daily Yield &amp; Boosters</div>
-                        </div>
-                        <div class="stream-card-body">
-                            <div class="stream-card-val-row">
-                                <span
-                                    class="stream-card-val val-cyan">{{ ($cpsCaiTotal < 1 && $cpsCaiTotal > 0) ? number_format($cpsCaiTotal, 4) : number_format($cpsCaiTotal, 2) }}
-                                    <small>CAI</small></span>
-                                <span class="stream-card-usd">≈ ${{ number_format($cpsUsdDynamic, 2) }}</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- 2. Direct Referral Bonus -->
+                    <!-- 1. Direct Referral Bonus -->
                     <a href="{{ url('/User/DirectBonus') }}" class="income-stream-standalone-card stream-direct">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-gold">
@@ -1055,7 +1325,7 @@
                         </div>
                     </a>
 
-                    <!-- 3. Level Income -->
+                    <!-- 2. Level Income -->
                     <a href="{{ url('/User/StakingReferralReward') }}"
                         class="income-stream-standalone-card stream-level">
                         <div class="stream-card-top">
@@ -1077,7 +1347,7 @@
                         </div>
                     </a>
 
-                    <!-- 4. Global Pool Income -->
+                    <!-- 3. Global Pool Income -->
                     <a href="{{ url('/User/PoolIncome') }}" class="income-stream-standalone-card stream-pool">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-green">
@@ -1097,9 +1367,9 @@
                         </div>
                     </a>
 
-                    <!-- 5. Rank & Milestone Reward (Spans full 2 columns) -->
+                    <!-- 4. Rank & Milestone Reward -->
                     <a href="{{ url('/User/RankIncome') }}"
-                        class="income-stream-standalone-card stream-rank stream-card-full-span">
+                        class="income-stream-standalone-card stream-rank">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-amber">
                                 <i class="fas fa-crown"></i>
@@ -1999,6 +2269,7 @@
             initBoosterCountdown();
             initPoolCountdowns();
             initRealtimeStreamingYield();
+            initLiveMiningStatsPoller();
         });
 
         /* ============================================================
@@ -2154,6 +2425,748 @@
                 setTimeout(function () {
                     if (btnText) btnText.innerText = 'COPY LINK';
                 }, 2000);
+            }
+        }
+
+        /* ============================================================
+           DASHBOARD 1-CLICK AUTO MINE & DEX SELL ENGINE HANDLERS
+           ============================================================ */
+        let DASH_UNMINED_USDT = {{ (float) $unminedRoiUsdt }};
+        let DASH_CAI_PRICE = {{ (float) $caiPrice }};
+        let DASH_ELIGIBLE_SELL_CAI = {{ (float) $eligibleSellCai }};
+        let DASH_ELIGIBLE_SELL_USDT = {{ (float) $eligibleSellUsdt }};
+        let DASH_PROTOCOL_HOLDING_CAI = {{ (float) $protocolHoldingCai }};
+        const DASH_MINING_ENGINE = "{{ $miningEngineContract }}";
+
+        const DASH_MINING_ABI = [
+            "function sellPortfolio(uint256 caiAmount, uint256 minUsdtOut, uint256 nonce, uint256 expiry, bytes calldata signature) external returns (uint256)"
+        ];
+
+        /* Real-Time Poller for DEX Price & Dynamic Metrics */
+        async function fetchLiveMiningStats() {
+            try {
+                const resp = await fetch('{{ url("/User/Mining/Stats") }}');
+                const json = await resp.json();
+                if (json.status === 'success' && json.data) {
+                    const d = json.data;
+                    DASH_UNMINED_USDT = parseFloat(d.unmined_usdt) || 0;
+                    DASH_CAI_PRICE = parseFloat(d.live_cai_price) || 1.0;
+                    DASH_ELIGIBLE_SELL_CAI = parseFloat(d.max_sellable_cai) || 0;
+                    DASH_ELIGIBLE_SELL_USDT = parseFloat(d.max_sellable_usdt) || 0;
+                    DASH_PROTOCOL_HOLDING_CAI = parseFloat(d.holding_cai_balance) || 0;
+
+                    // 1. Update Header Live Price Badge
+                    const hpEl = document.getElementById('dashLiveHeaderPrice');
+                    if (hpEl) hpEl.innerText = '$' + DASH_CAI_PRICE.toFixed(6);
+
+                    // 2. Update Step 1 (Mine to Protocol)
+                    const uUsdtEl = document.getElementById('dashUnminedUsdtTxt');
+                    if (uUsdtEl) uUsdtEl.innerHTML = '$' + DASH_UNMINED_USDT.toFixed(2) + ' <small style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">USDT</small>';
+
+                    const uCaiEl = document.getElementById('dashUnminedCaiYieldTxt');
+                    if (uCaiEl) uCaiEl.innerText = '≈ ' + (parseFloat(d.estimated_cai_to_mine) || 0).toFixed(4) + ' CAI';
+
+                    const btnMine = document.getElementById('btnDashMineAll');
+                    const btnMineTxt = document.getElementById('btnDashMineAllTxt');
+                    if (btnMine && btnMineTxt) {
+                        if (DASH_UNMINED_USDT > 0) {
+                            btnMine.disabled = false;
+                            btnMine.style.opacity = '1';
+                            btnMine.style.cursor = 'pointer';
+                            btnMineTxt.innerText = 'MINE ALL ($' + DASH_UNMINED_USDT.toFixed(2) + ')';
+                        } else {
+                            btnMine.disabled = true;
+                            btnMine.style.opacity = '0.4';
+                            btnMine.style.cursor = 'not-allowed';
+                            btnMineTxt.innerText = 'MINE ALL ($0.00)';
+                        }
+                    }
+
+                    // 3. Update Step 2 (Sell on DEX)
+                    const pHoldEl = document.getElementById('dashProtocolCaiTxt');
+                    if (pHoldEl) {
+                        pHoldEl.innerHTML = DASH_PROTOCOL_HOLDING_CAI.toFixed(4) + ' <small style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAI</small> <small style="font-size: 0.66rem; color: #8E99A8;">($' + (parseFloat(d.holding_value_usdt) || 0).toFixed(2) + ')</small>';
+                    }
+
+                    const sLimEl = document.getElementById('dashSellableLimitTxt');
+                    if (sLimEl) {
+                        sLimEl.innerHTML = '$' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ' USDT <small style="color: #8E99A8;">(' + DASH_ELIGIBLE_SELL_CAI.toFixed(2) + ' CAI)</small>';
+                    }
+
+                    const wRecEl = document.getElementById('dashEstWalletUsdtTxt');
+                    if (wRecEl) {
+                        wRecEl.innerHTML = '≈ $' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ' <small style="font-size: 0.60rem; color: #A0AEC0;">USDT</small>';
+                    }
+
+                    const btnSell = document.getElementById('btnDashSellAll');
+                    const btnSellTxt = document.getElementById('btnDashSellAllTxt');
+                    if (btnSell && btnSellTxt) {
+                        if (DASH_ELIGIBLE_SELL_USDT > 0) {
+                            btnSell.disabled = false;
+                            btnSell.style.opacity = '1';
+                            btnSell.style.cursor = 'pointer';
+                            btnSellTxt.innerText = 'SELL ALL ELIGIBLE ($' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ')';
+                        } else {
+                            btnSell.disabled = true;
+                            btnSell.style.opacity = '0.4';
+                            btnSell.style.cursor = 'not-allowed';
+                            btnSellTxt.innerText = 'SELL ALL ELIGIBLE ($0.00)';
+                        }
+                    }
+                }
+            } catch (e) {
+                // Silently handle background poller
+            }
+        }
+
+        function initLiveMiningStatsPoller() {
+            fetchLiveMiningStats();
+            setInterval(fetchLiveMiningStats, 7000);
+        }
+
+        /* 1-Click Mine All Accumulated ROI */
+        async function executeDashAutoMine() {
+            const btn = document.getElementById('btnDashMineAll');
+            const btnTxt = document.getElementById('btnDashMineAllTxt');
+
+            const unminedUsdt = typeof DASH_UNMINED_USDT !== 'undefined' ? DASH_UNMINED_USDT : 0;
+            const livePrice = typeof DASH_CAI_PRICE !== 'undefined' && DASH_CAI_PRICE > 0 ? DASH_CAI_PRICE : 1.0;
+            const estCai = unminedUsdt > 0 ? (unminedUsdt / livePrice).toFixed(4) : '0.0000';
+
+            const result = await Swal.fire({
+                title: 'MINE ALL ROI TO CAI',
+                html: `
+                    <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 215, 0, 0.22) 0%, rgba(245, 166, 35, 0.04) 70%); border: 1px solid rgba(255, 215, 0, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);">
+                        <i class="fas fa-coins" style="color: #FFD700; font-size: 20px;"></i>
+                    </div>
+                    <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; text-align: left; font-family: 'Inter', sans-serif;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
+                            <span style="color: #8C9BAE;">Unmined Daily ROI:</span>
+                            <strong style="color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.85rem;">$${unminedUsdt.toFixed(2)} USDT</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
+                            <span style="color: #8C9BAE;">Live DEX Rate:</span>
+                            <strong style="color: #FFE082; font-family: 'Space Mono', monospace; font-size: 0.80rem;">1 CAI = $${livePrice.toFixed(6)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.80rem; border-top: 1px solid rgba(245, 166, 35, 0.18); padding-top: 7px;">
+                            <span style="color: #CBD5E1; font-weight: 600;">Estimated CAI Yield:</span>
+                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace; font-size: 0.88rem;">≈ ${estCai} CAI</strong>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.72rem; color: #00FF88; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 8px; padding: 8px 12px; text-align: center; font-weight: 600; line-height: 1.4;">
+                        ✓ 0% Deposit Capping is deducted during mining.
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'CONFIRM MINE',
+                cancelButtonText: 'CANCEL',
+                buttonsStyling: false,
+                background: '#080A10',
+                customClass: {
+                    popup: 'mecha-swal-popup',
+                    title: 'mecha-swal-title',
+                    htmlContainer: 'mecha-swal-html',
+                    actions: 'mecha-swal-actions',
+                    confirmButton: 'mecha-swal-confirm',
+                    cancelButton: 'mecha-swal-cancel'
+                }
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                if (btn) btn.disabled = true;
+                if (btnTxt) btnTxt.innerText = 'MINING IN PROGRESS...';
+
+                const resp = await fetch('{{ url("/User/Mining/MineCAI") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const data = await resp.json();
+
+                if (data.status === 'success') {
+                    await Swal.fire({
+                        title: 'MINING SUCCESSFUL!',
+                        html: `
+                            <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 255, 136, 0.22) 0%, rgba(0, 255, 136, 0.04) 70%); border: 1px solid rgba(0, 255, 136, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(0, 255, 136, 0.25);">
+                                <i class="fas fa-check" style="color: #00FF88; font-size: 20px;"></i>
+                            </div>
+                            <div style="font-size: 0.82rem; color: #CBD5E1; margin-bottom: 12px; text-align: center;">${data.message}</div>
+                            <div style="background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 10px; padding: 10px 14px; font-family: 'Space Mono', monospace; color: #00FF88; font-weight: 700; font-size: 0.88rem; text-align: center;">
+                                New Balance: ${data.data.new_cai_balance} CAI
+                            </div>
+                        `,
+                        confirmButtonText: 'GREAT',
+                        buttonsStyling: false,
+                        background: '#080A10',
+                        customClass: {
+                            popup: 'mecha-swal-popup',
+                            title: 'mecha-swal-title',
+                            htmlContainer: 'mecha-swal-html',
+                            actions: 'mecha-swal-actions',
+                            confirmButton: 'mecha-swal-confirm'
+                        }
+                    });
+                    window.location.reload();
+                } else {
+                    Swal.fire({
+                        title: 'MINING FAILED',
+                        html: `<div style="font-size: 0.80rem; color: #EF4444; margin-bottom: 8px;">${data.message || 'Error executing mining.'}</div>`,
+                        confirmButtonText: 'CLOSE',
+                        buttonsStyling: false,
+                        background: '#080A10',
+                        customClass: {
+                            popup: 'mecha-swal-popup',
+                            title: 'mecha-swal-title',
+                            htmlContainer: 'mecha-swal-html',
+                            actions: 'mecha-swal-actions',
+                            confirmButton: 'mecha-swal-confirm'
+                        }
+                    });
+                    if (btn) btn.disabled = false;
+                    if (btnTxt) btnTxt.innerText = 'MINE ALL (${{ number_format($unminedRoiUsdt, 2) }})';
+                }
+            } catch (e) {
+                Swal.fire({
+                    title: 'ERROR',
+                    html: `<div style="font-size: 0.80rem; color: #EF4444; margin-bottom: 8px;">${e.message || 'Network exception occurred.'}</div>`,
+                    confirmButtonText: 'CLOSE',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                if (btn) btn.disabled = false;
+                if (btnTxt) btnTxt.innerText = 'MINE ALL (${{ number_format($unminedRoiUsdt, 2) }})';
+            }
+        }
+
+        /* ============================================================
+           EIP-6963 & MULTI-EXTENSION WEB3 PROVIDER RESOLVER
+           Strict MetaMask Priority & Phantom Override Prevention
+           ============================================================ */
+        const EIP6963_MAP = new Map();
+        if (typeof window !== 'undefined') {
+            window.addEventListener("eip6963:announceProvider", (event) => {
+                if (!event || !event.detail) return;
+                const { info, provider } = event.detail;
+                const rdns = (info.rdns || info.name || '').toLowerCase();
+                EIP6963_MAP.set(rdns, provider);
+                if (rdns.includes('metamask') || rdns === 'io.metamask') EIP6963_MAP.set('metamask', provider);
+                if (rdns.includes('trust') || rdns === 'com.trustwallet.app') EIP6963_MAP.set('trust', provider);
+                if (rdns.includes('binance') || rdns === 'com.binance') EIP6963_MAP.set('binance', provider);
+                if (rdns.includes('okx') || rdns === 'com.okx.wallet') EIP6963_MAP.set('okx', provider);
+            });
+            try {
+                window.dispatchEvent(new Event("eip6963:requestProvider"));
+            } catch (e) {}
+        }
+
+        function getPureMetaMaskProvider() {
+            // 1. EIP-6963 Pure MetaMask Announcement
+            if (EIP6963_MAP.has('metamask')) return EIP6963_MAP.get('metamask');
+            if (EIP6963_MAP.has('io.metamask')) return EIP6963_MAP.get('io.metamask');
+
+            // 2. window.ethereum.providers array (strictly exclude Phantom, Brave, TokenPocket)
+            if (typeof window.ethereum !== 'undefined') {
+                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                    const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom && !p.isBraveWallet && !p.isTokenPocket);
+                    if (mm) return mm;
+                }
+                // 3. Direct window.ethereum only if NOT Phantom
+                if (window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+                    return window.ethereum;
+                }
+                // 4. Detected array
+                if (window.ethereum.detected && Array.isArray(window.ethereum.detected)) {
+                    const mm = window.ethereum.detected.find(p => p.isMetaMask && !p.isPhantom);
+                    if (mm) return mm;
+                }
+            }
+            return null;
+        }
+
+        function getPureTrustProvider() {
+            if (EIP6963_MAP.has('trust')) return EIP6963_MAP.get('trust');
+            if (window.trustwallet) return window.trustwallet;
+            if (typeof window.ethereum !== 'undefined') {
+                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                    const t = window.ethereum.providers.find(p => (p.isTrust || p.isTrustWallet) && !p.isPhantom);
+                    if (t) return t;
+                }
+                if (window.ethereum.isTrust || window.ethereum.isTrustWallet) return window.ethereum;
+            }
+            return null;
+        }
+
+        function getPureBinanceProvider() {
+            if (EIP6963_MAP.has('binance')) return EIP6963_MAP.get('binance');
+            if (window.BinanceChain) return window.BinanceChain;
+            if (window.binance) return window.binance;
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                const b = window.ethereum.providers.find(p => p.isBinance);
+                if (b) return b;
+            }
+            return null;
+        }
+
+        function getPureOkxProvider() {
+            if (EIP6963_MAP.has('okx')) return EIP6963_MAP.get('okx');
+            if (window.okxwallet) return window.okxwallet;
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                const o = window.ethereum.providers.find(p => p.isOkxWallet);
+                if (o) return o;
+            }
+            return null;
+        }
+
+        /* Helper to resolve Web3 Provider (Seamless on Mobile, Extension Picker on Desktop) */
+        async function resolveWeb3Provider() {
+            const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+            // 1. MOBILE DAPP BROWSER: Directly use active injected provider without popup
+            if (isMobile) {
+                const mobileProvider = getPureMetaMaskProvider() || window.trustwallet || window.safepal || window.okxwallet || window.binance || (window.bitkeep && window.bitkeep.ethereum) || window.ethereum;
+                if (mobileProvider) return mobileProvider;
+
+                Swal.fire({
+                    title: 'DAPP BROWSER REQUIRED',
+                    html: `
+                        <div style="font-size: 0.80rem; color: #94A3B8; margin-bottom: 8px; text-align: center;">
+                            No Web3 wallet detected.
+                        </div>
+                        <div style="font-size: 0.74rem; color: #8C9BAE; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 10px; text-align: center; line-height: 1.4;">
+                            Please open this website inside your mobile wallet app (MetaMask, Trust Wallet, Bitget, or OKX DApp Browser).
+                        </div>
+                    `,
+                    confirmButtonText: 'UNDERSTOOD',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                return null;
+            }
+
+            // 2. DESKTOP / WEB BROWSER: Check installed extensions
+            const hasMetaMask = !!getPureMetaMaskProvider();
+            const hasTrust = !!getPureTrustProvider();
+            const hasBinance = !!getPureBinanceProvider();
+            const hasOkx = !!getPureOkxProvider();
+            const hasGeneric = !!(window.ethereum);
+
+            // Show Desktop Web3 Wallet Selector Modal
+            const walletChoice = await new Promise((resolve) => {
+                Swal.fire({
+                    title: 'SELECT WEB3 WALLET',
+                    html: `
+                        <div style="font-size: 0.76rem; color: #8E99A8; margin-bottom: 12px; text-align: center;">
+                            Choose your connected browser wallet extension to sign and execute DEX swap.
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                            
+                            <!-- 1. METAMASK (Priority) -->
+                            <div onclick="window.__selectWeb3Choice('metamask')" class="mecha-wallet-choice-item" style="border: 1px solid ${hasMetaMask ? 'rgba(255, 215, 0, 0.4)' : 'rgba(245, 166, 35, 0.22)'};">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(246, 133, 27, 0.15); border: 1px solid rgba(246, 133, 27, 0.35); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #F6851B; flex-shrink: 0;">
+                                        <i class="fas fa-cube"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.84rem; font-weight: 800; color: #FFD700; display: flex; align-items: center; gap: 6px;">
+                                            MetaMask
+                                            <span style="font-size: 0.52rem; padding: 1px 4px; border-radius: 3px; background: rgba(255, 215, 0, 0.15); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.35); font-weight: 800;">PRIORITY</span>
+                                        </div>
+                                        <div style="font-size: 0.60rem; color: #8E99A8;">MetaMask Browser Extension</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${hasMetaMask ? 'background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3);' : 'background: rgba(255, 255, 255, 0.05); color: #64748B;'}">
+                                    ${hasMetaMask ? 'DETECTED' : 'EXTENSION'}
+                                </span>
+                            </div>
+
+                            <!-- 2. TRUST WALLET -->
+                            <div onclick="window.__selectWeb3Choice('trust')" class="mecha-wallet-choice-item">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(5, 0, 255, 0.15); border: 1px solid rgba(5, 0, 255, 0.35); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #3375BB; flex-shrink: 0;">
+                                        <i class="fas fa-shield-halved"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 800; color: #FFFFFF;">Trust Wallet</div>
+                                        <div style="font-size: 0.60rem; color: #8E99A8;">Web3 Extension</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${hasTrust ? 'background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3);' : 'background: rgba(255, 255, 255, 0.05); color: #64748B;'}">
+                                    ${hasTrust ? 'DETECTED' : 'EXTENSION'}
+                                </span>
+                            </div>
+
+                            <!-- 3. BINANCE WALLET -->
+                            <div onclick="window.__selectWeb3Choice('binance')" class="mecha-wallet-choice-item">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(243, 186, 47, 0.15); border: 1px solid rgba(243, 186, 47, 0.35); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #F3BA2F; flex-shrink: 0;">
+                                        <i class="fas fa-coins"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 800; color: #FFFFFF;">Binance Wallet</div>
+                                        <div style="font-size: 0.60rem; color: #8E99A8;">BNB Chain & Web3</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${hasBinance ? 'background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3);' : 'background: rgba(255, 255, 255, 0.05); color: #64748B;'}">
+                                    ${hasBinance ? 'DETECTED' : 'EXTENSION'}
+                                </span>
+                            </div>
+
+                            <!-- 4. OKX WALLET -->
+                            <div onclick="window.__selectWeb3Choice('okx')" class="mecha-wallet-choice-item">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #FFFFFF; flex-shrink: 0;">
+                                        <i class="fas fa-globe"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 800; color: #FFFFFF;">OKX Wallet</div>
+                                        <div style="font-size: 0.60rem; color: #8E99A8;">Web3 Portal</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${hasOkx ? 'background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3);' : 'background: rgba(255, 255, 255, 0.05); color: #64748B;'}">
+                                    ${hasOkx ? 'DETECTED' : 'EXTENSION'}
+                                </span>
+                            </div>
+
+                            <!-- 5. DEFAULT INJECTED / OTHER -->
+                            <div onclick="window.__selectWeb3Choice('injected')" class="mecha-wallet-choice-item">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(255, 215, 0, 0.15); border: 1px solid rgba(255, 215, 0, 0.35); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 800; color: #FFFFFF;">Other Web3 Wallet</div>
+                                        <div style="font-size: 0.60rem; color: #8E99A8;">Injected Browser Provider</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; ${hasGeneric ? 'background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3);' : 'background: rgba(255, 255, 255, 0.05); color: #64748B;'}">
+                                    ${hasGeneric ? 'READY' : 'OTHER'}
+                                </span>
+                            </div>
+
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: 'CANCEL',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        cancelButton: 'mecha-swal-cancel'
+                    },
+                    didOpen: () => {
+                        window.__selectWeb3Choice = (choice) => {
+                            Swal.close();
+                            resolve(choice);
+                        };
+                    },
+                    willClose: () => {
+                        delete window.__selectWeb3Choice;
+                        resolve(null);
+                    }
+                });
+            });
+
+            if (!walletChoice) return null;
+
+            // Resolve exact provider instance (Strictly avoiding Phantom)
+            if (walletChoice === 'metamask') {
+                const mm = getPureMetaMaskProvider();
+                if (mm) return mm;
+
+                Swal.fire({
+                    title: 'METAMASK EXTENSION REQUIRED',
+                    html: `
+                        <div style="font-size: 0.80rem; color: #CBD5E1; margin-bottom: 10px; text-align: center;">
+                            MetaMask extension was not detected or is being overridden.
+                        </div>
+                        <div style="font-size: 0.74rem; color: #8C9BAE; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px; text-align: center; line-height: 1.4; margin-bottom: 12px;">
+                            Please make sure the MetaMask extension is active in your browser.
+                        </div>
+                        <div style="text-align: center;">
+                            <a href="https://metamask.io/download/" target="_blank" style="color: #FFD700; font-weight: 700; text-decoration: underline; font-size: 0.78rem;">
+                                Download MetaMask Extension →
+                            </a>
+                        </div>
+                    `,
+                    confirmButtonText: 'CLOSE',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                return null;
+            } else if (walletChoice === 'trust') {
+                const t = getPureTrustProvider();
+                if (t) return t;
+                return window.ethereum && !window.ethereum.isPhantom ? window.ethereum : null;
+            } else if (walletChoice === 'binance') {
+                const b = getPureBinanceProvider();
+                if (b) return b;
+                return window.ethereum && !window.ethereum.isPhantom ? window.ethereum : null;
+            } else if (walletChoice === 'okx') {
+                const o = getPureOkxProvider();
+                if (o) return o;
+                return window.ethereum && !window.ethereum.isPhantom ? window.ethereum : null;
+            } else {
+                return getPureMetaMaskProvider() || (window.ethereum && !window.ethereum.isPhantom ? window.ethereum : window.ethereum);
+            }
+        }
+
+        /* 1-Click Sell All Eligible CAI on DEX */
+        async function executeDashAutoSellOnDex() {
+            if (DASH_ELIGIBLE_SELL_CAI <= 0 || DASH_ELIGIBLE_SELL_USDT <= 0) {
+                Swal.fire({
+                    title: 'NO SELLABLE BALANCE',
+                    html: `
+                        <div style="font-size: 0.80rem; color: #94A3B8; margin-bottom: 8px; text-align: center;">
+                            You currently have <strong style="color:#FFD700; font-family:'Space Mono', monospace;">$0.00</strong> eligible sell balance.
+                        </div>
+                        <div style="font-size: 0.74rem; color: #8C9BAE; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                            Please check your protocol CAI holdings or active capping limit.
+                        </div>
+                    `,
+                    confirmButtonText: 'UNDERSTOOD',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                return;
+            }
+
+            const btn = document.getElementById('btnDashSellAll');
+            const btnTxt = document.getElementById('btnDashSellAllTxt');
+
+            const result = await Swal.fire({
+                title: 'SELL ON PANCAKESWAP',
+                html: `
+                    <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 166, 35, 0.22) 0%, rgba(217, 119, 6, 0.04) 70%); border: 1px solid rgba(245, 166, 35, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(245, 166, 35, 0.25);">
+                        <i class="fas fa-arrow-right-arrow-left" style="color: #FFD700; font-size: 19px;"></i>
+                    </div>
+                    <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; text-align: left; font-family: 'Inter', sans-serif;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
+                            <span style="color: #8C9BAE;">CAI to Sell:</span>
+                            <strong style="color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.85rem;">${DASH_ELIGIBLE_SELL_CAI} CAI</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
+                            <span style="color: #8C9BAE;">Gross USDT Received:</span>
+                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace; font-size: 0.85rem;">$${DASH_ELIGIBLE_SELL_USDT.toFixed(2)} USDT</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.80rem; border-top: 1px solid rgba(245, 166, 35, 0.18); padding-top: 7px;">
+                            <span style="color: #8C9BAE;">Capping Deduction:</span>
+                            <strong style="color: #F5A623; font-family: 'Space Mono', monospace; font-size: 0.85rem;">-$${DASH_ELIGIBLE_SELL_USDT.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.72rem; color: #CBD5E1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 12px; line-height: 1.4; text-align: center;">
+                        ✓ Live USDT transferred straight to your connected Web3 wallet.
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'EXECUTE SWAP',
+                cancelButtonText: 'CANCEL',
+                buttonsStyling: false,
+                background: '#080A10',
+                customClass: {
+                    popup: 'mecha-swal-popup',
+                    title: 'mecha-swal-title',
+                    htmlContainer: 'mecha-swal-html',
+                    actions: 'mecha-swal-actions',
+                    confirmButton: 'mecha-swal-confirm',
+                    cancelButton: 'mecha-swal-cancel'
+                }
+            });
+
+            if (!result.isConfirmed) return;
+
+            // 1. Resolve Web3 Provider (Direct on mobile DApp, Selector on desktop Web)
+            const chosenRawProvider = await resolveWeb3Provider();
+            if (!chosenRawProvider) {
+                if (btn) btn.disabled = false;
+                if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
+                return;
+            }
+
+            try {
+                if (btn) btn.disabled = true;
+                if (btnTxt) btnTxt.innerText = 'CONNECTING WALLET...';
+
+                const provider = new ethers.providers.Web3Provider(chosenRawProvider);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+
+                // 2. Verify Network (BSC Mainnet: 56)
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56) {
+                    try {
+                        await chosenRawProvider.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x38' }],
+                        });
+                    } catch (switchError) {
+                        Swal.fire({
+                            title: 'SWITCH TO BSC',
+                            html: '<div style="font-size: 0.80rem; color: #CBD5E1; text-align: center;">Please switch your wallet network to BNB Smart Chain (BSC Mainnet).</div>',
+                            confirmButtonText: 'OK',
+                            buttonsStyling: false,
+                            background: '#080A10',
+                            customClass: {
+                                popup: 'mecha-swal-popup',
+                                title: 'mecha-swal-title',
+                                htmlContainer: 'mecha-swal-html',
+                                actions: 'mecha-swal-actions',
+                                confirmButton: 'mecha-swal-confirm'
+                            }
+                        });
+                        if (btn) btn.disabled = false;
+                        if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
+                        return;
+                    }
+                }
+
+                if (btnTxt) btnTxt.innerText = 'REQUESTING SIGNATURE...';
+
+                // 3. Request EIP-712 Signature from Backend
+                const userAccount = await signer.getAddress();
+                const sigResp = await fetch('{{ url("/User/Mining/RequestSellSignature") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        cai_amount: DASH_ELIGIBLE_SELL_CAI,
+                        wallet_address: userAccount
+                    })
+                });
+
+                const sigData = await sigResp.json();
+                if (sigData.status !== 'success') {
+                    throw new Error(sigData.message || 'Signature authorization failed.');
+                }
+
+                const d = sigData.data;
+
+                // 4. Execute Web3 Transaction on CyeraMiningEngine
+                if (btnTxt) btnTxt.innerText = 'CONFIRM IN WALLET...';
+
+                const miningContract = new ethers.Contract(DASH_MINING_ENGINE, DASH_MINING_ABI, signer);
+
+                const tx = await miningContract.sellPortfolio(
+                    d.caiAmountWei,
+                    d.minUsdtOutWei,
+                    d.nonce,
+                    d.expiry,
+                    d.signature,
+                    { gasLimit: 500000 }
+                );
+
+                if (btnTxt) btnTxt.innerText = 'WAITING CONFIRMATION...';
+
+                const receipt = await tx.wait(1);
+
+                if (btnTxt) btnTxt.innerText = 'FINALIZING SETTLEMENT...';
+
+                // 5. Confirm to Backend (Deduct Capping FIFO & Log Audit Table)
+                const confirmResp = await fetch('{{ url("/User/Mining/ConfirmSell") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        tx_hash: receipt.transactionHash,
+                        cai_amount: d.caiAmount,
+                        usdt_received: d.estimatedCappingUse
+                    })
+                });
+
+                const confirmData = await confirmResp.json();
+
+                await Swal.fire({
+                    title: 'PORTFOLIO SOLD ON DEX!',
+                    html: `
+                        <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 255, 136, 0.22) 0%, rgba(0, 255, 136, 0.04) 70%); border: 1px solid rgba(0, 255, 136, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(0, 255, 136, 0.25);">
+                            <i class="fas fa-check" style="color: #00FF88; font-size: 20px;"></i>
+                        </div>
+                        <div style="font-size: 0.82rem; color: #CBD5E1; margin-bottom: 12px; text-align: center; font-family: 'Inter', sans-serif;">
+                            Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAI</strong> on PancakeSwap!
+                        </div>
+                        <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; text-align: left; font-size: 0.78rem;">
+                            <div style="color: #00FF88; margin-bottom: 5px;">✓ Delivered $${d.estimatedCappingUse.toFixed(2)} USDT directly to wallet.</div>
+                            <div style="color: #FFD700;">✓ Deducted $${d.estimatedCappingUse.toFixed(2)} from active deposit capping.</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <a href="https://bscscan.com/tx/${receipt.transactionHash}" target="_blank" style="color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-decoration: underline;">
+                                View on BscScan <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
+                            </a>
+                        </div>
+                    `,
+                    confirmButtonText: 'DONE',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+
+                window.location.reload();
+
+            } catch (e) {
+                console.error(e);
+                let errMsg = e.reason || e.data?.message || e.message || 'Swap transaction rejected.';
+                Swal.fire({
+                    title: 'SWAP FAILED',
+                    html: `<div style="font-size: 0.80rem; color: #EF4444; margin-bottom: 8px; text-align: center;">${errMsg}</div>`,
+                    confirmButtonText: 'CLOSE',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                if (btn) btn.disabled = false;
+                if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
             }
         }
     </script>

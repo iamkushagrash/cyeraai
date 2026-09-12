@@ -146,10 +146,11 @@ class RankIncomeController extends Controller
             $rewardUsdt = (float)$rank->weekly_reward;
 
             if ($rewardUsdt > 0) {
-                // Capping calculation: Deducts commission from user's active deposits' remaining capping
-                $finalUsdt = $cappingController->cappingCalculation($user->id, $rewardUsdt);
+                // Capping is checked: User must have active capping, but rank income does NOT deduct capping limit
+                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
 
-                if ($finalUsdt > 0) {
+                if ($user->capping != 1 && $remCap > 0) {
+                    $finalUsdt = $rewardUsdt;
                     $tokenAmount = $finalUsdt / $tokenPrice;
                     $legs = $user->getLegBusiness();
                     $power = (float)($legs['power'] ?? 0);
@@ -173,7 +174,7 @@ class RankIncomeController extends Controller
                     $distributedCount++;
                     $totalDistributedUsdt += $finalUsdt;
 
-                    Log::info("Weekly Rank Income: User {$user->userid} awarded {$rank->rank_name} (\${$finalUsdt} USDT)");
+                    Log::info("Weekly Rank Income: User {$user->userid} awarded {$rank->rank_name} (\${$finalUsdt} USDT - Capping Verified, Not Deducted)");
                 }
             }
         }

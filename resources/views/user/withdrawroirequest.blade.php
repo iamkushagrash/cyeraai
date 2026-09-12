@@ -37,6 +37,20 @@
     $destWallet = $user->assetDetail()->usdtbep20addr ?? ($user->assetDetail()->usdttrc20addr ?? '');
 @endphp
 
+<!-- Top Mining Hub Link Banner -->
+<div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-microchip" style="font-size: 20px; color: #00E5FF;"></i>
+        <div>
+            <strong style="color: #00E5FF; font-size: 13px;">⚡ Decentralized CAI Mining &amp; DEX Swap</strong>
+            <div style="color: #8C9BAE; font-size: 10.5px;">Mine your ROI into protocol holdings with 0% capping deduction and sell on PancakeSwap with dynamic capping protection.</div>
+        </div>
+    </div>
+    <a href="{{ url('/User/Mining') }}" class="mecha-btn-gold" style="height: 34px; padding: 0 16px; font-size: 11px; background: linear-gradient(135deg, #00E5FF 0%, #0088FF 100%); color: #000; font-weight: 800; border-color: #00E5FF;">
+        <i class="fas fa-hammer"></i> Open Mining Hub
+    </a>
+</div>
+
 <!-- Top Stats Grid -->
 <div class="mecha-stat-grid-2">
     <div class="mecha-metric-box" style="border-color: rgba(255, 215, 0, 0.4);">

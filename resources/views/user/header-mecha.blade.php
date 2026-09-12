@@ -1,5 +1,5 @@
 @php
-    $caiLivePrice = \App\ProfileStore::where('id', 1)->value('price') ?? 1.25;
+    $caiLivePrice = \App\ProfileStore::getLivePrice();
 @endphp
 
 <div class="hud-header-container">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="price-content-block">
                     <span class="price-crypto-label">CAI</span>
-                    <span class="price-crypto-val">${{ number_format((float)$caiLivePrice, 2) }}</span>
+                    <span class="price-crypto-val">${{ number_format((float)$caiLivePrice, 4) }}</span>
                 </div>
             </div>
         </div>

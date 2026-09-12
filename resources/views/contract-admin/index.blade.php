@@ -784,6 +784,54 @@
                 </div>
             </div>
 
+            <!-- Protocol Smart Contracts Directory (Complete Overview) -->
+            <div style="background: rgba(14, 18, 30, 0.95); border: 1px solid var(--border-gold); border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 215, 0, 0.15); padding-bottom: 8px;">
+                    <div style="font-size: 13px; font-weight: 800; color: var(--gold-primary); display: flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif;">
+                        <i class="fas fa-network-wired"></i> CYERA PROTOCOL — LIVE BSC MAINNET SMART CONTRACTS
+                    </div>
+                    <span style="font-size: 10px; color: var(--green-neon); font-weight: 700; background: rgba(0, 255, 136, 0.12); border: 1px solid rgba(0, 255, 136, 0.3); padding: 2px 8px; border-radius: 20px;">
+                        CHAIN ID: 56
+                    </span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">👑 Admin Owner (3E7):</span>
+                        <a href="https://bscscan.com/address/{{ $contracts['adminOwnerAddress'] }}" target="_blank" style="color: var(--gold-primary); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['adminOwnerAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">💸 USDT Payout Vault (USDTWithdrawalVault):</span>
+                        <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--green-neon); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['usdtWithdrawalVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">⚡ Mining Engine (Invest &amp; Sell):</span>
+                        <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['miningEngineAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🪙 CAI Token Contract:</span>
+                        <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank" style="color: var(--gold-primary); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['caiTokenAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🥞 PancakeSwap V2 Pair:</span>
+                        <a href="https://bscscan.com/address/{{ $contracts['pancakePairAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['pancakePairAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🔑 Backend EIP-712 Signer:</span>
+                        <span style="color: #FFE082; word-break: break-all;">{{ $contracts['backendSignerAddress'] }}</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Navigation Tabs -->
             <nav class="admin-nav-tabs">
                 <button type="button" class="nav-tab-btn active" onclick="switchTab('tab-splitter')">
@@ -1110,7 +1158,11 @@
                         <div class="info-matrix-box">
                             <div class="info-matrix-row">
                                 <span class="k">Contract Address:</span>
-                                <span class="v">{{ substr($contracts['caiRewardClaimVaultAddress'], 0, 8) . '...' . substr($contracts['caiRewardClaimVaultAddress'], -6) }}</span>
+                                <span class="v">
+                                    <a href="https://bscscan.com/address/{{ $contracts['caiRewardClaimVaultAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; font-size: 11px; word-break: break-all;">
+                                        {{ $contracts['caiRewardClaimVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                                    </a>
+                                </span>
                             </div>
                             <div class="info-matrix-row">
                                 <span class="k">Vault CAI Balance:</span>
@@ -1157,7 +1209,11 @@
                         <div class="info-matrix-box">
                             <div class="info-matrix-row">
                                 <span class="k">Contract Address:</span>
-                                <span class="v">{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 8) . '...' . substr($contracts['usdtWithdrawalVaultAddress'], -6) }}</span>
+                                <span class="v">
+                                    <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--green-neon); text-decoration: none; font-size: 11px; word-break: break-all;">
+                                        {{ $contracts['usdtWithdrawalVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                                    </a>
+                                </span>
                             </div>
                             <div class="info-matrix-row">
                                 <span class="k">Vault USDT Balance:</span>
@@ -1409,18 +1465,27 @@
             const chainId = Number(network.chainId);
             document.getElementById('networkText').innerText = `BSC (${chainId === 56 ? 'Mainnet' : 'Chain ' + chainId})`;
 
-            // Check against configured admin or on-chain owner
-            let isContractOwner = (currentAccount === CONFIG.ADMIN_OWNER);
+            // Check against configured admin or on-chain owner (3E7 Wallet)
+            const targetAdmin = (CONFIG.ADMIN_OWNER || '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7').toLowerCase();
+            let isContractOwner = (currentAccount.toLowerCase() === targetAdmin);
 
             if (!isContractOwner) {
                 try {
-                    const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, provider);
-                    const onChainOwner = (await splitter.owner()).toLowerCase();
-                    if (currentAccount === onChainOwner) {
+                    const engine = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, ["function owner() view returns (address)"], provider);
+                    const onChainOwner = (await engine.owner()).toLowerCase();
+                    if (currentAccount.toLowerCase() === onChainOwner) {
                         isContractOwner = true;
                     }
                 } catch (e) {
-                    console.warn("Could not query splitter owner on-chain:", e);
+                    try {
+                        const vault = new ethers.Contract(CONFIG.CONTRACTS.WITHDRAWAL_VAULT, ["function owner() view returns (address)"], provider);
+                        const vaultOwner = (await vault.owner()).toLowerCase();
+                        if (currentAccount.toLowerCase() === vaultOwner) {
+                            isContractOwner = true;
+                        }
+                    } catch (err2) {
+                        console.warn("Could not query contract owner on-chain:", err2);
+                    }
                 }
             }
 

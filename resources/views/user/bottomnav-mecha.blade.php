@@ -25,8 +25,8 @@
         <div class="tab-active-bar"></div>
     </a>
 
-    <!-- 3. CENTER CAI COIN BUTTON (DASHBOARD) -->
-    <a href="{{ url('/User/Dashboard') }}" class="hud-center-lion-btn" title="Dashboard / CAI Protocol">
+    <!-- 3. CENTER CAI COIN BUTTON (MINING & DEX HUB) -->
+    <a href="{{ url('/User/Mining') }}" class="hud-center-lion-btn {{ request()->is('User/Mining*') ? 'active' : '' }}" title="CAI Mining & DEX Swap">
         <div class="nav-lion-corona">
             <div class="nav-lion-ring">
                 <img src="{{ asset('images/cai-token-coin.png') }}" alt="CYERA AI">

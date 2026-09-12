@@ -124,12 +124,12 @@ class CpsIncomeController extends Controller
                 continue;
             }
 
-            // 9. Generate Daily ROI Income Record
+            // 9. Generate Daily ROI Income Record (Clean 1:1 Base in Database)
             $insIncomeEntry = \App\CpsIncome::create([
                 'userid'         => $deposit->userid,
                 'txnid'          => $deposit->id,
-                'amount'         => $cpsUsdt / $profileStore->price,
-                'remaining'      => $cpsUsdt / $profileStore->price,
+                'amount'         => $cpsUsdt,
+                'remaining'      => $cpsUsdt,
                 'amt_usdt'       => $cpsUsdt,
                 'remaining_usdt' => $cpsUsdt,
                 'status'         => 0,
@@ -149,7 +149,6 @@ class CpsIncomeController extends Controller
     public function ProductCpsGeneration()
     {
         $getAllDeposit = \App\StackingDeposite::where([['status', 1], ['staketype', 0], ['planid', '>', 2], ['created_at', '<', date('Y-m-d')]])->get();
-        $profileStore = \App\ProfileStore::where('id', 1)->first();
         foreach ($getAllDeposit as $deposit) {
             $loanStatus = (((!is_null($deposit->userDetail()->userLoanStatus()) && $deposit->userDetail()->userLoanStatus()->status == 0 && $deposit->userDetail()->userLoanStatus()->remaining == 0) || is_null($deposit->userDetail()->userLoanStatus())) ? 0 : 3);
             if (
@@ -168,8 +167,8 @@ class CpsIncomeController extends Controller
                 $insIncomeEntry = \App\CpsIncome::create([
                     'userid' => $deposit->userid,
                     'txnid' => $deposit->id,
-                    'amount' => $returnAmount / $profileStore->price,
-                    'remaining' => $returnAmount / $profileStore->price,
+                    'amount' => $returnAmount,
+                    'remaining' => $returnAmount,
                     'amt_usdt' => $returnAmount,
                     'remaining_usdt' => $returnAmount,
                     'status' => 0,

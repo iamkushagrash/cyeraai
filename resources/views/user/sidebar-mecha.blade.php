@@ -232,7 +232,7 @@
             </div>
 
             <!-- Income & Rewards (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/IncomeOverview*') || request()->is('User/StakingReward*') || request()->is('User/DirectBonus*') || request()->is('User/StakingReferralReward*') || request()->is('User/PoolIncome*') || request()->is('User/RankIncome*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/DirectBonus*') || request()->is('User/StakingReferralReward*') || request()->is('User/PoolIncome*') || request()->is('User/RankIncome*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
@@ -246,15 +246,7 @@
                     <i class="fas fa-chevron-down nav-caret"></i>
                 </div>
                 <div class="mecha-submenu">
-                    <a href="{{ url('/User/IncomeOverview') }}" class="mecha-sub-link {{ request()->is('User/IncomeOverview') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Income Overview</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/StakingReward') }}" class="mecha-sub-link {{ request()->is('User/StakingReward') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot"></span> Daily Staking ROI</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/DirectBonus') }}" class="mecha-sub-link {{ request()->is('User/DirectBonus') ? 'active' : '' }}">
+                    <a href="{{ url('/User/DirectBonus') }}" class="mecha-sub-link {{ request()->is('User/DirectBonus*') ? 'active' : '' }}">
                         <div class="sub-left-txt"><span class="sub-dot"></span> Direct Referral Bonus</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
@@ -275,7 +267,7 @@
 
 
             <!-- Wallet & Exchange (Dropdown) -->
-            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') || request()->is('User/RoiWithdrawRequest*') || request()->is('User/RoiWithdrawalHistory*') ? 'open' : '' }}">
+            <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') || request()->is('User/Mining*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
                     <div class="nav-link-left-grp">
                         <div class="nav-ico-orb">
@@ -289,20 +281,16 @@
                     <i class="fas fa-chevron-down nav-caret"></i>
                 </div>
                 <div class="mecha-submenu">
-                    <a href="{{ url('/User/WithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/WithdrawRequest') ? 'active' : '' }}">
+                    <a href="{{ url('/User/Mining') }}" class="mecha-sub-link {{ request()->is('User/Mining*') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00E5FF;"></span> ⚡ Mine &amp; Sell CAI</div>
+                        <i class="fas fa-arrow-right sub-arr"></i>
+                    </a>
+                    <a href="{{ url('/User/WithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/WithdrawRequest*') || request()->is('User/Withdraw') ? 'active' : '' }}">
                         <div class="sub-left-txt"><span class="sub-dot" style="background: #00FF88;"></span> Working Withdraw</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
-                    <a href="{{ url('/User/WithdrawalHistory') }}" class="mecha-sub-link {{ request()->is('User/WithdrawalHistory') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00FF88;"></span> Working History</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/RoiWithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/RoiWithdrawRequest') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot" style="background: #FFD700;"></span> Staking ROI Claim</div>
-                        <i class="fas fa-arrow-right sub-arr"></i>
-                    </a>
-                    <a href="{{ url('/User/RoiWithdrawalHistory') }}" class="mecha-sub-link {{ request()->is('User/RoiWithdrawalHistory') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot" style="background: #FFD700;"></span> ROI Claim History</div>
+                    <a href="{{ url('/User/WithdrawalHistory') }}" class="mecha-sub-link {{ request()->is('User/WithdrawalHistory*') ? 'active' : '' }}">
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00FF88;"></span> Working Withdraw History</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                 </div>

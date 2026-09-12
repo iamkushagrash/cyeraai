@@ -32,12 +32,12 @@ class WithdrawInfoController extends Controller
         $caiPrice = $detail ? (float) $detail->price : 1.0;
         if ($caiPrice <= 0) $caiPrice = 1.0;
 
-        $workingRemainingUsdt = (float) (
-            $user->levelIncome()->where('status', 0)->sum('remaining_usdt') +
-            $user->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt') +
-            $user->clubIncome()->where('status', 0)->sum('remaining_usdt') +
-            $user->lifetimeIncome()->where('status', 0)->sum('remaining')
-        );
+        $poolRemaining = (float)\App\PoolIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt') + (float)$user->clubIncome()->where('status', 0)->sum('remaining_usdt');
+        $rankRemaining = (float)\App\RankIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt') + (float)$user->lifetimeIncome()->where('status', 0)->sum('remaining');
+        $levelRemaining = (float)$user->levelIncome()->where('status', 0)->sum('remaining_usdt');
+        $bonusRemaining = (float)$user->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt');
+
+        $workingRemainingUsdt = $levelRemaining + $bonusRemaining + $poolRemaining + $rankRemaining;
 
         return view('user.withdrawrequest')
             ->with('detail', $detail)
@@ -76,13 +76,13 @@ class WithdrawInfoController extends Controller
         if (!is_null($userDetail->assetDetail()) && $userDetail->assetDetail()->asset_status == 0) {
             return redirect('/User/WithdrawRequest')->with('warning', 'Conversion not permitted. Please contact Admin');
         }
-        // Working Balance Check
-        $workingBalance = (float) (
-            $userDetail->levelIncome()->where('status', 0)->sum('remaining_usdt') +
-            $userDetail->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt') +
-            $userDetail->clubIncome()->where('status', 0)->sum('remaining_usdt') +
-            $userDetail->lifetimeIncome()->where('status', 0)->sum('remaining')
-        );
+        // Working Balance Check (Level + Direct Bonus + Global Pool + Rank Income)
+        $poolRemaining = (float)\App\PoolIncome::where('userid', $userDetail->id)->where('status', 0)->sum('remaining_usdt') + (float)$userDetail->clubIncome()->where('status', 0)->sum('remaining_usdt');
+        $rankRemaining = (float)\App\RankIncome::where('userid', $userDetail->id)->where('status', 0)->sum('remaining_usdt') + (float)$userDetail->lifetimeIncome()->where('status', 0)->sum('remaining');
+        $levelRemaining = (float)$userDetail->levelIncome()->where('status', 0)->sum('remaining_usdt');
+        $bonusRemaining = (float)$userDetail->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt');
+
+        $workingBalance = $levelRemaining + $bonusRemaining + $poolRemaining + $rankRemaining;
 
         if ($request->amountusdt <= 0) {
             return redirect()->back()->with('warning', 'Please enter a valid withdrawal amount.');
@@ -115,6 +115,7 @@ class WithdrawInfoController extends Controller
                 $reducePool = 0;
                 $reduceLevel = 0;
                 $reduceReward = 0;
+                $reduceRank = 0;
 
                 // (A) Level Income
                 $entry = \App\LevelIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
@@ -150,37 +151,74 @@ class WithdrawInfoController extends Controller
                     }
                 }
 
-                // (C) Club / Pool Income
+                // (C) Global Pool Income (pool_incomes & club_incomes) -> goes to withdraw_infos.club
                 if ($amt > 0) {
-                    $entry = \App\ClubIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
-                    $reducePool = ($amt > $entry->sum('remaining_usdt')) ? $entry->sum('remaining_usdt') : $amt;
-                    foreach ($entry as $club) {
+                    $entryPool = \App\PoolIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                    foreach ($entryPool as $pInc) {
                         if ($amt > 0) {
-                            $deductUsdt = min($amt, (float) $club->remaining_usdt);
-                            \App\ClubIncome::where('id', $club->id)->update([
-                                'remaining_usdt' => max(0, $club->remaining_usdt - $deductUsdt),
-                                ($club->intxna == 0) ? 'intxna' : 'intxnb' => $txnId
+                            $deductUsdt = min($amt, (float) $pInc->remaining_usdt);
+                            \App\PoolIncome::where('id', $pInc->id)->update([
+                                'remaining_usdt' => max(0, $pInc->remaining_usdt - $deductUsdt),
+                                'remaining'      => max(0, (float)$pInc->remaining - $deductUsdt),
+                                'status'         => ($pInc->remaining_usdt - $deductUsdt <= 0.000001) ? 1 : 0
                             ]);
+                            $reducePool += $deductUsdt;
                             $amt -= $deductUsdt;
                         } else {
                             break;
                         }
                     }
+
+                    if ($amt > 0) {
+                        $entryClub = \App\ClubIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
+                        foreach ($entryClub as $club) {
+                            if ($amt > 0) {
+                                $deductUsdt = min($amt, (float) $club->remaining_usdt);
+                                \App\ClubIncome::where('id', $club->id)->update([
+                                    'remaining_usdt' => max(0, $club->remaining_usdt - $deductUsdt),
+                                    ($club->intxna == 0) ? 'intxna' : 'intxnb' => $txnId
+                                ]);
+                                $reducePool += $deductUsdt;
+                                $amt -= $deductUsdt;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                 }
 
-                // (D) Achievement / Lifetime Income
+                // (D) Rank Leadership Income (rank_incomes & achievement_incomes) -> goes to withdraw_infos.salary
                 if ($amt > 0) {
-                    $entry = \App\AchievementIncome::where('userid', $userDetail->id)->where('remaining', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
-                    foreach ($entry as $ach) {
+                    $entryRank = \App\RankIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                    foreach ($entryRank as $rInc) {
                         if ($amt > 0) {
-                            $deductUsdt = min($amt, (float) $ach->remaining);
-                            \App\AchievementIncome::where('id', $ach->id)->update([
-                                'remaining' => max(0, $ach->remaining - $deductUsdt),
-                                ($ach->intxna == 0) ? 'intxna' : 'intxnb' => $txnId
+                            $deductUsdt = min($amt, (float) $rInc->remaining_usdt);
+                            \App\RankIncome::where('id', $rInc->id)->update([
+                                'remaining_usdt' => max(0, $rInc->remaining_usdt - $deductUsdt),
+                                'remaining'      => max(0, (float)$rInc->remaining - $deductUsdt),
+                                'status'         => ($rInc->remaining_usdt - $deductUsdt <= 0.000001) ? 1 : 0
                             ]);
+                            $reduceRank += $deductUsdt;
                             $amt -= $deductUsdt;
                         } else {
                             break;
+                        }
+                    }
+
+                    if ($amt > 0) {
+                        $entryAch = \App\AchievementIncome::where('userid', $userDetail->id)->where('remaining', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                        foreach ($entryAch as $ach) {
+                            if ($amt > 0) {
+                                $deductUsdt = min($amt, (float) $ach->remaining);
+                                \App\AchievementIncome::where('id', $ach->id)->update([
+                                    'remaining' => max(0, $ach->remaining - $deductUsdt),
+                                    ($ach->intxna == 0) ? 'intxna' : 'intxnb' => $txnId
+                                ]);
+                                $reduceRank += $deductUsdt;
+                                $amt -= $deductUsdt;
+                            } else {
+                                break;
+                            }
                         }
                     }
                 }
@@ -191,6 +229,7 @@ class WithdrawInfoController extends Controller
                     'level'    => $reduceLevel,
                     'bonus'    => $reduceReward,
                     'club'     => $reducePool,
+                    'salary'   => $reduceRank,
                 ]);
 
                 \App\TransactionDetail::where('id', $txnId)->update([
@@ -215,6 +254,319 @@ class WithdrawInfoController extends Controller
     public function withdrawRequest(Request $request)
     {
         return $this->withdrawWorkingRequest($request);
+    }
+
+    /**
+     * EIP-712 Signature for Instant On-Chain Working Income Withdrawal from USDTWithdrawalVault
+     */
+    public function requestWorkingWithdrawSignature(Request $request)
+    {
+        $request->validate([
+            'amountusdt'     => 'required|numeric|min:0.01',
+            'wallet_address' => 'nullable|string',
+        ]);
+
+        $userId = \Session::get('user.id');
+        $userDetail = \App\UserDetails::where('id', $userId)->first();
+        if (!$userDetail) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
+        }
+
+        $grossAmount = (float) $request->amountusdt;
+        if ($grossAmount <= 0) {
+            return response()->json(['status' => 'error', 'message' => 'Please enter a valid withdrawal amount.'], 400);
+        }
+
+        // Available Working Balance Check
+        $workingBalance = (float) (
+            $userDetail->levelIncome()->where('status', 0)->sum('remaining_usdt') +
+            $userDetail->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt') +
+            $userDetail->clubIncome()->where('status', 0)->sum('remaining_usdt') +
+            $userDetail->lifetimeIncome()->where('status', 0)->sum('remaining')
+        );
+
+        if ($workingBalance < $grossAmount) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Insufficient Working Income balance. Available: $' . number_format($workingBalance, 2)
+            ], 400);
+        }
+
+        // Determine destination recipient wallet
+        $recipient = $request->wallet_address;
+        if (empty($recipient) || !preg_match('/^0x[a-fA-F0-9]{40}$/', $recipient)) {
+            $recipient = \Session::get('user.walletaddress') ?? ($userDetail->assetDetail()->usdtbep20addr ?? '');
+            if (empty($recipient) || !preg_match('/^0x[a-fA-F0-9]{40}$/', $recipient)) {
+                $user = $userDetail->user();
+                if ($user && preg_match('/^0x[a-fA-F0-9]{40}$/', $user->email)) {
+                    $recipient = $user->email;
+                } elseif ($user && preg_match('/^0x[a-fA-F0-9]{40}$/', $user->uuid)) {
+                    $recipient = $user->uuid;
+                }
+            }
+        }
+
+        if (empty($recipient) || !preg_match('/^0x[a-fA-F0-9]{40}$/', $recipient)) {
+            return response()->json(['status' => 'error', 'message' => 'Please connect a valid Web3 BNB Chain wallet address.'], 400);
+        }
+
+        // 10% Admin Fee Calculation
+        $adminFee = round($grossAmount * 0.10, 4);
+        $netPayout = round($grossAmount - $adminFee, 4);
+
+        if ($netPayout <= 0) {
+            return response()->json(['status' => 'error', 'message' => 'Net payout amount must be greater than zero.'], 400);
+        }
+
+        // 18 decimals for BSC-USDT
+        $amountWei = bcmul((string) $netPayout, '1000000000000000000', 0);
+        $withdrawalId = (string) (time() . rand(100, 999));
+        $expiry = (string) (time() + 600);
+
+        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b');
+        $chainId = "56"; // BSC Mainnet
+        $privateKey = env('SIGNER_PRIVATE_KEY', '38765232db1a84b6571252884f7168205f3207242cd31f99ab4e76ad76f5a67b');
+
+        // Execute sign script
+        $scriptPath = base_path('contracts/scripts/sign_usdt_withdrawal.js');
+        $cmd = "node " . escapeshellarg($scriptPath) . " "
+            . escapeshellarg($recipient) . " "
+            . escapeshellarg($amountWei) . " "
+            . escapeshellarg($withdrawalId) . " "
+            . escapeshellarg($expiry) . " "
+            . escapeshellarg($vaultAddress) . " "
+            . escapeshellarg($chainId) . " "
+            . escapeshellarg($privateKey);
+
+        $output = shell_exec($cmd);
+        $result = json_decode($output, true);
+
+        if (!$result || !isset($result['signature'])) {
+            \Log::error("Working Withdrawal Signature Generation Failed. Command output: " . $output);
+            return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization signature.'], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'recipient'     => $recipient,
+                'gross_amount'  => $grossAmount,
+                'admin_fee'     => $adminFee,
+                'net_amount'    => $netPayout,
+                'amount_wei'    => $amountWei,
+                'withdrawal_id' => $withdrawalId,
+                'expiry'        => $expiry,
+                'signature'     => $result['signature'],
+                'vault_address' => $vaultAddress,
+            ]
+        ]);
+    }
+
+    /**
+     * Confirm On-Chain Working Income Withdrawal & Save Tx Hash
+     */
+    public function confirmWorkingWithdrawal(Request $request)
+    {
+        $request->validate([
+            'tx_hash'       => 'required|string',
+            'withdrawal_id' => 'required',
+            'gross_amount'  => 'required|numeric|min:0.01',
+            'net_amount'    => 'required|numeric|min:0.01',
+            'recipient'     => 'required|string',
+        ]);
+
+        $userId = \Session::get('user.id');
+        $userDetail = \App\UserDetails::where('id', $userId)->first();
+        if (!$userDetail) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
+        }
+
+        $txHash = strtolower(trim($request->tx_hash));
+        $grossAmount = (float) $request->gross_amount;
+        $netAmount = (float) $request->net_amount;
+        $adminFee = (float) ($grossAmount - $netAmount);
+        $recipient = $request->recipient;
+
+        // Prevent duplicate transaction log
+        $alreadyLogged = \App\TransactionInfo::where('transaction_hash', $txHash)->exists();
+        if ($alreadyLogged) {
+            return response()->json(['status' => 'success', 'message' => 'Withdrawal already processed.']);
+        }
+
+        \DB::beginTransaction();
+        try {
+            $amt = $grossAmount;
+            $reducePool = 0;
+            $reduceLevel = 0;
+            $reduceReward = 0;
+
+            // 1. Insert Transaction Detail (Instant Approved / Confirmed)
+            $insTxn = \App\TransactionDetail::insertGetId([
+                'userid'        => $userId,
+                'txntype'       => 1,
+                'amountsftc'    => 0,
+                'amountusdt'    => $grossAmount,
+                'remaining'     => 0,
+                'paymentstatus' => 2, // Confirmed
+                'txndesc'       => 'Working Income Instant Web3 Withdrawal',
+                'currency'      => 'usdtbep20',
+                'comments'      => 'working',
+                'paidby'        => 0,
+                'release_date'  => date('Y-m-d'),
+                'deduction'     => $adminFee,
+                'net_amount'    => $netAmount,
+                'planid'        => 2,
+                'plan_status'   => 0,
+                'b_status'      => 3, // Auto-Approved
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s'),
+            ]);
+
+            // 2. Insert Transaction Info with Tx Hash
+            \App\TransactionInfo::create([
+                'txnid'            => $insTxn,
+                'payment_addr'     => $recipient,
+                'payee_addr'       => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b'),
+                'transaction_hash' => $txHash,
+                'created_at'       => date('Y-m-d H:i:s'),
+            ]);
+
+            // 3. (A) Level Income FIFO
+            $entry = \App\LevelIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
+            $reduceLevel = ($amt > $entry->sum('remaining_usdt')) ? $entry->sum('remaining_usdt') : $amt;
+            foreach ($entry as $level) {
+                if ($amt > 0) {
+                    $deductUsdt = min($amt, (float) $level->remaining_usdt);
+                    \App\LevelIncome::where('id', $level->id)->update([
+                        'remaining_usdt' => max(0, $level->remaining_usdt - $deductUsdt),
+                        ($level->intxna == 0) ? 'intxna' : 'intxnb' => $insTxn
+                    ]);
+                    $amt -= $deductUsdt;
+                } else {
+                    break;
+                }
+            }
+
+            // 4. (B) Direct Bonus FIFO
+            if ($amt > 0) {
+                $entry = \App\BonusReward::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
+                $reduceReward = ($amt > $entry->sum('remaining_usdt')) ? $entry->sum('remaining_usdt') : $amt;
+                foreach ($entry as $bonus) {
+                    if ($amt > 0) {
+                        $deductUsdt = min($amt, (float) $bonus->remaining_usdt);
+                        \App\BonusReward::where('id', $bonus->id)->update([
+                            'remaining_usdt' => max(0, $bonus->remaining_usdt - $deductUsdt),
+                            ($bonus->intxna == 0) ? 'intxna' : 'intxnb' => $insTxn
+                        ]);
+                        $amt -= $deductUsdt;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            $reduceRank = 0;
+
+            // 5. (C) Global Pool Income FIFO (pool_incomes & club_incomes) -> goes to withdraw_infos.club
+            if ($amt > 0) {
+                $entryPool = \App\PoolIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                foreach ($entryPool as $pInc) {
+                    if ($amt > 0) {
+                        $deductUsdt = min($amt, (float) $pInc->remaining_usdt);
+                        \App\PoolIncome::where('id', $pInc->id)->update([
+                            'remaining_usdt' => max(0, $pInc->remaining_usdt - $deductUsdt),
+                            'remaining'      => max(0, (float)$pInc->remaining - $deductUsdt),
+                            'status'         => ($pInc->remaining_usdt - $deductUsdt <= 0.000001) ? 1 : 0
+                        ]);
+                        $reducePool += $deductUsdt;
+                        $amt -= $deductUsdt;
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($amt > 0) {
+                    $entryClub = \App\ClubIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', '!=', 3)->orderBy('id', 'asc')->get();
+                    foreach ($entryClub as $club) {
+                        if ($amt > 0) {
+                            $deductUsdt = min($amt, (float) $club->remaining_usdt);
+                            \App\ClubIncome::where('id', $club->id)->update([
+                                'remaining_usdt' => max(0, $club->remaining_usdt - $deductUsdt),
+                                ($club->intxna == 0) ? 'intxna' : 'intxnb' => $insTxn
+                            ]);
+                            $reducePool += $deductUsdt;
+                            $amt -= $deductUsdt;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 6. (D) Rank Leadership Income FIFO (rank_incomes & achievement_incomes) -> goes to withdraw_infos.salary
+            if ($amt > 0) {
+                $entryRank = \App\RankIncome::where('userid', $userDetail->id)->where('remaining_usdt', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                foreach ($entryRank as $rInc) {
+                    if ($amt > 0) {
+                        $deductUsdt = min($amt, (float) $rInc->remaining_usdt);
+                        \App\RankIncome::where('id', $rInc->id)->update([
+                            'remaining_usdt' => max(0, $rInc->remaining_usdt - $deductUsdt),
+                            'remaining'      => max(0, (float)$rInc->remaining - $deductUsdt),
+                            'status'         => ($rInc->remaining_usdt - $deductUsdt <= 0.000001) ? 1 : 0
+                        ]);
+                        $reduceRank += $deductUsdt;
+                        $amt -= $deductUsdt;
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($amt > 0) {
+                    $entryAch = \App\AchievementIncome::where('userid', $userDetail->id)->where('remaining', '>', 0)->where('status', 0)->orderBy('id', 'asc')->get();
+                    foreach ($entryAch as $ach) {
+                        if ($amt > 0) {
+                            $deductUsdt = min($amt, (float) $ach->remaining);
+                            \App\AchievementIncome::where('id', $ach->id)->update([
+                                'remaining' => max(0, $ach->remaining - $deductUsdt),
+                                ($ach->intxna == 0) ? 'intxna' : 'intxnb' => $insTxn
+                            ]);
+                            $reduceRank += $deductUsdt;
+                            $amt -= $deductUsdt;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 7. Insert WithdrawInfo summary
+            \App\WithdrawInfo::create([
+                'txnid'    => $insTxn,
+                'stacking' => 0,
+                'level'    => $reduceLevel,
+                'bonus'    => $reduceReward,
+                'club'     => $reducePool,
+                'salary'   => $reduceRank,
+            ]);
+
+            \DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => "Instant Web3 Withdrawal of \${$netAmount} USDT completed successfully on BNB Smart Chain!",
+                'data'    => [
+                    'tx_hash'      => $txHash,
+                    'gross_amount' => $grossAmount,
+                    'admin_fee'    => $adminFee,
+                    'net_amount'   => $netAmount,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            \Log::error("ConfirmWorkingWithdrawal Exception: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to log withdrawal: ' . $e->getMessage()], 500);
+        }
     }
 
     public function withdrawWorkingHistory()

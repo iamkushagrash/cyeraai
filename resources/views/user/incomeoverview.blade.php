@@ -7,12 +7,12 @@
 @section('content')
 @php
     $directIncome = (float) $data['userDetail']->bonusReward()->where('status', '!=', 3)->sum('amt_usdt');
-    $stakingIncome = (float) $data['userDetail']->stackingIncome()->sum('amt_usdt');
     $stakingReferralIncome = (float) $data['userDetail']->levelIncome()->where('description', 'l')->sum('amt_usdt');
     $rankIncome = (float) $data['userDetail']->rankIncome()->sum('amt_usdt');
     $poolIncome = (float) \App\PoolIncome::where('userid', $data['userDetail']->id)->sum('amt_usdt');
     
-    $totalIncomeUsdt = $directIncome + $stakingIncome + $stakingReferralIncome + $rankIncome + $poolIncome;
+    // Total Working Rewards Only (Direct + Staking Referral + Pool + Rank)
+    $totalIncomeUsdt = $directIncome + $stakingReferralIncome + $rankIncome + $poolIncome;
     $totalWithdraw = !empty($data['totalwithdraw']->amount) ? round((float)$data['totalwithdraw']->amount, 2) : 0.00;
     $remainingCap = !is_null($data['userDetail']->remainingCapping()) ? round((float)$data['userDetail']->remainingCapping(), 2) : 0.00;
 
@@ -27,11 +27,11 @@
 <div class="mecha-stat-grid-2" style="margin-bottom: 12px;">
     <div class="mecha-metric-box">
         <div class="mecha-metric-lbl">
-            <span>TOTAL REWARDS EARNED</span>
+            <span>TOTAL WORKING REWARDS</span>
             <i class="fas fa-hand-holding-dollar" style="color: #FFD700;"></i>
         </div>
         <div class="mecha-metric-val gold">${{ number_format($totalIncomeUsdt, 2) }}</div>
-        <div class="mecha-metric-sub">Cumulative across 5 Active Streams</div>
+        <div class="mecha-metric-sub">Cumulative across 4 Working Streams</div>
     </div>
     <div class="mecha-metric-box">
         <div class="mecha-metric-lbl">
@@ -43,29 +43,16 @@
     </div>
 </div>
 
-<!-- 5 Active Income Streams Grid -->
+<!-- 4 Active Working Reward Streams Grid -->
 <div class="mecha-section-title" style="font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 8px 4px;">
-    Active Ecosystem Reward Streams
+    Active Working Reward Streams
 </div>
 
 <div class="row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;">
-    <!-- 1. Daily Staking Yield -->
-    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/StakingReward') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(255,215,0,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
-        <div class="mecha-metric-lbl">
-            <span style="color: #FFE082;">1. DAILY STAKING ROI</span>
-            <i class="fas fa-coins" style="color: #FFE082;"></i>
-        </div>
-        <div class="mecha-metric-val" style="color: #FFE082;">${{ number_format($stakingIncome, 2) }}</div>
-        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>0.5% Daily Accrual</span>
-            <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
-        </div>
-    </div>
-
-    <!-- 2. Direct Referral Bonus -->
+    <!-- 1. Direct Referral Bonus -->
     <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/DirectBonus') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(0,229,255,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span style="color: #00E5FF;">2. DIRECT REFERRAL</span>
+            <span style="color: #00E5FF;">1. DIRECT REFERRAL</span>
             <i class="fas fa-money-bill-wave" style="color: #00E5FF;"></i>
         </div>
         <div class="mecha-metric-val" style="color: #00E5FF;">${{ number_format($directIncome, 2) }}</div>
@@ -75,10 +62,10 @@
         </div>
     </div>
 
-    <!-- 3. Staking Referral Reward -->
+    <!-- 2. Staking Referral Reward -->
     <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/StakingReferralReward') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(179,75,254,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span style="color: #B34BFE;">3. STAKING REFERRAL</span>
+            <span style="color: #B34BFE;">2. STAKING REFERRAL</span>
             <i class="fas fa-users" style="color: #B34BFE;"></i>
         </div>
         <div class="mecha-metric-val" style="color: #B34BFE;">${{ number_format($stakingReferralIncome, 2) }}</div>
@@ -88,10 +75,10 @@
         </div>
     </div>
 
-    <!-- 4. Global Pool (5.0%) -->
+    <!-- 3. Global Pool (5.0%) -->
     <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/PoolIncome') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(167,139,250,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span style="color: #A78BFA;">4. GLOBAL POOL (5%)</span>
+            <span style="color: #A78BFA;">3. GLOBAL POOL (5%)</span>
             <i class="fas fa-layer-group" style="color: #A78BFA;"></i>
         </div>
         <div class="mecha-metric-val" style="color: #A78BFA;">${{ number_format($poolIncome, 2) }}</div>
@@ -101,18 +88,15 @@
         </div>
     </div>
 
-    <!-- 5. Rank Income (V1-V8) Full Width -->
-    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/RankIncome') }}'" style="grid-column: span 2; cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
+    <!-- 4. Rank Income (V1 TO V8 LEADERSHIP) -->
+    <div class="mecha-metric-box" onclick="window.location.href='{{ url('/User/RankIncome') }}'" style="cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor=''; this.style.transform=''">
         <div class="mecha-metric-lbl">
-            <span style="color: #F59E0B;">5. RANK INCOME (V1 TO V8 LEADERSHIP)</span>
+            <span style="color: #F59E0B;">4. RANK INCOME (V1-V8)</span>
             <i class="fas fa-crown" style="color: #F59E0B;"></i>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <div class="mecha-metric-val gold">${{ number_format($rankIncome, 2) }}</div>
-            <div style="font-size: 11px; font-weight: 700; color: #94A3B8;">Current Rank: <span style="color: #00FF88;">{{ $rankQual['current_rank'] ?: 'None' }}</span></div>
-        </div>
-        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-            <span>Weekly Leadership Turnover Dividend Pool</span>
+        <div class="mecha-metric-val gold">${{ number_format($rankIncome, 2) }}</div>
+        <div class="mecha-metric-sub" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Rank: <span style="color: #00FF88;">{{ $rankQual['current_rank'] ?: 'None' }}</span></span>
             <i class="fas fa-arrow-right" style="font-size: 9px; opacity: 0.7;"></i>
         </div>
     </div>
@@ -138,7 +122,7 @@
 
         <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 14px; border-top: 1px solid rgba(229, 168, 35, 0.2); padding-top: 12px;">
             <div style="text-align: center;">
-                <div style="font-size: 8.5px; font-weight: 800; color: #94A3B8;">TOTAL EARNED</div>
+                <div style="font-size: 8.5px; font-weight: 800; color: #94A3B8;">TOTAL WORKING EARNED</div>
                 <div style="font-size: 13px; font-weight: 900; color: #00FF88;">${{ number_format($totalIncomeUsdt, 2) }}</div>
             </div>
             <div style="text-align: center;">

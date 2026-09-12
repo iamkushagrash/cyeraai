@@ -616,7 +616,7 @@ class WalletTransferController extends Controller
 
         // 3. Decode & Strictly Verify Official USDT Token Contract and Event Logs
         $officialUsdtContract = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
-        $investedTopic0 = '0x9bce88ff835d9d8831ccf5c7e04a2533f68510314393b3a54f990dea62e7134e';
+        $investedTopic0 = '0xf77aeb8a2e27f3c48052a7019aa2cf8d273c715051f79b8bb153f91cf4a04760'; // CyeraMiningEngine: Invested(address,uint256,uint256,uint256,uint256,uint256,uint256)
         $transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
         
         $validUsdtTransferFound = false;
@@ -628,7 +628,7 @@ class WalletTransferController extends Controller
             if (isset($log['topics'][0])) {
                 $topic0 = strtolower($log['topics'][0]);
 
-                // Verify Official Invested Event from Splitter Contract
+                // Verify Official Invested Event from CyeraMiningEngine Contract
                 if ($topic0 === strtolower($investedTopic0) && $logContract === strtolower($expectedContract)) {
                     $cleanData = (substr($log['data'], 0, 2) === '0x' || substr($log['data'], 0, 2) === '0X') ? substr($log['data'], 2) : $log['data'];
                     $amountHex = substr($cleanData, 0, 64);

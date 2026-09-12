@@ -277,8 +277,8 @@
             ];
 
             const SPLITTER_ABI = [
-                "function invest(uint256 amount) external",
-                "event Invested(address indexed user, uint256 amountUSDT, uint256 timestamp, uint256 investmentId)"
+                "function invest(uint256 amountUsdt, uint256 packageId) external",
+                "event Invested(address indexed user, uint256 totalAmountUsdt, uint256 indexed packageId, uint256 treasuryUsdt, uint256 liquidityUsdt, uint256 caiPurchased, uint256 timestamp)"
             ];
 
             let userAccount = null;
@@ -576,11 +576,20 @@
 
                         setModalStep(1, 'done');
 
-                        // 2. Execute On-Chain Splitter Invest
+                        // 2. Execute On-Chain Splitter Invest (70% Treasury + 30% PancakeSwap Auto-Buy)
                         showModal('Step 2: Executing Staking Deposit', 'Please confirm the staking investment transaction in your wallet popup...');
                         setModalStep(2, 'active');
 
-                        const investTx = await splitterContract.invest(amountWei);
+                        let investTx;
+                        try {
+                            investTx = await splitterContract['invest(uint256,uint256)'](amountWei, 1, { gasLimit: 500000 });
+                        } catch (invErr) {
+                            if (invErr?.code === 'INVALID_ARGUMENT' || invErr?.message?.includes('no matching function')) {
+                                investTx = await splitterContract['invest(uint256)'](amountWei, { gasLimit: 500000 });
+                            } else {
+                                throw invErr;
+                            }
+                        }
                         const receipt = await investTx.wait();
 
                         txHash = receipt.hash;

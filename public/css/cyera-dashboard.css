@@ -1886,14 +1886,21 @@ body {
 .action-content h3 {
     margin: 0;
     font-family: 'Outfit', sans-serif;
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 900;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.4px;
     color: #FFFFFF;
     text-shadow: 0 0 8px var(--neon-glow);
     text-transform: uppercase;
     line-height: 1.15;
-    white-space: nowrap;
+    text-align: center;
+    max-width: 100%;
+}
+
+.action-card.claim-roi .action-content h3 {
+    font-size: 9px;
+    letter-spacing: 0.4px;
+    line-height: 1.15;
 }
 
 .action-sub-row {
@@ -5856,16 +5863,16 @@ body {
 
 .live-yield-cron-timer {
     font-family: 'Space Mono', monospace;
-    font-size: 7.5px;
+    font-size: 11px;
     font-weight: 700;
     color: #FFE082;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    padding: 3px 8px;
     border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .live-yield-grid-row {
@@ -7314,3 +7321,184 @@ body {
         min-height: 86px;
     }
 }
+
+/* ============================================================
+   SWEETALERT2 — CYBER MECHA GOLD & OBSIDIAN LUXURY THEME
+   ============================================================ */
+/* ============================================================
+   SWEETALERT2 — CYBER MECHA GOLD & OBSIDIAN LUXURY THEME
+   ============================================================ */
+.swal2-container,
+div:where(.swal2-container) {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    background: rgba(2, 3, 6, 0.88) !important;
+    z-index: 999999 !important;
+    padding: 12px !important;
+}
+
+.swal2-popup,
+div:where(.swal2-container) .swal2-popup,
+.mecha-swal-popup {
+    background: linear-gradient(180deg, #0D111A 0%, #040508 100%) !important;
+    background-color: #080A10 !important;
+    border: 1px solid rgba(245, 166, 35, 0.45) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 166, 35, 0.2), inset 0 1px 1px rgba(255, 215, 0, 0.18) !important;
+    color: #FFFFFF !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 22px 18px 20px 18px !important;
+    width: 92% !important;
+    max-width: 380px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.swal2-title,
+div:where(.swal2-container) .swal2-title,
+.mecha-swal-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #FFD700 !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
+    padding: 0 !important;
+    margin: 8px 0 10px 0 !important;
+    text-align: center !important;
+    text-shadow: 0 0 14px rgba(255, 215, 0, 0.3) !important;
+}
+
+.swal2-html-container,
+div:where(.swal2-container) .swal2-html-container,
+.mecha-swal-html {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.80rem !important;
+    color: #94A3B8 !important;
+    line-height: 1.5 !important;
+    padding: 0 !important;
+    margin: 4px 0 14px 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+}
+
+.swal2-html-container strong,
+.mecha-swal-html strong {
+    color: #FFD700 !important;
+    font-family: 'Space Mono', monospace !important;
+}
+
+.swal2-icon,
+div:where(.swal2-container) .swal2-icon {
+    width: 48px !important;
+    height: 48px !important;
+    margin: 4px auto 10px auto !important;
+    border-width: 2px !important;
+    border-color: rgba(245, 166, 35, 0.6) !important;
+    color: #FFD700 !important;
+}
+
+.swal2-icon.swal2-question,
+div:where(.swal2-container) .swal2-icon.swal2-question {
+    border-color: rgba(245, 166, 35, 0.6) !important;
+    color: #FFD700 !important;
+}
+
+.swal2-icon.swal2-success,
+div:where(.swal2-container) .swal2-icon.swal2-success {
+    border-color: rgba(0, 255, 136, 0.6) !important;
+    color: #00FF88 !important;
+}
+
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #00FF88 !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(0, 255, 136, 0.3) !important;
+}
+
+.swal2-icon.swal2-warning,
+div:where(.swal2-container) .swal2-icon.swal2-warning {
+    border-color: rgba(245, 166, 35, 0.7) !important;
+    color: #FFD700 !important;
+}
+
+.swal2-icon.swal2-error,
+div:where(.swal2-container) .swal2-icon.swal2-error {
+    border-color: rgba(239, 68, 68, 0.6) !important;
+    color: #EF4444 !important;
+}
+
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: #EF4444 !important;
+}
+
+.swal2-actions,
+div:where(.swal2-container) .swal2-actions,
+.mecha-swal-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 12px 0 0 0 !important;
+    padding: 0 !important;
+}
+
+.swal2-confirm,
+div:where(.swal2-container) .swal2-confirm,
+.mecha-swal-confirm {
+    flex: 1 !important;
+    min-height: 40px !important;
+    background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%) !important;
+    color: #000000 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35) !important;
+    cursor: pointer !important;
+    outline: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.swal2-confirm:active,
+.mecha-swal-confirm:active {
+    transform: scale(0.98) !important;
+}
+
+.swal2-cancel,
+div:where(.swal2-container) .swal2-cancel,
+.mecha-swal-cancel {
+    flex: 1 !important;
+    min-height: 40px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #8E99A8 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    cursor: pointer !important;
+    outline: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+.swal2-cancel:hover,
+.mecha-swal-cancel:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+}
+
+

@@ -409,8 +409,11 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
 
 
     // 1. Working Incomes Withdrawal & History
+    Route::get('/User/Withdraw', 'WithdrawInfoController@withdrawWorkingPage');
     Route::get('/User/WithdrawRequest', 'WithdrawInfoController@withdrawWorkingPage');
     Route::post('/User/WithdrawRequest', 'WithdrawInfoController@withdrawWorkingRequest');
+    Route::post('/User/WithdrawWorking/RequestSignature', 'WithdrawInfoController@requestWorkingWithdrawSignature');
+    Route::post('/User/WithdrawWorking/Confirm', 'WithdrawInfoController@confirmWorkingWithdrawal');
     Route::get('/User/WithdrawalHistory', 'WithdrawInfoController@withdrawWorkingHistory');
     Route::get('/User/resendWithdrawOtp', 'AssetDetailChangesController@resendWithdrawOtpWeb');
 
@@ -418,6 +421,14 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::get('/User/RoiWithdrawRequest', 'WithdrawInfoController@withdrawRoiPage');
     Route::post('/User/RoiWithdrawRequest', 'WithdrawInfoController@withdrawRoiRequest');
     Route::get('/User/RoiWithdrawalHistory', 'WithdrawInfoController@withdrawRoiHistory');
+
+    // 3. Decentralized CAI Mining & Live DEX Portfolio Liquidation
+    Route::get('/User/Mining', 'PortfolioMiningController@miningPage');
+    Route::get('/User/MiningHistory', 'PortfolioMiningController@miningPage');
+    Route::get('/User/Mining/Stats', 'PortfolioMiningController@getMiningStats');
+    Route::post('/User/Mining/MineCAI', 'PortfolioMiningController@mineRoiToCai');
+    Route::post('/User/Mining/RequestSellSignature', 'PortfolioMiningController@requestSellPortfolioSignature');
+    Route::post('/User/Mining/ConfirmSell', 'PortfolioMiningController@confirmPortfolioSold');
 
     Route::post('/User/WithdrawLifetimeReward', 'WithdrawInfoController@withdrawLifetimeIncome');
     Route::post('/User/WithdrawClubReward', 'WithdrawInfoController@withdrawClubIncome');

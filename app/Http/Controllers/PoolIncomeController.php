@@ -87,11 +87,12 @@ class PoolIncomeController extends Controller
 
         if ($perUserShare > 0) {
             $price = ProfileStore::where('id', 1)->first()->price ?? 1;
-            $capping = new StackingDetailController();
 
             foreach ($eligibleUsers as $user) {
-                $finalUsdt = $capping->cappingCalculation($user->id, $perUserShare);
-                if ($finalUsdt > 0) {
+                // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
+                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                if ($user->capping != 1 && $remCap > 0) {
+                    $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
@@ -177,11 +178,12 @@ class PoolIncomeController extends Controller
 
         if ($perUserShare > 0) {
             $price = ProfileStore::where('id', 1)->first()->price ?? 1;
-            $capping = new StackingDetailController();
 
             foreach ($eligibleUsers as $user) {
-                $finalUsdt = $capping->cappingCalculation($user->id, $perUserShare);
-                if ($finalUsdt > 0) {
+                // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
+                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                if ($user->capping != 1 && $remCap > 0) {
+                    $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
@@ -267,11 +269,12 @@ class PoolIncomeController extends Controller
 
         if ($perUserShare > 0) {
             $price = ProfileStore::where('id', 1)->first()->price ?? 1;
-            $capping = new StackingDetailController();
 
             foreach ($eligibleUsers as $user) {
-                $finalUsdt = $capping->cappingCalculation($user->id, $perUserShare);
-                if ($finalUsdt > 0) {
+                // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
+                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                if ($user->capping != 1 && $remCap > 0) {
+                    $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
