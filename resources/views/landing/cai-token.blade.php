@@ -567,7 +567,7 @@
                     }
                 </style>
                 <div id="landing-chart-frame">
-                    <iframe src="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c?embed=1&theme=dark&trades=0&info=0" allowfullscreen></iframe>
+                    <iframe src="https://www.geckoterminal.com/bsc/pools/0x4b33d9a80aeae68ad6d9ee84fd816db9a29d6a2c?embed=1&info=0&swaps=0&grayscale=0&light_chart=0" allowfullscreen></iframe>
                 </div>
             </div>
 
