@@ -314,10 +314,18 @@
                 const d = sigData.data;
                 document.getElementById('modalSubtitle').innerText = 'Please confirm the withdrawal in your wallet...';
 
-                // 2. Call executeWithdrawalWithSignature on Vault
-                const ethersProvider = new ethers.BrowserProvider(rawProvider);
-                const signer = await ethersProvider.getSigner();
-                const vaultContract = new ethers.Contract(d.vault_address, VAULT_ABI, signer);
+                // 2. Call executeWithdrawalWithSignature on Vault (Supports both Ethers v5 and v6)
+                let signer;
+                let vaultContract;
+                if (typeof ethers.BrowserProvider !== 'undefined') {
+                    const ethersProvider = new ethers.BrowserProvider(rawProvider);
+                    signer = await ethersProvider.getSigner();
+                    vaultContract = new ethers.Contract(d.vault_address, VAULT_ABI, signer);
+                } else {
+                    const ethersProvider = new ethers.providers.Web3Provider(rawProvider);
+                    signer = ethersProvider.getSigner();
+                    vaultContract = new ethers.Contract(d.vault_address, VAULT_ABI, signer);
+                }
 
                 const tx = await vaultContract.executeWithdrawalWithSignature(
                     d.recipient,
