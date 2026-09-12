@@ -465,81 +465,96 @@
 <div class="divider"></div>
 
 <!-- ============================================================
-     LIVE DEX MARKET & TRADINGVIEW CANDLESTICK CHART
+     LIVE DEX MARKET & TRADINGVIEW CANDLESTICK CHART (COMPACT)
      ============================================================ -->
-<section class="sec-pad" id="chart" style="padding: 42px 16px; background: radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.05) 0%, transparent 70%);">
-    <div class="container">
-        <div class="reveal" style="text-align: center; margin-bottom: 24px;">
-            <div class="sec-eyebrow" style="margin: 0 auto 10px;"><i class="fas fa-chart-line"></i> DEX Real-Time Market</div>
-            <h2 class="sec-title" style="text-align: center;">Live <span>CAI / USDT</span> Market Chart</h2>
-            <p class="sec-desc" style="margin: 0 auto; text-align: center;">Direct real-time streaming price, on-chain liquidity, and TradingView candlestick charting from PancakeSwap V2 pool.</p>
+<section class="sec-pad" id="chart" style="padding: 24px 12px; background: radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.05) 0%, transparent 70%);">
+    <div class="container" style="max-width: 860px;">
+        <div class="reveal" style="text-align: center; margin-bottom: 12px;">
+            <div class="sec-eyebrow" style="margin: 0 auto 6px; font-size: 0.58rem; padding: 2px 7px;"><i class="fas fa-chart-line"></i> DEX Real-Time Market</div>
+            <h2 class="sec-title" style="font-size: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 4px;">Live <span>CAI / USDT</span> Market Chart</h2>
+            <p class="sec-desc" style="margin: 0 auto; font-size: 0.76rem; max-width: 480px;">Real-time streaming price, on-chain liquidity &amp; candlestick chart from PancakeSwap V2.</p>
         </div>
 
-        <div class="reveal" style="background: rgba(10, 13, 25, 0.9); border: 1px solid rgba(245, 166, 35, 0.3); border-radius: 16px; padding: 16px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
+        <div class="reveal" style="background: rgba(10, 13, 25, 0.95); border: 1px solid rgba(245, 166, 35, 0.3); border-radius: 12px; padding: 10px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
             <!-- Header Telemetry Row -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center;">
-                        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI" style="width: 24px; height: 24px; object-fit: contain;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI" style="width: 18px; height: 18px; object-fit: contain;">
                     </div>
                     <div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; font-weight: 800; color: #FFF; letter-spacing: 0.5px;">CAI / USDT</span>
-                            <span style="font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.35); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP V2</span>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="font-family: 'Rajdhani', sans-serif; font-size: 0.92rem; font-weight: 800; color: #FFF; letter-spacing: 0.4px;">CAI / USDT</span>
+                            <span style="font-size: 0.52rem; padding: 1px 4px; border-radius: 3px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP</span>
                         </div>
-                        <div style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace; margin-top: 2px;">
-                            Pool: <a href="https://bscscan.com/address/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" style="color: #FFD700; text-decoration: none;">0x4B33...6A2c <i class="fas fa-external-link-alt" style="font-size: 9px;"></i></a>
+                        <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
+                            Pool: <a href="https://bscscan.com/address/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" style="color: #FFD700; text-decoration: none;">0x4B33...6A2c <i class="fas fa-external-link-alt" style="font-size: 7px;"></i></a>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <div>
-                        <div style="font-size: 0.62rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600; text-align: right;">Live DEX Rate</div>
-                        <div id="landingLivePrice" style="font-size: 1.25rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88; line-height: 1.1; text-align: right;">
+                        <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600; text-align: right;">Live DEX Rate</div>
+                        <div id="landingLivePrice" style="font-size: 0.95rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88; line-height: 1.1; text-align: right;">
                             $0.9991
                         </div>
                     </div>
-                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 6px 12px; text-align: center;">
-                        <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Change</div>
-                        <div id="landing24hChange" style="font-size: 0.85rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88;">
+                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 3px 7px; text-align: center;">
+                        <div style="font-size: 0.48rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Change</div>
+                        <div id="landing24hChange" style="font-size: 0.72rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88;">
                             <i class="fas fa-arrow-trend-up"></i> +0.00%
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats Bar -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 14px;">
-                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
-                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Volume</div>
-                    <div id="landing24hVol" style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
+            <!-- Compact 2x2 on Mobile, 4x1 on Desktop Stats Bar -->
+            <style>
+                .dex-stats-grid-compact {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 6px;
+                    margin-bottom: 8px;
+                }
+                @media (max-width: 600px) {
+                    .dex-stats-grid-compact {
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 4px;
+                        margin-bottom: 6px;
+                    }
+                }
+            </style>
+            <div class="dex-stats-grid-compact">
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
+                    <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">24H Volume</div>
+                    <div id="landing24hVol" style="font-size: 0.68rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
                 </div>
-                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
-                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Pool Liquidity</div>
-                    <div id="landingLiquidity" style="font-size: 0.82rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
+                    <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Pool Liquidity</div>
+                    <div id="landingLiquidity" style="font-size: 0.68rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
                 </div>
-                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
-                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Token Standard</div>
-                    <div style="font-size: 0.82rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">BEP-20 (BSC)</div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
+                    <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Token Standard</div>
+                    <div style="font-size: 0.68rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">BEP-20 (BSC)</div>
                 </div>
-                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 10px;">
-                    <div style="font-size: 0.60rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Capped Supply</div>
-                    <div style="font-size: 0.82rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAI</div>
+                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
+                    <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Capped Supply</div>
+                    <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAI</div>
                 </div>
             </div>
 
-            <!-- TradingView Candlestick Chart Container (100% Mobile Responsive) -->
-            <div style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
+            <!-- TradingView Candlestick Chart Container (Compact Height) -->
+            <div style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
                 <style>
                     #landing-chart-frame {
                         position: relative;
                         width: 100%;
-                        height: 480px;
+                        height: 380px;
                     }
-                    @media (max-width: 768px) {
+                    @media (max-width: 600px) {
                         #landing-chart-frame {
-                            height: 380px;
+                            height: 300px;
                         }
                     }
                     #landing-chart-frame iframe {
@@ -556,18 +571,18 @@
                 </div>
             </div>
 
-            <!-- Footer Buttons -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="https://pancakeswap.finance/swap?outputCurrency=0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" class="btn-primary" style="padding: 8px 16px; font-size: 0.78rem;">
+            <!-- Footer Buttons (Ultra Compact) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <a href="https://pancakeswap.finance/swap?outputCurrency=0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" class="btn-primary" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
                         <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
                     </a>
-                    <a href="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" class="btn-ghost" style="padding: 8px 16px; font-size: 0.78rem;">
-                        <i class="fas fa-chart-line"></i> Open Full DexScreener
+                    <a href="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" class="btn-ghost" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
+                        <i class="fas fa-chart-line"></i> Full DexScreener
                     </a>
                 </div>
-                <div style="font-size: 0.70rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
-                    Decentralized Liquidity Pool
+                <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
+                    PancakeSwap Pool
                 </div>
             </div>
         </div>

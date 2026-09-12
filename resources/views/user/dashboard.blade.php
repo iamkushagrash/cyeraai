@@ -983,37 +983,52 @@
                             </div>
                         </div>
 
-                        <!-- 4-Pill Micro Telemetry (24h Vol, Liquidity, 24h High, 24h Low) -->
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; margin-bottom: 10px;">
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 6px 8px;">
-                                <div style="font-size: 0.55rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">24H Volume</div>
-                                <div id="dex24hVolume" style="font-size: 0.72rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
+                        <!-- 4-Pill Micro Telemetry (Compact 2x2 Mobile, 4x1 Desktop) -->
+                        <style>
+                            .dash-dex-stats-grid {
+                                display: grid;
+                                grid-template-columns: repeat(4, 1fr);
+                                gap: 6px;
+                                margin-bottom: 8px;
+                            }
+                            @media (max-width: 600px) {
+                                .dash-dex-stats-grid {
+                                    grid-template-columns: repeat(2, 1fr);
+                                    gap: 4px;
+                                    margin-bottom: 6px;
+                                }
+                            }
+                        </style>
+                        <div class="dash-dex-stats-grid">
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">24H Volume</div>
+                                <div id="dex24hVolume" style="font-size: 0.68rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 6px 8px;">
-                                <div style="font-size: 0.55rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Total Liquidity</div>
-                                <div id="dexLiquidity" style="font-size: 0.72rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Total Liquidity</div>
+                                <div id="dexLiquidity" style="font-size: 0.68rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 6px 8px;">
-                                <div style="font-size: 0.55rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Base Token</div>
-                                <div style="font-size: 0.72rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">CAI BEP-20</div>
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Base Token</div>
+                                <div style="font-size: 0.68rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">CAI BEP-20</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 6px 8px;">
-                                <div style="font-size: 0.55rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Network</div>
-                                <div style="font-size: 0.72rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">BSC Mainnet</div>
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Network</div>
+                                <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">BSC Mainnet</div>
                             </div>
                         </div>
 
-                        <!-- Embedded Interactive TradingView / DexScreener Candlestick Chart Container -->
-                        <div style="position: relative; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
+                        <!-- Embedded Interactive TradingView / DexScreener Candlestick Chart Container (Compact Height) -->
+                        <div style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
                             <style>
                                 #dexscreener-embed-box {
                                     position: relative;
                                     width: 100%;
-                                    height: 440px;
+                                    height: 380px;
                                 }
-                                @media (max-width: 768px) {
+                                @media (max-width: 600px) {
                                     #dexscreener-embed-box {
-                                        height: 380px;
+                                        height: 300px;
                                     }
                                 }
                                 #dexscreener-embed-box iframe {
@@ -1030,17 +1045,17 @@
                             </div>
                         </div>
 
-                        <!-- Direct Quick Actions Footer -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <a href="https://pancakeswap.finance/swap?outputCurrency=0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" class="btn-solid-gold-claim" style="height: 28px; padding: 0 10px; font-size: 0.68rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 800;">
+                        <!-- Direct Quick Actions Footer (Compact) -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <a href="https://pancakeswap.finance/swap?outputCurrency=0x4756618F389A46819008Aff01ad0f91A38154eDB" target="_blank" class="btn-solid-gold-claim" style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 800;">
                                     <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
                                 </a>
-                                <a href="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" class="mecha-btn-outline" style="height: 28px; padding: 0 10px; font-size: 0.68rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border-color: rgba(245, 166, 35, 0.4); color: #FFD700;">
-                                    <i class="fas fa-chart-line"></i> Open Full Chart
+                                <a href="https://dexscreener.com/bsc/0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c" target="_blank" class="mecha-btn-outline" style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(245, 166, 35, 0.4); color: #FFD700;">
+                                    <i class="fas fa-chart-line"></i> Full DexScreener
                                 </a>
                             </div>
-                            <div style="font-size: 0.60rem; color: #8E99A8; font-family: 'Space Mono', monospace;">
+                            <div style="font-size: 0.58rem; color: #8E99A8; font-family: 'Space Mono', monospace;">
                                 Pair: 0x4B33...6A2c
                             </div>
                         </div>
