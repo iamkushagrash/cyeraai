@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cyera AI | Login</title>
-    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
+    <meta name="theme-color" content="#F5A623">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/cai-token-coin.png') }}">
+    <meta property="og:image" content="{{ asset('images/cai-token-coin.png') }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->

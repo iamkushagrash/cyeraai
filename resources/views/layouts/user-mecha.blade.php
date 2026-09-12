@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>@yield('title', 'Cyera AI - Web3 Portal')</title>
     <meta name="description" content="CYERA AI - Next-Gen Decentralized Mecha Web3 Ecosystem">
-    <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
+    <meta name="theme-color" content="#F5A623">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/cai-token-coin.png') }}">
+    <meta property="og:image" content="{{ asset('images/cai-token-coin.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">

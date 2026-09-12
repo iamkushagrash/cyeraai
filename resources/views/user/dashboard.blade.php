@@ -7,7 +7,11 @@
     <title>Cyera AI - Dashboard</title>
     <meta name="description"
         content="CYERA AI - CAI Ecosystem Dashboard. Track your investments, incomes, and team performance.">
-    <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
+    <meta name="theme-color" content="#F5A623">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/cai-token-coin.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="{{asset('css/cyera-dashboard.css')}}?v={{ time() }}" rel="stylesheet">

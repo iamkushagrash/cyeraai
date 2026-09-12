@@ -3,8 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cyera AI | Register Account</title>
-    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
+    <title>Cyera AI | Register & Activate Account</title>
+    <meta name="description" content="Join Cyera AI with referral invitation. Experience next-gen decentralized AI computing, staking rewards, and multi-tier ecosystem yields on BNB Smart Chain.">
+    <meta name="keywords" content="Cyera AI, CAI Token, Web3 AI, Staking, Crypto Rewards, Binance Smart Chain">
+    <meta name="theme-color" content="#F5A623">
+    <meta name="msapplication-TileColor" content="#060609">
+    <meta name="msapplication-TileImage" content="{{ asset('images/cai-token-coin.png') }}">
+
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/cai-token-coin.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/cai-token-coin.png') }}">
+
+    <!-- Open Graph / WhatsApp / Facebook / Telegram Sharing Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="Cyera AI">
+    <meta property="og:title" content="Join Cyera AI | Official Referral Invitation">
+    <meta property="og:description" content="Decentralized AI ecosystem powered by CAI Token on Binance Smart Chain. Register your account to activate staking, mining pools, and multi-tier rewards.">
+    <meta property="og:image" content="{{ asset('images/cai-token-coin.png') }}">
+    <meta property="og:image:secure_url" content="{{ asset('images/cai-token-coin.png') }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="Cyera AI CAI Token">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@CyeraAI">
+    <meta name="twitter:title" content="Join Cyera AI | Official Referral Invitation">
+    <meta name="twitter:description" content="Decentralized AI ecosystem powered by CAI Token on Binance Smart Chain. Register your account to activate staking, mining pools, and multi-tier rewards.">
+    <meta name="twitter:image" content="{{ asset('images/cai-token-coin.png') }}">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->
