@@ -49,8 +49,8 @@ class PoolIncomeController extends Controller
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->get();
 
-        $totalTurnover = (float)$depositsInPeriod->sum('usdt');
-        $poolAmount = ($totalTurnover * (float)$pool->pool_percent) / 100;
+        $totalTurnover = (float) $depositsInPeriod->sum('usdt');
+        $poolAmount = ($totalTurnover * (float) $pool->pool_percent) / 100;
 
         // 2. Find Sponsors of the users who staked in this period
         $eligibleUserMap = [];
@@ -60,7 +60,7 @@ class PoolIncomeController extends Controller
                 $sponsor = UserDetails::where('id', $stakedUser->sponsorid)->orWhere('userid', $stakedUser->sponsorid)->first();
                 if ($sponsor) {
                     // Check Sponsor's own qualification: Active user, not capped out, self investment >= min_self_investment ($100)
-                    if ($sponsor->userstatus == 1 && $sponsor->capping != 1 && (float)$sponsor->current_self_investment >= (float)$pool->min_self_investment) {
+                    if ($sponsor->userstatus == 1 && $sponsor->capping != 1 && (float) $sponsor->current_self_investment >= (float) $pool->min_self_investment) {
                         $eligibleUserMap[$sponsor->id] = $sponsor;
                     }
                 }
@@ -72,17 +72,17 @@ class PoolIncomeController extends Controller
         $perUserShare = ($eligibleCount > 0 && $poolAmount > 0) ? ($poolAmount / $eligibleCount) : 0;
 
         $distribution = PoolDistribution::create([
-            'pool_id'              => $pool->id,
-            'pool_type'            => 1,
-            'period_start'         => $periodStart,
-            'period_end'           => $periodEnd,
-            'total_turnover'       => $totalTurnover,
-            'pool_percent'         => $pool->pool_percent,
-            'total_pool_amount'    => $poolAmount,
+            'pool_id' => $pool->id,
+            'pool_type' => 1,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+            'total_turnover' => $totalTurnover,
+            'pool_percent' => $pool->pool_percent,
+            'total_pool_amount' => $poolAmount,
             'eligible_users_count' => $eligibleCount,
-            'per_user_share'       => $perUserShare,
-            'distributed_date'     => $distDate,
-            'status'               => 1,
+            'per_user_share' => $perUserShare,
+            'distributed_date' => $distDate,
+            'status' => 1,
         ]);
 
         if ($perUserShare > 0) {
@@ -90,20 +90,20 @@ class PoolIncomeController extends Controller
 
             foreach ($eligibleUsers as $user) {
                 // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
-                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                $remCap = !is_null($user->remainingCapping()) ? (float) $user->remainingCapping() : 0.00;
                 if ($user->capping != 1 && $remCap > 0) {
                     $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
-                        'userid'          => $user->id,
-                        'pool_id'         => $pool->id,
-                        'pool_type'       => 1,
-                        'amount'          => $tokenAmt,
-                        'remaining'       => $tokenAmt,
-                        'amt_usdt'        => $finalUsdt,
-                        'remaining_usdt'  => $finalUsdt,
-                        'status'          => 0,
+                        'userid' => $user->id,
+                        'pool_id' => $pool->id,
+                        'pool_type' => 1,
+                        'amount' => $tokenAmt,
+                        'remaining' => $tokenAmt,
+                        'amt_usdt' => $finalUsdt,
+                        'remaining_usdt' => $finalUsdt,
+                        'status' => 0,
                     ]);
                 }
             }
@@ -139,16 +139,16 @@ class PoolIncomeController extends Controller
             return;
         }
 
-        $totalTurnover = (float)StackingDeposite::where('status', 1)
+        $totalTurnover = (float) StackingDeposite::where('status', 1)
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->sum('usdt');
 
-        $poolAmount = ($totalTurnover * (float)$pool->pool_percent) / 100;
+        $poolAmount = ($totalTurnover * (float) $pool->pool_percent) / 100;
 
         // Check qualification for all active users
         $activeUsers = UserDetails::where('userstatus', 1)
             ->where('capping', '!=', 1)
-            ->where('current_self_investment', '>=', (float)$pool->min_self_investment)
+            ->where('current_self_investment', '>=', (float) $pool->min_self_investment)
             ->get();
 
         $eligibleUsers = [];
@@ -163,17 +163,17 @@ class PoolIncomeController extends Controller
         $perUserShare = ($eligibleCount > 0 && $poolAmount > 0) ? ($poolAmount / $eligibleCount) : 0;
 
         $distribution = PoolDistribution::create([
-            'pool_id'              => $pool->id,
-            'pool_type'            => 2,
-            'period_start'         => $periodStart,
-            'period_end'           => $periodEnd,
-            'total_turnover'       => $totalTurnover,
-            'pool_percent'         => $pool->pool_percent,
-            'total_pool_amount'    => $poolAmount,
+            'pool_id' => $pool->id,
+            'pool_type' => 2,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+            'total_turnover' => $totalTurnover,
+            'pool_percent' => $pool->pool_percent,
+            'total_pool_amount' => $poolAmount,
             'eligible_users_count' => $eligibleCount,
-            'per_user_share'       => $perUserShare,
-            'distributed_date'     => $distDate,
-            'status'               => 1,
+            'per_user_share' => $perUserShare,
+            'distributed_date' => $distDate,
+            'status' => 1,
         ]);
 
         if ($perUserShare > 0) {
@@ -181,20 +181,20 @@ class PoolIncomeController extends Controller
 
             foreach ($eligibleUsers as $user) {
                 // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
-                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                $remCap = !is_null($user->remainingCapping()) ? (float) $user->remainingCapping() : 0.00;
                 if ($user->capping != 1 && $remCap > 0) {
                     $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
-                        'userid'          => $user->id,
-                        'pool_id'         => $pool->id,
-                        'pool_type'       => 2,
-                        'amount'          => $tokenAmt,
-                        'remaining'       => $tokenAmt,
-                        'amt_usdt'        => $finalUsdt,
-                        'remaining_usdt'  => $finalUsdt,
-                        'status'          => 0,
+                        'userid' => $user->id,
+                        'pool_id' => $pool->id,
+                        'pool_type' => 2,
+                        'amount' => $tokenAmt,
+                        'remaining' => $tokenAmt,
+                        'amt_usdt' => $finalUsdt,
+                        'remaining_usdt' => $finalUsdt,
+                        'status' => 0,
                     ]);
                 }
             }
@@ -230,16 +230,16 @@ class PoolIncomeController extends Controller
             return;
         }
 
-        $totalTurnover = (float)StackingDeposite::where('status', 1)
+        $totalTurnover = (float) StackingDeposite::where('status', 1)
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->sum('usdt');
 
-        $poolAmount = ($totalTurnover * (float)$pool->pool_percent) / 100;
+        $poolAmount = ($totalTurnover * (float) $pool->pool_percent) / 100;
 
         // Check qualification for all active users
         $activeUsers = UserDetails::where('userstatus', 1)
             ->where('capping', '!=', 1)
-            ->where('current_self_investment', '>=', (float)$pool->min_self_investment)
+            ->where('current_self_investment', '>=', (float) $pool->min_self_investment)
             ->get();
 
         $eligibleUsers = [];
@@ -254,17 +254,17 @@ class PoolIncomeController extends Controller
         $perUserShare = ($eligibleCount > 0 && $poolAmount > 0) ? ($poolAmount / $eligibleCount) : 0;
 
         $distribution = PoolDistribution::create([
-            'pool_id'              => $pool->id,
-            'pool_type'            => 3,
-            'period_start'         => $periodStart,
-            'period_end'           => $periodEnd,
-            'total_turnover'       => $totalTurnover,
-            'pool_percent'         => $pool->pool_percent,
-            'total_pool_amount'    => $poolAmount,
+            'pool_id' => $pool->id,
+            'pool_type' => 3,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+            'total_turnover' => $totalTurnover,
+            'pool_percent' => $pool->pool_percent,
+            'total_pool_amount' => $poolAmount,
             'eligible_users_count' => $eligibleCount,
-            'per_user_share'       => $perUserShare,
-            'distributed_date'     => $distDate,
-            'status'               => 1,
+            'per_user_share' => $perUserShare,
+            'distributed_date' => $distDate,
+            'status' => 1,
         ]);
 
         if ($perUserShare > 0) {
@@ -272,20 +272,20 @@ class PoolIncomeController extends Controller
 
             foreach ($eligibleUsers as $user) {
                 // Capping is checked: User must have active capping, but pool income does NOT deduct capping limit
-                $remCap = !is_null($user->remainingCapping()) ? (float)$user->remainingCapping() : 0.00;
+                $remCap = !is_null($user->remainingCapping()) ? (float) $user->remainingCapping() : 0.00;
                 if ($user->capping != 1 && $remCap > 0) {
                     $finalUsdt = $perUserShare;
                     $tokenAmt = $finalUsdt / $price;
                     PoolIncome::create([
                         'distribution_id' => $distribution->id,
-                        'userid'          => $user->id,
-                        'pool_id'         => $pool->id,
-                        'pool_type'       => 3,
-                        'amount'          => $tokenAmt,
-                        'remaining'       => $tokenAmt,
-                        'amt_usdt'        => $finalUsdt,
-                        'remaining_usdt'  => $finalUsdt,
-                        'status'          => 0,
+                        'userid' => $user->id,
+                        'pool_id' => $pool->id,
+                        'pool_type' => 3,
+                        'amount' => $tokenAmt,
+                        'remaining' => $tokenAmt,
+                        'amt_usdt' => $finalUsdt,
+                        'remaining_usdt' => $finalUsdt,
+                        'status' => 0,
                     ]);
                 }
             }
@@ -308,14 +308,14 @@ class PoolIncomeController extends Controller
         $poolQualifications = $userDetail->getPoolQualifications();
 
         // Summary Totals
-        $dailyTotalUsdt = (float)PoolIncome::where('userid', $userId)->where('pool_type', 1)->sum('amt_usdt');
-        $weeklyTotalUsdt = (float)PoolIncome::where('userid', $userId)->where('pool_type', 2)->sum('amt_usdt');
-        $monthlyTotalUsdt = (float)PoolIncome::where('userid', $userId)->where('pool_type', 3)->sum('amt_usdt');
+        $dailyTotalUsdt = (float) PoolIncome::where('userid', $userId)->where('pool_type', 1)->sum('amt_usdt');
+        $weeklyTotalUsdt = (float) PoolIncome::where('userid', $userId)->where('pool_type', 2)->sum('amt_usdt');
+        $monthlyTotalUsdt = (float) PoolIncome::where('userid', $userId)->where('pool_type', 3)->sum('amt_usdt');
         $grandTotalUsdt = $dailyTotalUsdt + $weeklyTotalUsdt + $monthlyTotalUsdt;
 
-        $dailyTotalTokens = (float)PoolIncome::where('userid', $userId)->where('pool_type', 1)->sum('amount');
-        $weeklyTotalTokens = (float)PoolIncome::where('userid', $userId)->where('pool_type', 2)->sum('amount');
-        $monthlyTotalTokens = (float)PoolIncome::where('userid', $userId)->where('pool_type', 3)->sum('amount');
+        $dailyTotalTokens = (float) PoolIncome::where('userid', $userId)->where('pool_type', 1)->sum('amount');
+        $weeklyTotalTokens = (float) PoolIncome::where('userid', $userId)->where('pool_type', 2)->sum('amount');
+        $monthlyTotalTokens = (float) PoolIncome::where('userid', $userId)->where('pool_type', 3)->sum('amount');
         $grandTotalTokens = $dailyTotalTokens + $weeklyTotalTokens + $monthlyTotalTokens;
 
         // User Pool Incomes with distribution details
