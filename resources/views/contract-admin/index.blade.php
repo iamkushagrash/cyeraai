@@ -903,43 +903,24 @@
                             </div>
                         </div>
 
-                        <!-- Right: 1-Click Distribute & Settings -->
+                        <!-- Right: 1-Click Distribute Box -->
                         <div>
-                            <!-- 1-Click Distribute Box -->
-                            <div style="background: rgba(255, 215, 0, 0.04); border: 1px solid var(--border-gold); border-radius: 14px; padding: 18px; margin-bottom: 14px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                    <div style="font-size: 13px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #FFF;">
-                                        <i class="fas fa-bolt" style="color: var(--gold-primary);"></i> Distribute Treasury Funds
+                            <div style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--border-gold); border-radius: 14px; padding: 24px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                        <div style="font-size: 15px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #FFF; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-bolt" style="color: var(--gold-primary);"></i> Distribute Treasury Funds
+                                        </div>
+                                        <span style="font-size: 10px; color: var(--gold-primary); font-weight: 800; background: rgba(255, 215, 0, 0.12); border: 1px solid var(--border-gold); padding: 4px 10px; border-radius: 20px;">65% / 5% ON-CHAIN</span>
                                     </div>
-                                    <span style="font-size: 10px; color: var(--gold-primary); font-weight: 700; background: rgba(255, 215, 0, 0.1); border: 1px solid var(--border-gold); padding: 2px 8px; border-radius: 20px;">65% / 5% ON-CHAIN</span>
+                                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+                                        Triggers the smart contract execution on BSC Mainnet to automatically split and transfer <strong>65% to Owner Main Wallet</strong> and <strong>5% to Secondary Wallet</strong>.
+                                    </p>
                                 </div>
-                                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
-                                    Directly triggers smart contract execution to deliver 65% to Owner Main Wallet and 5% to Secondary Wallet on BSC Mainnet.
-                                </p>
-                                <button type="button" id="btnExecuteDistribute" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 44px; font-size: 13px; font-weight: 800;" onclick="handleDistributeSplitterFunds()">
+                                <button type="button" id="btnExecuteDistribute" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 48px; font-size: 14px; font-weight: 800; box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);" onclick="handleDistributeSplitterFunds()">
                                     <i class="fas fa-paper-plane"></i> Distribute Splitter Funds Now
                                 </button>
                             </div>
-
-                            <!-- Update Destination Wallets Form -->
-                            <form onsubmit="handleUpdateSplitterWallets(event)" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 14px;">
-                                <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">
-                                    <i class="fas fa-gear"></i> Update Destination Wallets
-                                </div>
-                                <div style="display: grid; gap: 8px; margin-bottom: 8px;">
-                                    <div>
-                                        <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Owner Main Wallet (65%)</label>
-                                        <input type="text" class="control-input" id="inputSplitterOwnerWallet" value="{{ $contracts['adminOwnerAddress'] }}" placeholder="0x..." required>
-                                    </div>
-                                    <div>
-                                        <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Secondary Wallet (5%)</label>
-                                        <input type="text" class="control-input" id="inputSplitterSecWallet" value="{{ $contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2' }}" placeholder="0x..." required>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center; height: 36px;">
-                                    <i class="fas fa-save"></i> Save Wallets On-Chain
-                                </button>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -1641,25 +1622,28 @@
 
         // Load all live on-chain balances & parameters
         async function loadDashboardData() {
-            if (!provider) return;
+            let activeProvider = provider;
+            if (!activeProvider) {
+                try {
+                    activeProvider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+                } catch (e) {
+                    console.warn("Fallback provider creation error:", e);
+                }
+            }
+            if (!activeProvider) return;
 
+            // 1. Treasury Balances
             try {
-                // Contracts
-                const usdt = new ethers.Contract(CONFIG.CONTRACTS.USDT, ERC20_ABI, provider);
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, provider);
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, provider);
-                const treasury = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_VAULT, TREASURY_VAULT_ABI, provider);
-                const rewardVault = new ethers.Contract(CONFIG.CONTRACTS.REWARD_VAULT, REWARD_VAULT_ABI, provider);
-                const withdrawalVault = new ethers.Contract(CONFIG.CONTRACTS.WITHDRAWAL_VAULT, WITHDRAWAL_VAULT_ABI, provider);
-
-                // 1. Treasury Balances
+                const usdt = new ethers.Contract(CONFIG.CONTRACTS.USDT, ERC20_ABI, activeProvider);
+                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, activeProvider);
+                
                 const [treasuryBalRaw, rewardBalRaw, withdrawalBalRaw] = await Promise.all([
                     usdt.balanceOf(CONFIG.CONTRACTS.TREASURY_VAULT).catch(() => 0n),
-                    usdt.balanceOf(CONFIG.CONTRACTS.REWARD_VAULT).catch(() => 0n), // Or CAI token balance
+                    usdt.balanceOf(CONFIG.CONTRACTS.REWARD_VAULT).catch(() => 0n),
                     usdt.balanceOf(CONFIG.CONTRACTS.WITHDRAWAL_VAULT).catch(() => 0n)
                 ]);
 
-                const caiVaultBal = await (new ethers.Contract(CONFIG.CONTRACTS.CAI, ERC20_ABI, provider))
+                const caiVaultBal = await (new ethers.Contract(CONFIG.CONTRACTS.CAI, ERC20_ABI, activeProvider))
                     .balanceOf(CONFIG.CONTRACTS.REWARD_VAULT).catch(() => 0n);
 
                 const treasuryBal = ethers.formatUnits(treasuryBalRaw, 18);
@@ -1667,22 +1651,34 @@
                 const withdrawalBal = ethers.formatUnits(withdrawalBalRaw, 18);
 
                 const maxTransferable = parseFloat(treasuryBal) > 0 ? parseFloat(treasuryBal).toFixed(2) : '0.00';
-                document.getElementById('metricTreasuryUsdt').innerHTML = `${parseFloat(treasuryBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                document.getElementById('dispTreasuryBalance').innerText = `${parseFloat(treasuryBal).toFixed(2)} USDT`;
-                document.getElementById('dispMaxTransferable').innerText = maxTransferable;
+                const elTreasuryUsdt = document.getElementById('metricTreasuryUsdt');
+                if (elTreasuryUsdt) elTreasuryUsdt.innerHTML = `${parseFloat(treasuryBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
+                const elDispTreasury = document.getElementById('dispTreasuryBalance');
+                if (elDispTreasury) elDispTreasury.innerText = `${parseFloat(treasuryBal).toFixed(2)} USDT`;
+                const elDispMax = document.getElementById('dispMaxTransferable');
+                if (elDispMax) elDispMax.innerText = maxTransferable;
 
                 const transferAmtInput = document.getElementById('inputTransferAmount');
                 if (transferAmtInput && (!transferAmtInput.value || transferAmtInput.dataset.userEdited !== 'true')) {
                     transferAmtInput.value = maxTransferable;
                 }
 
-                document.getElementById('metricRewardCai').innerHTML = `${parseFloat(rewardCaiBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">CAI</small>`;
-                document.getElementById('dispRewardVaultBal').innerText = `${parseFloat(rewardCaiBal).toFixed(4)} CAI`;
+                const elMetricRewardCai = document.getElementById('metricRewardCai');
+                if (elMetricRewardCai) elMetricRewardCai.innerHTML = `${parseFloat(rewardCaiBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">CAI</small>`;
+                const elDispRewardVault = document.getElementById('dispRewardVaultBal');
+                if (elDispRewardVault) elDispRewardVault.innerText = `${parseFloat(rewardCaiBal).toFixed(4)} CAI`;
 
-                document.getElementById('metricPayoutUsdt').innerHTML = `${parseFloat(withdrawalBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                document.getElementById('dispWithdrawalVaultBal').innerText = `${parseFloat(withdrawalBal).toFixed(2)} USDT`;
+                const elMetricPayout = document.getElementById('metricPayoutUsdt');
+                if (elMetricPayout) elMetricPayout.innerHTML = `${parseFloat(withdrawalBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
+                const elDispWithdrawalVault = document.getElementById('dispWithdrawalVaultBal');
+                if (elDispWithdrawalVault) elDispWithdrawalVault.innerText = `${parseFloat(withdrawalBal).toFixed(2)} USDT`;
+            } catch (err) {
+                console.warn("Treasury balances read error:", err);
+            }
 
-                // 2. Splitter Stats
+            // 2. Investment Splitter (70/30) Stats
+            try {
+                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, activeProvider);
                 const [splitter70, splitter30, minInvRaw, maxInvRaw, totalInvRaw, invCount] = await Promise.all([
                     splitter.treasuryClaimVault().catch(() => 'N/A'),
                     splitter.liquidityTreasuryWallet().catch(() => 'N/A'),
@@ -1692,77 +1688,92 @@
                     splitter.investmentCount().catch(() => 0n)
                 ]);
 
-                document.getElementById('dispSplitter70Vault').innerText = splitter70;
-                document.getElementById('dispSplitter30Wallet').innerText = splitter30;
+                const el70 = document.getElementById('dispSplitter70Vault');
+                if (el70) el70.innerText = splitter70;
+                const el30 = document.getElementById('dispSplitter30Wallet');
+                if (el30) el30.innerText = splitter30;
                 
                 const minInv = ethers.formatUnits(minInvRaw, 18);
                 const maxInv = ethers.formatUnits(maxInvRaw, 18);
-                document.getElementById('dispSplitterLimits').innerText = `$${parseFloat(minInv).toFixed(0)} - $${parseFloat(maxInv).toFixed(0)} USDT`;
+                const elLimits = document.getElementById('dispSplitterLimits');
+                if (elLimits) elLimits.innerText = `$${parseFloat(minInv).toFixed(0)} - $${parseFloat(maxInv).toFixed(0)} USDT`;
 
                 const totalInv = ethers.formatUnits(totalInvRaw, 18);
-                document.getElementById('metricSplitterTotal').innerHTML = `${parseFloat(totalInv).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                document.getElementById('metricInvestmentCount').innerText = invCount.toString();
+                const elTotal = document.getElementById('metricSplitterTotal');
+                if (elTotal) elTotal.innerHTML = `${parseFloat(totalInv).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
+                const elCount = document.getElementById('metricInvestmentCount');
+                if (elCount) elCount.innerText = invCount.toString();
+            } catch (err) {
+                console.warn("Splitter stats read error:", err);
+            }
 
-                // 3. CAI Token Stats
-                const [pairAddr, pairLocked] = await Promise.all([
+            // 3. CAI Token Stats
+            try {
+                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, activeProvider);
+                const [pairAddr, isConfigLocked] = await Promise.all([
                     cai.pancakePair().catch(() => '0x0000000000000000000000000000000000000000'),
-                    cai.pancakePairLocked().catch(() => false)
+                    cai.configurationLocked().catch(() => false)
                 ]);
 
-                document.getElementById('dispPancakePair').innerText = (pairAddr && pairAddr !== '0x0000000000000000000000000000000000000000') ? pairAddr : 'Not Set';
-                document.getElementById('dispPancakePairLocked').innerText = pairLocked ? 'Permanently Locked 🔒' : 'Unlocked';
-                if (pairLocked) {
-                    document.getElementById('btnLockPair').disabled = true;
-                    document.getElementById('btnLockPair').innerText = 'Pair Permanently Locked';
-                    document.getElementById('btnSetPancakePair').disabled = true;
-                }
+                const elPair = document.getElementById('dispPancakePair');
+                if (elPair) elPair.innerText = (pairAddr && pairAddr !== '0x0000000000000000000000000000000000000000') ? pairAddr : 'Not Set';
+                const elPairLocked = document.getElementById('dispPancakePairLocked');
+                if (elPairLocked) elPairLocked.innerText = isConfigLocked ? 'Permanently Locked 🔒' : 'Unlocked';
+            } catch (err) {
+                console.warn("CAI token stats read error:", err);
+            }
 
-                // 4. Signers
+            // 4. Signers
+            try {
+                const rewardVault = new ethers.Contract(CONFIG.CONTRACTS.REWARD_VAULT, REWARD_VAULT_ABI, activeProvider);
+                const withdrawalVault = new ethers.Contract(CONFIG.CONTRACTS.WITHDRAWAL_VAULT, WITHDRAWAL_VAULT_ABI, activeProvider);
                 const [rewardSigner, withdrawalSigner] = await Promise.all([
                     rewardVault.backendSigner().catch(() => 'N/A'),
                     withdrawalVault.backendSigner().catch(() => 'N/A')
                 ]);
 
-                document.getElementById('dispRewardSigner').innerText = rewardSigner;
-                document.getElementById('dispWithdrawalSigner').innerText = withdrawalSigner;
+                const elRewardSig = document.getElementById('dispRewardSigner');
+                if (elRewardSig) elRewardSig.innerText = rewardSigner;
+                const elWithdrawSig = document.getElementById('dispWithdrawalSigner');
+                if (elWithdrawSig) elWithdrawSig.innerText = withdrawalSigner;
+            } catch (err) {
+                console.warn("Vault signers read error:", err);
+            }
 
-                // 5. Treasury Splitter Live Balances & Breakdown
-                if (CONFIG.CONTRACTS.TREASURY_SPLITTER && CONFIG.CONTRACTS.TREASURY_SPLITTER !== '0x0000000000000000000000000000000000000000') {
-                    try {
-                        const splitterUsdtBalRaw = await usdt.balanceOf(CONFIG.CONTRACTS.TREASURY_SPLITTER).catch(() => 0n);
-                        const splitterUsdtBal = parseFloat(ethers.formatUnits(splitterUsdtBalRaw, 18));
-                        
-                        const elBal = document.getElementById('dispSplitterUsdtBal');
-                        if (elBal) elBal.innerText = `${splitterUsdtBal.toFixed(2)} USDT`;
-                        
-                        const ownerShare = (splitterUsdtBal * 65) / 70;
-                        const secShare = splitterUsdtBal - ownerShare;
-                        
-                        const elOwnerShare = document.getElementById('dispSplitterOwnerShare');
-                        if (elOwnerShare) {
-                            elOwnerShare.innerHTML = `≈ ${ownerShare.toFixed(2)} USDT <small style="color: var(--text-muted); font-size: 10px;">(${CONFIG.ADMIN_OWNER.substring(0, 6)}...${CONFIG.ADMIN_OWNER.substring(CONFIG.ADMIN_OWNER.length - 4)})</small>`;
-                        }
-                        
-                        const elSecShare = document.getElementById('dispSplitterSecShare');
-                        if (elSecShare) {
-                            elSecShare.innerHTML = `≈ ${secShare.toFixed(2)} USDT`;
-                        }
-
-                        const treasurySplitterContract = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, provider);
-                        const totalDistRaw = await treasurySplitterContract.totalDistributedUsdt().catch(() => 0n);
-                        const elTotalDist = document.getElementById('dispSplitterTotalDistributed');
-                        if (elTotalDist) elTotalDist.innerText = `${parseFloat(ethers.formatUnits(totalDistRaw, 18)).toFixed(2)} USDT`;
-                    } catch (e) {
-                        console.warn("Treasury Splitter read warning:", e);
-                    }
+            // 5. Treasury Splitter Live Balances & Breakdown (65% Owner / 5% Secondary)
+            try {
+                const usdt = new ethers.Contract(CONFIG.CONTRACTS.USDT, ERC20_ABI, activeProvider);
+                const treasurySplitterAddr = CONFIG.CONTRACTS.TREASURY_SPLITTER || '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5';
+                
+                const splitterUsdtBalRaw = await usdt.balanceOf(treasurySplitterAddr).catch(() => 0n);
+                const splitterUsdtBal = parseFloat(ethers.formatUnits(splitterUsdtBalRaw, 18));
+                
+                const elBal = document.getElementById('dispSplitterUsdtBal');
+                if (elBal) elBal.innerText = `${splitterUsdtBal.toFixed(2)} USDT`;
+                
+                const ownerShare = (splitterUsdtBal * 65) / 70;
+                const secShare = (splitterUsdtBal * 5) / 70;
+                
+                const elOwnerShare = document.getElementById('dispSplitterOwnerShare');
+                if (elOwnerShare) {
+                    elOwnerShare.innerHTML = `≈ ${ownerShare.toFixed(2)} USDT <small style="color: var(--text-muted); font-size: 10px;">(${CONFIG.ADMIN_OWNER.substring(0, 6)}...${CONFIG.ADMIN_OWNER.substring(CONFIG.ADMIN_OWNER.length - 4)})</small>`;
+                }
+                
+                const elSecShare = document.getElementById('dispSplitterSecShare');
+                if (elSecShare) {
+                    elSecShare.innerHTML = `≈ ${secShare.toFixed(2)} USDT`;
                 }
 
-                // Load event logs
-                fetchRecentEvents();
-
-            } catch (err) {
-                console.error("Dashboard data load error:", err);
+                const treasurySplitterContract = new ethers.Contract(treasurySplitterAddr, TREASURY_SPLITTER_ABI, activeProvider);
+                const totalDistRaw = await treasurySplitterContract.totalDistributedUsdt().catch(() => 0n);
+                const elTotalDist = document.getElementById('dispSplitterTotalDistributed');
+                if (elTotalDist) elTotalDist.innerText = `${parseFloat(ethers.formatUnits(totalDistRaw, 18)).toFixed(2)} USDT`;
+            } catch (e) {
+                console.warn("Treasury Splitter read error:", e);
             }
+
+            // Load event logs
+            fetchRecentEvents();
         }
 
         // ============================================================
@@ -2125,6 +2136,7 @@
 
         // Auto-check on page load if wallet already injected & connected
         document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
             if (window.ethereum && window.ethereum.selectedAddress) {
                 connectWallet();
             }
