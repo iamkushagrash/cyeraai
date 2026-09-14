@@ -825,6 +825,12 @@
                             {{ $contracts['pancakePairAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
                         </a>
                     </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-gold); border-radius: 8px; padding: 8px 10px;">
+                        <span style="color: var(--gold-primary); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">⚡ Treasury Splitter (65% / 5%):</span>
+                        <a href="https://bscscan.com/address/{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}" target="_blank" style="color: var(--green-neon); text-decoration: none; word-break: break-all;">
+                            {{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+                        </a>
+                    </div>
                     <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
                         <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🔑 Backend EIP-712 Signer:</span>
                         <span style="color: #FFE082; word-break: break-all;">{{ $contracts['backendSignerAddress'] }}</span>
@@ -834,7 +840,10 @@
 
             <!-- Navigation Tabs -->
             <nav class="admin-nav-tabs">
-                <button type="button" class="nav-tab-btn active" onclick="switchTab('tab-splitter')">
+                <button type="button" class="nav-tab-btn active" onclick="switchTab('tab-treasury-splitter')">
+                    <i class="fas fa-divide"></i> Treasury Splitter (65% / 5%)
+                </button>
+                <button type="button" class="nav-tab-btn" onclick="switchTab('tab-splitter')">
                     <i class="fas fa-arrows-split-up-and-left"></i> 70/30 Investment Splitter
                 </button>
                 <button type="button" class="nav-tab-btn" onclick="switchTab('tab-treasury')">
@@ -851,8 +860,93 @@
                 </button>
             </nav>
 
+            <!-- TAB 0: TREASURY SPLITTER (65% Owner / 5% Secondary) -->
+            <div id="tab-treasury-splitter" class="tab-panel-section active">
+                <div class="control-card">
+                    <div class="control-card-header">
+                        <div class="control-card-title">
+                            <i class="fas fa-divide" style="color: var(--gold-primary);"></i>
+                            <div>
+                                <h3>Treasury Splitter (65% Owner / 5% Secondary)</h3>
+                                <p>On-Chain Splitter: Automatically calculates and splits 70% deposit funds into 65% Owner and 5% Secondary</p>
+                            </div>
+                        </div>
+                        <span class="card-badge" style="background: rgba(0, 255, 136, 0.15); color: var(--green-neon); border-color: rgba(0, 255, 136, 0.35);">SPLITTER LIVE</span>
+                    </div>
+
+                    <div class="control-grid-2">
+                        <!-- Left: Live State & Balances Matrix -->
+                        <div>
+                            <div class="info-matrix-box">
+                                <div class="info-matrix-row">
+                                    <span class="k">Splitter Contract Address:</span>
+                                    <a href="https://bscscan.com/address/{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}" target="_blank" class="v" style="color: var(--gold-primary); text-decoration: underline;">
+                                        {{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 8px;"></i>
+                                    </a>
+                                </div>
+                                <div class="info-matrix-row" style="background: rgba(0, 255, 136, 0.08); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(0, 255, 136, 0.25); margin: 6px 0;">
+                                    <span class="k" style="font-weight: 800; color: #FFF; font-size: 12px;">Undistributed Splitter Balance:</span>
+                                    <span class="v" id="dispSplitterUsdtBal" style="color: var(--green-neon); font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace;">0.00 USDT</span>
+                                </div>
+                                <div class="info-matrix-row">
+                                    <span class="k">Owner Main Share (65%):</span>
+                                    <span class="v" id="dispSplitterOwnerShare" style="color: var(--gold-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace;">≈ 0.00 USDT <small style="color: var(--text-muted); font-size: 10px;">({{ substr($contracts['adminOwnerAddress'], 0, 6) }}...{{ substr($contracts['adminOwnerAddress'], -4) }})</small></span>
+                                </div>
+                                <div class="info-matrix-row">
+                                    <span class="k">Secondary Share (5%):</span>
+                                    <span class="v" id="dispSplitterSecShare" style="color: var(--cyan-neon); font-weight: 700; font-family: 'JetBrains Mono', monospace;">≈ 0.00 USDT <small style="color: var(--text-muted); font-size: 10px;">({{ substr($contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2', 0, 6) }}...{{ substr($contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2', -4) }})</small></span>
+                                </div>
+                                <div class="info-matrix-row">
+                                    <span class="k">Total Distributed to Date:</span>
+                                    <span class="v" id="dispSplitterTotalDistributed" style="color: #FFF; font-family: 'JetBrains Mono', monospace;">0.00 USDT</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: 1-Click Distribute & Settings -->
+                        <div>
+                            <!-- 1-Click Distribute Box -->
+                            <div style="background: rgba(255, 215, 0, 0.04); border: 1px solid var(--border-gold); border-radius: 14px; padding: 18px; margin-bottom: 14px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                    <div style="font-size: 13px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #FFF;">
+                                        <i class="fas fa-bolt" style="color: var(--gold-primary);"></i> Distribute Treasury Funds
+                                    </div>
+                                    <span style="font-size: 10px; color: var(--gold-primary); font-weight: 700; background: rgba(255, 215, 0, 0.1); border: 1px solid var(--border-gold); padding: 2px 8px; border-radius: 20px;">65% / 5% ON-CHAIN</span>
+                                </div>
+                                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
+                                    Directly triggers smart contract execution to deliver 65% to Owner Main Wallet and 5% to Secondary Wallet on BSC Mainnet.
+                                </p>
+                                <button type="button" id="btnExecuteDistribute" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 44px; font-size: 13px; font-weight: 800;" onclick="handleDistributeSplitterFunds()">
+                                    <i class="fas fa-paper-plane"></i> Distribute Splitter Funds Now
+                                </button>
+                            </div>
+
+                            <!-- Update Destination Wallets Form -->
+                            <form onsubmit="handleUpdateSplitterWallets(event)" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 14px;">
+                                <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">
+                                    <i class="fas fa-gear"></i> Update Destination Wallets
+                                </div>
+                                <div style="display: grid; gap: 8px; margin-bottom: 8px;">
+                                    <div>
+                                        <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Owner Main Wallet (65%)</label>
+                                        <input type="text" class="control-input" id="inputSplitterOwnerWallet" value="{{ $contracts['adminOwnerAddress'] }}" placeholder="0x..." required>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Secondary Wallet (5%)</label>
+                                        <input type="text" class="control-input" id="inputSplitterSecWallet" value="{{ $contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2' }}" placeholder="0x..." required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center; height: 36px;">
+                                    <i class="fas fa-save"></i> Save Wallets On-Chain
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB 1: CYERA INVESTMENT SPLITTER (70/30 Splitter) -->
-            <div id="tab-splitter" class="tab-panel-section active">
+            <div id="tab-splitter" class="tab-panel-section">
                 <div class="control-card">
                     <div class="control-card-header">
                         <div class="control-card-title">
@@ -1307,6 +1401,7 @@
                 CAI: "{{ $contracts['caiTokenAddress'] }}",
                 TREASURY_VAULT: "{{ $contracts['treasuryClaimVaultAddress'] }}",
                 SPLITTER: "{{ $contracts['investmentSplitterAddress'] }}",
+                TREASURY_SPLITTER: "{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}",
                 REWARD_VAULT: "{{ $contracts['caiRewardClaimVaultAddress'] }}",
                 WITHDRAWAL_VAULT: "{{ $contracts['usdtWithdrawalVaultAddress'] }}"
             }
@@ -1316,6 +1411,18 @@
         const ERC20_ABI = [
             "function balanceOf(address account) view returns (uint256)",
             "function decimals() view returns (uint8)"
+        ];
+
+        const TREASURY_SPLITTER_ABI = [
+            "function distribute() external returns (uint256, uint256)",
+            "function ownerWallet() view returns (address)",
+            "function secondaryWallet() view returns (address)",
+            "function totalDistributedUsdt() view returns (uint256)",
+            "function totalOwnerPaid() view returns (uint256)",
+            "function totalSecondaryPaid() view returns (uint256)",
+            "function owner() view returns (address)",
+            "function setWallets(address _newOwnerWallet, address _newSecondaryWallet) external",
+            "event FundsDistributed(uint256 totalAmount, uint256 ownerAmount, uint256 secondaryAmount, uint256 timestamp)"
         ];
 
         const SPLITTER_ABI = [
@@ -1619,6 +1726,37 @@
                 document.getElementById('dispRewardSigner').innerText = rewardSigner;
                 document.getElementById('dispWithdrawalSigner').innerText = withdrawalSigner;
 
+                // 5. Treasury Splitter Live Balances & Breakdown
+                if (CONFIG.CONTRACTS.TREASURY_SPLITTER && CONFIG.CONTRACTS.TREASURY_SPLITTER !== '0x0000000000000000000000000000000000000000') {
+                    try {
+                        const splitterUsdtBalRaw = await usdt.balanceOf(CONFIG.CONTRACTS.TREASURY_SPLITTER).catch(() => 0n);
+                        const splitterUsdtBal = parseFloat(ethers.formatUnits(splitterUsdtBalRaw, 18));
+                        
+                        const elBal = document.getElementById('dispSplitterUsdtBal');
+                        if (elBal) elBal.innerText = `${splitterUsdtBal.toFixed(2)} USDT`;
+                        
+                        const ownerShare = (splitterUsdtBal * 65) / 70;
+                        const secShare = splitterUsdtBal - ownerShare;
+                        
+                        const elOwnerShare = document.getElementById('dispSplitterOwnerShare');
+                        if (elOwnerShare) {
+                            elOwnerShare.innerHTML = `≈ ${ownerShare.toFixed(2)} USDT <small style="color: var(--text-muted); font-size: 10px;">(${CONFIG.ADMIN_OWNER.substring(0, 6)}...${CONFIG.ADMIN_OWNER.substring(CONFIG.ADMIN_OWNER.length - 4)})</small>`;
+                        }
+                        
+                        const elSecShare = document.getElementById('dispSplitterSecShare');
+                        if (elSecShare) {
+                            elSecShare.innerHTML = `≈ ${secShare.toFixed(2)} USDT`;
+                        }
+
+                        const treasurySplitterContract = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, provider);
+                        const totalDistRaw = await treasurySplitterContract.totalDistributedUsdt().catch(() => 0n);
+                        const elTotalDist = document.getElementById('dispSplitterTotalDistributed');
+                        if (elTotalDist) elTotalDist.innerText = `${parseFloat(ethers.formatUnits(totalDistRaw, 18)).toFixed(2)} USDT`;
+                    } catch (e) {
+                        console.warn("Treasury Splitter read warning:", e);
+                    }
+                }
+
                 // Load event logs
                 fetchRecentEvents();
 
@@ -1630,6 +1768,67 @@
         // ============================================================
         // SMART CONTRACT WRITE ACTIONS
         // ============================================================
+
+        // 0. Treasury Splitter: Execute 1-Click Distribute (65% / 5%)
+        async function handleDistributeSplitterFunds() {
+            if (!signer) return showToast("Please connect your Admin Web3 wallet first!", "error");
+
+            const btn = document.getElementById('btnExecuteDistribute');
+            const originalHtml = btn ? btn.innerHTML : '';
+
+            try {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Confirming in MetaMask...`;
+                }
+
+                const splitter = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, signer);
+                showToast("Please approve the transaction in your wallet...", "info");
+                
+                const tx = await splitter.distribute();
+                showToast(`Distribution submitted! Hash: ${tx.hash.substring(0, 10)}...`, "info");
+                
+                if (btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Waiting Confirmation...`;
+                await tx.wait();
+
+                showToast("Treasury funds distributed successfully (65% to Owner / 5% to Secondary)!", "success");
+                loadDashboardData();
+            } catch (e) {
+                console.error(e);
+                showToast(e.reason || e.message || "Failed to distribute funds.", "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        // 0.1 Treasury Splitter: Update Destination Wallets
+        async function handleUpdateSplitterWallets(e) {
+            e.preventDefault();
+            if (!signer) return showToast("Please connect your Admin Web3 wallet first!", "error");
+
+            const ownerWallet = document.getElementById('inputSplitterOwnerWallet').value.trim();
+            const secWallet = document.getElementById('inputSplitterSecWallet').value.trim();
+
+            if (!ethers.isAddress(ownerWallet) || !ethers.isAddress(secWallet)) {
+                return showToast("Invalid wallet address provided!", "error");
+            }
+
+            try {
+                const splitter = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, signer);
+                showToast("Please approve wallet update in MetaMask...", "info");
+                const tx = await splitter.setWallets(ownerWallet, secWallet);
+                showToast(`Update submitted: ${tx.hash.substring(0, 10)}...`, "info");
+                await tx.wait();
+                showToast("Splitter destination wallets updated successfully!", "success");
+                loadDashboardData();
+            } catch (e) {
+                console.error(e);
+                showToast(e.reason || e.message || "Failed to update wallets.", "error");
+            }
+        }
 
         // 1. Splitter: Update 70% Vault
         async function handleSetTreasuryVault(e) {

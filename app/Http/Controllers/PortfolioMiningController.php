@@ -431,18 +431,30 @@ class PortfolioMiningController extends Controller
         $requestedUsdtValue = $requestedCai * $livePrice;
 
         // Smart Capping Guard: Cap sell strictly to remaining capping limit
-        $effectiveUsdtValue = min($requestedUsdtValue, $runtimeCapping);
-        $effectiveCaiAmount = round($effectiveUsdtValue / $livePrice, 6);
+        $grossUsdtValue = min($requestedUsdtValue, $runtimeCapping);
+        $grossCaiAmount = round($grossUsdtValue / $livePrice, 6);
 
-        if ($effectiveCaiAmount <= 0) {
+        if ($grossCaiAmount <= 0) {
             return response()->json(['status' => 'error', 'message' => 'Allowed sell amount is 0.'], 400);
         }
 
-        // Slippage Protection: 2% slippage
-        $minUsdtOut = round($effectiveUsdtValue * 0.98, 6);
+        // 10% Admin Deduction
+        $adminFeeRate = 0.10;
+        $adminFeeUsdt = round($grossUsdtValue * $adminFeeRate, 4);
+        $adminFeeCai = round($grossCaiAmount * $adminFeeRate, 6);
+        
+        $netUsdtValue = round($grossUsdtValue - $adminFeeUsdt, 4);
+        $netCaiToSell = round($grossCaiAmount - $adminFeeCai, 6);
+
+        if ($netCaiToSell <= 0 || $netUsdtValue <= 0) {
+            return response()->json(['status' => 'error', 'message' => 'Net claim amount after 10% admin deduction is 0.'], 400);
+        }
+
+        // Slippage Protection: 2% slippage on net amount
+        $minUsdtOut = round($netUsdtValue * 0.98, 6);
 
         // Convert to Wei (18 Decimals for CAI and BSC-USDT)
-        $caiWei = bcmul((string) $effectiveCaiAmount, '1000000000000000000', 0);
+        $caiWei = bcmul((string) $netCaiToSell, '1000000000000000000', 0);
         $minUsdtWei = bcmul((string) $minUsdtOut, '1000000000000000000', 0);
 
         // Unique Nonce & Expiry (10 minutes)
@@ -475,8 +487,14 @@ class PortfolioMiningController extends Controller
             'status' => 'success',
             'data'   => [
                 'user'                => $walletAddress,
-                'caiAmount'           => $effectiveCaiAmount,
+                'grossCai'            => $grossCaiAmount,
+                'grossUsdt'           => $grossUsdtValue,
+                'adminFeePercent'     => 10,
+                'adminFeeUsdt'        => $adminFeeUsdt,
+                'adminFeeCai'         => $adminFeeCai,
+                'caiAmount'           => $netCaiToSell, // Net CAI swapped on DEX
                 'caiAmountWei'        => $caiWei,
+                'netUsdt'             => $netUsdtValue, // Net USDT received
                 'minUsdtOut'          => $minUsdtOut,
                 'minUsdtOutWei'       => $minUsdtWei,
                 'nonce'               => $nonce,
@@ -485,8 +503,8 @@ class PortfolioMiningController extends Controller
                 'miningContract'      => $miningContract,
                 'livePrice'           => $livePrice,
                 'cappingBefore'       => $runtimeCapping,
-                'estimatedCappingUse' => $effectiveUsdtValue,
-                'excessHeldCai'       => max(0, round($currentCaiBalance - $effectiveCaiAmount, 6)),
+                'estimatedCappingUse' => $grossUsdtValue,
+                'excessHeldCai'       => max(0, round($currentCaiBalance - $grossCaiAmount, 6)),
             ]
         ]);
     }
@@ -498,8 +516,10 @@ class PortfolioMiningController extends Controller
     {
         $request->validate([
             'tx_hash'       => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
-            'cai_amount'    => 'required|numeric|min:0.0001',
-            'usdt_received' => 'required|numeric|min:0.0001',
+            'cai_amount'    => 'required|numeric|min:0.0001', // Net CAI sold on DEX
+            'gross_cai'     => 'nullable|numeric',
+            'usdt_received' => 'required|numeric|min:0.0001', // Net USDT received
+            'gross_usdt'    => 'nullable|numeric',
         ]);
 
         $userDetail = $this->getAuthUserDetail();
@@ -509,8 +529,12 @@ class PortfolioMiningController extends Controller
 
         $userId = $userDetail->id;
         $txHash = strtolower(trim($request->tx_hash));
-        $caiSold = (float) $request->cai_amount;
-        $usdtReceived = (float) $request->usdt_received;
+        $netCaiSold = (float) $request->cai_amount;
+        $netUsdtReceived = (float) $request->usdt_received;
+        
+        $grossCai = $request->has('gross_cai') && (float)$request->gross_cai > 0 ? (float)$request->gross_cai : round($netCaiSold / 0.90, 6);
+        $grossUsdt = $request->has('gross_usdt') && (float)$request->gross_usdt > 0 ? (float)$request->gross_usdt : round($netUsdtReceived / 0.90, 4);
+        $adminFeeUsdt = round($grossUsdt - $netUsdtReceived, 4);
 
         // Prevent duplicate transaction execution
         $alreadyLogged = CaiMiningLedger::where('tx_hash', $txHash)->exists();
@@ -523,40 +547,40 @@ class PortfolioMiningController extends Controller
             $userDetail = UserDetails::where('id', $userId)->lockForUpdate()->first();
             $currentCai = (float) ($userDetail->cai_balance ?? 0);
 
-            // 1. Deduct Sold CAI Tokens from System Balance (Remaining CAI stays held!)
-            $newCaiBalance = max(0, round($currentCai - $caiSold, 6));
+            // 1. Deduct Full Gross CAI Tokens from System Balance (Remaining CAI stays held!)
+            $newCaiBalance = max(0, round($currentCai - $grossCai, 6));
             $userDetail->cai_balance = $newCaiBalance;
             $userDetail->save();
 
-            // 2. Deduct USDT Amount Received from Runtime Capping Limit
+            // 2. Deduct Gross USDT Amount from Runtime Capping Limit
             $cappingBefore = $this->calculateRuntimeCapping($userId);
-            $cappingAfter = $this->deductRuntimeCapping($userId, $usdtReceived);
+            $cappingAfter = $this->deductRuntimeCapping($userId, $grossUsdt);
 
             // 3. Record in Audit Ledger
             $livePrice = $this->getLiveCaiPrice();
             CaiMiningLedger::create([
                 'userid'           => $userId,
                 'type'             => 'sell',
-                'usdt_amount'      => $usdtReceived,
-                'cai_amount'       => $caiSold,
+                'usdt_amount'      => $netUsdtReceived,
+                'cai_amount'       => $grossCai,
                 'cai_price'        => $livePrice,
                 'capping_before'   => $cappingBefore,
-                'capping_deducted' => $usdtReceived,
+                'capping_deducted' => $grossUsdt,
                 'capping_after'    => $cappingAfter,
                 'tx_hash'          => $txHash,
                 'status'           => 1,
-                'notes'            => "Sold {$caiSold} CAI on PancakeSwap for \${$usdtReceived} USDT. Deducted \${$usdtReceived} from Capping.",
+                'notes'            => "Claimed {$grossCai} CAI (\${$grossUsdt} USDT). 10% Admin Fee: -\${$adminFeeUsdt}. Net Swapped: {$netCaiSold} CAI -> \${$netUsdtReceived} USDT delivered to wallet.",
             ]);
 
             DB::commit();
 
             return response()->json([
                 'status'  => 'success',
-                'message' => "Portfolio successfully sold! \${$usdtReceived} USDT delivered to your wallet.",
+                'message' => "Portfolio successfully claimed! \${$netUsdtReceived} USDT (90% net after 10% admin deduction) delivered to your wallet.",
                 'data'    => [
                     'new_cai_balance'  => $newCaiBalance,
                     'capping_before'   => $cappingBefore,
-                    'capping_deducted' => $usdtReceived,
+                    'capping_deducted' => $grossUsdt,
                     'capping_after'    => $cappingAfter,
                     'tx_hash'          => $txHash,
                 ]
