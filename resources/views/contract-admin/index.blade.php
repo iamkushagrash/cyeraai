@@ -965,7 +965,7 @@
                             <div class="info-matrix-box">
                                 <div class="info-matrix-row">
                                     <span class="k">Splitter Contract:</span>
-                                    <span class="v" id="dispSplitterAddr">{{ $contracts['investmentSplitterAddress'] }}</span>
+                                    <span class="v" id="dispSplitterAddr">{{ $contracts['investmentSplitterAddress'] ?? $contracts['treasurySplitterAddress'] ?? $contracts['miningEngineAddress'] ?? '0xdd905468F6F91f8c37eFB9e27E1f282734E60217' }}</span>
                                 </div>
                                 <div class="info-matrix-row">
                                     <span class="k">70% Treasury Vault:</span>
@@ -1400,7 +1400,7 @@
                 USDT: "{{ $contracts['usdtTokenAddress'] }}",
                 CAI: "{{ $contracts['caiTokenAddress'] }}",
                 TREASURY_VAULT: "{{ $contracts['treasuryClaimVaultAddress'] }}",
-                SPLITTER: "{{ $contracts['investmentSplitterAddress'] }}",
+                SPLITTER: "{{ $contracts['investmentSplitterAddress'] ?? $contracts['treasurySplitterAddress'] ?? $contracts['miningEngineAddress'] ?? '0xdd905468F6F91f8c37eFB9e27E1f282734E60217' }}",
                 TREASURY_SPLITTER: "{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}",
                 REWARD_VAULT: "{{ $contracts['caiRewardClaimVaultAddress'] }}",
                 WITHDRAWAL_VAULT: "{{ $contracts['usdtWithdrawalVaultAddress'] }}"

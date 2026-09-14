@@ -24,6 +24,7 @@ class ContractAdminController extends Controller
             'pancakePairAddress'        => env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c'),
             'pancakeRouterAddress'      => env('PANCAKE_ROUTER_ADDRESS', '0x10ED43C718714eb63d5aA57B78B54704E256024E'),
             'miningEngineAddress'       => env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'),
+            'investmentSplitterAddress' => env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'),
             'treasurySplitterAddress'   => env('TREASURY_SPLITTER_ADDRESS', '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5'),
             'secondaryTreasuryWallet'   => env('SECONDARY_TREASURY_WALLET', '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2'),
             'usdtWithdrawalVaultAddress' => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b'),
