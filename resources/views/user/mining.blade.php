@@ -79,7 +79,7 @@
                     <th style="padding: 10px 12px; text-align: left; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">ACTION</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAI AMOUNT</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">RATE / PRICE</th>
-                    <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">GROSS USDT</th>
+                    <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">USDT AMOUNT</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAP BEFORE</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAP DEDUCTED</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAP REMAINING</th>
@@ -111,6 +111,9 @@
                     </td>
                     <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace; white-space: nowrap;">
                         ${{ number_format((float)$entry->usdt_amount, 2) }}
+                        @if($entry->type == 'sell')
+                            <div style="font-size: 8.5px; color: #8C9BAE; font-weight: normal;">(90% Net)</div>
+                        @endif
                     </td>
                     <td style="padding: 10px 12px; text-align: right; font-family: 'Space Mono', monospace; color: #8C9BAE; white-space: nowrap;">
                         ${{ number_format((float)$entry->capping_before, 2) }}
@@ -184,7 +187,7 @@
                     </div>
                 </div>
                 <div style="text-align: right;">
-                    <div style="font-size: 8px; font-weight: 800; color: #8C9BAE; text-transform: uppercase;">Gross USD (Rate: ${{ number_format((float)$entry->cai_price, 6) }})</div>
+                    <div style="font-size: 8px; font-weight: 800; color: #8C9BAE; text-transform: uppercase;">{{ $entry->type == 'mine' ? 'USDT Value' : 'Net Received (90%)' }} (Rate: ${{ number_format((float)$entry->cai_price, 6) }})</div>
                     <div style="font-size: 13px; font-weight: 800; color: #FFFFFF; font-family: 'Space Mono', monospace;">
                         ${{ number_format((float)$entry->usdt_amount, 2) }} <small style="font-size: 9px; color: #00FF88;">USDT</small>
                     </div>
