@@ -855,13 +855,12 @@
                                     </div>
                                 </div>
 
-                                <button type="button" onclick="executeDashAutoSellOnDex()" id="btnDashSellAll"
+                                <button type="button" onclick="openCustomSellModal()" id="btnDashSellAll"
                                     style="width: 100%; height: 32px; background: linear-gradient(135deg, #F5A623 0%, #D97706 100%); color: #000000; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.72rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; box-shadow: 0 3px 10px rgba(245, 166, 35, 0.25); text-transform: uppercase; letter-spacing: 0.3px;"
                                     @if($eligibleSellUsdt <= 0) disabled
                                         style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 32px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.72rem; border-radius: 6px; font-family: 'Inter', sans-serif;"
                                     @endif>
-                                    <span id="btnDashSellAllTxt">SELL ALL ELIGIBLE
-                                        (${{ number_format($eligibleSellUsdt, 2) }})</span>
+                                    <span id="btnDashSellAllTxt">SELL CAI ON DEX (${{ number_format($eligibleSellUsdt, 2) }})</span>
                                 </button>
                             </div>
 
@@ -3068,7 +3067,8 @@
         }
 
         /* 1-Click Sell All Eligible CAI on DEX */
-        async function executeDashAutoSellOnDex() {
+        /* Open Interactive Custom CAI Liquidation Modal */
+        async function openCustomSellModal() {
             if (DASH_ELIGIBLE_SELL_CAI <= 0 || DASH_ELIGIBLE_SELL_USDT <= 0) {
                 Swal.fire({
                     title: 'NO SELLABLE BALANCE',
@@ -3094,35 +3094,90 @@
                 return;
             }
 
-            const btn = document.getElementById('btnDashSellAll');
-            const btnTxt = document.getElementById('btnDashSellAllTxt');
+            const livePrice = DASH_LIVE_PRICE > 0 ? DASH_LIVE_PRICE : 1.0;
+            const maxCai = DASH_ELIGIBLE_SELL_CAI;
+            const defaultCai = maxCai;
+            const defaultGrossUsdt = defaultCai * livePrice;
+            const defaultFeeUsdt = defaultGrossUsdt * 0.10;
+            const defaultNetUsdt = defaultGrossUsdt - defaultFeeUsdt;
 
-            const result = await Swal.fire({
-                title: 'SELL ON PANCAKESWAP',
+            const { value: customCaiAmount, isConfirmed } = await Swal.fire({
+                title: 'SWAP CAI FOR USDT ON DEX',
                 html: `
-                    <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 166, 35, 0.22) 0%, rgba(217, 119, 6, 0.04) 70%); border: 1px solid rgba(245, 166, 35, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(245, 166, 35, 0.25);">
-                        <i class="fas fa-arrow-right-arrow-left" style="color: #FFD700; font-size: 19px;"></i>
-                    </div>
-                    <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; text-align: left; font-family: 'Inter', sans-serif;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
-                            <span style="color: #8C9BAE;">CAI to Sell:</span>
-                            <strong style="color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.85rem;">${DASH_ELIGIBLE_SELL_CAI} CAI</strong>
+                    <div style="text-align: left; font-family: 'Inter', sans-serif;">
+                        <!-- Protocol Info Bar -->
+                        <div style="background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="color: #8C9BAE;">Protocol CAI Holding:</span>
+                                <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">${DASH_HOLDING_CAI.toFixed(4)} CAI (~$${DASH_HOLDING_USDT.toFixed(2)})</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="color: #8C9BAE;">Active Capping Limit:</span>
+                                <strong style="color: #00FF88; font-family: 'Space Mono', monospace;">$${DASH_REMAINING_CAPPING.toFixed(2)} USDT (Max ${DASH_ELIGIBLE_SELL_CAI.toFixed(4)} CAI)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #8C9BAE;">Live DEX Price:</span>
+                                <strong style="color: #FFE082; font-family: 'Space Mono', monospace;">$${livePrice.toFixed(6)} / CAI</strong>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
-                            <span style="color: #8C9BAE;">Gross USDT Received:</span>
-                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace; font-size: 0.85rem;">$${DASH_ELIGIBLE_SELL_USDT.toFixed(2)} USDT</strong>
+
+                        <!-- Amount Input Label -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 0.74rem; font-weight: 800; color: #FFFFFF; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">
+                                ENTER CAI TO SELL:
+                            </label>
+                            <span style="font-size: 0.65rem; color: #8C9BAE;">Max: <strong style="color: #FFD700; cursor: pointer;" onclick="setCustomSellPercent(100)">${maxCai.toFixed(4)} CAI</strong></span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.80rem; border-top: 1px solid rgba(245, 166, 35, 0.18); padding-top: 7px;">
-                            <span style="color: #8C9BAE;">Capping Deduction:</span>
-                            <strong style="color: #F5A623; font-family: 'Space Mono', monospace; font-size: 0.85rem;">-$${DASH_ELIGIBLE_SELL_USDT.toFixed(2)}</strong>
+
+                        <!-- Input Box with CAI addon -->
+                        <div style="position: relative; margin-bottom: 8px;">
+                            <input type="number" id="customSellCaiInput" value="${defaultCai}" step="any" min="0.0001" max="${maxCai}"
+                                style="width: 100%; height: 40px; background: rgba(5, 7, 12, 0.9); border: 1px solid rgba(245, 166, 35, 0.4); border-radius: 8px; padding: 0 54px 0 12px; color: #FFD700; font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);"
+                                oninput="updateCustomSellCalculations()"
+                            />
+                            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.72rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace; pointer-events: none;">
+                                CAI
+                            </span>
                         </div>
-                    </div>
-                    <div style="font-size: 0.72rem; color: #CBD5E1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 12px; line-height: 1.4; text-align: center;">
-                        ✓ Live USDT transferred straight to your connected Web3 wallet.
+
+                        <!-- Quick Percentage Chips -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px;">
+                            <button type="button" onclick="setCustomSellPercent(25)" style="height: 26px; border-radius: 6px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); color: #FFD700; font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: 'Space Mono', monospace;">25%</button>
+                            <button type="button" onclick="setCustomSellPercent(50)" style="height: 26px; border-radius: 6px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); color: #FFD700; font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: 'Space Mono', monospace;">50%</button>
+                            <button type="button" onclick="setCustomSellPercent(75)" style="height: 26px; border-radius: 6px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); color: #FFD700; font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: 'Space Mono', monospace;">75%</button>
+                            <button type="button" onclick="setCustomSellPercent(100)" style="height: 26px; border-radius: 6px; background: linear-gradient(135deg, rgba(245, 166, 35, 0.25), rgba(217, 119, 6, 0.35)); border: 1px solid #FFD700; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: 'Space Mono', monospace;">MAX</button>
+                        </div>
+
+                        <!-- Live Calculations Card -->
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #8C9BAE;">Gross Value:</span>
+                                <span id="cSellGrossUsdt" style="color: #FFFFFF; font-family: 'Space Mono', monospace; font-weight: 700;">$${defaultGrossUsdt.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #8C9BAE;">10% Protocol Fee:</span>
+                                <span id="cSellFeeUsdt" style="color: #F5A623; font-family: 'Space Mono', monospace; font-weight: 700;">-$${defaultFeeUsdt.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 7px; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                                <span style="color: #00FF88; font-weight: 800;">Est. Delivered to Wallet:</span>
+                                <span id="cSellNetUsdt" style="color: #00FF88; font-family: 'Space Mono', monospace; font-weight: 900; font-size: 0.88rem;">$${defaultNetUsdt.toFixed(2)} USDT</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.68rem; color: #8C9BAE; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                                <span>Remaining CAI Holding:</span>
+                                <span id="cSellRemCai" style="color: #FFE082; font-family: 'Space Mono', monospace;">${Math.max(0, DASH_HOLDING_CAI - defaultCai).toFixed(4)} CAI</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #8C9BAE;">
+                                <span>Remaining Capping:</span>
+                                <span id="cSellRemCap" style="color: #6EE7B7; font-family: 'Space Mono', monospace;">$${Math.max(0, DASH_REMAINING_CAPPING - defaultGrossUsdt).toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Error Message Box -->
+                        <div id="customSellErrBox" style="display: none; font-size: 0.70rem; color: #EF4444; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; text-align: center;"></div>
                     </div>
                 `,
                 showCancelButton: true,
-                confirmButtonText: 'EXECUTE SWAP',
+                confirmButtonText: 'CONFIRM &amp; SIGN ON-CHAIN',
                 cancelButtonText: 'CANCEL',
                 buttonsStyling: false,
                 background: '#080A10',
@@ -3133,16 +3188,112 @@
                     actions: 'mecha-swal-actions',
                     confirmButton: 'mecha-swal-confirm',
                     cancelButton: 'mecha-swal-cancel'
+                },
+                didOpen: () => {
+                    window.updateCustomSellCalculations = function() {
+                        const input = document.getElementById('customSellCaiInput');
+                        const errBox = document.getElementById('customSellErrBox');
+                        const confirmBtn = Swal.getConfirmButton();
+                        if (!input) return;
+
+                        let val = parseFloat(input.value) || 0;
+                        if (val < 0) val = 0;
+
+                        const maxAllowed = DASH_ELIGIBLE_SELL_CAI;
+                        const p = DASH_LIVE_PRICE > 0 ? DASH_LIVE_PRICE : 1.0;
+                        const gross = val * p;
+                        const fee = gross * 0.10;
+                        const net = gross - fee;
+
+                        const remCai = Math.max(0, DASH_HOLDING_CAI - val);
+                        const remCap = Math.max(0, DASH_REMAINING_CAPPING - gross);
+
+                        const grossEl = document.getElementById('cSellGrossUsdt');
+                        const feeEl = document.getElementById('cSellFeeUsdt');
+                        const netEl = document.getElementById('cSellNetUsdt');
+                        const remCaiEl = document.getElementById('cSellRemCai');
+                        const remCapEl = document.getElementById('cSellRemCap');
+
+                        if (grossEl) grossEl.innerText = '$' + gross.toFixed(2);
+                        if (feeEl) feeEl.innerText = '-$' + fee.toFixed(2);
+                        if (netEl) netEl.innerText = '$' + net.toFixed(2) + ' USDT';
+                        if (remCaiEl) remCaiEl.innerText = remCai.toFixed(4) + ' CAI';
+                        if (remCapEl) remCapEl.innerText = '$' + remCap.toFixed(2);
+
+                        if (val <= 0) {
+                            if (errBox) {
+                                errBox.innerText = 'Please enter a CAI amount greater than 0.';
+                                errBox.style.display = 'block';
+                            }
+                            if (confirmBtn) confirmBtn.disabled = true;
+                        } else if (val > DASH_HOLDING_CAI) {
+                            if (errBox) {
+                                errBox.innerText = 'Amount exceeds your Protocol CAI Holding (' + DASH_HOLDING_CAI.toFixed(4) + ' CAI).';
+                                errBox.style.display = 'block';
+                            }
+                            if (confirmBtn) confirmBtn.disabled = true;
+                        } else if (val > (maxAllowed + 0.0001)) {
+                            if (errBox) {
+                                errBox.innerText = 'Amount exceeds your Active Capping Limit (Max ' + maxAllowed.toFixed(4) + ' CAI).';
+                                errBox.style.display = 'block';
+                            }
+                            if (confirmBtn) confirmBtn.disabled = true;
+                        } else {
+                            if (errBox) errBox.style.display = 'none';
+                            if (confirmBtn) confirmBtn.disabled = false;
+                        }
+                    };
+
+                    window.setCustomSellPercent = function(pct) {
+                        const input = document.getElementById('customSellCaiInput');
+                        if (!input) return;
+                        let target = 0;
+                        if (pct === 100) {
+                            target = DASH_ELIGIBLE_SELL_CAI;
+                        } else {
+                            target = parseFloat(((DASH_ELIGIBLE_SELL_CAI * pct) / 100).toFixed(4));
+                        }
+                        input.value = target;
+                        window.updateCustomSellCalculations();
+                    };
+
+                    window.updateCustomSellCalculations();
+                },
+                preConfirm: () => {
+                    const input = document.getElementById('customSellCaiInput');
+                    const val = parseFloat(input ? input.value : 0);
+                    if (isNaN(val) || val <= 0) {
+                        Swal.showValidationMessage('Please enter a valid CAI amount to sell.');
+                        return false;
+                    }
+                    if (val > DASH_HOLDING_CAI) {
+                        Swal.showValidationMessage('Amount exceeds your Protocol CAI balance.');
+                        return false;
+                    }
+                    if (val > (DASH_ELIGIBLE_SELL_CAI + 0.0001)) {
+                        Swal.showValidationMessage('Amount exceeds your remaining capping limit.');
+                        return false;
+                    }
+                    return val;
                 }
             });
 
-            if (!result.isConfirmed) return;
+            if (!isConfirmed || !customCaiAmount) return;
+
+            // Execute On-Chain Web3 Liquidation with user-entered custom CAI amount
+            await executeCustomSellOnDex(customCaiAmount);
+        }
+
+        /* Execute On-Chain DEX Liquidation for Custom CAI Amount */
+        async function executeCustomSellOnDex(selectedCai) {
+            const btn = document.getElementById('btnDashSellAll');
+            const btnTxt = document.getElementById('btnDashSellAllTxt');
 
             // 1. Resolve Web3 Provider (Direct on mobile DApp, Selector on desktop Web)
             const chosenRawProvider = await resolveWeb3Provider();
             if (!chosenRawProvider) {
                 if (btn) btn.disabled = false;
-                if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
+                if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
                 return;
             }
 
@@ -3178,14 +3329,14 @@
                             }
                         });
                         if (btn) btn.disabled = false;
-                        if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
+                        if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
                         return;
                     }
                 }
 
                 if (btnTxt) btnTxt.innerText = 'REQUESTING SIGNATURE...';
 
-                // 3. Request EIP-712 Signature from Backend
+                // 3. Request EIP-712 Signature from Backend for selected custom CAI amount
                 const userAccount = await signer.getAddress();
                 const sigResp = await fetch('{{ url("/User/Mining/RequestSellSignature") }}', {
                     method: 'POST',
@@ -3194,7 +3345,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
-                        cai_amount: DASH_ELIGIBLE_SELL_CAI,
+                        cai_amount: selectedCai,
                         wallet_address: userAccount
                     })
                 });
@@ -3236,7 +3387,9 @@
                     body: JSON.stringify({
                         tx_hash: receipt.transactionHash,
                         cai_amount: d.caiAmount,
-                        usdt_received: d.estimatedCappingUse
+                        gross_cai: d.grossCai,
+                        usdt_received: d.netUsdt,
+                        gross_usdt: d.grossUsdt
                     })
                 });
 
@@ -3252,8 +3405,9 @@
                             Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAI</strong> on PancakeSwap!
                         </div>
                         <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; text-align: left; font-size: 0.78rem;">
-                            <div style="color: #00FF88; margin-bottom: 5px;">✓ Delivered $${d.estimatedCappingUse.toFixed(2)} USDT directly to wallet.</div>
-                            <div style="color: #FFD700;">✓ Deducted $${d.estimatedCappingUse.toFixed(2)} from active deposit capping.</div>
+                            <div style="color: #00FF88; margin-bottom: 5px;">✓ Delivered $${parseFloat(d.netUsdt).toFixed(2)} USDT directly to wallet.</div>
+                            <div style="color: #FFD700; margin-bottom: 5px;">✓ Protocol Fee (10%): $${parseFloat(d.adminFeeUsdt).toFixed(2)} USDT.</div>
+                            <div style="color: #6EE7B7;">✓ Deducted $${parseFloat(d.grossUsdt).toFixed(2)} from active deposit capping.</div>
                         </div>
                         <div style="text-align: center;">
                             <a href="https://bscscan.com/tx/${receipt.transactionHash}" target="_blank" style="color: #FFD700; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-decoration: underline;">
@@ -3293,7 +3447,7 @@
                     }
                 });
                 if (btn) btn.disabled = false;
-                if (btnTxt) btnTxt.innerText = 'SELL ALL ELIGIBLE (${{ number_format($eligibleSellUsdt, 2) }})';
+                if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
             }
         }
 

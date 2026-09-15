@@ -414,7 +414,7 @@ class PortfolioMiningController extends Controller
         if ($currentCaiBalance < $requestedCai) {
             return response()->json([
                 'status' => 'error',
-                'message' => "Insufficient CAI balance. You have {$currentCaiBalance} CAI."
+                'message' => "Insufficient CAI holding balance. You have {$currentCaiBalance} CAI."
             ], 400);
         }
 
@@ -428,17 +428,25 @@ class PortfolioMiningController extends Controller
         }
 
         $livePrice = $this->getLiveCaiPrice();
-        $requestedUsdtValue = $requestedCai * $livePrice;
-
-        // Smart Capping Guard: Cap sell strictly to remaining capping limit
-        $grossUsdtValue = min($requestedUsdtValue, $runtimeCapping);
-        $grossCaiAmount = round($grossUsdtValue / $livePrice, 6);
-
-        if ($grossCaiAmount <= 0) {
-            return response()->json(['status' => 'error', 'message' => 'Allowed sell amount is 0.'], 400);
+        if ($livePrice <= 0) $livePrice = 1.00;
+        
+        $requestedUsdtValue = round($requestedCai * $livePrice, 4);
+        if ($requestedUsdtValue > ($runtimeCapping + 0.01)) {
+            $maxAllowedCai = round($runtimeCapping / $livePrice, 6);
+            return response()->json([
+                'status' => 'error',
+                'message' => "Requested {$requestedCai} CAI exceeds your active capping limit (\${$runtimeCapping} USDT / max {$maxAllowedCai} CAI)."
+            ], 400);
         }
 
-        // 10% Admin Deduction
+        $grossCaiAmount = round($requestedCai, 6);
+        $grossUsdtValue = min($requestedUsdtValue, $runtimeCapping);
+
+        if ($grossCaiAmount <= 0 || $grossUsdtValue <= 0) {
+            return response()->json(['status' => 'error', 'message' => 'Sell amount must be greater than 0.'], 400);
+        }
+
+        // 10% Protocol / Admin Deduction
         $adminFeeRate = 0.10;
         $adminFeeUsdt = round($grossUsdtValue * $adminFeeRate, 4);
         $adminFeeCai = round($grossCaiAmount * $adminFeeRate, 6);
@@ -447,10 +455,10 @@ class PortfolioMiningController extends Controller
         $netCaiToSell = round($grossCaiAmount - $adminFeeCai, 6);
 
         if ($netCaiToSell <= 0 || $netUsdtValue <= 0) {
-            return response()->json(['status' => 'error', 'message' => 'Net claim amount after 10% admin deduction is 0.'], 400);
+            return response()->json(['status' => 'error', 'message' => 'Net claim amount after 10% protocol deduction is 0.'], 400);
         }
 
-        // Slippage Protection: 2% slippage on net amount
+        // Slippage Protection: 2% slippage on net DEX swap
         $minUsdtOut = round($netUsdtValue * 0.98, 6);
 
         // Convert to Wei (18 Decimals for CAI and BSC-USDT)
