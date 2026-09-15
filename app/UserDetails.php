@@ -451,13 +451,24 @@ class UserDetails extends Model
             ->distinct('user_details.id')
             ->count('user_details.id');
 
-        $dailyQual = ($selfInv >= 100 && $directs100 >= 1);
+        $todayStart = \Carbon\Carbon::today()->startOfDay();
+        $todayEnd = \Carbon\Carbon::today()->endOfDay();
+        $todayDirects100 = \App\UserDetails::where('user_details.sponsorid', $this->userid)
+            ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
+            ->where('sd.usdt', '>=', 100)
+            ->where('sd.status', 1)
+            ->whereBetween('sd.created_at', [$todayStart, $todayEnd])
+            ->distinct('user_details.id')
+            ->count('user_details.id');
+
+        $dailyQual = ($selfInv >= 100 && $todayDirects100 >= 1);
         $weeklyQual = ($selfInv >= 100 && $directs100 >= 5);
         $monthlyQual = ($selfInv >= 100 && $directs100 >= 15 && $power >= 5000 && $weaker >= 5000);
 
         return [
             'self_investment' => $selfInv,
             'directs_100' => $directs100,
+            'today_directs_100' => $todayDirects100,
             'power_leg' => $power,
             'weaker_leg' => $weaker,
             'daily' => [
@@ -468,8 +479,8 @@ class UserDetails extends Model
                 'req_self' => 100,
                 'current_self' => $selfInv,
                 'req_directs' => 1,
-                'current_directs' => $directs100,
-                'progress_pct' => min(100, round((min($selfInv / 100, $directs100 / 1)) * 100)),
+                'current_directs' => $todayDirects100,
+                'progress_pct' => min(100, round((min($selfInv / 100, $todayDirects100 / 1)) * 100)),
             ],
             'weekly' => [
                 'name' => 'Weekly Pool',

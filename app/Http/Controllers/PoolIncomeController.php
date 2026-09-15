@@ -44,7 +44,7 @@ class PoolIncomeController extends Controller
             return;
         }
 
-        // 1. Get all deposits created in yesterday's period
+        // 1. Get all deposits created in yesterday's period (includes all $50+, $100+, etc. in total turnover)
         $depositsInPeriod = StackingDeposite::where('status', 1)
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->get();
@@ -52,16 +52,27 @@ class PoolIncomeController extends Controller
         $totalTurnover = (float) $depositsInPeriod->sum('usdt');
         $poolAmount = ($totalTurnover * (float) $pool->pool_percent) / 100;
 
-        // 2. Find Sponsors of the users who staked in this period
+        // 2. Find Sponsors of the users who staked >= $100 in this period
+        $minDirectDeposit = isset($pool->min_direct_amount) && (float) $pool->min_direct_amount > 0 ? (float) $pool->min_direct_amount : 100.00;
+        $minSelfInvestment = isset($pool->min_self_investment) && (float) $pool->min_self_investment > 0 ? (float) $pool->min_self_investment : 100.00;
+
         $eligibleUserMap = [];
         foreach ($depositsInPeriod as $dep) {
+            // Direct deposit must be at least $100 for the sponsor to be eligible for daily pool
+            if ((float) $dep->usdt < $minDirectDeposit) {
+                continue;
+            }
+
             $stakedUser = UserDetails::where('id', $dep->userid)->orWhere('userid', $dep->userid)->first();
             if ($stakedUser && $stakedUser->sponsorid > 0) {
                 $sponsor = UserDetails::where('id', $stakedUser->sponsorid)->orWhere('userid', $stakedUser->sponsorid)->first();
                 if ($sponsor) {
                     // Check Sponsor's own qualification: Active user, not capped out, self investment >= min_self_investment ($100)
-                    if ($sponsor->userstatus == 1 && $sponsor->capping != 1 && (float) $sponsor->current_self_investment >= (float) $pool->min_self_investment) {
-                        $eligibleUserMap[$sponsor->id] = $sponsor;
+                    if ($sponsor->userstatus == 1 && $sponsor->capping != 1 && (float) $sponsor->current_self_investment >= $minSelfInvestment) {
+                        $remCap = !is_null($sponsor->remainingCapping()) ? (float) $sponsor->remainingCapping() : 0.00;
+                        if ($remCap > 0) {
+                            $eligibleUserMap[$sponsor->id] = $sponsor;
+                        }
                     }
                 }
             }

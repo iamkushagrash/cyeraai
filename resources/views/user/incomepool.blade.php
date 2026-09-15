@@ -464,7 +464,7 @@
                                 {{ $dQual['is_qualified'] ? 'ACTIVE' : 'LOCK' }}
                             </span>
                         </div>
-                        <div class="qual-mini-req">Self: <b>${{ number_format($dQual['current_self'], 0) }}/100</b></div>
+                        <div class="qual-mini-req">Today: <b>{{ $dQual['current_directs'] }}/1 Dir ($100+)</b></div>
                         <div class="qual-mini-progress">
                             <div class="qual-mini-progress-fill" style="width: {{ $dQual['progress_pct'] }}%; background: #3B82F6;"></div>
                         </div>
