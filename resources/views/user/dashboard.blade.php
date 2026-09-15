@@ -2559,9 +2559,13 @@
            ============================================================ */
         let DASH_UNMINED_USDT = {{ (float) $unminedRoiUsdt }};
         let DASH_CAI_PRICE = {{ (float) $caiPrice }};
+        let DASH_LIVE_PRICE = {{ (float) $caiPrice }};
         let DASH_ELIGIBLE_SELL_CAI = {{ (float) $eligibleSellCai }};
         let DASH_ELIGIBLE_SELL_USDT = {{ (float) $eligibleSellUsdt }};
         let DASH_PROTOCOL_HOLDING_CAI = {{ (float) $protocolHoldingCai }};
+        let DASH_HOLDING_CAI = {{ (float) $protocolHoldingCai }};
+        let DASH_HOLDING_USDT = {{ (float) $protocolHoldingUsdt }};
+        let DASH_REMAINING_CAPPING = {{ (float) ($totalRemainingCapping ?? $eligibleSellUsdt) }};
         const DASH_MINING_ENGINE = "{{ $miningEngineContract }}";
 
         const DASH_MINING_ABI = [
@@ -2577,9 +2581,13 @@
                     const d = json.data;
                     DASH_UNMINED_USDT = parseFloat(d.unmined_usdt) || 0;
                     DASH_CAI_PRICE = parseFloat(d.live_cai_price) || 1.0;
+                    DASH_LIVE_PRICE = DASH_CAI_PRICE;
                     DASH_ELIGIBLE_SELL_CAI = parseFloat(d.max_sellable_cai) || 0;
                     DASH_ELIGIBLE_SELL_USDT = parseFloat(d.max_sellable_usdt) || 0;
                     DASH_PROTOCOL_HOLDING_CAI = parseFloat(d.holding_cai_balance) || 0;
+                    DASH_HOLDING_CAI = DASH_PROTOCOL_HOLDING_CAI;
+                    DASH_HOLDING_USDT = parseFloat(d.holding_value_usdt) || (DASH_HOLDING_CAI * DASH_CAI_PRICE);
+                    DASH_REMAINING_CAPPING = parseFloat(d.remaining_capping) || DASH_ELIGIBLE_SELL_USDT;
 
                     // 1. Update Header Live Price Badge
                     const hpEl = document.getElementById('dashLiveHeaderPrice');
@@ -2631,12 +2639,12 @@
                             btnSell.disabled = false;
                             btnSell.style.opacity = '1';
                             btnSell.style.cursor = 'pointer';
-                            btnSellTxt.innerText = 'SELL ALL ELIGIBLE ($' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ')';
+                            btnSellTxt.innerText = 'SELL CAI ON DEX ($' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ')';
                         } else {
                             btnSell.disabled = true;
                             btnSell.style.opacity = '0.4';
                             btnSell.style.cursor = 'not-allowed';
-                            btnSellTxt.innerText = 'SELL ALL ELIGIBLE ($0.00)';
+                            btnSellTxt.innerText = 'SELL CAI ON DEX ($0.00)';
                         }
                     }
                 }
