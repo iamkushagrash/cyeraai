@@ -278,13 +278,13 @@ class WithdrawInfoController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Minimum working income withdrawal limit is $1.00 USDT.'], 400);
         }
 
-        // Available Working Balance Check
-        $workingBalance = (float) (
-            $userDetail->levelIncome()->where('status', 0)->sum('remaining_usdt') +
-            $userDetail->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt') +
-            $userDetail->clubIncome()->where('status', 0)->sum('remaining_usdt') +
-            $userDetail->lifetimeIncome()->where('status', 0)->sum('remaining')
-        );
+        // Available Working Balance Check (Level + Direct Bonus + Global Pool + Rank Income)
+        $poolRemaining = (float)\App\PoolIncome::where('userid', $userDetail->id)->where('status', 0)->sum('remaining_usdt') + (float)$userDetail->clubIncome()->where('status', 0)->sum('remaining_usdt');
+        $rankRemaining = (float)\App\RankIncome::where('userid', $userDetail->id)->where('status', 0)->sum('remaining_usdt') + (float)$userDetail->lifetimeIncome()->where('status', 0)->sum('remaining');
+        $levelRemaining = (float)$userDetail->levelIncome()->where('status', 0)->sum('remaining_usdt');
+        $bonusRemaining = (float)$userDetail->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt');
+
+        $workingBalance = $levelRemaining + $bonusRemaining + $poolRemaining + $rankRemaining;
 
         if ($workingBalance < $grossAmount) {
             return response()->json([

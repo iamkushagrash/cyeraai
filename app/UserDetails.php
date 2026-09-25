@@ -37,24 +37,44 @@ class UserDetails extends Model
         return $this->hasMany('\App\ClubIncome', 'userid', 'id')->get();
     }
 
+    public function poolIncome()
+    {
+        return $this->hasMany('\App\PoolIncome', 'userid', 'id')->get();
+    }
+
+    public function rankIncome()
+    {
+        return $this->hasMany('\App\RankIncome', 'userid', 'id')->get();
+    }
+
     public function totalIncome()
     {
-        return $this->stackingIncome()->sum('amount') + $this->levelIncome()->sum('amount') + $this->bonusReward()->sum('amount') + $this->clubIncome()->sum('amount');
+        return $this->stackingIncome()->sum('amount') + $this->levelIncome()->sum('amount') + $this->bonusReward()->sum('amount') + $this->clubIncome()->sum('amount') + $this->poolIncome()->sum('amount') + $this->rankIncome()->sum('amount');
     }
 
     public function totalIncomeUSDT()
     {
-        return $this->stackingIncome()->sum('amt_usdt') + $this->levelIncome()->sum('amt_usdt') + $this->bonusReward()->sum('amt_usdt') + $this->clubIncome()->sum('amt_usdt');
+        return $this->stackingIncome()->sum('amt_usdt') + $this->levelIncome()->sum('amt_usdt') + $this->bonusReward()->sum('amt_usdt') + $this->clubIncome()->sum('amt_usdt') + $this->poolIncome()->sum('amt_usdt') + $this->rankIncome()->sum('amt_usdt');
     }
 
     public function remainingIncome()
     {
-        return $this->stackingIncome()->where('status', 0)->sum('remaining_usdt') + $this->levelIncome()->where('status', 0)->sum('remaining_usdt') + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt');
+        return $this->stackingIncome()->where('status', 0)->sum('remaining_usdt') 
+            + $this->levelIncome()->where('status', 0)->sum('remaining_usdt') 
+            + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
+            + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt');
     }
 
-    /*public function remainingIncome(){
-        return $this->stackingIncome()->where('status',0)->sum('remaining_usdt')+$this->levelIncome()->where('status',0)->sum('remaining_usdt')+$this->bonusReward()->where('status','!=',3)->sum('remaining_usdt')+$this->clubIncome()->where('status',0)->sum('remaining_usdt');
-    }*/
+    public function workingRemainingIncome()
+    {
+        return $this->levelIncome()->where('status', 0)->sum('remaining_usdt') 
+            + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
+            + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt');
+    }
 
     public function lockedIncome()
     {
