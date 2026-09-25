@@ -42,11 +42,6 @@ class UserDetails extends Model
         return $this->hasMany('\App\PoolIncome', 'userid', 'id')->get();
     }
 
-    public function rankIncome()
-    {
-        return $this->hasMany('\App\RankIncome', 'userid', 'id')->get();
-    }
-
     public function totalIncome()
     {
         return $this->stackingIncome()->sum('amount') + $this->levelIncome()->sum('amount') + $this->bonusReward()->sum('amount') + $this->clubIncome()->sum('amount') + $this->poolIncome()->sum('amount') + $this->rankIncome()->sum('amount');
