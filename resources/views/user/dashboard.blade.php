@@ -641,7 +641,7 @@
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>Governance Rights</span>
+                                    <span>Global Pool on V3</span>
                                 </div>
                             </div>
                         </div>
@@ -715,7 +715,7 @@
                             </div>
 
                             <!-- MINI CARD 2: CORE MEMBER -->
-                            <div style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 10px; padding: 8px 9px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                            <div style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 10px; padding: 8px 9px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6); ">
                                 <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #00D2FF, transparent);"></div>
 
                                 <!-- Top: Icon, Title & Badge -->
@@ -743,7 +743,7 @@
                                     <!-- Mini Perk -->
                                     <div style="font-size: 0.54rem; color: #CBD5E1; line-height: 1.25; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Governance Rights</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Global Pool on V3</span>
                                     </div>
                                 </div>
 
