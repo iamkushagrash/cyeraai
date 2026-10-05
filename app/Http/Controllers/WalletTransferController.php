@@ -35,11 +35,13 @@ class WalletTransferController extends Controller
         $daoMultiplier = 1;
         $daoTitle = '';
 
-        $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
-        $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+        $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
+        $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
+        $diamondCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
+        $coreCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
 
         if ($daoParam === 'diamond' || $daoParam === '1') {
-            if ($diamondCount >= 20) {
+            if ($diamondCount >= ($diamondDao->max_members ?? 20)) {
                 return redirect('/User/Dashboard')->with('warning', 'Diamond Club slots are currently full (20/20).');
             }
             $daoType = 1;
@@ -47,7 +49,7 @@ class WalletTransferController extends Controller
             $daoMultiplier = 4;
             $daoTitle = 'Diamond Club Member';
         } elseif ($daoParam === 'core' || $daoParam === '2') {
-            if ($coreCount >= 100) {
+            if ($coreCount >= ($coreDao->max_members ?? 100)) {
                 return redirect('/User/Dashboard')->with('warning', 'Core Member slots are currently full (100/100).');
             }
             $daoType = 2;
@@ -114,8 +116,9 @@ class WalletTransferController extends Controller
         $daoType = intval($request->dao_type ?? 0);
         if ($daoType === 1) {
             // Diamond Club: Fixed $10,000 & Max 20 slots
-            $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
-            if ($diamondCount >= 20) {
+            $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
+            $dCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
+            if ($dCount >= ($diamondDao->max_members ?? 20)) {
                 return redirect('/User/Stake?dao=diamond')->with('warning', 'Diamond Club slots are currently full (20/20).');
             }
             if (floatval($request->amount) != 10000) {
@@ -123,8 +126,9 @@ class WalletTransferController extends Controller
             }
         } elseif ($daoType === 2) {
             // Core Member: Fixed $3,333 & Max 100 slots
-            $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
-            if ($coreCount >= 100) {
+            $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
+            $cCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
+            if ($cCount >= ($coreDao->max_members ?? 100)) {
                 return redirect('/User/Stake?dao=core')->with('warning', 'Core Member slots are currently full (100/100).');
             }
             if (floatval($request->amount) != 3333) {
@@ -209,17 +213,7 @@ class WalletTransferController extends Controller
                     $userUpdatePayload = ['userstatus' => 1, 'capping' => 0, 'roi_status' => 1];
                     if ($daoType > 0) {
                         $userUpdatePayload['is_dao'] = $daoType;
-                        DB::table('dao_qualifications')->insert([
-                            'userid' => $targetUserId,
-                            'user_uuid' => $userUpdate->first()->user()->uuid ?? null,
-                            'dao_type' => $daoType,
-                            'amount' => $request->amount,
-                            'capping_multiplier' => $userMultiplier,
-                            'capping_amount' => $totalCapAmount,
-                            'status' => 1,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                        DB::table('dao_qualifications')->where('id', $daoType)->increment('total_qualified', 1);
                     }
                     $userUpdate->update($userUpdatePayload);
 
@@ -302,8 +296,9 @@ class WalletTransferController extends Controller
                 'targetUserId' => ['nullable', 'string'],
                 'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
             ]);
-            $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
-            if ($diamondCount >= 20) {
+            $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
+            $dCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
+            if ($dCount >= ($diamondDao->max_members ?? 20)) {
                 return response()->json(['status' => 'error', 'message' => 'Diamond Club slots are currently full (20/20).'], 400);
             }
             if (floatval($request->amount) != 10000) {
@@ -317,8 +312,9 @@ class WalletTransferController extends Controller
                 'targetUserId' => ['nullable', 'string'],
                 'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
             ]);
-            $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
-            if ($coreCount >= 100) {
+            $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
+            $cCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
+            if ($cCount >= ($coreDao->max_members ?? 100)) {
                 return response()->json(['status' => 'error', 'message' => 'Core Member slots are currently full (100/100).'], 400);
             }
             if (floatval($request->amount) != 3333) {
@@ -521,17 +517,7 @@ class WalletTransferController extends Controller
             ];
             if ($daoType > 0) {
                 $targetUserUpdatePayload['is_dao'] = $daoType;
-                \DB::table('dao_qualifications')->insert([
-                    'userid' => $targetUserId,
-                    'user_uuid' => $targetUserDetail->user() ? $targetUserDetail->user()->uuid : null,
-                    'dao_type' => $daoType,
-                    'amount' => $amount,
-                    'capping_multiplier' => $userMultiplier,
-                    'capping_amount' => $totalCapAmount,
-                    'status' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                \DB::table('dao_qualifications')->where('id', $daoType)->increment('total_qualified', 1);
             }
             $targetUserDetail->update($targetUserUpdatePayload);
 

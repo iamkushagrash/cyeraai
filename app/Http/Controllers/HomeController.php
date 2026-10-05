@@ -233,9 +233,16 @@ class HomeController extends Controller
         $userAsset = \App\AssetDetail::where('userid', Session::get('user.id'))->first();
         $usrRaw['userWallet'] = $userAsset->usdtbep20addr ?? ($userAsset->bep20addr ?? '');
 
-        // DAO Counts & Status
-        $usrRaw['diamondDaoCount'] = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
-        $usrRaw['coreDaoCount'] = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+        // DAO Qualification Tiers & Status
+        $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
+        $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
+        $dUserCount = DB::table('user_details')->where('is_dao', 1)->count();
+        $cUserCount = DB::table('user_details')->where('is_dao', 2)->count();
+
+        $usrRaw['diamondDaoCount'] = max($dUserCount, $diamondDao->total_qualified ?? 0);
+        $usrRaw['coreDaoCount'] = max($cUserCount, $coreDao->total_qualified ?? 0);
+        $usrRaw['diamondDao'] = $diamondDao;
+        $usrRaw['coreDao'] = $coreDao;
         $usrRaw['userDaoStatus'] = $userDetail->is_dao ?? 0;
 
         return view('user.dashboard')->with('data',$usrRaw);
