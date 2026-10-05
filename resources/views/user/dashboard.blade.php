@@ -658,8 +658,13 @@
                  3A. ULTRA-COMPACT 1-LINE REFERRAL LINK BAR
                  ============================================================ -->
                 @php
+                    $dashWallet = $data['userWallet'] ?? null;
+                    if (empty($dashWallet)) {
+                        $dashAsset = \App\AssetDetail::where('userid', Session::get('user.id'))->first();
+                        $dashWallet = $dashAsset->usdtbep20addr ?? ($dashAsset->bep20addr ?? null);
+                    }
                     $dashUserUuid = Session::get('user.userid') ?? ($data['userDetail']->user()->uuid ?? 'CAI000001');
-                    $dashReferralUrl = url('/register/' . $dashUserUuid);
+                    $dashReferralUrl = !empty($dashWallet) ? url('/register?ref=' . $dashWallet) : url('/register/' . $dashUserUuid);
                 @endphp
                 <div class="hud-referral-compact-line" style="margin-bottom: 20px;">
                     <div
@@ -3515,6 +3520,49 @@
 
             } catch (err) {
                 console.debug('Dex telemetry update error:', err);
+            }
+        }
+
+        // ============================================================
+        // DASHBOARD REFERRAL LINK CLIPBOARD COPY
+        // ============================================================
+        function copyDashRefLink() {
+            const input = document.getElementById('dashRefInput');
+            if (!input) return;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    handleDashCopySuccess();
+                }).catch(() => {
+                    document.execCommand('copy');
+                    handleDashCopySuccess();
+                });
+            } else {
+                document.execCommand('copy');
+                handleDashCopySuccess();
+            }
+        }
+
+        function handleDashCopySuccess() {
+            const btnTxt = document.getElementById('dashCopyBtnText');
+            if (btnTxt) {
+                const orig = btnTxt.innerText;
+                btnTxt.innerText = 'COPIED!';
+                setTimeout(() => {
+                    btnTxt.innerText = orig;
+                }, 2000);
+            }
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copied!',
+                    text: 'Referral link copied to clipboard.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: { popup: 'mecha-swal-popup', title: 'mecha-swal-title' }
+                });
             }
         }
 

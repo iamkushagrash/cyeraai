@@ -38,7 +38,6 @@
                                     <div class="card-user-info">
                                         <span class="card-index-tag">#{{ $i }}</span>
                                         <span class="card-user-id"><i class="fas fa-fingerprint"></i> {{ $row->userid }}</span>
-                                        <span class="card-user-name">{{ $row->usersname }}</span>
                                     </div>
                                     <div class="card-status-wrap">
                                         <span class="status-pill {{ $pillClass }}">

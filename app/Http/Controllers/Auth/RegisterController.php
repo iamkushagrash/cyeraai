@@ -55,15 +55,78 @@ class RegisterController extends Controller
      * @param  string|null  $userid
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
+    /**
+     * Show the application registration form with sponsor & wallet pre-fill support.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string|null  $userid
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
     public function showRegistrationForm(Request $request, $userid = null)
     {
-        $ref = $userid ?: $request->query('ref', $request->query('sponsor', ''));
+        $ref = $userid ?: $request->query('ref', $request->query('sponsor', $request->query('referral', '')));
         $wallet = $request->query('wallet', '');
 
         return view('auth.register', [
             'userid' => $ref,
             'wallet' => $wallet
         ]);
+    }
+
+    /**
+     * Helper to find a sponsor User by Wallet Address (BEP-20 / USDT-BEP20), UUID, or Email
+     *
+     * @param string $ref
+     * @return \App\User|null
+     */
+    public static function resolveSponsorUser($ref)
+    {
+        $ref = trim($ref);
+        if (empty($ref)) {
+            return null;
+        }
+
+        $refLower = strtolower($ref);
+
+        // 1. Check if ref is a BEP-20 wallet address (0x...)
+        if (preg_match('/^0x[a-fA-F0-9]{40}$/', $ref)) {
+            $asset = AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$refLower])
+                ->orWhereRaw('LOWER(bep20addr) = ?', [$refLower])
+                ->first();
+
+            if ($asset) {
+                $uDetail = UserDetails::where('id', $asset->userid)->orWhere('userid', $asset->userid)->first();
+                if ($uDetail) {
+                    $u = User::find($uDetail->userid);
+                    if ($u) return $u;
+                }
+            }
+        }
+
+        // 2. Lookup by UUID or Email
+        $user = User::where('uuid', $ref)
+            ->orWhereRaw('LOWER(uuid) = ?', [$refLower])
+            ->orWhere('email', $ref)
+            ->orWhereRaw('LOWER(email) = ?', [$refLower])
+            ->first();
+
+        if ($user) {
+            return $user;
+        }
+
+        // 3. Fallback: check asset_details if ref without 0x or any matching address
+        $asset = AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$refLower])
+            ->orWhereRaw('LOWER(bep20addr) = ?', [$refLower])
+            ->first();
+
+        if ($asset) {
+            $uDetail = UserDetails::where('id', $asset->userid)->orWhere('userid', $asset->userid)->first();
+            if ($uDetail) {
+                return User::find($uDetail->userid);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -75,30 +138,23 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name'           => ['required', 'string', 'max:255'],
+            'name'           => ['nullable', 'string', 'max:255'],
             'email'          => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'referrer'       => ['required', 'string'],
             'contact'        => ['nullable'],
             'countrycode'    => ['nullable', 'string'],
             'wallet_address' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/'],
         ], [
-            'referrer.required'       => 'Sponsor ID is required for registration.',
+            'referrer.required'       => 'Sponsor Wallet Address is required for registration.',
             'wallet_address.required' => 'Web3 Wallet connection is required to register.',
             'wallet_address.regex'    => 'Invalid BEP-20 Web3 wallet address format.',
-            'name.required'           => 'Full name is required.',
             'email.unique'            => 'This email address is already registered.',
         ])->after(function ($validator) use ($data) {
-            // Check Sponsor ID validity
+            // Check Sponsor validity (Wallet address or UUID)
             if (!empty($data['referrer'])) {
-                $ref = trim($data['referrer']);
-                $guiderUser = User::where('uuid', $ref)
-                    ->orWhereRaw('LOWER(uuid) = ?', [strtolower($ref)])
-                    ->orWhere('email', $ref)
-                    ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
-                    ->first();
-
-                if (is_null($guiderUser)) {
-                    $validator->errors()->add('referrer', 'Invalid Sponsor ID. Please verify and enter a valid Sponsor code.');
+                $sponsorUser = self::resolveSponsorUser($data['referrer']);
+                if (is_null($sponsorUser)) {
+                    $validator->errors()->add('referrer', 'Invalid Sponsor Wallet Address / ID. Please verify and enter a valid Sponsor.');
                 }
             }
 
@@ -127,13 +183,7 @@ class RegisterController extends Controller
         set_time_limit(0);
         $guiderid = 0;
         if (!empty($data['referrer'])) {
-            $ref = trim($data['referrer']);
-            $guiderUser = User::where('uuid', $ref)
-                ->orWhereRaw('LOWER(uuid) = ?', [strtolower($ref)])
-                ->orWhere('email', $ref)
-                ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
-                ->first();
-
+            $guiderUser = self::resolveSponsorUser($data['referrer']);
             if ($guiderUser) {
                 $guiderDetail = UserDetails::where('userid', $guiderUser->id)->first();
                 $guiderid = $guiderDetail ? $guiderDetail->id : $guiderUser->id;
@@ -146,9 +196,13 @@ class RegisterController extends Controller
         $defaultPassword = 'CY@' . rand(100000, 999999);
         $userPassword = !empty($data['password']) ? $data['password'] : $defaultPassword;
 
+        // Auto-assign display name from wallet address if name not provided
+        $walletAddr = !empty($data['wallet_address']) ? $data['wallet_address'] : '';
+        $userName = !empty($data['name']) ? $data['name'] : (!empty($walletAddr) ? substr($walletAddr, 0, 6) . '...' . substr($walletAddr, -4) : 'Cyera Member');
+
         $randomId = $this->randomid();
         $user = User::create([
-            'usersname'         => $data['name'],
+            'usersname'         => $userName,
             'email'             => $userEmail,
             'contact'           => $userContact,
             'ccode'             => !empty($data['countrycode']) ? $data['countrycode'] : '+91',
@@ -187,7 +241,6 @@ class RegisterController extends Controller
         ]);
 
         // Auto-bind wallet address if present (from Web3 session or form)
-        $walletAddr = !empty($data['wallet_address']) ? $data['wallet_address'] : null;
         AssetDetail::create([
             'userid'        => $newDetail->id,
             'bep20addr'     => $walletAddr ?: '',
@@ -206,7 +259,7 @@ class RegisterController extends Controller
         $details['uid'] = $newDetail->id;
         $details['email'] = $user->email;
         $details['contact'] = $userContact;
-        $details['name'] = $data['name'];
+        $details['name'] = $userName;
         $details['referrerid'] = $data['referrer'];
         $details['uniqueid'] = $randomId;
         $details['view'] = 'welcomeMail';
@@ -246,7 +299,6 @@ class RegisterController extends Controller
             'username' => $user->email,
             'password' => $plainPassword,
             'uniqueid' => $user->uuid,
-            'name'     => $user->usersname,
             'wallet'   => $request->wallet_address
         ];
 
@@ -254,7 +306,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Live AJAX Sponsor lookup by UUID or email
+     * Live AJAX Sponsor lookup by Wallet Address (0x...), UUID, or Email
      *
      * @param  string  $id
      * @return \Illuminate\Http\JsonResponse
@@ -265,32 +317,45 @@ class RegisterController extends Controller
         if (strlen($id) < 4) {
             return response()->json([
                 'status'  => 1,
-                'message' => 'Sponsor ID is too short'
+                'message' => 'Sponsor input is too short'
             ]);
         }
 
-        $user = User::where('uuid', $id)
-            ->orWhereRaw('LOWER(uuid) = ?', [strtolower($id)])
-            ->orWhere('email', $id)
-            ->orWhereRaw('LOWER(email) = ?', [strtolower($id)])
-            ->first();
+        $user = self::resolveSponsorUser($id);
 
         if (is_null($user)) {
             return response()->json([
                 'status'  => 1,
-                'message' => 'Invalid Sponsor ID'
+                'message' => 'Invalid Sponsor Wallet Address'
             ]);
         }
 
+        // Get sponsor wallet address for clean verified display (NO name returned)
+        $sponsorDetail = UserDetails::where('userid', $user->id)->first();
+        $sponsorWallet = '';
+        if ($sponsorDetail) {
+            $asset = AssetDetail::where('userid', $sponsorDetail->id)->first();
+            if ($asset && !empty($asset->usdtbep20addr)) {
+                $sponsorWallet = $asset->usdtbep20addr;
+            } elseif ($asset && !empty($asset->bep20addr)) {
+                $sponsorWallet = $asset->bep20addr;
+            }
+        }
+
+        $displayTag = !empty($sponsorWallet) 
+            ? (substr($sponsorWallet, 0, 6) . '...' . substr($sponsorWallet, -4)) 
+            : $user->uuid;
+
         return response()->json([
-            'status' => 0,
-            'name'   => $user->usersname,
-            'uuid'   => $user->uuid
+            'status'  => 0,
+            'display' => $displayTag,
+            'wallet'  => $sponsorWallet,
+            'uuid'    => $user->uuid
         ]);
     }
 
     /**
-     * Referral link redirector
+     * Referral link redirector (supports wallet address or UUID)
      *
      * @param  string  $userid
      * @return \Illuminate\Http\RedirectResponse

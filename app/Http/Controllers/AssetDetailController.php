@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\UserDetails;
 use App\User;
+use App\AssetDetail;
 use DB;
 use Session;
 use Illuminate\Support\Str;
@@ -61,12 +62,10 @@ class AssetDetailController extends Controller
                 $uid=array($usrid);
                 for($i=1;$i<1000;$i++){
                     
-                        //$rData=DB::table('users')
-                        //->whereIn('ud.sponsorid',$uid)
                         $rData=\App\User::whereIn('ud.sponsorid',$uid)
                         ->join('user_details as ud','users.id','=','ud.userid')
                         ->join('users as gu','ud.sponsorid','=','gu.id')
-                        ->select('users.id as id','users.usersname as name','users.email as email','users.uuid as userid','ud.current_self_investment as current','ud.leveluser as leveluser', 'users.permission as permission'/*,'gu.usersname as guidername','gu.user_gf as guidergf'*/)
+                        ->select('users.id as id','users.usersname as name','users.email as email','users.uuid as userid','ud.current_self_investment as current','ud.leveluser as leveluser', 'users.permission as permission')
                         ->selectRaw('"Level-'. $i.'" as level,DATE_FORMAT(users.doj,"%d-%m-%Y") as doj')
                         ->selectRaw('case when ud.userstatus=0 then "Inactive" when ud.userstatus=1 then "Active" end as status')
                         ->selectRaw('case when ud.userstatus=0 then "status-cancelled" when ud.userstatus=1 then "status-complete" end as statusclass')
@@ -82,7 +81,6 @@ class AssetDetailController extends Controller
                         }
 
                 }
-                /*dd($ar);*/
                 return view('control.userall')->with('data',$ar);
             } 
     }
@@ -137,99 +135,102 @@ class AssetDetailController extends Controller
             'status' => true,
             'data' => $all
         ]);
-
- 
     }
-
-
-
-
 
     //User Referral & Invite Page
     public function userReferralPage(){
         $user = \App\UserDetails::where('id', \Session::get('user.id'))->first();
         $totalDirects = \App\UserDetails::where('sponsorid', \Session::get('user.uuid'))->count();
         $activeDirects = \App\UserDetails::where('sponsorid', \Session::get('user.uuid'))->where('userstatus', 1)->count();
-        return view('user.referral')->with('user', $user)->with('totalDirects', $totalDirects)->with('activeDirects', $activeDirects);
+        
+        $asset = \App\AssetDetail::where('userid', \Session::get('user.id'))->first();
+        $userWallet = '';
+        if ($asset && !empty($asset->usdtbep20addr)) {
+            $userWallet = $asset->usdtbep20addr;
+        } elseif ($asset && !empty($asset->bep20addr)) {
+            $userWallet = $asset->bep20addr;
+        } else {
+            $userWallet = \Session::get('user.walletaddress') ?? \Session::get('user.uuid', 'CYERA');
+        }
+
+        return view('user.referral')
+            ->with('user', $user)
+            ->with('totalDirects', $totalDirects)
+            ->with('activeDirects', $activeDirects)
+            ->with('userWallet', $userWallet);
     }
 
     public function userNewRegistrationPage(){
-        /*$user=\App\UserDetails::where('id',\Session::get('user.id'))->first();
-        if($user->userstatus!=1){
-            return redirect()->back()->with('warning','Sponsor not activated. Please activate first'); 
-        }*/
         $details=NULL;
-        return view('user.newregistration')->with('details',$details);
+        $asset = \App\AssetDetail::where('userid', \Session::get('user.id'))->first();
+        $myWallet = ($asset && !empty($asset->usdtbep20addr)) ? $asset->usdtbep20addr : (\Session::get('user.walletaddress') ?? \Session::get('user.uuid'));
+        return view('user.newregistration')->with('details',$details)->with('myWallet', $myWallet);
     }
 
     public function userNewRegistration(Request $request)
     {   
         set_time_limit(0);
         
-        $info=$this->findUserName($request->referrer);
         Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'/*, 'unique:users'*/],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer'  =>['required',$info['regex']],
-            'contact'    => ['required', 'numeric'],
-            'countrycode'    => ['nullable', 'string'],
+            'name'        => ['nullable', 'string', 'max:255'],
+            'email'       => ['required', 'string', 'email', 'max:255'],
+            'password'    => ['required', 'string', 'min:8', 'confirmed'],
+            'referrer'    => ['required', 'string'],
+            'contact'     => ['required', 'numeric'],
+            'countrycode' => ['nullable', 'string'],
         ])->validate();
 
-        $guiderid=0;
-        if(!is_null($request->referrer)){
-            $info=$this->findUserName($request->referrer);
-            $guiderid=User::where('uuid',$request->referrer)->select('id')->get()->first();
-            if(is_null($guiderid)){
-                return redirect()->back()->with('warning','Referrer User Id incorrect.Register with correct Referrer User Id.');
+        $guiderid = 0;
+        if (!empty($request->referrer)) {
+            $guiderUser = \App\Http\Controllers\Auth\RegisterController::resolveSponsorUser($request->referrer);
+            if (is_null($guiderUser)) {
+                return redirect()->back()->with('warning', 'Referrer Sponsor Wallet Address / ID incorrect. Please verify and try again.');
             }
-            /*if(!$guiderid->userDetails()->first()->activationStatus()){
-                return redirect()->back()->with('warning','Referrer User Id inactive.Please Activate First.');
-            }*/
+            $guiderDetail = UserDetails::where('userid', $guiderUser->id)->first();
+            $guiderid = $guiderDetail ? $guiderDetail->id : $guiderUser->id;
         }
-        $randomId=$this->randomid();
-        $user= User::create([
-            'usersname' => $request->name,
-            'email' => $request->email,
-            'contact'    => $request->contact,
-            'ccode' => $request->countrycode,
-            'password' => Hash::make($request->password),
-            's_password' => Crypt::encrypt($request->password),
-            'doj'       => date("Y-m-d"),
-            'created_at'  => now(),
-            'uuid' => $randomId,
+
+        $randomId = $this->randomid();
+        $displayName = !empty($request->name) ? $request->name : ('Member_' . substr($randomId, 3));
+        
+        $user = User::create([
+            'usersname'         => $displayName,
+            'email'             => $request->email,
+            'contact'           => $request->contact,
+            'ccode'             => $request->countrycode,
+            'password'          => Hash::make($request->password),
+            's_password'        => Crypt::encrypt($request->password),
+            'doj'               => date("Y-m-d"),
+            'created_at'        => now(),
+            'uuid'              => $randomId,
             'email_verified_at' => now(),
-            ]);
-        $userdetails=\App\UserDetails::insertGetId([
-                'userid'   => $user->id,
-                'sponsorid' => is_object($guiderid)?$guiderid->id:$guiderid
-            ]);
-        $token = Str::random(64);
+        ]);
 
-        $details['id']=$user->email;
-        $details['password']=$request->password;
-        $details['uid']=$userdetails;
-        $details['email']=$request->email;
-        $details['contact']=$request->contact;
-        $details['name']=$request->name;
-        $details['referrerid']=$request->referrer;
-        $details['uniqueid']=$randomId;
-        $details['view']='welcomeMail';
-        $details['subject']='Welcome to Cyera AI.';
+        $userdetails = \App\UserDetails::insertGetId([
+            'userid'    => $user->id,
+            'sponsorid' => is_object($guiderid) ? $guiderid->id : $guiderid
+        ]);
+
+        $details['id'] = $user->email;
+        $details['password'] = $request->password;
+        $details['uid'] = $userdetails;
+        $details['email'] = $request->email;
+        $details['contact'] = $request->contact;
+        $details['name'] = $displayName;
+        $details['referrerid'] = $request->referrer;
+        $details['uniqueid'] = $randomId;
+        $details['view'] = 'welcomeMail';
+        $details['subject'] = 'Welcome to Cyera AI.';
+        
         event(new \App\Events\UserRegistered($details));
-        try{
-            $mailObj=new SupportQueryController();
-            $mailStatus=$mailObj->sendMailgun($details);//\Log::info('welcome mail status '.$mailStatus);
-            //\Mail::to($data['email'])->send(new VerificationEmail($token));
-            //\Mail::to($data['email'])->send(new WelcomeMail($details));
-        }
-        catch(Exception $e){
-            \Log::info('Error in mails after registration of user id '.$userdetails);
-            \Log::info($e->messages());
+        try {
+            $mailObj = new SupportQueryController();
+            $mailStatus = $mailObj->sendMailgun($details);
+        } catch(\Exception $e) {
+            \Log::info('Error in mails after registration: ' . $e->getMessage());
         }
 
-        /*$details=array('username' => $user->email, 'password'=>$request->password ,'uniqueid'=>$randomId);*/
-        return redirect()->back()->with('details',$details)->with('success','Registration Successful.');
+        return redirect()->back()->with('details', $details)->with('success', 'Registration Successful.');
     }
 
     public function randomid(){
@@ -245,20 +246,33 @@ class AssetDetailController extends Controller
     }
 
     public function getSponsor($id){
-        $data=array();
-        $info=$this->findUserName($id);
-        $name=\App\User::where($info['type'],$id)->pluck('usersname')->first();
-        if(is_null($name))
-            $data["status"]=1;
-        else{
-            $data["status"]=0;
-            $data["name"]=$name;
+        $id = trim($id);
+        $user = \App\Http\Controllers\Auth\RegisterController::resolveSponsorUser($id);
+        if (is_null($user)) {
+            return response()->json(['status' => 1, 'message' => 'Invalid Sponsor']);
         }
-        return $data;
+        
+        $sponsorDetail = UserDetails::where('userid', $user->id)->first();
+        $sponsorWallet = '';
+        if ($sponsorDetail) {
+            $asset = AssetDetail::where('userid', $sponsorDetail->id)->first();
+            if ($asset && !empty($asset->usdtbep20addr)) {
+                $sponsorWallet = $asset->usdtbep20addr;
+            } elseif ($asset && !empty($asset->bep20addr)) {
+                $sponsorWallet = $asset->bep20addr;
+            }
+        }
+
+        $displayTag = !empty($sponsorWallet) 
+            ? (substr($sponsorWallet, 0, 6) . '...' . substr($sponsorWallet, -4)) 
+            : $user->uuid;
+
+        return response()->json([
+            'status'  => 0,
+            'name'    => $displayTag,
+            'display' => $displayTag,
+            'wallet'  => $sponsorWallet,
+            'uuid'    => $user->uuid
+        ]);
     }
-
-
-
-
-    
 }

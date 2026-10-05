@@ -7,14 +7,14 @@
 @section('content')
 @php
     $userUuid = $profile->uuid ?? Session::get('user.userid', 'CAI000000');
-    $userName = $profile->usersname ?? Session::get('user.name', 'Cyera Member');
+    $walletAddress = $profile->usdtbep20address ?? ($profile->bep20address ?? Session::get('user.walletaddress', ''));
     $userDoj = !empty($profile->doj) ? date('d M Y', strtotime($profile->doj)) : date('d M Y');
     $sponsorId = $profile->guiderid ?? Session::get('user.sponsorid', 'Root Sponsor');
-    $sponsorName = $profile->guidername ?? 'Cyera Network';
-    $walletAddress = $profile->usdtbep20address ?? ($profile->bep20address ?? Session::get('user.walletaddress', ''));
+    $sponsorWallet = $profile->guiderwallet ?? '';
     $isActive = ($profile->userstatus ?? 0) == 1 || ($profile->total_self_investment ?? 0) > 0;
     $rankName = !empty($profile->rank_name) && $profile->rank_name !== 'None' ? $profile->rank_name : 'NO RANK';
-    $referralLink = url('/register/' . $userUuid);
+    $referralLink = !empty($walletAddress) ? url('/register?ref=' . $walletAddress) : url('/register/' . $userUuid);
+    $shortWallet = !empty($walletAddress) ? (substr($walletAddress, 0, 6) . '...' . substr($walletAddress, -4)) : $userUuid;
 @endphp
 
 <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;">
@@ -38,8 +38,8 @@
 
                 <div>
                     <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: #FFFFFF; margin: 0; line-height: 1.2;">
-                            {{ $userName }}
+                        <h2 style="font-family: 'Space Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin: 0; line-height: 1.2;">
+                            {{ $shortWallet }}
                         </h2>
                         <span style="font-size: 0.65rem; padding: 2px 7px; border-radius: 5px; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.35); color: #FFD700; font-weight: 700;">
                             <i class="fas fa-crown"></i> {{ $rankName }}
@@ -98,12 +98,6 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 8px;">
-                <!-- Full Name -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-user" style="color: #FFD700; width: 14px;"></i> Name</span>
-                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">{{ $userName }}</span>
-                </div>
-
                 <!-- User ID -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
                     <span style="font-size: 0.75rem; color: #94A3B8;"><i class="fas fa-id-badge" style="color: #FFD700; width: 14px;"></i> User ID</span>
@@ -118,8 +112,8 @@
 
                 <!-- Sponsor -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.2); border-radius: 8px;">
-                    <span style="font-size: 0.75rem; color: #FFD700;"><i class="fas fa-user-tag" style="color: #FFD700; width: 14px;"></i> Sponsor</span>
-                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFD700;">{{ $sponsorName }} ({{ $sponsorId }})</span>
+                    <span style="font-size: 0.75rem; color: #FFD700;"><i class="fas fa-wallet" style="color: #FFD700; width: 14px;"></i> Sponsor</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">{{ !empty($sponsorWallet) ? (substr($sponsorWallet, 0, 6) . '...' . substr($sponsorWallet, -4)) : $sponsorId }}</span>
                 </div>
             </div>
         </div>

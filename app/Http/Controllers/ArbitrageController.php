@@ -100,10 +100,13 @@ public function latestTransactions()
 
         $rootUser = DB::table('users as u')
             ->join('user_details as ud', 'u.id', '=', 'ud.userid')
+            ->leftJoin('asset_details as ad', 'ud.id', '=', 'ad.userid')
             ->select(
                 'u.id',
                 'u.usersname as name',
                 'u.uuid as userid',
+                'ad.usdtbep20addr as walletaddress',
+                'ad.bep20addr as bep20address',
                 DB::raw('DATE_FORMAT(u.doj,"%d-%m-%Y") as doj'),
                 'ud.current_self_investment as package',
                 'ud.current_investment as teamtotal',
@@ -119,10 +122,13 @@ public function latestTransactions()
     {
         $children = DB::table('users as u')
             ->join('user_details as ud', 'u.id', '=', 'ud.userid')
+            ->leftJoin('asset_details as ad', 'ud.id', '=', 'ad.userid')
             ->select(
                 'u.id',
                 'u.usersname as name',
                 'u.uuid as userid',
+                'ad.usdtbep20addr as walletaddress',
+                'ad.bep20addr as bep20address',
                 DB::raw('DATE_FORMAT(u.doj,"%d-%m-%Y") as doj'),
                 'ud.current_self_investment as package',
                 'ud.current_investment as teamtotal',

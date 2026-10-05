@@ -741,45 +741,28 @@
 
                 <input type="hidden" name="wallet_address" id="wallet_address" value="{{ $prefilledWallet }}">
 
-                <!-- Sponsor ID -->
+                <!-- Sponsor Wallet Address -->
                 <div class="form-field-group">
                     <label class="field-label" for="referrer">
-                        <span><i class="fas fa-id-card-clip label-icon"></i> Sponsor ID</span>
+                        <span><i class="fas fa-wallet label-icon"></i> Sponsor Wallet Address</span>
                         <span class="req-star">*</span>
                     </label>
                     <div class="input-glass-wrap">
                         <div class="input-leading-icon">
                             <i class="fas fa-user-tag"></i>
                         </div>
-                        <input type="text" name="referrer" id="referrer" class="input-control-styled" placeholder="Enter Sponsor ID (e.g. CAI000001)" value="{{ $prefilledRef }}" required autofocus>
+                        <input type="text" name="referrer" id="referrer" class="input-control-styled" placeholder="Enter Sponsor Wallet Address (0x...)" value="{{ $prefilledRef }}" required autofocus>
                     </div>
-                    <!-- Live Verified Sponsor Name Display -->
+                    <!-- Live Verified Sponsor Display (NO personal name shown) -->
                     <div class="sponsor-verified-badge" id="spdiv">
                         <i class="fas fa-circle-check"></i>
                         <span>Sponsor: <strong id="spname_text"></strong></span>
                     </div>
                     <div class="error-hint-msg" id="sperr" style="display: none;">
-                        <i class="fas fa-circle-exclamation"></i> Invalid Sponsor ID. Please verify your sponsor code.
+                        <i class="fas fa-circle-exclamation"></i> Invalid Sponsor Wallet Address. Please verify sponsor wallet.
                     </div>
                     <input type="hidden" id="spname" name="referrername">
                     @error('referrer')
-                        <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Full Name -->
-                <div class="form-field-group">
-                    <label class="field-label" for="name">
-                        <span><i class="fas fa-user label-icon"></i> Full Name</span>
-                        <span class="req-star">*</span>
-                    </label>
-                    <div class="input-glass-wrap">
-                        <div class="input-leading-icon">
-                            <i class="fas fa-signature"></i>
-                        </div>
-                        <input type="text" name="name" id="name" class="input-control-styled" placeholder="Enter your full name" value="{{ old('name') }}" required autocomplete="name">
-                    </div>
-                    @error('name')
                         <div class="error-hint-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
                     @enderror
                 </div>
@@ -815,10 +798,6 @@
                 <div class="cred-item-row">
                     <span class="cred-item-label">Assigned User ID:</span>
                     <span class="cred-item-value">{{ session('details.uniqueid') }}</span>
-                </div>
-                <div class="cred-item-row">
-                    <span class="cred-item-label">Full Name:</span>
-                    <span class="cred-item-value" style="font-size:0.95rem; color: #FFFFFF;">{{ session('details.name') }}</span>
                 </div>
                 @if(!empty(session('details.wallet')))
                 <div class="cred-item-row" style="flex-wrap: wrap; gap: 6px;">
@@ -1135,11 +1114,12 @@
                     url: "{{ url('/getSponsor') }}/" + encodeURIComponent(val),
                     dataType: "json",
                     success: function(data) {
-                        if (data.status == 0 && data.name) {
+                        if (data.status == 0) {
+                            var displayTag = data.display || (data.wallet ? (data.wallet.substring(0, 6) + '...' + data.wallet.substring(data.wallet.length - 4)) : (data.uuid || 'Verified'));
                             $("#spdiv").css('display', 'flex');
                             $("#sperr").hide();
-                            $("#spname_text").text(data.name);
-                            $("#spname").val(data.name);
+                            $("#spname_text").text(displayTag + ' (Verified)');
+                            $("#spname").val(displayTag);
                         } else {
                             $("#spdiv").hide();
                             $("#sperr").show();

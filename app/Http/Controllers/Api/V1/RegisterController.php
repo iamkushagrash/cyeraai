@@ -30,30 +30,32 @@ class RegisterController extends BaseController
         }
 
         $vali=Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'/*, 'unique:users'*/],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer'  => ['required', 'string','regex:/^CAI|cai|Cai[0-9]{7}+$/']/*$regex*/,
-            'contact'    => ['nullable', 'numeric'],
-            'countrycode'    => ['nullable', 'string'],
-            /*'gender'    => ['required', 'numeric'],*/
+            'name'        => ['nullable', 'string', 'max:255'],
+            'email'       => ['required', 'string', 'email', 'max:255'],
+            'password'    => ['required', 'string', 'min:8', 'confirmed'],
+            'referrer'    => ['required', 'string'],
+            'contact'     => ['nullable', 'numeric'],
+            'countrycode' => ['nullable', 'string'],
         ]);
         if($vali->fails()){
             return $this->sendError('Validation Error.', $vali->errors());
         }
         set_time_limit(0);
         $guiderid=0;
-        if(!is_null($data['referrer'])){
-            $guiderid= User::where('uuid',$data['referrer'])->select('id')->get()->first();
-            if(is_null($guiderid))
-                return $this->sendError('Invalid Referrer Id', $errorMessages = [], $code = 404);
+        if(!empty($data['referrer'])){
+            $guiderUser = \App\Http\Controllers\Auth\RegisterController::resolveSponsorUser($data['referrer']);
+            if(is_null($guiderUser))
+                return $this->sendError('Invalid Sponsor Wallet Address / ID', $errorMessages = [], $code = 404);
+            $guiderDetail = \App\UserDetails::where('userid', $guiderUser->id)->first();
+            $guiderid = $guiderDetail ? $guiderDetail->id : $guiderUser->id;
         }
 
         \DB::beginTransaction();
         try{
             $uidd=$this->randomid();
+            $displayName = !empty($data['name']) ? $data['name'] : ('Member_' . substr($uidd, 3));
             $user= User::create([
-                'usersname' => $data['name'],
+                'usersname' => $displayName,
                 'email' => $data['email'],
                 'contact'    => $data['contact'],
                 'ccode' => $data['countrycode'],
@@ -69,19 +71,13 @@ class RegisterController extends BaseController
                     'sponsorid' => is_object($guiderid)?$guiderid->id:$guiderid
                 ]);
             $token = Str::random(64);
-            /*$userVerification=\App\UserVerification::create([
-                'userid'  =>  $user->id,
-                'token'  =>  $token,
-                'purpose'  =>  'verification',
-                'created_at'  =>  now(),
-            ]);*/
             
             $details['id']=$user->email;
             $details['password']=$data['password'];
             $details['uid']=$userdetails;
             $details['email']=$data['email'];
             $details['contact']=$data['contact'];
-            $details['name']=$data['name'];
+            $details['name']=$displayName;
             $details['referrerid']=$data['referrer'];
             $details['uniqueid']=$uidd;
             event(new \App\Events\UserRegistered($details));
@@ -90,8 +86,6 @@ class RegisterController extends BaseController
                 $details['view']='welcomeMail';
                 $mailObj=new SupportQueryController();
                 $mailStatus=$mailObj->sendMailgun($details);
-                /*\Mail::to($data['email'])->send(new VerificationEmail($token));*/
-                //\Mail::to($data['email'])->send(new WelcomeMail($details));
             }
             catch(Exception $e){
                 \Log::info('Error in mails after registration of user id '.$userdetails);
@@ -99,8 +93,6 @@ class RegisterController extends BaseController
             }
 
             \DB::commit();
-            /*$success['token'] =  $user->createToken('CAIApp')->accessToken;
-            $success['name'] =  $user->name;*/
             $details=array('email' => $user->email, 'userid' => $uidd, 'password'=>$data['password'] ,);
             return $this->sendResponse($details, 'User register successfully.');
         }
@@ -113,14 +105,25 @@ class RegisterController extends BaseController
     }
 
     public function getSponsor(Request $request){
-        $datareg=$this->findUserName($request->referrer);
-        //$regex=['required',$datareg['regex']];
-        $name=\App\User::where('uuid',$request->referrer)->pluck('usersname')->first();
-        if(is_null($name))
-            return $this->sendError('Invalid Referrer Id', $errorMessages = [], $code = 404);
-        else{
-            return $this->sendResponse($name, 'Sponser Name.');
+        $user = \App\Http\Controllers\Auth\RegisterController::resolveSponsorUser($request->referrer);
+        if(is_null($user))
+            return $this->sendError('Invalid Sponsor Wallet Address / ID', $errorMessages = [], $code = 404);
+        
+        $sponsorDetail = \App\UserDetails::where('userid', $user->id)->first();
+        $sponsorWallet = '';
+        if ($sponsorDetail) {
+            $asset = \App\AssetDetail::where('userid', $sponsorDetail->id)->first();
+            if ($asset && !empty($asset->usdtbep20addr)) {
+                $sponsorWallet = $asset->usdtbep20addr;
+            } elseif ($asset && !empty($asset->bep20addr)) {
+                $sponsorWallet = $asset->bep20addr;
+            }
         }
+        $displayTag = !empty($sponsorWallet) 
+            ? (substr($sponsorWallet, 0, 6) . '...' . substr($sponsorWallet, -4)) 
+            : $user->uuid;
+
+        return $this->sendResponse(['display' => $displayTag, 'wallet' => $sponsorWallet, 'uuid' => $user->uuid], 'Sponsor Verified.');
     }
 
     public function forgetPasswordMailSend(Request $request){

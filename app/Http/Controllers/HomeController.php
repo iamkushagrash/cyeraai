@@ -230,7 +230,9 @@ class HomeController extends Controller
         $usrRaw['boosterDirectsNeeded'] = $boosterStats['booster1_needed'];
         $usrRaw['productAmount'] = $productAmount;
 
-        
+        $userAsset = \App\AssetDetail::where('userid', Session::get('user.id'))->first();
+        $usrRaw['userWallet'] = $userAsset->usdtbep20addr ?? ($userAsset->bep20addr ?? '');
+
         return view('user.dashboard')->with('data',$usrRaw);
     }
 

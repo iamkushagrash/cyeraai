@@ -1,13 +1,15 @@
 @php 
     $isRoot = $isRoot ?? false;
     $isActive = (strtolower($user->status ?? '') == 'active' || $user->status == '1');
-    $initial = strtoupper(substr($user->name ?? $user->userid ?? 'U', 0, 1));
+    $mWallet = $user->walletaddress ?? $user->bep20address ?? '';
+    $nodeDisplay = !empty($mWallet) ? (substr($mWallet, 0, 6) . '...' . substr($mWallet, -4)) : ($user->userid ?? 'Member');
+    $initial = !empty($mWallet) ? '0x' : 'C';
 @endphp
 
 <div class="user-node {{ $isRoot ? 'root' : '' }}" data-user-id="{{ $user->id }}">
     <div class="node-head-row">
-        <span class="node-avatar-circle">{{ $initial }}</span>
-        <span class="node-user-name" title="{{ $user->name }}">{{ $user->name ?: 'Community Member' }}</span>
+        <span class="node-avatar-circle" style="font-size: 8px; font-family: monospace;">{{ $initial }}</span>
+        <span class="node-user-name" style="font-family: monospace; color: #00FF88;">{{ $nodeDisplay }}</span>
     </div>
 
     <span class="node-uid-badge">{{ $user->userid }}</span>

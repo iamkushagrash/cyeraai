@@ -538,22 +538,23 @@
                     $levelPct = round($row->leveluser ?? 0);
                 }
                 
-                $displayName = $row->name ?: 'Member';
-                $initial = strtoupper(substr($displayName, 0, 1));
+                $mWallet = $row->walletaddress ?? $row->bep20address ?? '';
+                $displayWallet = !empty($mWallet) ? (substr($mWallet, 0, 6) . '...' . substr($mWallet, -4)) : ($row->userid ?? 'Member');
+                $initial = !empty($mWallet) ? '0x' : 'C';
             @endphp
             
             <div class="member-cyber-card" 
-                 data-search="{{ strtolower(($row->userid ?? '').' '.($row->name ?? '').' '.($row->doj ?? '').' '.($isActive ? 'active' : 'inactive').' '.($row->shares ?? '').' '.($row->teamtotal ?? '')) }}">
+                 data-search="{{ strtolower(($row->userid ?? '').' '.($mWallet).' '.($row->doj ?? '').' '.($isActive ? 'active' : 'inactive').' '.($row->shares ?? '').' '.($row->teamtotal ?? '')) }}">
                 
                 <!-- Card Header -->
                 <div class="card-member-head">
                     <div class="head-user-block">
-                        <div class="member-avatar-orb">
+                        <div class="member-avatar-orb" style="font-size: 0.72rem; font-family: monospace;">
                             {{ $initial }}
                             <span class="avatar-status-dot {{ $isActive ? 'dot-active' : 'dot-inactive' }}"></span>
                         </div>
                         <div class="member-name-stack">
-                            <span class="member-full-name" title="{{ $row->name }}">{{ $displayName }}</span>
+                            <span class="member-full-name" style="font-family: monospace; font-size: 0.88rem; color: #00FF88;">{{ $displayWallet }}</span>
                             <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 3px;">
                                 <div class="member-id-pill" onclick="copyUserId('{{ $row->userid }}')" title="Click to copy User ID">
                                     <span>{{ $row->userid }}</span>

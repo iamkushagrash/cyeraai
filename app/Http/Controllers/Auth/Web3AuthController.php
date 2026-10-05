@@ -255,21 +255,16 @@ class Web3AuthController extends Controller
             }
         }
 
-        // Validate Sponsor (Strictly required in Cyera AI)
+        // Validate Sponsor (Supports BEP-20 Wallet Address, UUID, or Email)
         $sponsorUser = null;
         if (!empty($request->sponsor)) {
-            $ref = trim($request->sponsor);
-            $sponsorUser = User::where('uuid', $ref)
-                ->orWhereRaw('LOWER(uuid) = ?', [strtolower($ref)])
-                ->orWhere('email', $ref)
-                ->orWhereRaw('LOWER(email) = ?', [strtolower($ref)])
-                ->first();
+            $sponsorUser = \App\Http\Controllers\Auth\RegisterController::resolveSponsorUser($request->sponsor);
         }
 
         if (!$sponsorUser) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Valid Sponsor ID is required for registration. Please provide a valid sponsor code.'
+                'message' => 'Valid Sponsor Wallet Address / ID is required for registration.'
             ], 422);
         }
 
@@ -285,7 +280,7 @@ class Web3AuthController extends Controller
             }
 
             $userEmail = !empty($request->email) ? $request->email : ($walletAddress . '@cyera.ai');
-            $userName = !empty($request->name) ? $request->name : ('Cyera_' . substr($request->address, 2, 6));
+            $userName = !empty($request->name) ? $request->name : (substr($request->address, 0, 6) . '...' . substr($request->address, -4));
             $userContact = !empty($request->contact) ? $request->contact : '';
             $countryCode = !empty($request->countrycode) ? $request->countrycode : '+91';
             $defaultPassword = 'CY@' . rand(100000, 999999);

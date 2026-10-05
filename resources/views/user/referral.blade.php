@@ -6,8 +6,9 @@
 
 @section('content')
 @php
-    $refUuid = Session::get('user.uuid') ?? 'CYERA';
-    $referralLink = url('/register/' . $refUuid);
+    $refWallet = !empty($userWallet) ? $userWallet : (Session::get('user.walletaddress') ?? Session::get('user.uuid', 'CYERA'));
+    $referralLink = url('/register?ref=' . $refWallet);
+    $shortWallet = (strlen($refWallet) >= 12) ? (substr($refWallet, 0, 6) . '...' . substr($refWallet, -4)) : $refWallet;
 @endphp
 
 <div class="mecha-inner-body" style="max-width: 680px; margin: 0 auto;">
@@ -39,10 +40,10 @@
                 <i class="fas fa-qrcode"></i>
                 <div>
                     <h2 class="mecha-card-title">YOUR EXCLUSIVE REFERRAL LINK</h2>
-                    <div class="mecha-card-subtitle">Share your unique link or QR code to build your team</div>
+                    <div class="mecha-card-subtitle">Share your unique Web3 wallet invitation link to build your team</div>
                 </div>
             </div>
-            <span class="mecha-card-badge">SPONSOR ID: {{ $refUuid }}</span>
+            <span class="mecha-card-badge" title="{{ $refWallet }}">SPONSOR WALLET: {{ $shortWallet }}</span>
         </div>
 
         <!-- Center QR Code Stage -->
