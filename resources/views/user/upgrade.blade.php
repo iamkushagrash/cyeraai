@@ -73,7 +73,7 @@
                             {{ $daoTitle ?? ($daoType == 1 ? 'Diamond Club Member' : 'Core DAO Member') }}
                         </div>
                         <div style="font-size: 0.62rem; color: #94A3B8;">
-                            {{ $daoType == 1 ? 'Fixed $10,000 USDT • 4X Dynamic Capping • 5% Global Pool on V4' : 'Fixed $3,333 USDT • 3X Dynamic Capping • Global Pool on V3' }}
+                            {{ $daoType == 1 ? 'Fixed $10,000 USDT • 4X Dynamic Capping • 5% Global Pool on V4' : 'Fixed $3,333 USDT • 3X Dynamic Capping • 5% Global Pool on V3' }}
                         </div>
                     </div>
                 </div>

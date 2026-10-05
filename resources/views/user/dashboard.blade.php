@@ -641,7 +641,7 @@
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>Global Pool on V3</span>
+                                    <span>5% Global Pool on V3</span>
                                 </div>
                             </div>
                         </div>
@@ -743,7 +743,7 @@
                                     <!-- Mini Perk -->
                                     <div style="font-size: 0.54rem; color: #CBD5E1; line-height: 1.25; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Global Pool on V3</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">5% Global Pool on V3</span>
                                     </div>
                                 </div>
 
