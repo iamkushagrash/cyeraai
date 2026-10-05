@@ -56,12 +56,34 @@
                 style="background: rgba(0, 255, 136, 0.12); color: #00FF88; border-color: rgba(0, 255, 136, 0.3); font-size: 8.5px; padding: 2px 6px;">
                 <i class="fas fa-circle" style="font-size: 5px; margin-right: 3px;"></i> BSC MAINNET
             </span>
-        </div>
-
-        <!-- Alert Container -->
+        </div>        <!-- Alert Container -->
         <div id="stakeAlert"
             style="display: none; padding: 10px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px;">
         </div>
+
+        @if(($daoType ?? 0) > 0)
+            <!-- DAO Dedicated Tier Banner -->
+            <div style="background: {{ $daoType == 1 ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(245, 166, 35, 0.05))' : 'linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(0, 119, 255, 0.05))' }}; border: 1px solid {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.5)' : 'rgba(0, 210, 255, 0.5)' }}; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.2)' : 'rgba(0, 210, 255, 0.2)' }}; color: {{ $daoType == 1 ? '#FFD700' : '#00D2FF' }}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+                        <i class="fas {{ $daoType == 1 ? 'fa-gem' : 'fa-user-astronaut' }}"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.78rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px;">
+                            {{ $daoTitle ?? ($daoType == 1 ? 'Diamond Club Member' : 'Core DAO Member') }}
+                        </div>
+                        <div style="font-size: 0.62rem; color: #94A3B8;">
+                            {{ $daoType == 1 ? 'Fixed $10,000 USDT • 4X Dynamic Capping • 5% Global Pool on V4' : 'Fixed $3,333 USDT • 3X Dynamic Capping • DAO Governance Priority' }}
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right; flex-shrink: 0;">
+                    <span style="font-size: 0.62rem; font-weight: 800; color: {{ $daoType == 1 ? '#FFD700' : '#00D2FF' }}; background: rgba(0, 0, 0, 0.5); border: 1px solid {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.3)' : 'rgba(0, 210, 255, 0.3)' }}; padding: 2px 6px; border-radius: 4px;">
+                        {{ $daoMultiplier }}X CAPPING
+                    </span>
+                </div>
+            </div>
+        @endif
 
         @php
             $userWallet = Session::get('user.walletaddress', Session::get('user.usdtbep20address', ''));
@@ -100,6 +122,7 @@
         <!-- Staking Form -->
         <form id="web3StakeForm">
             @csrf
+            <input type="hidden" id="daoTypeInput" name="dao_type" value="{{ $daoType ?? 0 }}">
 
             <!-- Target Beneficiary User ID -->
             <div class="mecha-form-group" style="margin-bottom: 10px; gap: 4px;">
@@ -118,15 +141,25 @@
             <div class="mecha-form-group" style="margin-bottom: 10px; gap: 4px;">
                 <label class="mecha-form-label" for="stakeAmount" style="font-size: 9.5px;">
                     <span>Staking Amount (USDT)</span>
-                    <span class="label-sub" style="color: #00FF88; font-size: 8px;">Min: $50 — Max: $2,000</span>
+                    @if(($daoType ?? 0) > 0)
+                        <span class="label-sub" style="color: #FFD700; font-size: 8px;">DAO Fixed Tier: ${{ number_format($daoAmount, 0) }} USDT (Locked)</span>
+                    @else
+                        <span class="label-sub" style="color: #00FF88; font-size: 8px;">Min: $50 — Max: $2,000</span>
+                    @endif
                 </label>
                 <div class="mecha-input-wrap">
                     <i class="fas fa-dollar-sign mecha-input-icon" style="left: 10px; font-size: 11px;"></i>
-                    <input type="number" step="10" min="50" max="2000" id="stakeAmount" class="mecha-input-control"
-                        name="amount" placeholder="Enter Amount (e.g. 100)" value="100" style="height: 38px; padding-left: 32px; font-size: 12px;" required>
+                    @if(($daoType ?? 0) > 0)
+                        <input type="number" id="stakeAmount" class="mecha-input-control"
+                            name="amount" value="{{ $daoAmount }}" readonly="readonly" style="height: 38px; padding-left: 32px; font-size: 13px; font-weight: 800; color: #FFD700; background: rgba(255, 215, 0, 0.05); cursor: not-allowed;" required>
+                    @else
+                        <input type="number" step="10" min="50" max="2000" id="stakeAmount" class="mecha-input-control"
+                            name="amount" placeholder="Enter Amount (e.g. 100)" value="100" style="height: 38px; padding-left: 32px; font-size: 12px;" required>
+                    @endif
                 </div>
             </div>
 
+            @if(($daoType ?? 0) == 0)
             <!-- Quick Preset Amount Buttons -->
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 12px;">
                 <button type="button" class="preset-amt-btn" data-amt="50">$50</button>
@@ -135,6 +168,7 @@
                 <button type="button" class="preset-amt-btn" data-amt="500">$500</button>
                 <button type="button" class="preset-amt-btn" data-amt="1000">$1K</button>
             </div>
+            @endif
 
             <!-- Verified Genuine USDT Security Assurance Badge -->
             <div style="background: rgba(10, 13, 25, 0.7); border: 1px solid rgba(0, 255, 136, 0.22); border-radius: 8px; padding: 7px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -406,7 +440,8 @@
                             amount: amount,
                             txHash: txHash,
                             targetUserId: targetUserId,
-                            senderAddress: senderAddress
+                            senderAddress: senderAddress,
+                            dao_type: parseInt($('#daoTypeInput').val() || '0')
                         })
                     });
 
@@ -456,10 +491,23 @@
 
                 const amount = parseFloat($('#stakeAmount').val()) || 0;
                 const targetUserId = $('#targetUserId').val().trim();
+                const currentDao = parseInt($('#daoTypeInput').val() || '0');
 
-                if (amount < 50 || amount > 2000) {
-                    showStakeAlert('Staking amount must be between $50 and $2,000 USDT.');
-                    return;
+                if (currentDao === 1) {
+                    if (amount !== 10000) {
+                        showStakeAlert('Diamond Club requires exact topup of $10,000 USDT.');
+                        return;
+                    }
+                } else if (currentDao === 2) {
+                    if (amount !== 3333) {
+                        showStakeAlert('Core Member requires exact topup of $3,333 USDT.');
+                        return;
+                    }
+                } else {
+                    if (amount < 50 || amount > 2000) {
+                        showStakeAlert('Staking amount must be between $50 and $2,000 USDT.');
+                        return;
+                    }
                 }
 
                 const provider = getMetaMaskProvider();

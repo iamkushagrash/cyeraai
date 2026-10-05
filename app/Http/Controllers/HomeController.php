@@ -233,6 +233,11 @@ class HomeController extends Controller
         $userAsset = \App\AssetDetail::where('userid', Session::get('user.id'))->first();
         $usrRaw['userWallet'] = $userAsset->usdtbep20addr ?? ($userAsset->bep20addr ?? '');
 
+        // DAO Counts & Status
+        $usrRaw['diamondDaoCount'] = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
+        $usrRaw['coreDaoCount'] = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+        $usrRaw['userDaoStatus'] = $userDetail->is_dao ?? 0;
+
         return view('user.dashboard')->with('data',$usrRaw);
     }
 

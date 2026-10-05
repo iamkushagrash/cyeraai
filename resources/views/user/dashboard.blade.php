@@ -590,6 +590,187 @@
                 </div>
 
                 <!-- ============================================================
+                     DAO MEMBER REGISTRATION SECTION (DIAMOND CLUB & CORE MEMBER)
+                     ============================================================ -->
+                @php
+                    $dCount = $data['diamondDaoCount'] ?? 0;
+                    $cCount = $data['coreDaoCount'] ?? 0;
+                    $myDao = $data['userDaoStatus'] ?? ($data['userDetail']->is_dao ?? 0);
+                    $dPct = min(100, round(($dCount / 20) * 100));
+                    $cPct = min(100, round(($cCount / 100) * 100));
+                @endphp
+                <div class="hud-dao-registration-section" style="margin-bottom: 16px;">
+                    <!-- Section Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding: 0 4px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(245, 166, 35, 0.1)); border: 1px solid rgba(255, 215, 0, 0.5); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 0.88rem; font-weight: 900; color: #FFFFFF; letter-spacing: 0.6px; text-transform: uppercase;">
+                                    DAO Member Registration
+                                </h3>
+                                <div style="font-size: 0.62rem; color: #94A3B8; font-weight: 600;">
+                                    Exclusive Decentralized Governance &amp; High-Yield Protocol Tiers
+                                </div>
+                            </div>
+                        </div>
+                        @if($myDao == 1)
+                            <span style="font-size: 0.62rem; font-weight: 800; color: #00FF88; background: rgba(0, 255, 136, 0.12); border: 1px solid rgba(0, 255, 136, 0.35); padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fas fa-gem"></i> DIAMOND MEMBER
+                            </span>
+                        @elseif($myDao == 2)
+                            <span style="font-size: 0.62rem; font-weight: 800; color: #00D2FF; background: rgba(0, 210, 255, 0.12); border: 1px solid rgba(0, 210, 255, 0.35); padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fas fa-user-astronaut"></i> CORE MEMBER
+                            </span>
+                        @else
+                            <span style="font-size: 0.60rem; font-weight: 800; color: #FFD700; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.35); padding: 3px 8px; border-radius: 6px;">
+                                LIMITED SLOTS
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- 2 Grid Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+                        
+                        <!-- CARD 1: DIAMOND CLUB -->
+                        <div style="background: linear-gradient(145deg, rgba(20, 16, 5, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(255, 215, 0, 0.45); border-radius: 12px; padding: 12px 14px; position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255, 215, 0, 0.25);">
+                            <!-- Top Glow Hairline -->
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #FFD700, #F5A623, transparent);"></div>
+                            
+                            <!-- Header Row -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <div style="width: 22px; height: 22px; border-radius: 5px; background: rgba(255, 215, 0, 0.15); color: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 10px;">
+                                        <i class="fas fa-gem"></i>
+                                    </div>
+                                    <span style="font-size: 0.80rem; font-weight: 900; color: #FFD700; letter-spacing: 0.4px;">DIAMOND CLUB</span>
+                                </div>
+                                <span style="font-size: 0.60rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; text-transform: uppercase;">4X CAPPING</span>
+                            </div>
+
+                            <!-- Fixed Topup Amount & Cap -->
+                            <div style="background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 0.58rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Fixed Topup Amount</div>
+                                    <div style="font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 800; color: #FFD700;">$10,000 <small style="font-size: 0.65rem; color: #FFF;">USDT</small></div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.58rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Total Capping Limit</div>
+                                    <div style="font-family: 'Space Mono', monospace; font-size: 0.92rem; font-weight: 800; color: #00FF88;">$40,000 <small style="font-size: 0.60rem; color: #94A3B8;">(4X)</small></div>
+                                </div>
+                            </div>
+
+                            <!-- Availability Progress Bar -->
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.60rem; margin-bottom: 3px;">
+                                    <span style="color: #8E99A8; font-weight: 600;">Subscribed Slots:</span>
+                                    <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">{{ $dCount }} / 20 Members</strong>
+                                </div>
+                                <div style="height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: {{ $dPct }}%; height: 100%; background: linear-gradient(90deg, #F5A623, #FFD700); border-radius: 3px; box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);"></div>
+                                </div>
+                            </div>
+
+                            <!-- Benefits List -->
+                            <div style="font-size: 0.62rem; color: #CBD5E1; line-height: 1.4; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
+                                <div style="display: flex; align-items: flex-start; gap: 5px;">
+                                    <i class="fas fa-check-circle" style="color: #00FF88; font-size: 9px; margin-top: 2px; flex-shrink: 0;"></i>
+                                    <span><strong>5% Monthly Global Turnover Pool</strong> on achieving <strong>V4 Rank</strong>.</span>
+                                </div>
+                                <div style="display: flex; align-items: flex-start; gap: 5px;">
+                                    <i class="fas fa-shield-halved" style="color: #FFD700; font-size: 9px; margin-top: 2px; flex-shrink: 0;"></i>
+                                    <span style="color: #94A3B8;">Pool activates once all 20 Diamond &amp; 100 Core slots are fully subscribed.</span>
+                                </div>
+                            </div>
+
+                            <!-- CTA Button -->
+                            @if($myDao == 1)
+                                <button type="button" disabled style="width: 100%; height: 32px; border-radius: 6px; background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.4); color: #00FF88; font-size: 0.70rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                    <i class="fas fa-circle-check"></i> QUALIFIED (DIAMOND MEMBER)
+                                </button>
+                            @elseif($dCount >= 20)
+                                <button type="button" disabled style="width: 100%; height: 32px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.70rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                    <i class="fas fa-lock"></i> SLOTS FULL (20/20)
+                                </button>
+                            @else
+                                <a href="{{ url('/User/Stake?dao=diamond') }}" style="width: 100%; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.70rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
+                                    <i class="fas fa-gem"></i> UPGRADE TO DIAMOND ($10,000)
+                                </a>
+                            @endif
+                        </div>
+
+                        <!-- CARD 2: CORE MEMBER -->
+                        <div style="background: linear-gradient(145deg, rgba(5, 18, 26, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(0, 210, 255, 0.45); border-radius: 12px; padding: 12px 14px; position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.7), inset 0 1px 1px rgba(0, 210, 255, 0.25);">
+                            <!-- Top Glow Hairline -->
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #00D2FF, #0077FF, transparent);"></div>
+                            
+                            <!-- Header Row -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <div style="width: 22px; height: 22px; border-radius: 5px; background: rgba(0, 210, 255, 0.15); color: #00D2FF; display: flex; align-items: center; justify-content: center; font-size: 10px;">
+                                        <i class="fas fa-user-astronaut"></i>
+                                    </div>
+                                    <span style="font-size: 0.80rem; font-weight: 900; color: #00D2FF; letter-spacing: 0.4px;">CORE MEMBER</span>
+                                </div>
+                                <span style="font-size: 0.60rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #00D2FF, #0099FF); padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; text-transform: uppercase;">3X CAPPING</span>
+                            </div>
+
+                            <!-- Fixed Topup Amount & Cap -->
+                            <div style="background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 0.58rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Fixed Topup Amount</div>
+                                    <div style="font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 800; color: #00D2FF;">$3,333 <small style="font-size: 0.65rem; color: #FFF;">USDT</small></div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.58rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Total Capping Limit</div>
+                                    <div style="font-family: 'Space Mono', monospace; font-size: 0.92rem; font-weight: 800; color: #00FF88;">$9,999 <small style="font-size: 0.60rem; color: #94A3B8;">(3X)</small></div>
+                                </div>
+                            </div>
+
+                            <!-- Availability Progress Bar -->
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.60rem; margin-bottom: 3px;">
+                                    <span style="color: #8E99A8; font-weight: 600;">Subscribed Slots:</span>
+                                    <strong style="color: #00D2FF; font-family: 'Space Mono', monospace;">{{ $cCount }} / 100 Members</strong>
+                                </div>
+                                <div style="height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: {{ $cPct }}%; height: 100%; background: linear-gradient(90deg, #0077FF, #00D2FF); border-radius: 3px; box-shadow: 0 0 8px rgba(0, 210, 255, 0.6);"></div>
+                                </div>
+                            </div>
+
+                            <!-- Benefits List -->
+                            <div style="font-size: 0.62rem; color: #CBD5E1; line-height: 1.4; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
+                                <div style="display: flex; align-items: flex-start; gap: 5px;">
+                                    <i class="fas fa-check-circle" style="color: #00FF88; font-size: 9px; margin-top: 2px; flex-shrink: 0;"></i>
+                                    <span><strong>3X Protocol Capping Multiplier</strong> &amp; DAO Voting Rights.</span>
+                                </div>
+                                <div style="display: flex; align-items: flex-start; gap: 5px;">
+                                    <i class="fas fa-shield-halved" style="color: #00D2FF; font-size: 9px; margin-top: 2px; flex-shrink: 0;"></i>
+                                    <span style="color: #94A3B8;">Core DAO Governance unlocks once all 100 Core slots are filled.</span>
+                                </div>
+                            </div>
+
+                            <!-- CTA Button -->
+                            @if($myDao == 2)
+                                <button type="button" disabled style="width: 100%; height: 32px; border-radius: 6px; background: rgba(0, 210, 255, 0.15); border: 1px solid rgba(0, 210, 255, 0.4); color: #00D2FF; font-size: 0.70rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                    <i class="fas fa-circle-check"></i> QUALIFIED (CORE MEMBER)
+                                </button>
+                            @elseif($cCount >= 100)
+                                <button type="button" disabled style="width: 100%; height: 32px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.70rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                    <i class="fas fa-lock"></i> SLOTS FULL (100/100)
+                                </button>
+                            @else
+                                <a href="{{ url('/User/Stake?dao=core') }}" style="width: 100%; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #00D2FF 0%, #0077FF 100%); color: #000; font-size: 0.70rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0, 210, 255, 0.35); text-transform: uppercase;">
+                                    <i class="fas fa-user-astronaut"></i> UPGRADE TO CORE ($3,333)
+                                </a>
+                            @endif
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ============================================================
              3. QUICK ACTIONS (4 GRID — 100% DITTO MECHA HUD TILES)
              ============================================================ -->
                 <div class="quick-actions">

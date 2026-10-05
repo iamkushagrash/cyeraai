@@ -15,7 +15,7 @@ use App\Http\Controllers\SupportQueryController;
 class WalletTransferController extends Controller
 {
     //User
-    public function stakePage()
+    public function stakePage(Request $request)
     {
         //$capping=\App\StackingDeposite::where('userid',\Session::get('user.id'))->first();dd(' capamount ',Crypt::decrypt($capping->capamount));
         $userDetail = \App\UserDetails::where('id', \Session::get('user.id'))->first();
@@ -27,11 +27,45 @@ class WalletTransferController extends Controller
 
         $user = null;
         $price = \App\ProfileStore::where('id', 1)->first();
-        /*$user=\App\User::where('uuid',\Session::get('user.uuid'))
-        ->join('user_details','users.id','=','user_details.userid')
-        ->select(\DB::raw('('.\Session::get('logtime').'+ user_details.id) as id'),'uuid as uuid','email as email','usersname as name')->first();*/
 
-        return view('user.upgrade')->with('balance', $availbleStfc)/*->with('stacking',$stackingPeriod)*/ ->with('user', $user)->with('price', $price);
+        // DAO Detection
+        $daoParam = strtolower(trim($request->query('dao', '')));
+        $daoType = 0;
+        $daoAmount = 0;
+        $daoMultiplier = 1;
+        $daoTitle = '';
+
+        $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
+        $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+
+        if ($daoParam === 'diamond' || $daoParam === '1') {
+            if ($diamondCount >= 20) {
+                return redirect('/User/Dashboard')->with('warning', 'Diamond Club slots are currently full (20/20).');
+            }
+            $daoType = 1;
+            $daoAmount = 10000;
+            $daoMultiplier = 4;
+            $daoTitle = 'Diamond Club Member';
+        } elseif ($daoParam === 'core' || $daoParam === '2') {
+            if ($coreCount >= 100) {
+                return redirect('/User/Dashboard')->with('warning', 'Core Member slots are currently full (100/100).');
+            }
+            $daoType = 2;
+            $daoAmount = 3333;
+            $daoMultiplier = 3;
+            $daoTitle = 'Core DAO Member';
+        }
+
+        return view('user.upgrade')
+            ->with('balance', $availbleStfc)
+            ->with('user', $user)
+            ->with('price', $price)
+            ->with('daoType', $daoType)
+            ->with('daoAmount', $daoAmount)
+            ->with('daoMultiplier', $daoMultiplier)
+            ->with('daoTitle', $daoTitle)
+            ->with('diamondCount', $diamondCount)
+            ->with('coreCount', $coreCount);
     }
 
 
@@ -48,19 +82,13 @@ class WalletTransferController extends Controller
         $user = \App\User::where('uuid', $request->userid)
             ->join('user_details', 'users.id', '=', 'user_details.userid')
             ->select(\DB::raw('(' . \Session::get('logtime') . '+ user_details.id) as id'), 'uuid as uuid', 'email as email', 'usersname as name', 'user_details.id as uid')->first();
-        /*$stackingDeposite=\App\StackingDeposite::where('userid',$user->uid)->get()->last();
-        if(!is_null($stackingDeposite)){
-            $stackingPeriod=\App\StackingDetail::where([['status',1],['id','>=',$stackingDeposite->planid]])->selectRaw('id +'.(pow(51, 3)).' as id,planname,cps,max_amount as amount')->get();
-        }else{
-            $stackingPeriod=\App\StackingDetail::where([['status',1]])->selectRaw('id +'.(pow(51, 3)).' as id,planname,cps,max_amount as amount')->get();
-        } */
 
         $userDetail = \App\UserDetails::where('id', $user->id - \Session::get('logtime'))->first();
         if (!is_null($userDetail->userLoanStatus()) && $userDetail->userLoanStatus()->remaining > 0) {
             return redirect()->back()->with('warning', $userDetail->user()->uuid . ' User have an acive loan please repay it first.');
         }
 
-        return view('user.upgrade')->with('balance', $availbleStfc)/*->with('stacking',$stackingPeriod)*/ ->with('user', $user)->with('price', $price);
+        return view('user.upgrade')->with('balance', $availbleStfc)->with('user', $user)->with('price', $price)->with('daoType', 0)->with('daoAmount', 0)->with('daoMultiplier', 1)->with('daoTitle', '');
     }
 
     public function stakeMWT(Request $request)
@@ -74,16 +102,38 @@ class WalletTransferController extends Controller
         $validator = Validator::make($request->all(), [
             'honeypotu' => ['required', 'gt:' . \Session::get('logtime')],
             'staketype' => ['nullable', 'string'],
-            /*'plan'       =>   ['required','numeric','gt:'.(pow(51,3))],*/
             'amount' => ['nullable', 'numeric'],
+            'dao_type' => ['nullable', 'integer'],
             'password' => ['required', 'string'],
         ]);
 
-        if ($validator->fails()) {//dd($validator->errors(),$request->plan);
+        if ($validator->fails()) {
             return redirect('/User/Stake')->with('errors', $validator->errors());
         }
-        if ($request->amount < 50 || $request->amount > 2000) {
-            return redirect('/User/Stake')->with('warning', 'Staking amount must be between $50 and $2,000 USD');
+
+        $daoType = intval($request->dao_type ?? 0);
+        if ($daoType === 1) {
+            // Diamond Club: Fixed $10,000 & Max 20 slots
+            $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
+            if ($diamondCount >= 20) {
+                return redirect('/User/Stake?dao=diamond')->with('warning', 'Diamond Club slots are currently full (20/20).');
+            }
+            if (floatval($request->amount) != 10000) {
+                return redirect('/User/Stake?dao=diamond')->with('warning', 'Diamond Club requires exact topup of $10,000 USD.');
+            }
+        } elseif ($daoType === 2) {
+            // Core Member: Fixed $3,333 & Max 100 slots
+            $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+            if ($coreCount >= 100) {
+                return redirect('/User/Stake?dao=core')->with('warning', 'Core Member slots are currently full (100/100).');
+            }
+            if (floatval($request->amount) != 3333) {
+                return redirect('/User/Stake?dao=core')->with('warning', 'Core Member requires exact topup of $3,333 USD.');
+            }
+        } else {
+            if ($request->amount < 50 || $request->amount > 2000) {
+                return redirect('/User/Stake')->with('warning', 'Staking amount must be between $50 and $2,000 USD');
+            }
         }
 
         $user = \App\User::where('uuid', \Session::get('user.userid'))->first();
@@ -125,8 +175,14 @@ class WalletTransferController extends Controller
                     }
 
                     $cappingFunction = new StackingDetailController();
-                    $userCapStats = $userUpdate->first()->getCappingTier();
-                    $userMultiplier = $userCapStats['multiplier'] ?: 2;
+                    if ($daoType === 1) {
+                        $userMultiplier = 4.0;
+                    } elseif ($daoType === 2) {
+                        $userMultiplier = 3.0;
+                    } else {
+                        $userCapStats = $userUpdate->first()->getCappingTier();
+                        $userMultiplier = $userCapStats['multiplier'] ?: 2;
+                    }
                     $totalCapAmount = $request->amount * $userMultiplier;
 
                     $insertWallet = StackingDeposite::insertGetId([
@@ -149,7 +205,23 @@ class WalletTransferController extends Controller
                     $userUpdate->increment('total_self_investment', $request->amount);
                     $userUpdate->increment('current_investment', $request->amount);
                     $userUpdate->increment('total_investment', $request->amount);
-                    $userUpdate->update(['userstatus' => 1, 'capping' => 0, 'roi_status' => 1]);
+
+                    $userUpdatePayload = ['userstatus' => 1, 'capping' => 0, 'roi_status' => 1];
+                    if ($daoType > 0) {
+                        $userUpdatePayload['is_dao'] = $daoType;
+                        DB::table('dao_qualifications')->insert([
+                            'userid' => $targetUserId,
+                            'user_uuid' => $userUpdate->first()->user()->uuid ?? null,
+                            'dao_type' => $daoType,
+                            'amount' => $request->amount,
+                            'capping_multiplier' => $userMultiplier,
+                            'capping_amount' => $totalCapAmount,
+                            'status' => 1,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                    $userUpdate->update($userUpdatePayload);
 
                     // 5% Direct Referral Commission to Sponsor
                     $guiderDetail = \App\UserDetails::where('userid', $userUpdate->first()->sponsorid)->first();
@@ -221,12 +293,45 @@ class WalletTransferController extends Controller
      */
     public function web3UnifiedStake(Request $request)
     {
-        $request->validate([
-            'amount' => ['required', 'numeric', 'min:50', 'max:2000'],
-            'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
-            'targetUserId' => ['nullable', 'string'],
-            'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
-        ]);
+        $daoType = intval($request->dao_type ?? 0);
+        if ($daoType === 1) {
+            // Diamond Club
+            $request->validate([
+                'amount' => ['required', 'numeric'],
+                'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+                'targetUserId' => ['nullable', 'string'],
+                'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
+            ]);
+            $diamondCount = DB::table('dao_qualifications')->where('dao_type', 1)->where('status', 1)->count();
+            if ($diamondCount >= 20) {
+                return response()->json(['status' => 'error', 'message' => 'Diamond Club slots are currently full (20/20).'], 400);
+            }
+            if (floatval($request->amount) != 10000) {
+                return response()->json(['status' => 'error', 'message' => 'Diamond Club requires exact amount of $10,000 USDT.'], 400);
+            }
+        } elseif ($daoType === 2) {
+            // Core Member
+            $request->validate([
+                'amount' => ['required', 'numeric'],
+                'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+                'targetUserId' => ['nullable', 'string'],
+                'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
+            ]);
+            $coreCount = DB::table('dao_qualifications')->where('dao_type', 2)->where('status', 1)->count();
+            if ($coreCount >= 100) {
+                return response()->json(['status' => 'error', 'message' => 'Core Member slots are currently full (100/100).'], 400);
+            }
+            if (floatval($request->amount) != 3333) {
+                return response()->json(['status' => 'error', 'message' => 'Core Member requires exact amount of $3,333 USDT.'], 400);
+            }
+        } else {
+            $request->validate([
+                'amount' => ['required', 'numeric', 'min:50', 'max:2000'],
+                'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+                'targetUserId' => ['nullable', 'string'],
+                'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
+            ]);
+        }
 
         $amount = floatval($request->amount);
         $txHash = strtolower($request->txHash);
@@ -234,6 +339,7 @@ class WalletTransferController extends Controller
         \Log::info("Web3UnifiedStake: Incoming Request", [
             'amount' => $amount,
             'txHash' => $txHash,
+            'dao_type' => $daoType,
             'targetUserId' => $request->targetUserId,
             'senderAddress' => $request->senderAddress,
             'session_user_id' => \Session::get('user.id')
@@ -318,8 +424,8 @@ class WalletTransferController extends Controller
                 'amountusdt'    => $amount,
                 'remaining'     => 0,
                 'paymentstatus' => 2, // Paid / Confirmed
-                'txndesc'       => 'Web3 On-Chain 70/30 Splitter Deposit',
-                'comments'      => 'web3_split',
+                'txndesc'       => $daoType > 0 ? ('Web3 On-Chain DAO ' . ($daoType === 1 ? 'Diamond' : 'Core') . ' Deposit') : 'Web3 On-Chain 70/30 Splitter Deposit',
+                'comments'      => $daoType > 0 ? ('web3_dao_' . $daoType) : 'web3_split',
                 'planid'        => 1,
                 'currency'      => 'usdtbep20',
                 'paidby'        => $currentUserId,
@@ -377,8 +483,14 @@ class WalletTransferController extends Controller
             // Capping tier calculation & StackingDeposite activation
             $plan = \App\StackingDetail::where('status', 1)->first() ?: (object)['id' => 1, 'capping' => 2.00, 'cps' => 0.50];
             $cappingFunction = new StackingDetailController();
-            $userCapStats = $targetUserDetail->getCappingTier();
-            $userMultiplier = $userCapStats['multiplier'] ?: 2;
+            if ($daoType === 1) {
+                $userMultiplier = 4.0;
+            } elseif ($daoType === 2) {
+                $userMultiplier = 3.0;
+            } else {
+                $userCapStats = $targetUserDetail->getCappingTier();
+                $userMultiplier = $userCapStats['multiplier'] ?: 2;
+            }
             $totalCapAmount = $amount * $userMultiplier;
 
             $stackingDeposit = StackingDeposite::create([
@@ -395,17 +507,33 @@ class WalletTransferController extends Controller
                 'staketype'  => 1,
             ]);
 
-            // Update UserDetails Investment Stats
+            // Update UserDetails Investment Stats & DAO Status
             $targetUserDetail->increment('userstate');
             $targetUserDetail->increment('current_self_investment', $amount);
             $targetUserDetail->increment('total_self_investment', $amount);
             $targetUserDetail->increment('current_investment', $amount);
             $targetUserDetail->increment('total_investment', $amount);
-            $targetUserDetail->update([
+
+            $targetUserUpdatePayload = [
                 'userstatus' => 1,
                 'capping'    => 0,
                 'roi_status' => 1
-            ]);
+            ];
+            if ($daoType > 0) {
+                $targetUserUpdatePayload['is_dao'] = $daoType;
+                \DB::table('dao_qualifications')->insert([
+                    'userid' => $targetUserId,
+                    'user_uuid' => $targetUserDetail->user() ? $targetUserDetail->user()->uuid : null,
+                    'dao_type' => $daoType,
+                    'amount' => $amount,
+                    'capping_multiplier' => $userMultiplier,
+                    'capping_amount' => $totalCapAmount,
+                    'status' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+            $targetUserDetail->update($targetUserUpdatePayload);
 
             // 5% Direct Referral Commission to Sponsor
             $guiderDetail = \App\UserDetails::where('userid', $targetUserDetail->sponsorid)->orWhere('id', $targetUserDetail->sponsorid)->first();

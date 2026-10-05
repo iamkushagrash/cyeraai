@@ -323,9 +323,19 @@ class UserDetails extends Model
             ];
         }
 
+        // DAO Baseline Capping Override: Diamond = 4X, Core Member = 3X
+        if ($this->is_dao == 1 && $multiplier < 4) {
+            $multiplier = 4;
+            $nextTier = '5X';
+        } elseif ($this->is_dao == 2 && $multiplier < 3) {
+            $multiplier = 3;
+            $nextTier = '5X';
+        }
+
         return [
             'multiplier' => $multiplier,
             'active_tier' => $multiplier . 'X',
+            'is_dao' => $this->is_dao ?? 0,
             'self_inv' => $selfInv,
             'directs_100' => $directs100,
             'directs_200' => $directs200,
