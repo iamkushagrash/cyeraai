@@ -1,0 +1,14 @@
+{
+  "name": "cai-pancake-volume-bot",
+  "version": "1.0.0",
+  "description": "Automated PancakeSwap Volume and Green Buy Bot for CAI Token",
+  "main": "bot.js",
+  "type": "module",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2"
+  }
+}
