@@ -72,6 +72,13 @@
                         @else
                             <span class="strip-status-pill inactive" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; line-height: 1.2; white-space: nowrap;"><i class="fas fa-circle-xmark" style="font-size: 5.5px;"></i> INACTIVE</span>
                         @endif
+                        @if(($sideUserDetail->is_dao ?? 0) == 3)
+                            <span class="strip-status-pill" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; background: rgba(255, 215, 0, 0.18); border: 1px solid #FFD700; color: #FFD700; font-weight: 800; line-height: 1.2; white-space: nowrap;"><i class="fas fa-gem" style="font-size: 5.5px;"></i> DIAMOND DAO</span>
+                        @elseif(($sideUserDetail->is_dao ?? 0) == 2)
+                            <span class="strip-status-pill" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; background: rgba(245, 158, 11, 0.18); border: 1px solid #F59E0B; color: #F59E0B; font-weight: 800; line-height: 1.2; white-space: nowrap;"><i class="fas fa-award" style="font-size: 5.5px;"></i> GOLDEN DAO</span>
+                        @elseif(($sideUserDetail->is_dao ?? 0) == 1)
+                            <span class="strip-status-pill" style="font-size: 6.2px; padding: 1px 3.5px; margin: 0; background: rgba(56, 189, 248, 0.18); border: 1px solid #38BDF8; color: #38BDF8; font-weight: 800; line-height: 1.2; white-space: nowrap;"><i class="fas fa-shield-alt" style="font-size: 5.5px;"></i> PLATINUM DAO</span>
+                        @endif
                     </div>
 
                     <!-- Connected Wallet Capsule -->

@@ -124,29 +124,43 @@ class WalletTransferController extends Controller
         }
 
         $daoType = intval($request->dao_type ?? 0);
-        if ($daoType === 1) {
-            // Diamond Club: Fixed $10,000 & Max 20 slots
-            $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
-            $dCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
-            if ($dCount >= ($diamondDao->max_members ?? 20)) {
-                return redirect('/User/Stake?dao=diamond')->with('warning', 'Diamond Club slots are currently full (20/20).');
+        $amount = floatval($request->amount ?? 0);
+        if ($daoType === 0) {
+            if ($amount == 10000) $daoType = 3;
+            elseif ($amount == 5555) $daoType = 2;
+            elseif ($amount == 3333) $daoType = 1;
+        }
+
+        if ($daoType === 3) {
+            // Diamond DAO: Fixed $10,000 & Max 50 slots
+            $dCount = DB::table('user_details')->where('is_dao', 3)->count();
+            if ($dCount >= 50) {
+                return redirect('/User/Stake?dao=3')->with('warning', 'Diamond DAO slots are currently full (50/50).');
             }
-            if (floatval($request->amount) != 10000) {
-                return redirect('/User/Stake?dao=diamond')->with('warning', 'Diamond Club requires exact topup of $10,000 USD.');
+            if ($amount != 10000) {
+                return redirect('/User/Stake?dao=3')->with('warning', 'Diamond DAO requires exact topup of $10,000 USD.');
             }
         } elseif ($daoType === 2) {
-            // Core Member: Fixed $3,333 & Max 100 slots
-            $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
-            $cCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
-            if ($cCount >= ($coreDao->max_members ?? 100)) {
-                return redirect('/User/Stake?dao=core')->with('warning', 'Core Member slots are currently full (100/100).');
+            // Golden DAO: Fixed $5,555 & Max 100 slots
+            $gCount = DB::table('user_details')->where('is_dao', 2)->count();
+            if ($gCount >= 100) {
+                return redirect('/User/Stake?dao=2')->with('warning', 'Golden DAO slots are currently full (100/100).');
             }
-            if (floatval($request->amount) != 3333) {
-                return redirect('/User/Stake?dao=core')->with('warning', 'Core Member requires exact topup of $3,333 USD.');
+            if ($amount != 5555) {
+                return redirect('/User/Stake?dao=2')->with('warning', 'Golden DAO requires exact topup of $5,555 USD.');
+            }
+        } elseif ($daoType === 1) {
+            // Platinum DAO: Fixed $3,333 & Max 100 slots
+            $pCount = DB::table('user_details')->where('is_dao', 1)->count();
+            if ($pCount >= 100) {
+                return redirect('/User/Stake?dao=1')->with('warning', 'Platinum DAO slots are currently full (100/100).');
+            }
+            if ($amount != 3333) {
+                return redirect('/User/Stake?dao=1')->with('warning', 'Platinum DAO requires exact topup of $3,333 USD.');
             }
         } else {
-            if ($request->amount < 50 || $request->amount > 2000) {
-                return redirect('/User/Stake')->with('warning', 'Staking amount must be between $50 and $2,000 USD');
+            if ($amount < 50 || $amount > 20000) {
+                return redirect('/User/Stake')->with('warning', 'Staking amount must be between $50 and $20,000 USD');
             }
         }
 
@@ -189,12 +203,14 @@ class WalletTransferController extends Controller
                     }
 
                     $cappingFunction = new StackingDetailController();
-                    if ($daoType === 1) {
+                    if ($daoType === 3) {
                         $userMultiplier = 4.0;
                     } elseif ($daoType === 2) {
+                        $userMultiplier = 3.5;
+                    } elseif ($daoType === 1) {
                         $userMultiplier = 3.0;
                     } else {
-                        $userCapStats = $userUpdate->first()->getCappingTier();
+                        $userCapStats = $userUpdate->first()->getCappingTier(false);
                         $userMultiplier = $userCapStats['multiplier'] ?: 2;
                     }
                     $totalCapAmount = $request->amount * $userMultiplier;
@@ -223,9 +239,8 @@ class WalletTransferController extends Controller
                     $userUpdatePayload = ['userstatus' => 1, 'capping' => 0, 'roi_status' => 1];
                     if ($daoType > 0) {
                         $userUpdatePayload['is_dao'] = $daoType;
-                        DB::table('dao_qualifications')->where('id', $daoType)->increment('total_qualified', 1);
                     }
-                    $userUpdate->update($userUpdatePayload);
+                    \DB::table('user_details')->where('id', $targetUserId)->update($userUpdatePayload);
 
                     // 5% Direct Referral Commission to Sponsor
                     $guiderDetail = \App\UserDetails::where('userid', $userUpdate->first()->sponsorid)->first();
@@ -354,6 +369,12 @@ class WalletTransferController extends Controller
 
         $amount = floatval($request->amount);
         $txHash = strtolower($request->txHash);
+        
+        if ($daoType === 0) {
+            if ($amount == 10000) $daoType = 3;
+            elseif ($amount == 5555) $daoType = 2;
+            elseif ($amount == 3333) $daoType = 1;
+        }
         
         \Log::info("Web3UnifiedStake: Incoming Request", [
             'amount' => $amount,
@@ -509,7 +530,7 @@ class WalletTransferController extends Controller
             } elseif ($daoType === 1) {
                 $userMultiplier = 3.0;
             } else {
-                $userCapStats = $targetUserDetail->getCappingTier();
+                $userCapStats = $targetUserDetail->getCappingTier(false);
                 $userMultiplier = $userCapStats['multiplier'] ?: 2;
             }
             $totalCapAmount = $amount * $userMultiplier;
@@ -543,7 +564,7 @@ class WalletTransferController extends Controller
             if ($daoType > 0) {
                 $targetUserUpdatePayload['is_dao'] = $daoType;
             }
-            $targetUserDetail->update($targetUserUpdatePayload);
+            \DB::table('user_details')->where('id', $targetUserId)->update($targetUserUpdatePayload);
 
             // 5% Direct Referral Commission to Sponsor
             $guiderDetail = \App\UserDetails::where('userid', $targetUserDetail->sponsorid)->orWhere('id', $targetUserDetail->sponsorid)->first();

@@ -9,7 +9,7 @@ class UserDetails extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['userid', 'sponsorid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'cai_balance', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected'];
+    protected $fillable = ['userid', 'sponsorid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'cai_balance', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected', 'is_dao'];
 
 
     public function stackingDeposite()
@@ -59,8 +59,8 @@ class UserDetails extends Model
 
     public function remainingIncome()
     {
-        return $this->stackingIncome()->where('status', 0)->sum('remaining_usdt') 
-            + $this->levelIncome()->where('status', 0)->sum('remaining_usdt') 
+        return $this->stackingIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->levelIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
             + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
@@ -70,7 +70,7 @@ class UserDetails extends Model
 
     public function workingRemainingIncome()
     {
-        return $this->levelIncome()->where('status', 0)->sum('remaining_usdt') 
+        return $this->levelIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
             + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
@@ -268,7 +268,7 @@ class UserDetails extends Model
         ];
     }
 
-    public function getCappingTier()
+    public function getCappingTier($includeDaoOverride = true)
     {
         $selfInv = (float) ($this->current_self_investment);
         $legs = $this->getLegBusiness();
@@ -330,13 +330,18 @@ class UserDetails extends Model
             ];
         }
 
-        // DAO Baseline Capping Override: Diamond = 4X, Core Member = 3X
-        if ($this->is_dao == 1 && $multiplier < 4) {
-            $multiplier = 4;
-            $nextTier = '5X';
-        } elseif ($this->is_dao == 2 && $multiplier < 3) {
-            $multiplier = 3;
-            $nextTier = '5X';
+        if ($includeDaoOverride) {
+            // DAO Baseline Capping Override: Diamond (3) = 4.0X, Golden (2) = 3.5X, Platinum (1) = 3.0X
+            if ($this->is_dao == 3 && $multiplier < 4.0) {
+                $multiplier = 4.0;
+                $nextTier = '5X';
+            } elseif ($this->is_dao == 2 && $multiplier < 3.5) {
+                $multiplier = 3.5;
+                $nextTier = '5X';
+            } elseif ($this->is_dao == 1 && $multiplier < 3.0) {
+                $multiplier = 3.0;
+                $nextTier = '3.5X';
+            }
         }
 
         return [
@@ -480,42 +485,42 @@ class UserDetails extends Model
 
         $userCreated = $this->user() ? \Carbon\Carbon::parse($this->user()->created_at) : \Carbon\Carbon::parse($this->created_at ?? now());
         $daysReg = $userCreated->diffInDays(now());
-        $rankLevel = (int)($this->rank_level ?? 0);
-        $userIsDao = (int)($this->is_dao ?? 0);
+        $rankLevel = (int) ($this->rank_level ?? 0);
+        $userIsDao = (int) ($this->is_dao ?? 0);
 
         $tiers = \App\DaoDetail::where('status', 1)->orderBy('dao_type', 'asc')->get();
         $result = [];
 
         foreach ($tiers as $tier) {
             $membersCount = \App\UserDetails::where('is_dao', $tier->dao_type)->count();
-            $isPurchased  = ($userIsDao === $tier->dao_type);
+            $isPurchased = ($userIsDao === $tier->dao_type);
 
-            $daysOk  = ($daysReg <= (int)$tier->days_limit);
-            $rankOk  = ($rankLevel >= (int)$tier->rank_required);
-            $slotsOk = ($membersCount < (int)$tier->max_members || $isPurchased);
+            $daysOk = ($daysReg <= (int) $tier->days_limit);
+            $rankOk = ($rankLevel >= (int) $tier->rank_required);
+            $slotsOk = ($membersCount < (int) $tier->max_members || $isPurchased);
 
             $totalReceived = (float) \App\DaoIncome::where('userid', $this->id)->where('dao_type', $tier->dao_type)->sum('amt_usdt');
-            $maxCapping    = (float)$tier->package_amount * (float)$tier->capping_multiplier;
+            $maxCapping = (float) $tier->package_amount * (float) $tier->capping_multiplier;
 
             $result[$tier->dao_type] = [
-                'dao_type'           => $tier->dao_type,
-                'dao_name'           => $tier->dao_name,
-                'package_amount'     => (float)$tier->package_amount,
-                'max_members'        => (int)$tier->max_members,
-                'current_members'    => $membersCount,
-                'rank_required'      => (int)$tier->rank_required,
-                'days_limit'         => (int)$tier->days_limit,
-                'pool_percent'       => (float)$tier->pool_percent,
-                'capping_multiplier' => (float)$tier->capping_multiplier,
-                'max_capping'        => $maxCapping,
-                'total_received'     => $totalReceived,
-                'is_purchased'       => $isPurchased,
-                'is_eligible'        => ($isPurchased && $daysOk && $rankOk && ($totalReceived < $maxCapping)),
-                'days_registered'    => $daysReg,
-                'current_rank'       => $rankLevel,
-                'days_ok'            => $daysOk,
-                'rank_ok'            => $rankOk,
-                'slots_ok'           => $slotsOk,
+                'dao_type' => $tier->dao_type,
+                'dao_name' => $tier->dao_name,
+                'package_amount' => (float) $tier->package_amount,
+                'max_members' => (int) $tier->max_members,
+                'current_members' => $membersCount,
+                'rank_required' => (int) $tier->rank_required,
+                'days_limit' => (int) $tier->days_limit,
+                'pool_percent' => (float) $tier->pool_percent,
+                'capping_multiplier' => (float) $tier->capping_multiplier,
+                'max_capping' => $maxCapping,
+                'total_received' => $totalReceived,
+                'is_purchased' => $isPurchased,
+                'is_eligible' => ($isPurchased && $daysOk && $rankOk && ($totalReceived < $maxCapping)),
+                'days_registered' => $daysReg,
+                'current_rank' => $rankLevel,
+                'days_ok' => $daysOk,
+                'rank_ok' => $rankOk,
+                'slots_ok' => $slotsOk,
             ];
         }
         return $result;

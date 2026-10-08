@@ -269,12 +269,15 @@
 
                 if ($activeDeposits->isNotEmpty()) {
                     $totalInvested = (float) $activeDeposits->sum('usdt');
-                    $maxCapping = $totalInvested > 0 ? ($totalInvested * $tierMultiplier) : 0.00;
+                    $maxCapping = 0;
                     $totalRemainingCapping = 0;
                     foreach ($activeDeposits as $dep) {
+                        $depMult = floatval($dep->istatus) > 0 ? floatval($dep->istatus) : 2.0;
+                        $maxCapping += (float) $dep->usdt * $depMult;
                         try {
                             $totalRemainingCapping += (float) \Crypt::decrypt($dep->capamount);
                         } catch (\Exception $e) {
+                            $totalRemainingCapping += (float) $dep->capamount;
                         }
                     }
                     $cappingConsumed = max(0, $maxCapping - $totalRemainingCapping);
@@ -287,10 +290,14 @@
                     }
                 } else {
                     // Check if user had previous deposits that have reached 0 capping (status 0)
-                    $lastDeposit = \App\StackingDeposite::where('userid', $uid)->orderBy('id', 'desc')->first();
-                    if ($lastDeposit) {
-                        $totalInvested = (float) $lastDeposit->usdt;
-                        $maxCapping = $totalInvested * $tierMultiplier;
+                    $allPrevDeposits = \App\StackingDeposite::where('userid', $uid)->get();
+                    if ($allPrevDeposits->isNotEmpty()) {
+                        $totalInvested = (float) $allPrevDeposits->sum('usdt');
+                        $maxCapping = 0;
+                        foreach ($allPrevDeposits as $dep) {
+                            $depMult = floatval($dep->istatus) > 0 ? floatval($dep->istatus) : 2.0;
+                            $maxCapping += (float) $dep->usdt * $depMult;
+                        }
                         $totalRemainingCapping = 0;
                         $cappingConsumed = $maxCapping;
                         $filledPct = 100;
@@ -556,6 +563,19 @@
                                         <span class="strip-status-pill rank-pill" title="Current Rank">
                                             <i class="fas fa-crown"></i> {{ $userRankName }}
                                         </span>
+                                        @if(($data['userDetail']->is_dao ?? 0) == 3)
+                                            <span class="strip-status-pill" style="background: rgba(255, 215, 0, 0.18); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.4); font-weight: 800;" title="Diamond DAO Member">
+                                                <i class="fas fa-gem"></i> DIAMOND DAO
+                                            </span>
+                                        @elseif(($data['userDetail']->is_dao ?? 0) == 2)
+                                            <span class="strip-status-pill" style="background: rgba(245, 158, 11, 0.18); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800;" title="Golden DAO Member">
+                                                <i class="fas fa-award"></i> GOLDEN DAO
+                                            </span>
+                                        @elseif(($data['userDetail']->is_dao ?? 0) == 1)
+                                            <span class="strip-status-pill" style="background: rgba(56, 189, 248, 0.18); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 800;" title="Platinum DAO Member">
+                                                <i class="fas fa-shield-alt"></i> PLATINUM DAO
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
 
