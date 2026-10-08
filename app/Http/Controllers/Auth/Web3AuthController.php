@@ -255,6 +255,15 @@ class Web3AuthController extends Controller
             }
         }
 
+        // Enforce Minimum $50 USDT Wallet Balance Requirement
+        $usdtBal = \App\Http\Controllers\Auth\RegisterController::checkWalletUsdtBalance($walletAddress);
+        if ($usdtBal < 50.00) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Minimum $50 USDT balance is required in your connected Web3 wallet to register. Your current wallet balance is $' . number_format($usdtBal, 2) . ' USDT.'
+            ], 422);
+        }
+
         // Validate Sponsor (Supports BEP-20 Wallet Address, UUID, or Email)
         $sponsorUser = null;
         if (!empty($request->sponsor)) {

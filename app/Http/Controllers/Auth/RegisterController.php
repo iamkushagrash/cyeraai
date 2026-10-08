@@ -158,7 +158,7 @@ class RegisterController extends Controller
                 }
             }
 
-            // Check if wallet address is already registered
+            // Check if wallet address is already registered & check 50 USDT balance
             if (!empty($data['wallet_address'])) {
                 $walletLower = strtolower(trim($data['wallet_address']));
                 $existingAsset = AssetDetail::whereRaw('LOWER(usdtbep20addr) = ?', [$walletLower])
@@ -167,9 +167,80 @@ class RegisterController extends Controller
 
                 if ($existingAsset) {
                     $validator->errors()->add('wallet_address', 'This Web3 Wallet is already registered. Please proceed to Sign In.');
+                } else {
+                    $usdtBal = self::checkWalletUsdtBalance($walletLower);
+                    if ($usdtBal < 50.00) {
+                        $validator->errors()->add('wallet_address', 'Minimum $50 USDT balance is required in your connected Web3 wallet to register. Your current wallet balance is $' . number_format($usdtBal, 2) . ' USDT.');
+                    }
                 }
             }
         });
+    }
+
+    /**
+     * Check USDT Balance on BSC Mainnet via RPC
+     */
+    public static function checkWalletUsdtBalance($walletAddress)
+    {
+        $isDemo = env('DEMO_MODE', false) || env('TEST_MODE', false) || config('app.demo_mode', false);
+        if ($isDemo) {
+            return 100.00; // Simulated $100 USDT balance in DEMO MODE
+        }
+
+        $usdtContract = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
+        $cleanAddr = ltrim(strtolower($walletAddress), '0x');
+        $cleanAddrPadded = str_pad($cleanAddr, 64, '0', STR_PAD_LEFT);
+        $data = '0x70a08231' . $cleanAddrPadded;
+
+        $rpcEndpoints = [
+            "https://bsc.meowrpc.com",
+            "https://bsc-dataseed1.defibit.io/",
+            "https://bsc-dataseed.binance.org/",
+            "https://1rpc.io/bnb"
+        ];
+
+        $payload = json_encode([
+            'jsonrpc' => '2.0',
+            'method'  => 'eth_call',
+            'params'  => [
+                [
+                    'to'   => $usdtContract,
+                    'data' => $data
+                ],
+                'latest'
+            ],
+            'id' => 1
+        ]);
+
+        foreach ($rpcEndpoints as $rpcUrl) {
+            $ch = curl_init($rpcUrl);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            if ($response) {
+                $json = json_decode($response, true);
+                if (isset($json['result']) && !empty($json['result']) && $json['result'] !== '0x') {
+                    $hexVal = ltrim(substr($json['result'], 2), '0');
+                    if ($hexVal === '') return 0.00;
+
+                    $dec = '0';
+                    $len = strlen($hexVal);
+                    for ($i = 0; $i < $len; $i++) {
+                        $digit = hexdec($hexVal[$i]);
+                        $dec = bcadd(bcmul($dec, '16'), (string)$digit);
+                    }
+
+                    return (float) bcdiv($dec, '1000000000000000000', 4);
+                }
+            }
+        }
+
+        return 0.00;
     }
 
     /**
