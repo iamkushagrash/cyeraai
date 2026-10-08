@@ -230,7 +230,7 @@ class StackingDetailController extends Controller
                     $guiderUpdate->increment('active_downline');
                 }
 
-                // Check Booster, Capping & Rank upgrades for Sponsor
+                // Check Booster, Capping, Rank & DAO upgrades for Sponsor
                 $this->boosterCheckForUser($guiderUpdate->id);
                 $this->checkAndUpgradeCapping($guiderUpdate->id);
                 \App\Http\Controllers\RankIncomeController::checkAndSyncUserRank($guiderUpdate->id);
@@ -261,12 +261,14 @@ class StackingDetailController extends Controller
                     $uplineLeadership->increment('total_level_investment', $staking->usdt);
                     $uplineLeadership->save();
 
-                    // Check Capping and Rank upgrades for Upline
+                    // Check Capping, Rank & DAO upgrades for Upline
                     $this->checkAndUpgradeCapping($upline->id);
                     \App\Http\Controllers\RankIncomeController::checkAndSyncUserRank($upline->id);
 
                     $currentGuiderId = $upline->sponsorid;
                 }
+                
+
             }
 
             // Distribute Level Income (Levels 2 to 15)

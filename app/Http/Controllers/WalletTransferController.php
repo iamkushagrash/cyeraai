@@ -35,27 +35,36 @@ class WalletTransferController extends Controller
         $daoMultiplier = 1;
         $daoTitle = '';
 
-        $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
-        $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
-        $diamondCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
-        $coreCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
+        \App\Http\Controllers\DaoIncomeController::seedDaoDetails();
 
-        if ($daoParam === 'diamond' || $daoParam === '1') {
-            if ($diamondCount >= ($diamondDao->max_members ?? 20)) {
-                return redirect('/User/Dashboard')->with('warning', 'Diamond Club slots are currently full (20/20).');
+        $diamondCount  = DB::table('user_details')->where('is_dao', 3)->count();
+        $goldenCount   = DB::table('user_details')->where('is_dao', 2)->count();
+        $platinumCount = DB::table('user_details')->where('is_dao', 1)->count();
+
+        if ($daoParam === 'diamond' || $daoParam === '3') {
+            if ($diamondCount >= 50) {
+                return redirect('/User/Dashboard')->with('warning', 'Diamond DAO slots are currently full (50/50).');
             }
-            $daoType = 1;
+            $daoType = 3;
             $daoAmount = 10000;
             $daoMultiplier = 4;
-            $daoTitle = 'Diamond Club Member';
-        } elseif ($daoParam === 'core' || $daoParam === '2') {
-            if ($coreCount >= ($coreDao->max_members ?? 100)) {
-                return redirect('/User/Dashboard')->with('warning', 'Core Member slots are currently full (100/100).');
+            $daoTitle = 'Diamond DAO Member';
+        } elseif ($daoParam === 'golden' || $daoParam === '2') {
+            if ($goldenCount >= 100) {
+                return redirect('/User/Dashboard')->with('warning', 'Golden DAO slots are currently full (100/100).');
             }
             $daoType = 2;
+            $daoAmount = 5555;
+            $daoMultiplier = 3.5;
+            $daoTitle = 'Golden DAO Member';
+        } elseif ($daoParam === 'platinum' || $daoParam === 'core' || $daoParam === '1') {
+            if ($platinumCount >= 100) {
+                return redirect('/User/Dashboard')->with('warning', 'Platinum DAO slots are currently full (100/100).');
+            }
+            $daoType = 1;
             $daoAmount = 3333;
             $daoMultiplier = 3;
-            $daoTitle = 'Core DAO Member';
+            $daoTitle = 'Platinum DAO Member';
         }
 
         return view('user.upgrade')
@@ -67,7 +76,8 @@ class WalletTransferController extends Controller
             ->with('daoMultiplier', $daoMultiplier)
             ->with('daoTitle', $daoTitle)
             ->with('diamondCount', $diamondCount)
-            ->with('coreCount', $coreCount);
+            ->with('goldenCount', $goldenCount)
+            ->with('platinumCount', $platinumCount);
     }
 
 
@@ -288,41 +298,54 @@ class WalletTransferController extends Controller
     public function web3UnifiedStake(Request $request)
     {
         $daoType = intval($request->dao_type ?? 0);
-        if ($daoType === 1) {
-            // Diamond Club
+        if ($daoType === 3) {
+            // Diamond DAO
             $request->validate([
                 'amount' => ['required', 'numeric'],
                 'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
                 'targetUserId' => ['nullable', 'string'],
                 'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
             ]);
-            $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
-            $dCount = max(DB::table('user_details')->where('is_dao', 1)->count(), $diamondDao->total_qualified ?? 0);
-            if ($dCount >= ($diamondDao->max_members ?? 20)) {
-                return response()->json(['status' => 'error', 'message' => 'Diamond Club slots are currently full (20/20).'], 400);
+            $dCount = DB::table('user_details')->where('is_dao', 3)->count();
+            if ($dCount >= 50) {
+                return response()->json(['status' => 'error', 'message' => 'Diamond DAO slots are currently full (50/50).'], 400);
             }
             if (floatval($request->amount) != 10000) {
-                return response()->json(['status' => 'error', 'message' => 'Diamond Club requires exact amount of $10,000 USDT.'], 400);
+                return response()->json(['status' => 'error', 'message' => 'Diamond DAO requires exact amount of $10,000 USDT.'], 400);
             }
         } elseif ($daoType === 2) {
-            // Core Member
+            // Golden DAO
             $request->validate([
                 'amount' => ['required', 'numeric'],
                 'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
                 'targetUserId' => ['nullable', 'string'],
                 'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
             ]);
-            $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
-            $cCount = max(DB::table('user_details')->where('is_dao', 2)->count(), $coreDao->total_qualified ?? 0);
-            if ($cCount >= ($coreDao->max_members ?? 100)) {
-                return response()->json(['status' => 'error', 'message' => 'Core Member slots are currently full (100/100).'], 400);
+            $gCount = DB::table('user_details')->where('is_dao', 2)->count();
+            if ($gCount >= 100) {
+                return response()->json(['status' => 'error', 'message' => 'Golden DAO slots are currently full (100/100).'], 400);
+            }
+            if (floatval($request->amount) != 5555) {
+                return response()->json(['status' => 'error', 'message' => 'Golden DAO requires exact amount of $5,555 USDT.'], 400);
+            }
+        } elseif ($daoType === 1) {
+            // Platinum DAO
+            $request->validate([
+                'amount' => ['required', 'numeric'],
+                'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
+                'targetUserId' => ['nullable', 'string'],
+                'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
+            ]);
+            $pCount = DB::table('user_details')->where('is_dao', 1)->count();
+            if ($pCount >= 100) {
+                return response()->json(['status' => 'error', 'message' => 'Platinum DAO slots are currently full (100/100).'], 400);
             }
             if (floatval($request->amount) != 3333) {
-                return response()->json(['status' => 'error', 'message' => 'Core Member requires exact amount of $3,333 USDT.'], 400);
+                return response()->json(['status' => 'error', 'message' => 'Platinum DAO requires exact amount of $3,333 USDT.'], 400);
             }
         } else {
             $request->validate([
-                'amount' => ['required', 'numeric', 'min:50', 'max:2000'],
+                'amount' => ['required', 'numeric', 'min:50', 'max:20000'],
                 'txHash' => ['required', 'string', 'regex:/^0x[a-fA-F0-9]{64}$/'],
                 'targetUserId' => ['nullable', 'string'],
                 'senderAddress' => ['nullable', 'string', 'regex:/^0x[a-fA-F0-9]{40}$/']
@@ -479,9 +502,11 @@ class WalletTransferController extends Controller
             // Capping tier calculation & StackingDeposite activation
             $plan = \App\StackingDetail::where('status', 1)->first() ?: (object)['id' => 1, 'capping' => 2.00, 'cps' => 0.50];
             $cappingFunction = new StackingDetailController();
-            if ($daoType === 1) {
+            if ($daoType === 3) {
                 $userMultiplier = 4.0;
             } elseif ($daoType === 2) {
+                $userMultiplier = 3.5;
+            } elseif ($daoType === 1) {
                 $userMultiplier = 3.0;
             } else {
                 $userCapStats = $targetUserDetail->getCappingTier();
@@ -517,7 +542,6 @@ class WalletTransferController extends Controller
             ];
             if ($daoType > 0) {
                 $targetUserUpdatePayload['is_dao'] = $daoType;
-                \DB::table('dao_qualifications')->where('id', $daoType)->increment('total_qualified', 1);
             }
             $targetUserDetail->update($targetUserUpdatePayload);
 

@@ -406,6 +406,7 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::get('/User/PoolIncome', 'PoolIncomeController@showPoolIncomePage');
     Route::get('/User/RankIncome', 'RankIncomeController@userRankIncome');
     Route::post('/User/RankIncome', 'RankIncomeController@userRankIncome');
+    Route::get('/User/DaoIncome', 'DaoIncomeController@showDaoIncomePage');
 
 
     // 1. Working Incomes Withdrawal & History

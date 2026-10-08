@@ -234,29 +234,15 @@ class HomeController extends Controller
         $usrRaw['userWallet'] = $userAsset->usdtbep20addr ?? ($userAsset->bep20addr ?? '');
 
         // DAO Qualification Tiers & Status
-        $diamondDao = DB::table('dao_qualifications')->where('id', 1)->first();
-        $coreDao = DB::table('dao_qualifications')->where('id', 2)->first();
-        $dUserCount = DB::table('user_details')->where('is_dao', 1)->count();
-        $cUserCount = DB::table('user_details')->where('is_dao', 2)->count();
+        $diamondDaoCount  = DB::table('user_details')->where('is_dao', 3)->count();
+        $goldenDaoCount   = DB::table('user_details')->where('is_dao', 2)->count();
+        $platinumDaoCount = DB::table('user_details')->where('is_dao', 1)->count();
 
-        $usrRaw['diamondDaoCount'] = max($dUserCount, $diamondDao->total_qualified ?? 0);
-        $usrRaw['coreDaoCount'] = max($cUserCount, $coreDao->total_qualified ?? 0);
-        $usrRaw['diamondDao'] = $diamondDao;
-        $usrRaw['coreDao'] = $coreDao;
-        
-        $myDaoStatus = (int) ($userDetail->is_dao ?? 0);
-        if ($myDaoStatus === 0) {
-            $hasDiamond = \App\StackingDeposite::where('userid', $userDetail->id)->where('usdt', '>=', 10000)->where('status', '>', 0)->exists();
-            $hasCore = \App\StackingDeposite::where('userid', $userDetail->id)->where('usdt', '>=', 3333)->where('status', '>', 0)->exists();
-            if ($hasDiamond) {
-                $myDaoStatus = 1;
-                DB::table('user_details')->where('id', $userDetail->id)->update(['is_dao' => 1]);
-            } elseif ($hasCore) {
-                $myDaoStatus = 2;
-                DB::table('user_details')->where('id', $userDetail->id)->update(['is_dao' => 2]);
-            }
-        }
-        $usrRaw['userDaoStatus'] = $myDaoStatus;
+        $usrRaw['diamondDaoCount']  = $diamondDaoCount;
+        $usrRaw['goldenDaoCount']   = $goldenDaoCount;
+        $usrRaw['platinumDaoCount'] = $platinumDaoCount;
+
+        $usrRaw['userDaoDetails']   = $userDetail->getDaoDetails();
 
         return view('user.dashboard')->with('data',$usrRaw);
     }

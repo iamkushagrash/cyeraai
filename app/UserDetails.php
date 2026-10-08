@@ -42,14 +42,19 @@ class UserDetails extends Model
         return $this->hasMany('\App\PoolIncome', 'userid', 'id')->get();
     }
 
+    public function daoIncome()
+    {
+        return $this->hasMany('\App\DaoIncome', 'userid', 'id')->get();
+    }
+
     public function totalIncome()
     {
-        return $this->stackingIncome()->sum('amount') + $this->levelIncome()->sum('amount') + $this->bonusReward()->sum('amount') + $this->clubIncome()->sum('amount') + $this->poolIncome()->sum('amount') + $this->rankIncome()->sum('amount');
+        return $this->stackingIncome()->sum('amount') + $this->levelIncome()->sum('amount') + $this->bonusReward()->sum('amount') + $this->clubIncome()->sum('amount') + $this->poolIncome()->sum('amount') + $this->rankIncome()->sum('amount') + $this->daoIncome()->sum('amount');
     }
 
     public function totalIncomeUSDT()
     {
-        return $this->stackingIncome()->sum('amt_usdt') + $this->levelIncome()->sum('amt_usdt') + $this->bonusReward()->sum('amt_usdt') + $this->clubIncome()->sum('amt_usdt') + $this->poolIncome()->sum('amt_usdt') + $this->rankIncome()->sum('amt_usdt');
+        return $this->stackingIncome()->sum('amt_usdt') + $this->levelIncome()->sum('amt_usdt') + $this->bonusReward()->sum('amt_usdt') + $this->clubIncome()->sum('amt_usdt') + $this->poolIncome()->sum('amt_usdt') + $this->rankIncome()->sum('amt_usdt') + $this->daoIncome()->sum('amt_usdt');
     }
 
     public function remainingIncome()
@@ -59,7 +64,8 @@ class UserDetails extends Model
             + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
             + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
-            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt');
+            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->daoIncome()->where('status', 0)->sum('remaining_usdt');
     }
 
     public function workingRemainingIncome()
@@ -68,7 +74,8 @@ class UserDetails extends Model
             + $this->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt')
             + $this->poolIncome()->where('status', 0)->sum('remaining_usdt')
             + $this->clubIncome()->where('status', 0)->sum('remaining_usdt')
-            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt');
+            + $this->rankIncome()->where('status', 0)->sum('remaining_usdt')
+            + $this->daoIncome()->where('status', 0)->sum('remaining_usdt');
     }
 
     public function lockedIncome()
@@ -460,6 +467,63 @@ class UserDetails extends Model
     public function poolIncomes()
     {
         return $this->hasMany('App\PoolIncome', 'userid', 'id');
+    }
+
+    public function daoIncomes()
+    {
+        return $this->hasMany('App\DaoIncome', 'userid', 'id');
+    }
+
+    public function getDaoDetails()
+    {
+        \App\Http\Controllers\DaoIncomeController::seedDaoDetails();
+
+        $userCreated = $this->user() ? \Carbon\Carbon::parse($this->user()->created_at) : \Carbon\Carbon::parse($this->created_at ?? now());
+        $daysReg = $userCreated->diffInDays(now());
+        $rankLevel = (int)($this->rank_level ?? 0);
+        $userIsDao = (int)($this->is_dao ?? 0);
+
+        $tiers = \App\DaoDetail::where('status', 1)->orderBy('dao_type', 'asc')->get();
+        $result = [];
+
+        foreach ($tiers as $tier) {
+            $membersCount = \App\UserDetails::where('is_dao', $tier->dao_type)->count();
+            $isPurchased  = ($userIsDao === $tier->dao_type);
+
+            $daysOk  = ($daysReg <= (int)$tier->days_limit);
+            $rankOk  = ($rankLevel >= (int)$tier->rank_required);
+            $slotsOk = ($membersCount < (int)$tier->max_members || $isPurchased);
+
+            $totalReceived = (float) \App\DaoIncome::where('userid', $this->id)->where('dao_type', $tier->dao_type)->sum('amt_usdt');
+            $maxCapping    = (float)$tier->package_amount * (float)$tier->capping_multiplier;
+
+            $result[$tier->dao_type] = [
+                'dao_type'           => $tier->dao_type,
+                'dao_name'           => $tier->dao_name,
+                'package_amount'     => (float)$tier->package_amount,
+                'max_members'        => (int)$tier->max_members,
+                'current_members'    => $membersCount,
+                'rank_required'      => (int)$tier->rank_required,
+                'days_limit'         => (int)$tier->days_limit,
+                'pool_percent'       => (float)$tier->pool_percent,
+                'capping_multiplier' => (float)$tier->capping_multiplier,
+                'max_capping'        => $maxCapping,
+                'total_received'     => $totalReceived,
+                'is_purchased'       => $isPurchased,
+                'is_eligible'        => ($isPurchased && $daysOk && $rankOk && ($totalReceived < $maxCapping)),
+                'days_registered'    => $daysReg,
+                'current_rank'       => $rankLevel,
+                'days_ok'            => $daysOk,
+                'rank_ok'            => $rankOk,
+                'slots_ok'           => $slotsOk,
+            ];
+        }
+        return $result;
+    }
+
+    public function getDaoQualifications()
+    {
+        return $this->getDaoDetails();
     }
 
     public function getPoolQualifications()

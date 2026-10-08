@@ -62,23 +62,37 @@
         </div>
 
         @if(($daoType ?? 0) > 0)
+            @php
+                $bannerColor = '#38BDF8';
+                $bannerIcon = 'fa-shield-alt';
+                $bannerDesc = 'Fixed $3,333 USDT • 3X Dynamic Capping • 2.5% Global Pool on V2';
+                if ($daoType == 3) {
+                    $bannerColor = '#FFD700';
+                    $bannerIcon = 'fa-gem';
+                    $bannerDesc = 'Fixed $10,000 USDT • 4X Dynamic Capping • 4.0% Global Pool on V3';
+                } elseif ($daoType == 2) {
+                    $bannerColor = '#F59E0B';
+                    $bannerIcon = 'fa-award';
+                    $bannerDesc = 'Fixed $5,555 USDT • 3.5X Dynamic Capping • 3.0% Global Pool on V3';
+                }
+            @endphp
             <!-- DAO Dedicated Tier Banner -->
-            <div style="background: {{ $daoType == 1 ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(245, 166, 35, 0.05))' : 'linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(0, 119, 255, 0.05))' }}; border: 1px solid {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.5)' : 'rgba(0, 210, 255, 0.5)' }}; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="background: linear-gradient(135deg, {{ $bannerColor }}1B, {{ $bannerColor }}0A); border: 1px solid {{ $bannerColor }}77; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 32px; height: 32px; border-radius: 8px; background: {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.2)' : 'rgba(0, 210, 255, 0.2)' }}; color: {{ $daoType == 1 ? '#FFD700' : '#00D2FF' }}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
-                        <i class="fas {{ $daoType == 1 ? 'fa-gem' : 'fa-user-astronaut' }}"></i>
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: {{ $bannerColor }}33; color: {{ $bannerColor }}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+                        <i class="fas {{ $bannerIcon }}"></i>
                     </div>
                     <div>
                         <div style="font-size: 0.78rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px;">
-                            {{ $daoTitle ?? ($daoType == 1 ? 'Diamond Club Member' : 'Core DAO Member') }}
+                            {{ $daoTitle ?? 'DAO Member' }}
                         </div>
                         <div style="font-size: 0.62rem; color: #94A3B8;">
-                            {{ $daoType == 1 ? 'Fixed $10,000 USDT • 4X Dynamic Capping • 5% Global Pool on V4' : 'Fixed $3,333 USDT • 3X Dynamic Capping • 5% Global Pool on V3' }}
+                            {{ $bannerDesc }}
                         </div>
                     </div>
                 </div>
                 <div style="text-align: right; flex-shrink: 0;">
-                    <span style="font-size: 0.62rem; font-weight: 800; color: {{ $daoType == 1 ? '#FFD700' : '#00D2FF' }}; background: rgba(0, 0, 0, 0.5); border: 1px solid {{ $daoType == 1 ? 'rgba(255, 215, 0, 0.3)' : 'rgba(0, 210, 255, 0.3)' }}; padding: 2px 6px; border-radius: 4px;">
+                    <span style="font-size: 0.62rem; font-weight: 800; color: {{ $bannerColor }}; background: rgba(0, 0, 0, 0.5); border: 1px solid {{ $bannerColor }}55; padding: 2px 6px; border-radius: 4px;">
                         {{ $daoMultiplier }}X CAPPING
                     </span>
                 </div>
@@ -493,14 +507,19 @@
                 const targetUserId = $('#targetUserId').val().trim();
                 const currentDao = parseInt($('#daoTypeInput').val() || '0');
 
-                if (currentDao === 1) {
+                if (currentDao === 3) {
                     if (amount !== 10000) {
-                        showStakeAlert('Diamond Club requires exact topup of $10,000 USDT.');
+                        showStakeAlert('Diamond DAO requires exact topup of $10,000 USDT.');
                         return;
                     }
                 } else if (currentDao === 2) {
+                    if (amount !== 5555) {
+                        showStakeAlert('Golden DAO requires exact topup of $5,555 USDT.');
+                        return;
+                    }
+                } else if (currentDao === 1) {
                     if (amount !== 3333) {
-                        showStakeAlert('Core Member requires exact topup of $3,333 USDT.');
+                        showStakeAlert('Platinum DAO requires exact topup of $3,333 USDT.');
                         return;
                     }
                 } else {

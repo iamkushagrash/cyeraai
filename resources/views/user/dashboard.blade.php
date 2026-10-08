@@ -236,11 +236,13 @@
                 }
                 $levelRemaining = (float) \App\LevelIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
 
-                // 4. Pool / Club Income (Global Turnover Pools & Club Dividends)
+                // 4. Pool / Club / DAO Income (Global Turnover Pools, Club & DAO Dividends)
                 $clubIncome = (float) \App\ClubIncome::where('userid', $uid)->sum('amt_usdt');
                 $poolIncome = (float) \App\PoolIncome::where('userid', $uid)->sum('amt_usdt');
-                $totalPoolIncome = $clubIncome + $poolIncome;
-                $poolRemaining = (float) \App\ClubIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+                $daoIncome = (float) \App\DaoIncome::where('userid', $uid)->sum('amt_usdt');
+                $totalPoolIncome = $clubIncome + $poolIncome + $daoIncome;
+                $daoRemaining = (float) \App\DaoIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt');
+                $poolRemaining = (float) \App\ClubIncome::where('userid', $uid)->where('status', 0)->sum('remaining_usdt') + $daoRemaining;
 
                 // 5. Rank & Lifetime / Achievement Income
                 $achievementIncome = (float) \App\AchievementIncome::where('userid', $uid)->sum('amount');
@@ -248,7 +250,7 @@
                 $totalRankIncome = $achievementIncome + $rankIncome;
                 $rankRemaining = (float) \App\AchievementIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
 
-                // Combined Totals (All 5 Incomes)
+                // Combined Totals (All Incomes including DAO)
                 $totalIncomeUsdt = $cpsIncome + $directIncome + $levelIncomeTotal + $totalPoolIncome + $totalRankIncome;
                 $readyToReleaseUsdt = $cpsRemaining + $directRemaining + $levelRemaining + $poolRemaining + $rankRemaining;
 
@@ -594,14 +596,17 @@
                      ============================================================ -->
                 @php
                     $dCount = $data['diamondDaoCount'] ?? 0;
-                    $cCount = $data['coreDaoCount'] ?? 0;
-                    $myDao = $data['userDaoStatus'] ?? ($data['userDetail']->is_dao ?? 0);
-                    $dPct = min(100, round(($dCount / 20) * 100));
-                    $cPct = min(100, round(($cCount / 100) * 100));
+                    $gCount = $data['goldenDaoCount'] ?? 0;
+                    $pCount = $data['platinumDaoCount'] ?? 0;
+
+                    $userDaoQuals = $data['userDaoDetails'] ?? ($data['userDaoQualifications'] ?? ($data['userDetail']->getDaoDetails() ?? []));
+                    $isDiamondQual = ($data['userDetail']->is_dao == 3);
+                    $isGoldenQual  = ($data['userDetail']->is_dao == 2);
+                    $isPlatQual    = ($data['userDetail']->is_dao == 1);
                 @endphp
 
-                @if($myDao == 1)
-                    <!-- QUALIFIED DIAMOND CLUB MEMBER BANNER -->
+                @if($isDiamondQual)
+                    <!-- QUALIFIED DIAMOND DAO MEMBER BANNER -->
                     <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(245, 166, 35, 0.05) 100%); border: 1px solid rgba(255, 215, 0, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
                         <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -610,13 +615,13 @@
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    <span style="font-size: 0.82rem; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; text-transform: uppercase;">DIAMOND MEMBER</span>
+                                    <span style="font-size: 0.82rem; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; text-transform: uppercase;">DIAMOND DAO MEMBER</span>
                                     <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 5px; border-radius: 3px;">4X CAPPING</span>
                                 </div>
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>5% Global Pool on V4</span>
+                                    <span>4.0% Weekly Global Pool (V3 in 90d)</span>
                                 </div>
                             </div>
                         </div>
@@ -625,33 +630,58 @@
                             <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">$10,000</div>
                         </div>
                     </div>
-                @elseif($myDao == 2)
-                    <!-- QUALIFIED CORE MEMBER BANNER -->
-                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(0, 119, 255, 0.05) 100%); border: 1px solid rgba(0, 210, 255, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #00D2FF, transparent);"></div>
+                @elseif($isGoldenQual)
+                    <!-- QUALIFIED GOLDEN DAO MEMBER BANNER -->
+                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);"></div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid rgba(0, 210, 255, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <i class="fas fa-user-astronaut" style="color: #00D2FF; font-size: 15px;"></i>
+                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-award" style="color: #F59E0B; font-size: 15px;"></i>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    <span style="font-size: 0.82rem; font-weight: 900; color: #00D2FF; letter-spacing: 0.5px; text-transform: uppercase;">CORE MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #00D2FF, #0099FF); padding: 1px 5px; border-radius: 3px;">3X CAPPING</span>
+                                    <span style="font-size: 0.82rem; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px; text-transform: uppercase;">GOLDEN DAO MEMBER</span>
+                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 5px; border-radius: 3px;">3.5X CAPPING</span>
                                 </div>
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>5% Global Pool on V3</span>
+                                    <span>3.0% Weekly Global Pool (V3 in 90d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
                             <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #00D2FF;">$3,333</div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">$5,555</div>
+                        </div>
+                    </div>
+                @elseif($isPlatQual)
+                    <!-- QUALIFIED PLATINUM DAO MEMBER BANNER -->
+                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(2, 132, 199, 0.05) 100%); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);"></div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-shield-alt" style="color: #38BDF8; font-size: 15px;"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 0.82rem; font-weight: 900; color: #38BDF8; letter-spacing: 0.5px; text-transform: uppercase;">PLATINUM DAO MEMBER</span>
+                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 5px; border-radius: 3px;">3X CAPPING</span>
+                                </div>
+                                <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
+                                    <span>•</span>
+                                    <span>2.5% Weekly Global Pool (V2 in 90d)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right; flex-shrink: 0;">
+                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">$3,333</div>
                         </div>
                     </div>
                 @else
-                    <!-- 2-COLUMN REGISTRATION CARDS (FOR UNREGISTERED USERS) -->
+                    <!-- 3-COLUMN DAO MEMBER REGISTRATION CARDS -->
                     <div class="hud-dao-compact-wrap" style="margin-bottom: 14px;">
                         <!-- Slim Header Bar -->
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 2px;">
@@ -661,100 +691,121 @@
                                     DAO Member Registration
                                 </span>
                             </div>
-                            <span style="font-size: 0.58rem; font-weight: 800; color: #F5A623; background: rgba(245, 166, 35, 0.12); border: 1px solid rgba(245, 166, 35, 0.35); padding: 1px 6px; border-radius: 4px; letter-spacing: 0.3px;">
-                                LIMITED SLOTS
-                            </span>
+                            <a href="{{ url('/User/DaoIncome') }}" style="font-size: 0.58rem; font-weight: 800; color: #F5A623; background: rgba(245, 166, 35, 0.12); border: 1px solid rgba(245, 166, 35, 0.35); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px; text-decoration: none;">
+                                LIMITED SLOTS • VIEW ALL <i class="fas fa-chevron-right" style="font-size: 7px;"></i>
+                            </a>
                         </div>
 
-                        <!-- 2 Side-by-Side Compact Cards (1fr 1fr) -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <!-- 3 Side-by-Side Cards Grid (Diamond, Golden, Platinum) -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
                             
-                            <!-- MINI CARD 1: DIAMOND CLUB -->
-                            <div style="background: linear-gradient(180deg, rgba(22, 17, 6, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 10px; padding: 8px 9px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                            <!-- MINI CARD 1: DIAMOND DAO -->
+                            <div style="background: linear-gradient(180deg, rgba(22, 17, 6, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
                                 <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
-
-                                <!-- Top: Icon, Title & Badge -->
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
                                         <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
                                             <i class="fas fa-gem" style="color: #FFD700; font-size: 10px;"></i>
-                                            <span style="font-size: 0.68rem; font-weight: 800; color: #FFD700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DIAMOND</span>
+                                            <span style="font-size: 0.64rem; font-weight: 800; color: #FFD700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DIAMOND</span>
                                         </div>
-                                        <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">4X CAP</span>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">4X CAP</span>
                                     </div>
-
-                                    <!-- Amount & Cap Row -->
-                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 6px; padding: 4px 6px; margin-bottom: 5px;">
+                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #FFD700;">$10,000</span>
-                                            <span style="font-size: 0.55rem; color: #00FF88; font-weight: 700;">$40K Max</span>
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">$10,000</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$40K Max</span>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 0.52rem; color: #94A3B8; margin-top: 1px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/20 Slots</span>
+                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/50 Slots</span>
                                         </div>
                                     </div>
-
-                                    <!-- Mini Perk -->
-                                    <div style="font-size: 0.54rem; color: #CBD5E1; line-height: 1.25; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">5% Global Pool on V4</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">4% Pool (V3 in 90d)</span>
                                     </div>
                                 </div>
-
-                                <!-- Button -->
-                                @if($dCount >= 20)
-                                    <button type="button" disabled style="width: 100%; height: 26px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.60rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
-                                        FULL (20/20)
+                                @if($dCount >= 50)
+                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                        FULL (50/50)
                                     </button>
                                 @else
-                                    <a href="{{ url('/User/Stake?dao=diamond') }}" style="width: 100%; height: 26px; border-radius: 5px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.62rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
-                                        <i class="fas fa-gem" style="font-size: 8px;"></i> UPGRADE
+                                    <a href="{{ url('/User/Stake?dao=diamond') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
+                                        <i class="fas fa-gem" style="font-size: 7px;"></i> UPGRADE
                                     </a>
                                 @endif
                             </div>
 
-                            <!-- MINI CARD 2: CORE MEMBER -->
-                            <div style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 10px; padding: 8px 9px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6); ">
-                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #00D2FF, transparent);"></div>
-
-                                <!-- Top: Icon, Title & Badge -->
+                            <!-- MINI CARD 2: GOLDEN DAO -->
+                            <div style="background: linear-gradient(180deg, rgba(24, 16, 5, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);"></div>
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
                                         <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
-                                            <i class="fas fa-user-astronaut" style="color: #00D2FF; font-size: 10px;"></i>
-                                            <span style="font-size: 0.68rem; font-weight: 800; color: #00D2FF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CORE DAO</span>
+                                            <i class="fas fa-award" style="color: #F59E0B; font-size: 10px;"></i>
+                                            <span style="font-size: 0.64rem; font-weight: 800; color: #F59E0B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GOLDEN</span>
                                         </div>
-                                        <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #00D2FF, #0099FF); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">3X CAP</span>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">3.5X CAP</span>
                                     </div>
-
-                                    <!-- Amount & Cap Row -->
-                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 210, 255, 0.15); border-radius: 6px; padding: 4px 6px; margin-bottom: 5px;">
+                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #00D2FF;">$3,333</span>
-                                            <span style="font-size: 0.55rem; color: #00FF88; font-weight: 700;">$9,999 Max</span>
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">$5,555</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$19.4K Max</span>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 0.52rem; color: #94A3B8; margin-top: 1px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #00D2FF; font-weight: 700;">{{ $cCount }}/100 Slots</span>
+                                            <span style="color: #F59E0B; font-weight: 700;">{{ $gCount }}/100 Slots</span>
                                         </div>
                                     </div>
-
-                                    <!-- Mini Perk -->
-                                    <div style="font-size: 0.54rem; color: #CBD5E1; line-height: 1.25; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">5% Global Pool on V3</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">3% Pool (V3 in 90d)</span>
                                     </div>
                                 </div>
-
-                                <!-- Button -->
-                                @if($cCount >= 100)
-                                    <button type="button" disabled style="width: 100%; height: 26px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.60rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                @if($gCount >= 100)
+                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
                                         FULL (100/100)
                                     </button>
                                 @else
-                                    <a href="{{ url('/User/Stake?dao=core') }}" style="width: 100%; height: 26px; border-radius: 5px; background: linear-gradient(135deg, #00D2FF 0%, #0077FF 100%); color: #000; font-size: 0.62rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 8px rgba(0, 210, 255, 0.35); text-transform: uppercase;">
-                                        <i class="fas fa-user-astronaut" style="font-size: 8px;"></i> UPGRADE
+                                    <a href="{{ url('/User/Stake?dao=golden') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); text-transform: uppercase;">
+                                        <i class="fas fa-award" style="font-size: 7px;"></i> UPGRADE
+                                    </a>
+                                @endif
+                            </div>
+
+                            <!-- MINI CARD 3: PLATINUM DAO -->
+                            <div style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);"></div>
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
+                                        <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
+                                            <i class="fas fa-shield-alt" style="color: #38BDF8; font-size: 10px;"></i>
+                                            <span style="font-size: 0.64rem; font-weight: 800; color: #38BDF8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PLATINUM</span>
+                                        </div>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">3X CAP</span>
+                                    </div>
+                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">$3,333</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$9,999 Max</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
+                                            <span>Fixed Stake</span>
+                                            <span style="color: #38BDF8; font-weight: 700;">{{ $pCount }}/100 Slots</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
+                                        <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">2.5% Pool (V2 in 90d)</span>
+                                    </div>
+                                </div>
+                                @if($pCount >= 100)
+                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                        FULL (100/100)
+                                    </button>
+                                @else
+                                    <a href="{{ url('/User/Stake?dao=platinum') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35); text-transform: uppercase;">
+                                        <i class="fas fa-shield-alt" style="font-size: 7px;"></i> UPGRADE
                                     </a>
                                 @endif
                             </div>

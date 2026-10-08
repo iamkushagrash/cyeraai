@@ -49,6 +49,9 @@ class Kernel extends ConsoleKernel
         // Weekly Rank Income Distribution Cron (V1 to V8, Non-Cumulative, Highest Active Rank)
         $schedule->call('App\Http\Controllers\RankIncomeController@weeklyRankDistribution')->weekly()->mondays()->at('01:30')->timezone('Asia/Kolkata');
 
+        // Weekly DAO Income Distribution Cron (Diamond 4.0%, Golden 3.0%, Platinum 2.5%)
+        $schedule->call('App\Http\Controllers\DaoIncomeController@weeklyDaoDistribution')->weekly()->mondays()->at('01:55')->timezone('Asia/Kolkata');
+
         // CAI Real-Time DEX Price Sync (Every 5 Minutes from PancakeSwap / DexScreener)
         $schedule->call('App\Http\Controllers\PriceUpdateController@updateCaiPrice')->everyFiveMinutes()->name('caiLivePriceUpdate')->withoutOverlapping()->timezone('Asia/Kolkata');
     }
