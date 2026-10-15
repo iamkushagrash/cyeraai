@@ -245,6 +245,37 @@ class HomeController extends Controller
 
         $usrRaw['userDaoDetails'] = $userDetail->getDaoDetails();
 
+        // Royal Jackpot Pools & User Stats for Dashboard
+        $rjPools = \App\LuckyDrawDetail::where('status', 1)->orderBy('pool_tier', 'asc')->get();
+        $rjPoolList = [];
+        $uid = $userDetail->id;
+
+        foreach ($rjPools as $p) {
+            $activeRound = \App\LuckyDrawRound::where('pool_tier', $p->pool_tier)
+                ->where('status', 0)
+                ->first();
+
+            $userTicketCount = 0;
+            if ($activeRound) {
+                $userTicketCount = \App\LuckyDrawParticipant::where('round_id', $activeRound->id)
+                    ->where('userid', $uid)
+                    ->count();
+            }
+
+            $slotsFilled = $activeRound ? $activeRound->current_members : 0;
+            $p->activeRound = $activeRound;
+            $p->slotsFilled = $slotsFilled;
+            $p->slotsRemaining = max(0, 500 - $slotsFilled);
+            $p->percentageFilled = round(($slotsFilled / 500) * 100, 1);
+            $p->userTicketsCount = $userTicketCount;
+            $rjPoolList[] = $p;
+        }
+
+        $usrRaw['rjPools'] = $rjPoolList;
+        $usrRaw['rjRoyalWallet'] = (float) ($userDetail->royal_wallet ?? 0.00);
+        $usrRaw['rjTotalWon'] = (float) \App\LuckyDrawWinner::where('userid', $uid)->sum('prize_amount');
+        $usrRaw['rjTotalClaimed'] = (float) \App\RoyalWalletLedger::where('userid', $uid)->where('type', 'CLAIM_CRYPTO')->where('status', 'COMPLETED')->sum('amount');
+
         return view('user.dashboard')->with('data', $usrRaw);
     }
 

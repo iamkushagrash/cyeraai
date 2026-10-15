@@ -126,6 +126,23 @@ Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
 // Decentralized Web3 Smart Contract Owner Governance Portal
 Route::get('/dishi/yashi', 'ContractAdminController@index');
 
+// ============================================
+// Lucky Draw Dedicated Web3 Deployer Admin Suite
+// ============================================
+Route::group(['prefix' => 'luckydraw/admin'], function () {
+    Route::get('/', 'LuckyDrawAdminController@index');
+    Route::get('/funds', 'LuckyDrawAdminController@funds');
+    Route::get('/rounds', 'LuckyDrawAdminController@rounds');
+    Route::get('/winners', 'LuckyDrawAdminController@winners');
+    Route::get('/settings', 'LuckyDrawAdminController@settings');
+
+    // Web3 Auth & Real-Time Sync Endpoints
+    Route::post('/api/auth-challenge', 'LuckyDrawAdminController@getAuthChallenge');
+    Route::post('/api/auth-login', 'LuckyDrawAdminController@authLogin');
+    Route::post('/api/logout', 'LuckyDrawAdminController@logout');
+    Route::get('/api/stats', 'LuckyDrawAdminController@getStats');
+});
+
 // Cron Route: CAI Live Price Sync (5-min DEX Sync)
 Route::get('/cron/update-cai-price', 'PriceUpdateController@updateCaiPrice');
 

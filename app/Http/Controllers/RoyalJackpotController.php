@@ -253,6 +253,8 @@ class RoyalJackpotController extends Controller
             'tx_hash'        => 'nullable|string',
         ]);
 
+        \Log::info("Royal Jackpot enterJackpot request received:", $request->all());
+
         $userId = Session::get('user.id');
         if (!$userId && \Auth::check()) {
             $userId = \Auth::id();
@@ -281,10 +283,31 @@ class RoyalJackpotController extends Controller
         $ticketPrice = (float) $poolDetail->ticket_price;
         $walletAddr = strtolower(trim($request->wallet_address ?: Session::get('user.walletaddress') ?: ''));
 
-        // Prevent duplicate transaction hash
-        $txHash = $request->tx_hash ? strtolower(trim($request->tx_hash)) : ('demo_' . time() . '_' . rand(1000, 9999));
-        if ($request->tx_hash && LuckyDrawParticipant::where('tx_hash', $txHash)->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been registered.'], 400);
+        $isDemo = (bool) env('DEMO_MODE', false);
+        $txHash = $request->tx_hash ? strtolower(trim($request->tx_hash)) : '';
+
+        if (!$isDemo) {
+            if (empty($txHash) || !preg_match('/^0x[a-fA-F0-9]{64}$/', $txHash)) {
+                return response()->json(['status' => 'error', 'message' => 'Valid on-chain transaction hash is required.'], 400);
+            }
+
+            // Prevent duplicate transaction hash before doing RPC check
+            if (LuckyDrawParticipant::where('tx_hash', $txHash)->exists()) {
+                return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been registered.'], 400);
+            }
+
+            // Verify on-chain execution with BSC RPC nodes
+            $verify = self::verifyJackpotDepositOnBsc($txHash, $walletAddr, $ticketPrice);
+            if (!$verify['valid']) {
+                return response()->json(['status' => 'error', 'message' => $verify['message']], 400);
+            }
+        } else {
+            if (empty($txHash)) {
+                $txHash = 'demo_' . time() . '_' . rand(1000, 9999);
+            }
+            if (LuckyDrawParticipant::where('tx_hash', $txHash)->exists()) {
+                return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been registered.'], 400);
+            }
         }
 
         DB::beginTransaction();
@@ -765,4 +788,157 @@ class RoyalJackpotController extends Controller
             'royal_wallet' => $royalWallet,
         ]);
     }
+
+    /**
+     * Strictly verify that the deposit transaction succeeded on Binance Smart Chain
+     * Decodes the Smart Contract ABI Events directly from the transaction receipt!
+     */
+    public static function verifyJackpotDepositOnBsc($txHash, $expectedSender, $ticketPrice)
+    {
+        $expectedContract = strtolower(env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5'));
+        $expectedUsdt     = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
+
+        $rpcEndpoints = [
+            "https://bsc-dataseed.binance.org/",
+            "https://bsc-dataseed1.defibit.io/",
+            "https://bsc-dataseed1.ninicoin.io/",
+            "https://1rpc.io/bnb",
+            "https://bsc.meowrpc.com"
+        ];
+
+        $payloadReceipt = json_encode([
+            'jsonrpc' => '2.0',
+            'method'  => 'eth_getTransactionReceipt',
+            'params'  => [$txHash],
+            'id'      => 1
+        ]);
+
+        $receipt = null;
+        $maxAttempts = 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            foreach ($rpcEndpoints as $rpcUrl) {
+                $ch = curl_init($rpcUrl);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadReceipt);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                if ($response) {
+                    $data = json_decode($response, true);
+                    if (isset($data['result']) && !empty($data['result'])) {
+                        $receipt = $data['result'];
+                        break 2;
+                    }
+                }
+            }
+            if ($attempt < $maxAttempts) {
+                sleep(2);
+            }
+        }
+
+        if (!$receipt) {
+            return ['valid' => false, 'message' => 'Transaction receipt not found on BSC. Please wait for block confirmation and retry.'];
+        }
+
+        \Log::info("Royal Jackpot on-chain receipt for {$txHash}:", [
+            'to' => $receipt['to'] ?? null,
+            'from' => $receipt['from'] ?? null,
+            'status' => $receipt['status'] ?? null,
+            'logs_count' => count($receipt['logs'] ?? []),
+        ]);
+
+        // Status check: 0x1 = confirmed success
+        if (!isset($receipt['status']) || $receipt['status'] !== '0x1') {
+            return ['valid' => false, 'message' => 'Blockchain transaction reverted or failed. Ticket was not issued.'];
+        }
+
+        // ========================================================
+        // SMART CONTRACT ABI EVENT VERIFICATION
+        // ========================================================
+        // 1. ERC-20 Transfer Event: Transfer(address indexed from, address indexed to, uint256 value)
+        $erc20TransferTopic  = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+        // 2. RoyalJackpotDeposit Event: JackpotDeposited(address indexed user, uint256 indexed poolTier, uint256 indexed roundId, uint256 amount, uint256 timestamp)
+        $jackpotDepositTopic = '0x3fe42b4055a2521f57b410326011af0ad4f668fbec5995b41ddad162bbafd8de';
+        // 3. Approval Event: Approval(address indexed owner, address indexed spender, uint256 value)
+        $erc20ApprovalTopic  = '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
+
+        $foundDepositEvent = false;
+        $foundUsdtTransferToContract = false;
+        $onlyApprovalFound = false;
+        $actualAmountUsdt = 0.0;
+        $actualSender = null;
+
+        $logs = $receipt['logs'] ?? [];
+
+        foreach ($logs as $log) {
+            $logAddr = strtolower($log['address'] ?? '');
+            $topics  = $log['topics'] ?? [];
+            $topic0  = strtolower($topics[0] ?? '');
+
+            // Check if JackpotDeposited event was emitted by Deposit contract
+            if ($logAddr === $expectedContract && $topic0 === $jackpotDepositTopic) {
+                $foundDepositEvent = true;
+                if (isset($topics[1])) {
+                    $actualSender = '0x' . substr(strtolower($topics[1]), 26);
+                }
+            }
+
+            // Check if USDT Transfer event was sent to Deposit contract
+            if ($logAddr === $expectedUsdt && $topic0 === $erc20TransferTopic) {
+                $recipient = isset($topics[2]) ? ('0x' . substr(strtolower($topics[2]), 26)) : '';
+                if ($recipient === $expectedContract) {
+                    $foundUsdtTransferToContract = true;
+                    if (isset($topics[1])) {
+                        $actualSender = '0x' . substr(strtolower($topics[1]), 26);
+                    }
+                    if (!empty($log['data']) && $log['data'] !== '0x') {
+                        $hexClean = ltrim(substr($log['data'], 2), '0');
+                        $val = empty($hexClean) ? 0 : base_convert($hexClean, 16, 10);
+                        $actualAmountUsdt = round($val / 1e18, 4);
+                    }
+                }
+            }
+
+            // Detect if this is only an Approval transaction
+            if ($logAddr === $expectedUsdt && $topic0 === $erc20ApprovalTopic) {
+                $spender = isset($topics[2]) ? ('0x' . substr(strtolower($topics[2]), 26)) : '';
+                if ($spender === $expectedContract) {
+                    $onlyApprovalFound = true;
+                }
+            }
+        }
+
+        // Also check direct contract interaction if receipt.to matches expectedContract
+        if (isset($receipt['to']) && strtolower($receipt['to']) === $expectedContract) {
+            $foundDepositEvent = true;
+        }
+
+        if (!$foundDepositEvent && !$foundUsdtTransferToContract) {
+            if ($onlyApprovalFound) {
+                return [
+                    'valid' => false,
+                    'message' => 'This was a USDT Approval transaction. Please confirm the second prompt in MetaMask to complete the ticket purchase!'
+                ];
+            }
+            return [
+                'valid' => false,
+                'message' => 'Transaction was not sent to the official Royal Jackpot Deposit contract (' . substr($expectedContract, 0, 8) . '...).'
+            ];
+        }
+
+        // Sender check
+        if (!empty($expectedSender) && !empty($actualSender)) {
+            if (strtolower($actualSender) !== strtolower($expectedSender)) {
+                return ['valid' => false, 'message' => 'Transaction sender (' . substr($actualSender, 0, 6) . '...) does not match your connected wallet.'];
+            }
+        }
+
+        return ['valid' => true, 'receipt' => $receipt, 'amount' => $actualAmountUsdt];
+    }
 }
+

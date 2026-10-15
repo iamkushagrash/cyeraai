@@ -970,6 +970,231 @@
                 @endphp
 
                 <!-- ============================================================
+                     2B. ROYAL JACKPOT SHOWCASE (4 PRIZE POOLS • 500 SLOTS • 50 WINNERS)
+                     ============================================================ -->
+                @php
+                    $dashRjPools = $data['rjPools'] ?? null;
+                    $dashRjRoyalWallet = $data['rjRoyalWallet'] ?? ((float) ($data['userDetail']->royal_wallet ?? 0.00));
+                    $dashRjTotalWon = $data['rjTotalWon'] ?? 0.00;
+                    $dashRjTotalClaimed = $data['rjTotalClaimed'] ?? 0.00;
+                    $uId = $data['userDetail']->id ?? Session::get('user.id');
+
+                    if (!$dashRjPools) {
+                        $rawPools = \App\LuckyDrawDetail::where('status', 1)->orderBy('pool_tier', 'asc')->get();
+                        $dashRjPools = [];
+                        foreach ($rawPools as $p) {
+                            $actRound = \App\LuckyDrawRound::where('pool_tier', $p->pool_tier)->where('status', 0)->first();
+                            $uTickets = 0;
+                            if ($actRound && $uId) {
+                                $uTickets = \App\LuckyDrawParticipant::where('round_id', $actRound->id)->where('userid', $uId)->count();
+                            }
+                            $sFilled = $actRound ? $actRound->current_members : 0;
+                            $p->activeRound = $actRound;
+                            $p->slotsFilled = $sFilled;
+                            $p->percentageFilled = round(($sFilled / 500) * 100, 1);
+                            $p->userTicketsCount = $uTickets;
+                            $dashRjPools[] = $p;
+                        }
+                    }
+                    $dashTierIcons = [1 => 'fa-medal', 2 => 'fa-award', 3 => 'fa-trophy', 4 => 'fa-gem'];
+                @endphp
+
+                <div class="hud-royaljackpot-section" style="margin: 0 8px 16px 8px; font-family: 'Inter', sans-serif;">
+                    <style>
+                        .dash-rjx-wrap {
+                            background: linear-gradient(160deg, #11100A 0%, #0A0B0F 55%, #060608 100%);
+                            border: 1px solid rgba(245, 166, 35, 0.35);
+                            border-radius: 14px;
+                            padding: 14px 14px 16px;
+                            box-shadow: 0 4px 22px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 215, 0, 0.1);
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .dash-rjx-wrap::before {
+                            content: ''; position: absolute; top: -60px; right: -40px; width: 180px; height: 180px; border-radius: 50%;
+                            background: radial-gradient(circle, rgba(245,166,35,.18) 0%, transparent 65%); pointer-events: none;
+                        }
+                        .dash-rjx-head {
+                            display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; position: relative; z-index: 1;
+                        }
+                        .dash-rjx-crown {
+                            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+                            display: flex; align-items: center; justify-content: center; font-size: 17px; color: #1A1203;
+                            background: linear-gradient(135deg, #FFE680 0%, #F0A500 100%);
+                            box-shadow: 0 4px 14px rgba(245,166,35,.35);
+                        }
+                        .dash-rjx-wallet-grid {
+                            display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 6px; margin-bottom: 14px; position: relative; z-index: 1;
+                        }
+                        .dash-rjx-wbox {
+                            background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 8px 10px;
+                            display: flex; flex-direction: column; justify-content: center; min-width: 0;
+                        }
+                        .dash-rjx-wbox.main {
+                            border-color: rgba(0,255,136,.3); background: linear-gradient(160deg, rgba(0,255,136,.08), rgba(0,0,0,.6));
+                        }
+                        .dash-rjx-wlbl { font-size: 8.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8A94A6; }
+                        .dash-rjx-wval { font-size: 15px; font-weight: 900; color: #fff; line-height: 1.2; white-space: nowrap; font-family: 'Space Mono', monospace; }
+                        .dash-rjx-wbox.main .dash-rjx-wval { color: #00FF88; }
+                        .dash-rjx-claim-btn {
+                            margin-top: 5px; height: 22px; border: none; border-radius: 6px; cursor: pointer;
+                            background: linear-gradient(135deg,#FFE680,#F0A500); color: #1A1203; font-size: 9.5px; font-weight: 900;
+                            letter-spacing: .3px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;
+                        }
+                        .dash-rjx-sec-title {
+                            display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 10px; position: relative; z-index: 1;
+                        }
+                        .dash-rjx-sec-title h4 {
+                            margin: 0; font-size: 11.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px;
+                        }
+                        .dash-rjx-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; position: relative; z-index: 1; }
+                        .dash-rjx-card {
+                            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px;
+                            background: linear-gradient(170deg, #0D0F15 0%, #07080C 100%);
+                            border: 1px solid rgba(255,255,255,.08); border-radius: 13px; padding: 10px 10px;
+                            text-decoration: none !important; color: inherit; transition: .2s ease;
+                        }
+                        .dash-rjx-card:hover { transform: translateY(-2px); border-color: rgba(245,166,35,.45); }
+                        .dash-rjx-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2.5px; }
+                        .dash-rjx-card.t1::before { background: linear-gradient(135deg,#E8A061 0%,#A9622B 100%); }
+                        .dash-rjx-card.t2::before { background: linear-gradient(135deg,#F4F6F9 0%,#9AA5B5 100%); }
+                        .dash-rjx-card.t3::before { background: linear-gradient(135deg,#FFE680 0%,#F0A500 100%); }
+                        .dash-rjx-card.t4::before { background: linear-gradient(135deg,#FFC09A 0%,#E4572E 100%); }
+                        .dash-rjx-card-top { display: flex; justify-content: space-between; align-items: center; }
+                        .dash-rjx-tier-tag {
+                            display: inline-flex; align-items: center; gap: 4px; font-size: 8.5px; font-weight: 800; letter-spacing: .4px;
+                            text-transform: uppercase; padding: 2px 6px; border-radius: 5px;
+                        }
+                        .dash-rjx-card.t1 .dash-rjx-tier-tag { color: #E8A061; background: rgba(217,138,74,.15); border: 1px solid rgba(217,138,74,.35); }
+                        .dash-rjx-card.t2 .dash-rjx-tier-tag { color: #D5DCE6; background: rgba(213,220,230,.15); border: 1px solid rgba(213,220,230,.35); }
+                        .dash-rjx-card.t3 .dash-rjx-tier-tag { color: #FFD23F; background: rgba(255,210,63,.15); border: 1px solid rgba(255,210,63,.35); }
+                        .dash-rjx-card.t4 .dash-rjx-tier-tag { color: #F7A072; background: rgba(247,160,114,.15); border: 1px solid rgba(247,160,114,.35); }
+                        .dash-rjx-cname { font-size: 9.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8A94A6; margin-bottom: -4px; }
+                        .dash-rjx-price { font-size: 24px; font-weight: 900; line-height: 1; color: #fff; display: flex; align-items: baseline; gap: 3px; }
+                        .dash-rjx-price small { font-size: 9.5px; font-weight: 700; color: #5B6475; }
+                        .dash-rjx-win {
+                            display: flex; justify-content: space-between; align-items: center; gap: 4px;
+                            background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.07); border-radius: 7px; padding: 5px 8px;
+                        }
+                        .dash-rjx-win span { font-size: 8.5px; font-weight: 600; color: #8A94A6; }
+                        .dash-rjx-win b { font-size: 12.5px; font-weight: 900; color: #FFD700; }
+                        .dash-rjx-prog-track { height: 4px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+                        .dash-rjx-prog-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #F5A623, #FFD700); }
+                        .dash-rjx-pmeta { display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; font-weight: 600; color: #8A94A6; }
+                        .dash-rjx-pmeta b { color: #fff; font-weight: 800; }
+                        .dash-rjx-cta-btn {
+                            margin-top: auto; height: 30px; border-radius: 8px;
+                            display: flex; align-items: center; justify-content: center; gap: 5px;
+                            background: linear-gradient(135deg,#FFE680,#F0A500); color: #150E02; font-size: 10.5px; font-weight: 900;
+                            letter-spacing: .3px; text-decoration: none;
+                        }
+                        .dash-rjx-mine-badge {
+                            position: absolute; z-index: 2; top: 32px; right: 8px; font-size: 8px; font-weight: 800; color: #000;
+                            background: #00FF88; border-radius: 12px; padding: 1px 6px;
+                        }
+                    </style>
+
+                    <div class="dash-rjx-wrap">
+                        <!-- Top Header -->
+                        <div class="dash-rjx-head">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="dash-rjx-crown"><i class="fas fa-crown"></i></div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 900; color: #FFF; letter-spacing: 0.4px;">
+                                        ROYAL <span style="background: linear-gradient(135deg,#FFE680,#F5A623); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">JACKPOT</span>
+                                    </div>
+                                    <div style="font-size: 9.5px; color: #8A94A6; margin-top: 1px;">
+                                        4 prize pools • 500 members each • 50 winners • instant draw
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{{ url('/User/RoyalJackpot') }}" style="font-size: 10px; font-weight: 800; color: #FFD700; background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.35); padding: 4px 8px; border-radius: 6px; text-decoration: none; white-space: nowrap;">
+                                Lobby <i class="fas fa-arrow-right" style="font-size: 8px;"></i>
+                            </a>
+                        </div>
+
+                        <!-- 3 Wallet Stat Counters -->
+                        <div class="dash-rjx-wallet-grid">
+                            <div class="dash-rjx-wbox main">
+                                <span class="dash-rjx-wlbl"><i class="fas fa-wallet"></i> Royal Wallet</span>
+                                <span class="dash-rjx-wval">${{ number_format($dashRjRoyalWallet, 2) }} <small style="font-size: 8.5px; color: #8A94A6;">USDT</small></span>
+                                <a href="{{ url('/User/RoyalJackpot') }}" class="dash-rjx-claim-btn">
+                                    <i class="fas fa-arrow-up-right-from-square"></i> Claim
+                                </a>
+                            </div>
+                            <div class="dash-rjx-wbox">
+                                <span class="dash-rjx-wlbl">Total Won</span>
+                                <span class="dash-rjx-wval">${{ number_format($dashRjTotalWon, 2) }}</span>
+                            </div>
+                            <div class="dash-rjx-wbox">
+                                <span class="dash-rjx-wlbl">Claimed</span>
+                                <span class="dash-rjx-wval">${{ number_format($dashRjTotalClaimed, 2) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Choose Your Pool Section Bar -->
+                        <div class="dash-rjx-sec-title">
+                            <h4><i class="fas fa-layer-group" style="color: #F5A623;"></i> Choose Your Pool</h4>
+                            <span style="font-size: 9.5px; color: #8A94A6; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                <span style="width: 5px; height: 5px; border-radius: 50%; background: #00FF88; box-shadow: 0 0 6px #00FF88; display: inline-block;"></span> Live
+                            </span>
+                        </div>
+
+                        <!-- 2x2 Pools Grid (Identical to Royal Jackpot Page) -->
+                        <div class="dash-rjx-grid">
+                            @foreach($dashRjPools as $p)
+                            @php
+                                $shortName = trim(preg_replace('/\s*\$\d+$/', '', $p->pool_name));
+                                $sFill = $p->slotsFilled ?? 0;
+                                $pctFill = $p->percentageFilled ?? 0;
+                                $roundNum = ($p->activeRound && $p->activeRound->round_number) ? $p->activeRound->round_number : 1;
+                                $uTickets = $p->userTicketsCount ?? 0;
+                                $winUpTo = ($p->prizes_json['rank_1'] ?? ($p->pool_tier == 1 ? 500 : ($p->pool_tier == 2 ? 1000 : ($p->pool_tier == 3 ? 2000 : 5000))));
+                            @endphp
+                            <a href="{{ url('/User/RoyalJackpot/Pool/' . $p->pool_tier) }}" class="dash-rjx-card t{{ $p->pool_tier }}">
+                                <div class="dash-rjx-card-top">
+                                    <span class="dash-rjx-tier-tag">
+                                        <i class="fas {{ $dashTierIcons[$p->pool_tier] ?? 'fa-trophy' }}"></i> Pool {{ $p->pool_tier }}
+                                    </span>
+                                    <span style="font-size: 8.5px; font-weight: 700; color: #8A94A6; display: flex; align-items: center; gap: 3px;">
+                                        <span style="width: 4px; height: 4px; border-radius: 50%; background: #00FF88;"></span> R#{{ $roundNum }}
+                                    </span>
+                                </div>
+
+                                @if($uTickets > 0)
+                                    <span class="dash-rjx-mine-badge">{{ $uTickets }} ticket{{ $uTickets > 1 ? 's' : '' }}</span>
+                                @endif
+
+                                <div class="dash-rjx-cname">{{ $shortName }}</div>
+                                <div class="dash-rjx-price">
+                                    ${{ number_format($p->ticket_price, 0) }} <small>/ ticket</small>
+                                </div>
+
+                                <div class="dash-rjx-win">
+                                    <span>Win up to</span>
+                                    <b>${{ number_format($winUpTo, 0) }}</b>
+                                </div>
+
+                                <div>
+                                    <div class="dash-rjx-prog-track">
+                                        <div class="dash-rjx-prog-fill" style="width: {{ max(2, $pctFill) }}%;"></div>
+                                    </div>
+                                    <div class="dash-rjx-pmeta">
+                                        <span>Filled <b>{{ $sFill }} / 500</b></span>
+                                        <span>{{ $pctFill }}%</span>
+                                    </div>
+                                </div>
+
+                                <div class="dash-rjx-cta-btn">
+                                    Open Pool <i class="fas fa-arrow-right" style="font-size: 8px;"></i>
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================
                      3. DECENTRALIZED CAI MINING & DEX SWAP (PURE GOLDEN & BLACK THEME)
                      ============================================================ -->
                 <div class="hud-mining-engine-section" style="margin: 0 8px 12px 8px;">

@@ -421,21 +421,27 @@ async function enterPool(tier, price, roundId) {
 
                 const allowance = await usdt.allowance(walletAddress, CONTRACT_DEPOSIT);
                 if (allowance < amountWei) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Approve USDT in wallet...';
-                    const appTx = await usdt.approve(CONTRACT_DEPOSIT, ethers.MaxUint256);
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Step 1/2: Approve USDT in wallet...';
+                    const appTx = await usdt.approve(CONTRACT_DEPOSIT, amountWei);
                     await appTx.wait(1);
                 }
 
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirm purchase in wallet...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Step 2/2: Confirm Ticket in wallet...';
                 const deposit = new ethers.Contract(CONTRACT_DEPOSIT, depositAbi, signer);
                 const tx = await deposit.depositJackpot(tier, roundId, amountWei);
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming on BSC...';
                 const receipt = await tx.wait(1);
-                txHash = receipt.hash;
+                txHash = (receipt && receipt.hash) ? receipt.hash : tx.hash;
             } else {
                 txHash = 'demo_' + Date.now() + '_' + Math.floor(Math.random() * 9000 + 1000);
             }
         } else {
+            if (!IS_DEMO_MODE) {
+                await toast('warning', 'Wallet Required', 'Please connect MetaMask or TrustWallet on BSC to purchase tickets.');
+                btn.disabled = false;
+                btn.innerHTML = original;
+                return;
+            }
             txHash = 'web_' + Date.now() + '_' + Math.floor(Math.random() * 9000 + 1000);
         }
 
