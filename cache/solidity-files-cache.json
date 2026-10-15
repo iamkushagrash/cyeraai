@@ -1103,6 +1103,80 @@
         "SafeERC20",
         "USDTWithdrawalVault"
       ]
+    },
+    "D:\\Cyera AI\\contracts\\RoyalJackpotDeposit.sol": {
+      "lastModificationDate": 1792059773120,
+      "contentHash": "2d57c3b1c4c51fdbff6403e0143e0de1",
+      "sourceName": "contracts/RoyalJackpotDeposit.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20",
+        "RoyalJackpotDeposit"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\RoyalJackpotVault.sol": {
+      "lastModificationDate": 1792059782599,
+      "contentHash": "b1633a965f8b0f0a7509add2f8ae2d07",
+      "sourceName": "contracts/RoyalJackpotVault.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20",
+        "RoyalJackpotVault"
+      ]
     }
   }
 }

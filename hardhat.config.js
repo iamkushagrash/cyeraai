@@ -50,7 +50,9 @@ export default {
     bscMainnet: {
       url: process.env.BSC_MAINNET_RPC || "https://bsc-dataseed.binance.org/",
       chainId: 56,
-      accounts: process.env.PRIVATE_KEY ? [(process.env.PRIVATE_KEY.startsWith("0x") ? process.env.PRIVATE_KEY : "0x" + process.env.PRIVATE_KEY)] : (process.env.SIGNER_PRIVATE_KEY ? [(process.env.SIGNER_PRIVATE_KEY.startsWith("0x") ? process.env.SIGNER_PRIVATE_KEY : "0x" + process.env.SIGNER_PRIVATE_KEY)] : []),
+      accounts: process.env.LUCKYDRAW_PRIVATE_KEY 
+        ? [(process.env.LUCKYDRAW_PRIVATE_KEY.startsWith("0x") ? process.env.LUCKYDRAW_PRIVATE_KEY : "0x" + process.env.LUCKYDRAW_PRIVATE_KEY)]
+        : (process.env.PRIVATE_KEY ? [(process.env.PRIVATE_KEY.startsWith("0x") ? process.env.PRIVATE_KEY : "0x" + process.env.PRIVATE_KEY)] : []),
     },
   },
 };

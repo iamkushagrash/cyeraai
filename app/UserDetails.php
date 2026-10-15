@@ -9,7 +9,7 @@ class UserDetails extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['userid', 'sponsorid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'cai_balance', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected', 'is_dao'];
+    protected $fillable = ['userid', 'sponsorid', 'level', 'total_direct', 'active_direct', 'total_downline', 'active_downline', 'level_income', 'roi_income', 'wallet_amount', 'cai_balance', 'royal_wallet', 'total_investment', 'current_investment', 'total_level_investment', 'current_level_investment', 'total_self_investment', 'current_self_investment', 'total_direct_investment', 'current_direct_investment', 'level_status', 'capping', 'roi_status', 'updated_at', 'userstatus', 'userstate', 'rank_level', 'rank_name', 'booster', 'loan_attempts', 'power_protected', 'lifetime_protected', 'silver_protected', 'is_dao'];
 
 
     public function stackingDeposite()

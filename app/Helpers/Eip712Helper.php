@@ -121,6 +121,63 @@ class Eip712Helper
     }
 
     /**
+     * Sign Royal Jackpot Prize Claim for RoyalJackpotVault contract
+     *
+     * @param string $recipient
+     * @param string $amountWei
+     * @param string $claimId
+     * @param string $expiry
+     * @param string $verifyingContract
+     * @param string|int $chainId
+     * @param string $privateKey
+     * @return array
+     */
+    public static function signRoyalJackpotClaim($recipient, $amountWei, $claimId, $expiry, $verifyingContract, $chainId, $privateKey)
+    {
+        // 1. Domain Separator
+        $typeHashDomain = Keccak::hash("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)", 256);
+        $nameHash = Keccak::hash("RoyalJackpotVault", 256);
+        $versionHash = Keccak::hash("1", 256);
+        $chainIdHex = self::padUint($chainId);
+        $contractHex = self::padAddress($verifyingContract);
+
+        $domainData = hex2bin($typeHashDomain . $nameHash . $versionHash . $chainIdHex . $contractHex);
+        $domainSeparator = Keccak::hash($domainData, 256);
+
+        // 2. Struct Hash
+        $typeHashClaim = Keccak::hash("ClaimJackpotPrize(address recipient,uint256 amount,uint256 claimId,uint256 expiry)", 256);
+        $recipientHex = self::padAddress($recipient);
+        $amountHex = self::padUint($amountWei);
+        $claimIdHex = self::padUint($claimId);
+        $expiryHex = self::padUint($expiry);
+
+        $structData = hex2bin($typeHashClaim . $recipientHex . $amountHex . $claimIdHex . $expiryHex);
+        $structHash = Keccak::hash($structData, 256);
+
+        // 3. Digest: keccak256("\x19\x01" + domainSeparator + structHash)
+        $digestData = "\x19\x01" . hex2bin($domainSeparator) . hex2bin($structHash);
+        $digest = Keccak::hash($digestData, 256);
+
+        // 4. ECDSA Secp256k1 Sign
+        $ec = new EC('secp256k1');
+        $privKeyHex = ltrim($privateKey, '0x');
+        $key = $ec->keyFromPrivate($privKeyHex, 'hex');
+        $sig = $key->sign($digest, ['canonical' => true]);
+
+        $r = str_pad($sig->r->toString('hex'), 64, '0', STR_PAD_LEFT);
+        $s = str_pad($sig->s->toString('hex'), 64, '0', STR_PAD_LEFT);
+        $v = dechex($sig->recoveryParam + 27);
+        $signature = '0x' . $r . $s . str_pad($v, 2, '0', STR_PAD_LEFT);
+
+        return [
+            'signature' => $signature,
+            'signer'    => '0x' . $key->getPublic(false, 'hex'),
+            'digest'    => '0x' . $digest,
+        ];
+    }
+
+
+    /**
      * Pad Ethereum address to 32 bytes (64 hex characters)
      */
     private static function padAddress($addr)

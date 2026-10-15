@@ -431,6 +431,14 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
     Route::post('/User/Mining/RequestSellSignature', 'PortfolioMiningController@requestSellPortfolioSignature');
     Route::post('/User/Mining/ConfirmSell', 'PortfolioMiningController@confirmPortfolioSold');
 
+    // 4. Royal Jackpot (Decoupled 500-Member Instant Pools & Royal Wallet)
+    Route::get('/User/RoyalJackpot', 'RoyalJackpotController@index');
+    Route::get('/User/RoyalJackpot/Stats', 'RoyalJackpotController@getLiveStats');
+    Route::post('/User/RoyalJackpot/Enter', 'RoyalJackpotController@enterJackpot');
+    Route::post('/User/RoyalJackpot/RequestClaim', 'RoyalJackpotController@requestClaimSignature');
+    Route::post('/User/RoyalJackpot/ConfirmClaim', 'RoyalJackpotController@confirmClaim');
+
+
     Route::post('/User/WithdrawLifetimeReward', 'WithdrawInfoController@withdrawLifetimeIncome');
     Route::post('/User/WithdrawClubReward', 'WithdrawInfoController@withdrawClubIncome');
 

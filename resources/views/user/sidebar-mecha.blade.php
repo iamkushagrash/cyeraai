@@ -273,6 +273,22 @@
             </div>
 
 
+            <!-- Royal Jackpot (New 500-Member Instant Pools) -->
+            <div class="mecha-nav-item">
+                <a href="{{ url('/User/RoyalJackpot') }}" class="mecha-nav-link {{ request()->is('User/RoyalJackpot*') ? 'active' : '' }}" style="{{ request()->is('User/RoyalJackpot*') ? '' : 'border-left: 2px solid rgba(245, 158, 11, 0.6);' }}">
+                    <div class="nav-link-left-grp">
+                        <div class="nav-ico-orb" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.1)); border-color: rgba(245, 158, 11, 0.5); color: #F59E0B;">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="nav-txt-stack">
+                            <span class="nav-link-txt" style="color: #FDE68A;">Royal Jackpot</span>
+                            <span class="nav-sub-txt">500-Member Instant Pools</span>
+                        </div>
+                    </div>
+                    <span class="strip-status-pill" style="font-size: 7px; padding: 1px 5px; background: rgba(245, 158, 11, 0.2); border: 1px solid #F59E0B; color: #FDE68A; font-weight: 800;">HOT</span>
+                </a>
+            </div>
+
             <!-- Wallet & Exchange (Dropdown) -->
             <div class="mecha-nav-item mecha-nav-has-sub {{ request()->is('User/WithdrawRequest*') || request()->is('User/WithdrawalHistory*') || request()->is('User/Mining*') ? 'open' : '' }}">
                 <div class="mecha-nav-link" onclick="toggleMechaSubmenu(this)">
