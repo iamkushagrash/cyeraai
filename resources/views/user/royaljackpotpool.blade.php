@@ -144,16 +144,11 @@
 .rjp-rule:last-child { border-bottom: none; }
 .rjp-rule i { color: var(--accent); margin-top: 2px; width: 14px; text-align: center; }
 
+.rjp-layout { display: flex; flex-direction: column; gap: 12px; }
 .rjp-join { order: 1; }
 .rjp-progress { order: 2; }
 .rjp-ladder { order: 3; }
 .rjp-tabs { order: 4; }
-
-@media (min-width: 900px) {
-    .rjp-layout { grid-template-columns: 1fr 360px; align-items: start; }
-    .rjp-join { grid-column: 2; grid-row: 1 / span 4; position: sticky; top: 8px; }
-    .rjp-progress, .rjp-ladder, .rjp-tabs { grid-column: 1; }
-}
 </style>
 
 <!-- ======================= POOL HERO ======================= -->
@@ -217,6 +212,13 @@
             <div class="rjp-fact"><span>Slots left</span><b id="factLeft">{{ $slotsRemaining }}</b></div>
             <div class="rjp-fact"><span>Your tickets (this round)</span><b id="factMine">{{ $myTicketsInRound->count() }}</b></div>
             <div class="rjp-fact"><span>Your tickets (all rounds)</span><b>{{ $myTotalTicketsAllRounds }}</b></div>
+        </div>
+
+        <div id="walletBadgeBar" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:11px;">
+            <span style="color:#8A94A6;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-wallet" style="color:#00FF88;"></i> <span id="walletNameLabel">Wallet:</span>
+            </span>
+            <b id="walletAddrLabel" style="color:#00FF88;font-family:monospace;letter-spacing:.3px;">Detecting...</b>
         </div>
 
         @if($eligibility['is_eligible'])
@@ -371,9 +373,9 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script>
-const TIER           = {{ $pool->pool_tier }};
+const TIER             = {{ $pool->pool_tier }};
 const CONTRACT_DEPOSIT = "{{ $contracts['depositContract'] }}";
 const CONTRACT_USDT    = "{{ $contracts['usdtToken'] }}";
 const IS_DEMO_MODE     = {{ $contracts['demoMode'] ? 'true' : 'false' }};
@@ -381,7 +383,16 @@ const CSRF_TOKEN       = "{{ csrf_token() }}";
 
 function toast(icon, title, text) {
     if (window.Swal) {
-        return Swal.fire({ icon: icon, title: title, text: text, background: '#0A0C11', color: '#fff', confirmButtonColor: '#F5A623' });
+        return Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            background: '#0A0C11',
+            color: '#fff',
+            confirmButtonColor: '#F5A623',
+            confirmButtonText: 'OK',
+            showCancelButton: false
+        });
     }
     alert(title + (text ? '\n' + text : ''));
     return Promise.resolve();
@@ -394,6 +405,100 @@ function switchTab(tabId, btn) {
     document.getElementById('tab-' + tabId).style.display = 'block';
 }
 
+function getWeb3Provider() {
+    // 1. SafePal dedicated provider (Mobile DApp Browser & Extension)
+    if (window.safepalProvider) return window.safepalProvider;
+    if (window.safepal && window.safepal.ethereum) return window.safepal.ethereum;
+    if (window.safepal && typeof window.safepal.request === 'function') return window.safepal;
+
+    // 2. TokenPocket dedicated provider
+    if (window.tokenpocket && window.tokenpocket.ethereum) return window.tokenpocket.ethereum;
+    if (window.tokenpocket && typeof window.tokenpocket.request === 'function') return window.tokenpocket;
+
+    // 3. Trust Wallet dedicated provider
+    if (window.trustwallet && window.trustwallet.ethereum) return window.trustwallet.ethereum;
+    if (window.trustwallet && typeof window.trustwallet.request === 'function') return window.trustwallet;
+
+    // 4. OKX dedicated provider
+    if (window.okxwallet && window.okxwallet.ethereum) return window.okxwallet.ethereum;
+    if (window.okxwallet && typeof window.okxwallet.request === 'function') return window.okxwallet;
+
+    // 5. Bitget / BitKeep
+    if (window.bitkeep && window.bitkeep.ethereum) return window.bitkeep.ethereum;
+    if (window.bitkeep && typeof window.bitkeep.request === 'function') return window.bitkeep;
+
+    // 6. Binance Web3 Wallet
+    if (window.binance && typeof window.binance.request === 'function') return window.binance;
+
+    // 7. Multi-provider array (EIP-1193 / EIP-5749)
+    if (typeof window.ethereum !== 'undefined') {
+        if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+            const prioritized = window.ethereum.providers.find(p => p.isSafePal || p.isTokenPocket || p.isTrust || p.isTrustWallet || p.isBinance || p.isOkxWallet || (p.isMetaMask && !p.isPhantom));
+            if (prioritized) return prioritized;
+            return window.ethereum.providers[0];
+        }
+        return window.ethereum;
+    }
+
+    if (window.phantom && window.phantom.ethereum) return window.phantom.ethereum;
+    return null;
+}
+
+function detectWalletName(provider) {
+    if (!provider) return 'Web3';
+    if (window.safepalProvider || provider.isSafePal || window.safepal) return 'SafePal';
+    if (window.tokenpocket || provider.isTokenPocket) return 'TokenPocket';
+    if (window.trustwallet || provider.isTrust || provider.isTrustWallet) return 'TrustWallet';
+    if (window.okxwallet || provider.isOkxWallet) return 'OKX';
+    if (window.bitkeep || provider.isBitKeep) return 'Bitget';
+    if (window.binance || provider.isBinance) return 'Binance';
+    if (provider.isMetaMask) return 'MetaMask';
+    return 'Web3 Wallet';
+}
+
+async function updateWalletStatusUI() {
+    const rawProvider = getWeb3Provider();
+    const lblAddr = document.getElementById('walletAddrLabel');
+    const lblName = document.getElementById('walletNameLabel');
+    if (!lblAddr) return;
+
+    if (!rawProvider) {
+        lblAddr.style.color = '#F5A623';
+        lblAddr.innerText = 'Not Detected (Open in DApp)';
+        if (lblName) lblName.innerText = 'Wallet:';
+        return;
+    }
+
+    const walletName = detectWalletName(rawProvider);
+    if (lblName) lblName.innerText = walletName + ':';
+
+    try {
+        let accounts = [];
+        if (typeof rawProvider.request === 'function') {
+            accounts = await rawProvider.request({ method: 'eth_accounts' });
+        }
+        if (accounts && accounts.length > 0) {
+            const a = accounts[0];
+            const short = a.substring(0, 6) + '...' + a.substring(a.length - 4);
+            lblAddr.style.color = '#00FF88';
+            lblAddr.innerText = short + ' (Connected)';
+        } else {
+            lblAddr.style.color = '#94A3B8';
+            lblAddr.innerText = 'Ready (Tap Buy)';
+        }
+    } catch (e) {
+        lblAddr.style.color = '#94A3B8';
+        lblAddr.innerText = 'Ready (Tap Buy)';
+    }
+}
+
+// Auto update wallet badge on load, focus, and ethereum initialized
+document.addEventListener('DOMContentLoaded', updateWalletStatusUI);
+window.addEventListener('focus', updateWalletStatusUI);
+window.addEventListener('ethereum#initialized', updateWalletStatusUI);
+setTimeout(updateWalletStatusUI, 500);
+setTimeout(updateWalletStatusUI, 1500);
+
 async function enterPool(tier, price, roundId) {
     const btn = document.getElementById('btnBuy');
     const original = btn.innerHTML;
@@ -404,31 +509,114 @@ async function enterPool(tier, price, roundId) {
     let walletAddress = null;
 
     try {
-        if (window.ethereum) {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            walletAddress = await signer.getAddress();
+        const rawProvider = getWeb3Provider();
+
+        if (rawProvider) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting wallet...';
+
+            // 1. Request account connection explicitly with multi-wallet fallbacks
+            let accounts = [];
+            try {
+                accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
+            } catch (accErr) {
+                try {
+                    if (typeof rawProvider.send === 'function') {
+                        accounts = await rawProvider.send('eth_requestAccounts', []);
+                    }
+                } catch (e2) {
+                    try {
+                        accounts = await rawProvider.request({ method: 'eth_accounts' });
+                    } catch (e3) {}
+                }
+            }
+
+            if (!accounts || accounts.length === 0) {
+                await toast('warning', 'Account Required', 'Please unlock and connect your wallet account.');
+                btn.disabled = false;
+                btn.innerHTML = original;
+                return;
+            }
+
+            // Normalize user address to clean EIP-55 format to prevent checksum crashes in TokenPocket/SafePal
+            const rawUserAddr = accounts[0];
+            walletAddress = ethers.getAddress(rawUserAddr.toLowerCase());
+            updateWalletStatusUI();
+
+            // 2. Ensure network is BSC (ChainId 56 / 0x38)
+            try {
+                const currentChain = await rawProvider.request({ method: 'eth_chainId' });
+                const currentChainId = parseInt(currentChain, 16) || parseInt(currentChain, 10);
+                if (currentChainId !== 56) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Switching to BSC...';
+                    try {
+                        await rawProvider.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x38' }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902 || switchError?.data?.originalError?.code === 4902) {
+                            await rawProvider.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x38',
+                                    chainName: 'BNB Smart Chain Mainnet',
+                                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                    blockExplorerUrls: ['https://bscscan.com']
+                                }]
+                            });
+                        }
+                    }
+                }
+            } catch (netErr) {
+                console.warn('Network switch check warning:', netErr);
+            }
+
+            const provider = new ethers.BrowserProvider(rawProvider);
+            // Pass clean checksummed address so ethers never attempts to parse malformed casing internally
+            const signer = await provider.getSigner(walletAddress);
 
             if (!IS_DEMO_MODE) {
+                const cleanDeposit = ethers.getAddress(CONTRACT_DEPOSIT.toLowerCase());
+                const cleanUsdt    = ethers.getAddress(CONTRACT_USDT.toLowerCase());
+
                 const usdtAbi = [
                     "function approve(address spender, uint256 amount) public returns (bool)",
                     "function allowance(address owner, address spender) public view returns (uint256)"
                 ];
                 const depositAbi = ["function depositJackpot(uint256 poolTier, uint256 roundId, uint256 amountUsdt) external"];
 
-                const usdt = new ethers.Contract(CONTRACT_USDT, usdtAbi, signer);
+                const usdt = new ethers.Contract(cleanUsdt, usdtAbi, signer);
                 const amountWei = ethers.parseUnits(price.toString(), 18);
 
-                const allowance = await usdt.allowance(walletAddress, CONTRACT_DEPOSIT);
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking USDT allowance...';
+                let allowance = 0n;
+                try {
+                    allowance = await usdt.allowance(walletAddress, cleanDeposit);
+                } catch (allowErr) {
+                    console.warn('Allowance check warning, proceeding to approve:', allowErr);
+                }
+
                 if (allowance < amountWei) {
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Step 1/2: Approve USDT in wallet...';
-                    const appTx = await usdt.approve(CONTRACT_DEPOSIT, amountWei);
+                    let appTx;
+                    try {
+                        appTx = await usdt.approve(cleanDeposit, amountWei, { gasLimit: 100000 });
+                    } catch (eAppGas) {
+                        appTx = await usdt.approve(cleanDeposit, amountWei);
+                    }
                     await appTx.wait(1);
                 }
 
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Step 2/2: Confirm Ticket in wallet...';
-                const deposit = new ethers.Contract(CONTRACT_DEPOSIT, depositAbi, signer);
-                const tx = await deposit.depositJackpot(tier, roundId, amountWei);
+                const deposit = new ethers.Contract(cleanDeposit, depositAbi, signer);
+                let tx;
+                try {
+                    tx = await deposit.depositJackpot(tier, roundId, amountWei, { gasLimit: 350000 });
+                } catch (eDepGas) {
+                    tx = await deposit.depositJackpot(tier, roundId, amountWei);
+                }
+
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming on BSC...';
                 const receipt = await tx.wait(1);
                 txHash = (receipt && receipt.hash) ? receipt.hash : tx.hash;
@@ -437,7 +625,7 @@ async function enterPool(tier, price, roundId) {
             }
         } else {
             if (!IS_DEMO_MODE) {
-                await toast('warning', 'Wallet Required', 'Please connect MetaMask or TrustWallet on BSC to purchase tickets.');
+                await toast('warning', 'Wallet Required', 'Please open this page inside SafePal, TokenPocket, TrustWallet or MetaMask dApp browser.');
                 btn.disabled = false;
                 btn.innerHTML = original;
                 return;
@@ -445,6 +633,7 @@ async function enterPool(tier, price, roundId) {
             txHash = 'web_' + Date.now() + '_' + Math.floor(Math.random() * 9000 + 1000);
         }
 
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying ticket...';
         const res = await fetch("{{ url('/User/RoyalJackpot/Enter') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
@@ -462,7 +651,8 @@ async function enterPool(tier, price, roundId) {
         }
     } catch (err) {
         console.error('Enter Jackpot error:', err);
-        await toast('error', 'Transaction failed', err.message || 'Transaction cancelled or failed.');
+        const errMsg = err?.info?.error?.message || err?.message || 'Transaction cancelled or failed.';
+        await toast('error', 'Transaction failed', errMsg);
         btn.disabled = false;
         btn.innerHTML = original;
     }

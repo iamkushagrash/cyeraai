@@ -13,6 +13,7 @@ class DaoDistribution extends Model
         'dao_name',
         'week_start',
         'week_end',
+        'period_days',
         'total_weekly_business',
         'pool_percent',
         'pool_amount',

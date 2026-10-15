@@ -345,7 +345,7 @@
                             <span class="dao-head-title">DAO GOVERNANCE POOLS</span>
                             <span class="dao-rate-pill">9.5% TOTAL DAO TURNOVER</span>
                         </div>
-                        <div class="dao-head-subtitle">Platinum (2.5%), Golden (3.0%) & Diamond (4.0%) Weekly Pools</div>
+                        <div class="dao-head-subtitle">Platinum (2.5%), Golden (3.0%) & Diamond (4.0%) &bull; Starts 5 Nov 2026 &bull; Weekly on Sundays</div>
                     </div>
                 </div>
             </div>
@@ -379,8 +379,8 @@
             @endphp
             <div class="dao-qual-container">
                 <div class="dao-qual-title-bar">
-                    <span class="dao-qual-title"><i class="fas fa-shield-alt text-warning"></i> DAO Qualification Status</span>
-                    <span style="font-size: 0.52rem; color: #64748B;">Mondays at 01:55 AM Distribution</span>
+                    <span class="dao-qual-title"><i class="fas fa-shield-alt text-warning"></i> DAO Qualification Status (Pool Starts 5 Nov 2026)</span>
+                    <span style="font-size: 0.52rem; color: #64748B;">Weekly on Sundays (60 Days Rank Rule)</span>
                 </div>
 
                 <div class="dao-cards-grid">
@@ -390,7 +390,7 @@
                         <div class="dao-pool-head">
                             <span class="dao-pool-name" style="color: #38BDF8;">Platinum DAO (2.5%)</span>
                             <span class="dao-badge {{ ($platQual['is_purchased'] ?? false) ? 'active' : 'locked' }}">
-                                {{ ($platQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED' }}
+                                {{ $platQual['status_text'] ?? (($platQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED') }}
                             </span>
                         </div>
                         <div class="dao-criteria-list">
@@ -399,12 +399,12 @@
                                 <i class="fas {{ ($platQual['is_purchased'] ?? false) ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Rank Required: <b>V2 Rank</b></span>
-                                <i class="fas {{ $platQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>Rank Required: <b>V3 Rank (in 60 Days)</b></span>
+                                <i class="fas {{ $platQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-hourglass-half status-check' }}" style="{{ $platQual['rank_ok'] ? '' : 'color:#F59E0B;' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Time Limit: <b>90 Days ({{ $platQual['days_registered'] }}d)</b></span>
-                                <i class="fas {{ $platQual['days_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>60-Day Countdown: <b>Starts 5 Nov 2026</b></span>
+                                <i class="fas fa-calendar-check status-check ok"></i>
                             </div>
                             <div class="dao-criteria-item">
                                 <span>Member Limit: <b>{{ $platQual['current_members'] }}/{{ $platQual['max_members'] }}</b></span>
@@ -423,7 +423,7 @@
                         <div class="dao-pool-head">
                             <span class="dao-pool-name" style="color: #F59E0B;">Golden DAO (3.0%)</span>
                             <span class="dao-badge {{ ($goldQual['is_purchased'] ?? false) ? 'active' : 'locked' }}">
-                                {{ ($goldQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED' }}
+                                {{ $goldQual['status_text'] ?? (($goldQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED') }}
                             </span>
                         </div>
                         <div class="dao-criteria-list">
@@ -432,12 +432,12 @@
                                 <i class="fas {{ ($goldQual['is_purchased'] ?? false) ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Rank Required: <b>V3 Rank</b></span>
-                                <i class="fas {{ $goldQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>Rank Required: <b>V4 Rank (in 60 Days)</b></span>
+                                <i class="fas {{ $goldQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-hourglass-half status-check' }}" style="{{ $goldQual['rank_ok'] ? '' : 'color:#F59E0B;' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Time Limit: <b>90 Days ({{ $goldQual['days_registered'] }}d)</b></span>
-                                <i class="fas {{ $goldQual['days_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>60-Day Countdown: <b>Starts 5 Nov 2026</b></span>
+                                <i class="fas fa-calendar-check status-check ok"></i>
                             </div>
                             <div class="dao-criteria-item">
                                 <span>Member Limit: <b>{{ $goldQual['current_members'] }}/{{ $goldQual['max_members'] }}</b></span>
@@ -456,7 +456,7 @@
                         <div class="dao-pool-head">
                             <span class="dao-pool-name" style="color: #EC4899;">Diamond DAO (4.0%)</span>
                             <span class="dao-badge {{ ($diamQual['is_purchased'] ?? false) ? 'active' : 'locked' }}">
-                                {{ ($diamQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED' }}
+                                {{ $diamQual['status_text'] ?? (($diamQual['is_purchased'] ?? false) ? 'PURCHASED' : 'LOCKED') }}
                             </span>
                         </div>
                         <div class="dao-criteria-list">
@@ -465,12 +465,12 @@
                                 <i class="fas {{ ($diamQual['is_purchased'] ?? false) ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Rank Required: <b>V3 Rank</b></span>
-                                <i class="fas {{ $diamQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>Rank Required: <b>V5 Rank (in 60 Days)</b></span>
+                                <i class="fas {{ $diamQual['rank_ok'] ? 'fa-check-circle status-check ok' : 'fa-hourglass-half status-check' }}" style="{{ $diamQual['rank_ok'] ? '' : 'color:#F59E0B;' }}"></i>
                             </div>
                             <div class="dao-criteria-item">
-                                <span>Time Limit: <b>90 Days ({{ $diamQual['days_registered'] }}d)</b></span>
-                                <i class="fas {{ $diamQual['days_ok'] ? 'fa-check-circle status-check ok' : 'fa-times-circle status-check fail' }}"></i>
+                                <span>60-Day Countdown: <b>Starts 5 Nov 2026</b></span>
+                                <i class="fas fa-calendar-check status-check ok"></i>
                             </div>
                             <div class="dao-criteria-item">
                                 <span>Member Limit: <b>{{ $diamQual['current_members'] }}/{{ $diamQual['max_members'] }} (Top 50)</b></span>

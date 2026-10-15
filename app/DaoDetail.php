@@ -17,6 +17,7 @@ class DaoDetail extends Model
         'days_limit',
         'pool_percent',
         'capping_multiplier',
+        'start_date',
         'status',
     ];
 

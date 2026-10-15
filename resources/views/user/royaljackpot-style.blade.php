@@ -193,8 +193,114 @@ body, .master-app-wrap, .hud-app-shell, .hud-scroll-area { background: #000 !imp
 .rjx-btn.ghost { background: #000; border: 1px solid var(--rj-line); color: #CBD5E1; }
 .rjx-btn.red { background: linear-gradient(135deg,#FF7A7A,#E03131); color: #fff; }
 
-@media (min-width: 900px) {
-    .rjx-grid { grid-template-columns: repeat(4, 1fr); }
-    .rjx-price { font-size: 34px; }
+/* Keep 2x2 grid for mobile HUD shell */
+.rjx-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+/* ============================================================
+   SWEETALERT2: CRUST-FREE PRISTINE TICK ICON (TICK KA NISHAN)
+   ============================================================ */
+.swal2-popup {
+    background: #0A0C11 !important;
+    border: 1px solid rgba(245, 166, 35, 0.45) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.95), 0 0 30px rgba(245, 166, 35, 0.15) !important;
+    padding: 22px 18px 20px !important;
+    max-width: 340px !important;
+}
+.swal2-title {
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: .5px !important;
+    color: #FFD700 !important;
+    text-transform: uppercase !important;
+    margin: 8px 0 6px !important;
+    padding: 0 !important;
+}
+.swal2-html-container {
+    font-size: 12px !important;
+    color: #CBD5E1 !important;
+    line-height: 1.45 !important;
+    margin: 4px 0 16px !important;
+    padding: 0 !important;
+}
+.swal2-icon {
+    width: 60px !important;
+    height: 60px !important;
+    margin: 6px auto 10px auto !important;
+    border-width: 2.5px !important;
+    border-style: solid !important;
+    border-radius: 50% !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* SUCCESS TICK MARK */
+.swal2-icon.swal2-success {
+    border-color: #00FF88 !important;
+    color: #00FF88 !important;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.18) 0%, rgba(0, 0, 0, 0.5) 75%) !important;
+    box-shadow: 0 0 24px rgba(0, 255, 136, 0.4), inset 0 0 12px rgba(0, 255, 136, 0.15) !important;
+}
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-icon.swal2-success .swal2-success-fix,
+.swal2-icon.swal2-success .swal2-success-ring,
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    display: none !important;
+}
+.swal2-icon.swal2-success::after {
+    content: '' !important;
+    display: block !important;
+    width: 32px !important;
+    height: 32px !important;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300FF88' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center / contain !important;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.85)) !important;
+    animation: swalTickBounce 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+@keyframes swalTickBounce {
+    0% { transform: scale(0.2); opacity: 0; }
+    60% { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ERROR ICON */
+.swal2-icon.swal2-error {
+    border-color: #EF4444 !important;
+    color: #EF4444 !important;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.18) 0%, rgba(0, 0, 0, 0.5) 75%) !important;
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.4) !important;
+}
+.swal2-icon.swal2-error .swal2-x-mark,
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    display: none !important;
+}
+.swal2-icon.swal2-error::after {
+    content: '' !important;
+    display: block !important;
+    width: 28px !important;
+    height: 28px !important;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EF4444' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E") no-repeat center / contain !important;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)) !important;
+    animation: swalTickBounce 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FFE680 0%, #F5A623 50%, #D48806 100%) !important;
+    color: #0A0A0A !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    height: 40px !important;
+    font-size: 13px !important;
+    letter-spacing: .5px !important;
+    padding: 0 24px !important;
+    box-shadow: 0 6px 18px rgba(245, 166, 35, 0.35) !important;
+}
+.swal2-cancel[style*="display: none"],
+.swal2-styled.swal2-cancel[style*="display: none"] {
+    display: none !important;
 }
 </style>

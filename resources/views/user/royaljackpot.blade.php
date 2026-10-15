@@ -223,7 +223,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script>
 const CONTRACT_VAULT = "{{ $contracts['vaultContract'] }}";
 const IS_DEMO_MODE   = {{ $contracts['demoMode'] ? 'true' : 'false' }};
@@ -231,7 +231,16 @@ const CSRF_TOKEN     = "{{ csrf_token() }}";
 
 function toast(icon, title, text) {
     if (window.Swal) {
-        return Swal.fire({ icon: icon, title: title, text: text, background: '#0A0C11', color: '#fff', confirmButtonColor: '#F5A623' });
+        return Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            background: '#0A0C11',
+            color: '#fff',
+            confirmButtonColor: '#F5A623',
+            confirmButtonText: 'OK',
+            showCancelButton: false
+        });
     }
     alert(title + (text ? '\n' + text : ''));
     return Promise.resolve();
@@ -244,6 +253,38 @@ function switchTab(tabId, btn) {
     document.getElementById('tab-' + tabId).style.display = 'block';
 }
 
+function getWeb3Provider() {
+    if (window.safepalProvider) return window.safepalProvider;
+    if (window.safepal && window.safepal.ethereum) return window.safepal.ethereum;
+    if (window.safepal && typeof window.safepal.request === 'function') return window.safepal;
+
+    if (window.tokenpocket && window.tokenpocket.ethereum) return window.tokenpocket.ethereum;
+    if (window.tokenpocket && typeof window.tokenpocket.request === 'function') return window.tokenpocket;
+
+    if (window.trustwallet && window.trustwallet.ethereum) return window.trustwallet.ethereum;
+    if (window.trustwallet && typeof window.trustwallet.request === 'function') return window.trustwallet;
+
+    if (window.okxwallet && window.okxwallet.ethereum) return window.okxwallet.ethereum;
+    if (window.okxwallet && typeof window.okxwallet.request === 'function') return window.okxwallet;
+
+    if (window.bitkeep && window.bitkeep.ethereum) return window.bitkeep.ethereum;
+    if (window.bitkeep && typeof window.bitkeep.request === 'function') return window.bitkeep;
+
+    if (window.binance && typeof window.binance.request === 'function') return window.binance;
+
+    if (typeof window.ethereum !== 'undefined') {
+        if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+            const prioritized = window.ethereum.providers.find(p => p.isSafePal || p.isTokenPocket || p.isTrust || p.isTrustWallet || p.isBinance || p.isOkxWallet || (p.isMetaMask && !p.isPhantom));
+            if (prioritized) return prioritized;
+            return window.ethereum.providers[0];
+        }
+        return window.ethereum;
+    }
+
+    if (window.phantom && window.phantom.ethereum) return window.phantom.ethereum;
+    return null;
+}
+
 function openClaimModal()  { document.getElementById('claimModal').classList.add('active'); }
 function closeClaimModal() { document.getElementById('claimModal').classList.remove('active'); }
 
@@ -253,20 +294,61 @@ async function executeClaimWeb3() {
     const btn = document.getElementById('btnExecuteClaim');
 
     if (!amount || amount < 1.0) { toast('warning', 'Minimum claim is $1.00 USDT'); return; }
-    if (!window.ethereum) { toast('warning', 'Wallet not found', 'Open this page in MetaMask / Trust Wallet to withdraw.'); return; }
+
+    const rawProvider = getWeb3Provider();
+    if (!rawProvider) {
+        toast('warning', 'Wallet not found', 'Open this page inside SafePal, TokenPocket, TrustWallet or MetaMask dApp browser.');
+        return;
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authorizing...';
     statusBox.style.display = 'block';
     statusBox.style.background = 'rgba(245,166,35,.12)';
     statusBox.style.color = '#FDE68A';
-    statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting withdrawal signature...';
+    statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting wallet...';
 
     try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const userAddress = await signer.getAddress();
+        let accounts = [];
+        try {
+            accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
+        } catch (accErr) {
+            try {
+                if (typeof rawProvider.send === 'function') {
+                    accounts = await rawProvider.send('eth_requestAccounts', []);
+                }
+            } catch (e2) {
+                try {
+                    accounts = await rawProvider.request({ method: 'eth_accounts' });
+                } catch (e3) {}
+            }
+        }
 
+        if (!accounts || accounts.length === 0) {
+            throw new Error('Please select or unlock an account in your wallet.');
+        }
+
+        const rawAddr = accounts[0];
+        const userAddress = ethers.getAddress(rawAddr.toLowerCase());
+
+        // Check BSC network
+        try {
+            const chain = await rawProvider.request({ method: 'eth_chainId' });
+            const chainIdNum = parseInt(chain, 16) || parseInt(chain, 10);
+            if (chainIdNum !== 56) {
+                try {
+                    await rawProvider.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }]
+                    });
+                } catch (swErr) {}
+            }
+        } catch (netErr) {}
+
+        const provider = new ethers.BrowserProvider(rawProvider);
+        const signer = await provider.getSigner(userAddress);
+
+        statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting withdrawal signature...';
         const sigRes = await fetch("{{ url('/User/RoyalJackpot/RequestClaim') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
@@ -280,11 +362,17 @@ async function executeClaimWeb3() {
 
         let claimTxHash = 'claim_' + Date.now();
         if (!IS_DEMO_MODE) {
+            const cleanVault = ethers.getAddress(CONTRACT_VAULT.toLowerCase());
             const vaultAbi = ["function claimPrize(uint256 amount, uint256 claimId, uint256 expiry, bytes calldata signature) external"];
-            const vault = new ethers.Contract(CONTRACT_VAULT, vaultAbi, signer);
-            const tx = await vault.claimPrize(auth.amountWei, auth.claimId, auth.expiry, auth.signature);
+            const vault = new ethers.Contract(cleanVault, vaultAbi, signer);
+            let tx;
+            try {
+                tx = await vault.claimPrize(auth.amountWei, auth.claimId, auth.expiry, auth.signature, { gasLimit: 250000 });
+            } catch (gErr) {
+                tx = await vault.claimPrize(auth.amountWei, auth.claimId, auth.expiry, auth.signature);
+            }
             const receipt = await tx.wait(1);
-            claimTxHash = receipt.hash;
+            claimTxHash = (receipt && receipt.hash) ? receipt.hash : tx.hash;
         }
 
         statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing ledger...';
@@ -303,7 +391,7 @@ async function executeClaimWeb3() {
         console.error('Claim error:', err);
         statusBox.style.background = 'rgba(239,68,68,.15)';
         statusBox.style.color = '#FCA5A5';
-        statusBox.innerHTML = '<i class="fas fa-times-circle"></i> ' + (err.message || 'Withdrawal failed.');
+        statusBox.innerHTML = '<i class="fas fa-times-circle"></i> ' + (err?.info?.error?.message || err?.message || 'Withdrawal failed.');
         btn.disabled = false;
         btn.innerHTML = 'Confirm Withdrawal';
     }

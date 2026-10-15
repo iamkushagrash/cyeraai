@@ -20,6 +20,7 @@ class CreateDaoDistributionsTable extends Migration
                 $table->string('dao_name');
                 $table->timestamp('week_start')->nullable();
                 $table->timestamp('week_end')->nullable();
+                $table->integer('period_days')->default(7)->comment('4 for first partial week, 7 for full weeks');
                 $table->decimal('total_weekly_business', 15, 2)->default(0.00);
                 $table->decimal('pool_percent', 5, 2);
                 $table->decimal('pool_amount', 15, 2)->default(0.00);

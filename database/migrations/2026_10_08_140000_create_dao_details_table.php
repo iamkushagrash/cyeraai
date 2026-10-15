@@ -20,10 +20,11 @@ class CreateDaoDetailsTable extends Migration
                 $table->string('dao_name');
                 $table->decimal('package_amount', 15, 2);
                 $table->integer('max_members');
-                $table->integer('rank_required')->comment('2=V2, 3=V3');
-                $table->integer('days_limit')->default(90);
+                $table->integer('rank_required')->comment('3=V3, 4=V4, 5=V5');
+                $table->integer('days_limit')->default(60)->comment('60 Days from 5 Nov 2026');
                 $table->decimal('pool_percent', 5, 2);
                 $table->decimal('capping_multiplier', 5, 2);
+                $table->date('start_date')->default('2026-11-05');
                 $table->tinyInteger('status')->default(1);
                 $table->timestamps();
             });

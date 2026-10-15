@@ -483,8 +483,6 @@ class UserDetails extends Model
     {
         \App\Http\Controllers\DaoIncomeController::seedDaoDetails();
 
-        $userCreated = $this->user() ? \Carbon\Carbon::parse($this->user()->created_at) : \Carbon\Carbon::parse($this->created_at ?? now());
-        $daysReg = $userCreated->diffInDays(now());
         $rankLevel = (int) ($this->rank_level ?? 0);
         $userIsDao = (int) ($this->is_dao ?? 0);
 
@@ -495,12 +493,36 @@ class UserDetails extends Model
             $membersCount = \App\UserDetails::where('is_dao', $tier->dao_type)->count();
             $isPurchased = ($userIsDao === $tier->dao_type);
 
-            $daysOk = ($daysReg <= (int) $tier->days_limit);
+            $startDate = \Carbon\Carbon::parse($tier->start_date ?? '2026-11-05');
+            $deadline = $startDate->copy()->addDays((int) ($tier->days_limit ?? 60));
+            $now = \Carbon\Carbon::now();
+
+            $isStarted = $now->gte($startDate);
+            $inGracePeriod = $now->lte($deadline);
+            $daysUntilStart = ceil($now->diffInDays($startDate, false));
+            $daysLeft = $isStarted ? max(0, ceil($now->diffInDays($deadline, false))) : (int) ($tier->days_limit ?? 60);
+
             $rankOk = ($rankLevel >= (int) $tier->rank_required);
             $slotsOk = ($membersCount < (int) $tier->max_members || $isPurchased);
 
             $totalReceived = (float) \App\DaoIncome::where('userid', $this->id)->where('dao_type', $tier->dao_type)->sum('amt_usdt');
             $maxCapping = (float) $tier->package_amount * (float) $tier->capping_multiplier;
+
+            // Eligible for weekly dividend if purchased, capping headroom exists, and (either rank achieved OR still within 60 days grace)
+            $isEligible = ($isPurchased && ($rankOk || $inGracePeriod) && ($totalReceived < $maxCapping));
+
+            $statusText = 'LOCKED';
+            if ($isPurchased) {
+                if ($rankOk) {
+                    $statusText = 'QUALIFIED (Rank V' . $rankLevel . ')';
+                } elseif (!$isStarted) {
+                    $statusText = 'PURCHASED (Starts 5 Nov &bull; 60d to V' . $tier->rank_required . ')';
+                } elseif ($inGracePeriod) {
+                    $statusText = 'ACTIVE (' . $daysLeft . 'd to achieve V' . $tier->rank_required . ')';
+                } else {
+                    $statusText = 'PAUSED (V' . $tier->rank_required . ' not met in 60d)';
+                }
+            }
 
             $result[$tier->dao_type] = [
                 'dao_type' => $tier->dao_type,
@@ -510,17 +532,19 @@ class UserDetails extends Model
                 'current_members' => $membersCount,
                 'rank_required' => (int) $tier->rank_required,
                 'days_limit' => (int) $tier->days_limit,
+                'start_date' => $tier->start_date ?? '2026-11-05',
                 'pool_percent' => (float) $tier->pool_percent,
                 'capping_multiplier' => (float) $tier->capping_multiplier,
                 'max_capping' => $maxCapping,
                 'total_received' => $totalReceived,
                 'is_purchased' => $isPurchased,
-                'is_eligible' => ($isPurchased && $daysOk && $rankOk && ($totalReceived < $maxCapping)),
-                'days_registered' => $daysReg,
+                'is_eligible' => $isEligible,
                 'current_rank' => $rankLevel,
-                'days_ok' => $daysOk,
+                'days_left' => $daysLeft,
+                'in_grace_period' => $inGracePeriod,
                 'rank_ok' => $rankOk,
                 'slots_ok' => $slotsOk,
+                'status_text' => $statusText,
             ];
         }
         return $result;

@@ -727,11 +727,11 @@ class RoyalJackpotController extends Controller
         $royalWalletBalance = (float) ($userDetail->royal_wallet ?? 0.00);
 
         $contracts = [
-            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x1C27Be1bAf6a8946755490a61250fD0e9D6A1234'),
-            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0x7B99cB95A85B3De549aE29b626E6fB2983756789'),
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5'),
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xF68506dAA4BD94B65112816DB41Bf0F371186B16'),
             'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
             'chainId'         => 56,
-            'demoMode'        => (bool) env('DEMO_MODE', true),
+            'demoMode'        => (bool) env('DEMO_MODE', false),
         ];
 
         return view('user.royaljackpotpool', compact(
