@@ -243,6 +243,8 @@ class HomeController extends Controller
         $usrRaw['goldenDaoCount'] = $goldenDaoCount;
         $usrRaw['platinumDaoCount'] = $platinumDaoCount;
 
+        \App\Http\Controllers\DaoIncomeController::seedDaoDetails();
+        $usrRaw['daoTiers'] = \App\DaoDetail::where('status', 1)->get()->keyBy('dao_type');
         $usrRaw['userDaoDetails'] = $userDetail->getDaoDetails();
 
         // Royal Jackpot Pools & User Stats for Dashboard

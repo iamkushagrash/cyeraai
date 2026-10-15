@@ -619,6 +619,35 @@
                     $gCount = $data['goldenDaoCount'] ?? 0;
                     $pCount = $data['platinumDaoCount'] ?? 0;
 
+                    $daoTiers  = $data['daoTiers'] ?? (\App\DaoDetail::where('status', 1)->get()->keyBy('dao_type'));
+                    $tDiamond  = $daoTiers[3] ?? null;
+                    $tGolden   = $daoTiers[2] ?? null;
+                    $tPlatinum = $daoTiers[1] ?? null;
+
+                    $dPct  = $tDiamond ? rtrim(rtrim(number_format($tDiamond->pool_percent, 2), '0'), '.') : '4';
+                    $dRank = $tDiamond->rank_required ?? 5;
+                    $dDays = $tDiamond->days_limit ?? 60;
+                    $dCap  = $tDiamond ? rtrim(rtrim($tDiamond->capping_multiplier, '0'), '.') : '4';
+                    $dPkg  = $tDiamond ? number_format($tDiamond->package_amount, 0) : '10,000';
+                    $dMax  = $tDiamond ? number_format(($tDiamond->package_amount * $tDiamond->capping_multiplier) / 1000, 0) . 'K' : '40K';
+                    $dSlots = $tDiamond->max_members ?? 50;
+
+                    $gPct  = $tGolden ? rtrim(rtrim(number_format($tGolden->pool_percent, 2), '0'), '.') : '3';
+                    $gRank = $tGolden->rank_required ?? 4;
+                    $gDays = $tGolden->days_limit ?? 60;
+                    $gCap  = $tGolden ? rtrim(rtrim($tGolden->capping_multiplier, '0'), '.') : '3.5';
+                    $gPkg  = $tGolden ? number_format($tGolden->package_amount, 0) : '5,555';
+                    $gMax  = $tGolden ? number_format(($tGolden->package_amount * $tGolden->capping_multiplier) / 1000, 1) . 'K' : '19.4K';
+                    $gSlots = $tGolden->max_members ?? 100;
+
+                    $pPct  = $tPlatinum ? rtrim(rtrim(number_format($tPlatinum->pool_percent, 2), '0'), '.') : '2.5';
+                    $pRank = $tPlatinum->rank_required ?? 3;
+                    $pDays = $tPlatinum->days_limit ?? 60;
+                    $pCap  = $tPlatinum ? rtrim(rtrim($tPlatinum->capping_multiplier, '0'), '.') : '3';
+                    $pPkg  = $tPlatinum ? number_format($tPlatinum->package_amount, 0) : '3,333';
+                    $pMax  = $tPlatinum ? number_format($tPlatinum->package_amount * $tPlatinum->capping_multiplier, 0) : '9,999';
+                    $pSlots = $tPlatinum->max_members ?? 100;
+
                     $userDaoQuals = $data['userDaoDetails'] ?? ($data['userDaoQualifications'] ?? ($data['userDetail']->getDaoDetails() ?? []));
                     $isDiamondQual = ($data['userDetail']->is_dao == 3);
                     $isGoldenQual  = ($data['userDetail']->is_dao == 2);
@@ -636,18 +665,18 @@
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                                     <span style="font-size: 0.82rem; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; text-transform: uppercase;">DIAMOND DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 5px; border-radius: 3px;">4X CAPPING</span>
+                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 5px; border-radius: 3px;">{{ $dCap }}X CAPPING</span>
                                 </div>
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>4.0% Weekly Global Pool (V3 in 90d)</span>
+                                    <span>{{ $dPct }}% Weekly Global Pool (V{{ $dRank }} in {{ $dDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
                             <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">$10,000</div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">${{ $dPkg }}</div>
                         </div>
                     </div>
                 @elseif($isGoldenQual)
@@ -661,18 +690,18 @@
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                                     <span style="font-size: 0.82rem; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px; text-transform: uppercase;">GOLDEN DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 5px; border-radius: 3px;">3.5X CAPPING</span>
+                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 5px; border-radius: 3px;">{{ $gCap }}X CAPPING</span>
                                 </div>
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>3.0% Weekly Global Pool (V3 in 90d)</span>
+                                    <span>{{ $gPct }}% Weekly Global Pool (V{{ $gRank }} in {{ $gDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
                             <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">$5,555</div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">${{ $gPkg }}</div>
                         </div>
                     </div>
                 @elseif($isPlatQual)
@@ -686,18 +715,18 @@
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                                     <span style="font-size: 0.82rem; font-weight: 900; color: #38BDF8; letter-spacing: 0.5px; text-transform: uppercase;">PLATINUM DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 5px; border-radius: 3px;">3X CAPPING</span>
+                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 5px; border-radius: 3px;">{{ $pCap }}X CAPPING</span>
                                 </div>
                                 <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
                                     <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
                                     <span>•</span>
-                                    <span>2.5% Weekly Global Pool (V2 in 90d)</span>
+                                    <span>{{ $pPct }}% Weekly Global Pool (V{{ $pRank }} in {{ $pDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
                             <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">$3,333</div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">${{ $pPkg }}</div>
                         </div>
                     </div>
                 @else
@@ -728,26 +757,26 @@
                                             <i class="fas fa-gem" style="color: #FFD700; font-size: 10px;"></i>
                                             <span style="font-size: 0.64rem; font-weight: 800; color: #FFD700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DIAMOND</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">4X CAP</span>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $dCap }}X CAP</span>
                                     </div>
                                     <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">$10,000</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$40K Max</span>
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">${{ $dPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $dMax }} Max</span>
                                         </div>
                                         <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/50 Slots</span>
+                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/{{ $dSlots }} Slots</span>
                                         </div>
                                     </div>
                                     <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">4% Pool (V3 in 90d)</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $dPct }}% Pool (V{{ $dRank }} in {{ $dDays }}d)</span>
                                     </div>
                                 </div>
-                                @if($dCount >= 50)
+                                @if($dCount >= $dSlots)
                                     <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
-                                        FULL (50/50)
+                                        FULL ({{ $dSlots }}/{{ $dSlots }})
                                     </button>
                                 @else
                                     <a href="{{ url('/User/Stake?dao=diamond') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
@@ -765,26 +794,26 @@
                                             <i class="fas fa-award" style="color: #F59E0B; font-size: 10px;"></i>
                                             <span style="font-size: 0.64rem; font-weight: 800; color: #F59E0B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GOLDEN</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">3.5X CAP</span>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $gCap }}X CAP</span>
                                     </div>
                                     <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">$5,555</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$19.4K Max</span>
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">${{ $gPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $gMax }} Max</span>
                                         </div>
                                         <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #F59E0B; font-weight: 700;">{{ $gCount }}/100 Slots</span>
+                                            <span style="color: #F59E0B; font-weight: 700;">{{ $gCount }}/{{ $gSlots }} Slots</span>
                                         </div>
                                     </div>
                                     <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">3% Pool (V3 in 90d)</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $gPct }}% Pool (V{{ $gRank }} in {{ $gDays }}d)</span>
                                     </div>
                                 </div>
-                                @if($gCount >= 100)
+                                @if($gCount >= $gSlots)
                                     <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
-                                        FULL (100/100)
+                                        FULL ({{ $gSlots }}/{{ $gSlots }})
                                     </button>
                                 @else
                                     <a href="{{ url('/User/Stake?dao=golden') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); text-transform: uppercase;">
@@ -802,26 +831,26 @@
                                             <i class="fas fa-shield-alt" style="color: #38BDF8; font-size: 10px;"></i>
                                             <span style="font-size: 0.64rem; font-weight: 800; color: #38BDF8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PLATINUM</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">3X CAP</span>
+                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $pCap }}X CAP</span>
                                     </div>
                                     <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">$3,333</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">$9,999 Max</span>
+                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">${{ $pPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $pMax }} Max</span>
                                         </div>
                                         <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #38BDF8; font-weight: 700;">{{ $pCount }}/100 Slots</span>
+                                            <span style="color: #38BDF8; font-weight: 700;">{{ $pCount }}/{{ $pSlots }} Slots</span>
                                         </div>
                                     </div>
                                     <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">2.5% Pool (V2 in 90d)</span>
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $pPct }}% Pool (V{{ $pRank }} in {{ $pDays }}d)</span>
                                     </div>
                                 </div>
-                                @if($pCount >= 100)
+                                @if($pCount >= $pSlots)
                                     <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
-                                        FULL (100/100)
+                                        FULL ({{ $pSlots }}/{{ $pSlots }})
                                     </button>
                                 @else
                                     <a href="{{ url('/User/Stake?dao=platinum') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35); text-transform: uppercase;">
