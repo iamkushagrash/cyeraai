@@ -632,6 +632,103 @@ class RoyalJackpotController extends Controller
     }
 
     /**
+     * Dedicated Pool Details & Joining Page
+     */
+    public function poolPage($tier)
+    {
+        $tier = (int) $tier;
+        if (!in_array($tier, [1, 2, 3, 4])) {
+            return redirect('/User/RoyalJackpot');
+        }
+
+        self::seedJackpotDetails();
+
+        $userId = Session::get('user.id');
+        if (!$userId && \Auth::check()) {
+            $userId = \Auth::id();
+        }
+
+        $userDetail = UserDetails::where('id', $userId)->orWhere('userid', $userId)->first();
+        $eligibility = self::checkUserStakingEligibility($userId);
+
+        $pool = LuckyDrawDetail::where('pool_tier', $tier)->first();
+        if (!$pool) {
+            return redirect('/User/RoyalJackpot');
+        }
+
+        $activeRound = LuckyDrawRound::where('pool_tier', $tier)->where('status', 0)->first();
+        if (!$activeRound) {
+            $activeRound = LuckyDrawRound::create([
+                'pool_tier'       => $tier,
+                'round_number'    => $pool->current_round ?: 1,
+                'max_members'     => 500,
+                'current_members' => 0,
+                'ticket_price'    => $pool->ticket_price,
+                'total_collected' => 0.00,
+                'status'          => 0,
+                'started_at'      => now(),
+            ]);
+        }
+
+        $slotsFilled     = (int) $activeRound->current_members;
+        $slotsRemaining  = max(0, 500 - $slotsFilled);
+        $percentFilled   = round(($slotsFilled / 500) * 100, 1);
+
+        $myTicketsInRound = $userDetail
+            ? LuckyDrawParticipant::where('round_id', $activeRound->id)->where('userid', $userDetail->id)->orderBy('ticket_number', 'asc')->get()
+            : collect();
+
+        $myTotalTicketsAllRounds = $userDetail
+            ? LuckyDrawParticipant::where('pool_tier', $tier)->where('userid', $userDetail->id)->count()
+            : 0;
+
+        // Latest members who joined this round (masked wallets only)
+        $recentJoins = LuckyDrawParticipant::where('round_id', $activeRound->id)
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
+
+        // Past winners of this pool
+        $pastWinners = LuckyDrawWinner::with(['round'])
+            ->where('pool_tier', $tier)
+            ->orderBy('id', 'desc')
+            ->take(20)
+            ->get();
+
+        $completedRounds = LuckyDrawRound::where('pool_tier', $tier)
+            ->where('status', 1)
+            ->orderBy('drawn_at', 'desc')
+            ->take(10)
+            ->get();
+
+        $royalWalletBalance = (float) ($userDetail->royal_wallet ?? 0.00);
+
+        $contracts = [
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x1C27Be1bAf6a8946755490a61250fD0e9D6A1234'),
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0x7B99cB95A85B3De549aE29b626E6fB2983756789'),
+            'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
+            'chainId'         => 56,
+            'demoMode'        => (bool) env('DEMO_MODE', true),
+        ];
+
+        return view('user.royaljackpotpool', compact(
+            'pool',
+            'activeRound',
+            'slotsFilled',
+            'slotsRemaining',
+            'percentFilled',
+            'myTicketsInRound',
+            'myTotalTicketsAllRounds',
+            'recentJoins',
+            'pastWinners',
+            'completedRounds',
+            'eligibility',
+            'royalWalletBalance',
+            'contracts'
+        ));
+    }
+
+    /**
      * Polling API for Live Real-Time Slot Progress & Notifications
      */
     public function getLiveStats()

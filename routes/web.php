@@ -433,6 +433,7 @@ Route::group(['middleware' => ['auth', 'userverification']], function () {
 
     // 4. Royal Jackpot (Decoupled 500-Member Instant Pools & Royal Wallet)
     Route::get('/User/RoyalJackpot', 'RoyalJackpotController@index');
+    Route::get('/User/RoyalJackpot/Pool/{tier}', 'RoyalJackpotController@poolPage');
     Route::get('/User/RoyalJackpot/Stats', 'RoyalJackpotController@getLiveStats');
     Route::post('/User/RoyalJackpot/Enter', 'RoyalJackpotController@enterJackpot');
     Route::post('/User/RoyalJackpot/RequestClaim', 'RoyalJackpotController@requestClaimSignature');
