@@ -267,6 +267,7 @@ class WalletTransferController extends Controller
 
                     // Real-time Tree Business Update, Booster Check & Level 2-15 Income Distribution
                     $cappingFunction->businessUpdate();
+                    $cappingFunction->boosterCheckForUser($targetUserId);
                     try {
                         $sendMail = new SupportQueryController();
                         $details['email'] = $userUpdate->first()->user()->email;
@@ -589,6 +590,7 @@ class WalletTransferController extends Controller
 
             // Real-time Tree Business Update, Booster Check & Level 2-15 Income Distribution
             $cappingFunction->businessUpdate();
+            $cappingFunction->boosterCheckForUser($targetUserId);
 
             \DB::commit();
             \Log::info("Web3UnifiedStake: Success! Staking activated for UserID: $targetUserId, Amount: $$amount");

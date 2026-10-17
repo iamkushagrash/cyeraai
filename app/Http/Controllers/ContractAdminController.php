@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
 
 class ContractAdminController extends Controller
 {
@@ -36,6 +37,68 @@ class ContractAdminController extends Controller
             'chainId'                   => 56, // BSC Mainnet default
         ];
 
-        return view('contract-admin.index', compact('contracts'));
+        // Fetch All Staking Deposits with User Details, Name, UUID & Wallet Address
+        $rawDeposits = \App\StackingDeposite::orderBy('id', 'desc')->get();
+
+        $stakingList = $rawDeposits->map(function ($deposit) {
+            $userDetail = \App\UserDetails::where('id', $deposit->userid)->first();
+            $user = null;
+            $assetDetail = null;
+
+            if ($userDetail) {
+                $user = \App\User::where('id', $userDetail->userid)->first();
+                $assetDetail = \App\AssetDetail::where('userid', $userDetail->id)
+                    ->orWhere('userid', $userDetail->userid)
+                    ->first();
+            } else {
+                // Direct fallback if userid points directly to users table
+                $user = \App\User::where('id', $deposit->userid)->first();
+                if ($user) {
+                    $assetDetail = \App\AssetDetail::where('userid', $user->id)->first();
+                }
+            }
+
+            $walletAddress = '';
+            if ($assetDetail) {
+                $walletAddress = $assetDetail->usdtbep20addr ?: ($assetDetail->bep20addr ?: '');
+            }
+
+            $displayName = 'Anonymous';
+            if ($user) {
+                $displayName = $user->usersname ?: ($user->email ?: ($user->uuid ?: 'Member #' . $deposit->userid));
+            } elseif ($userDetail) {
+                $displayName = 'User #' . $userDetail->id;
+            }
+
+            return (object) [
+                'id'            => $deposit->id,
+                'userid'        => $deposit->userid,
+                'uuid'          => $user ? $user->uuid : ('ID-' . $deposit->userid),
+                'name'          => $displayName,
+                'email'         => $user ? $user->email : 'N/A',
+                'wallet'        => $walletAddress,
+                'usdt'          => (float) $deposit->usdt,
+                'multiplier'    => (float) ($deposit->istatus > 0 ? $deposit->istatus : 2.0),
+                'status'        => (int) $deposit->status,
+                'status_label'  => (int) $deposit->status === 1 ? 'Active' : 'Completed',
+                'staketype'     => (int) $deposit->staketype,
+                'is_dao'        => $userDetail ? (int) $userDetail->is_dao : 0,
+                'created_at'    => $deposit->created_at,
+            ];
+        });
+
+        // Summary Statistics
+        $stakingSummary = [
+            'totalCount'      => $stakingList->count(),
+            'activeCount'     => $stakingList->where('status', 1)->count(),
+            'completedCount'  => $stakingList->where('status', '!=', 1)->count(),
+            'totalUsdt'       => $stakingList->sum('usdt'),
+            'activeUsdt'      => $stakingList->where('status', 1)->sum('usdt'),
+            'uniqueUsers'     => $stakingList->pluck('uuid')->unique()->filter()->count(),
+            'topStake'        => $stakingList->max('usdt') ?: 0,
+            'avgStake'        => $stakingList->count() > 0 ? ($stakingList->sum('usdt') / $stakingList->count()) : 0,
+        ];
+
+        return view('contract-admin.index', compact('contracts', 'stakingList', 'stakingSummary'));
     }
 }

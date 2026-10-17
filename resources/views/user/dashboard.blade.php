@@ -2033,6 +2033,18 @@
                         </div>
                     </div>
 
+                    @if(!empty($boosterStats['is_dao']))
+                        <div style="margin-bottom: 8px; padding: 6px 10px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 8px; font-size: 10px; color: #E2E8F0; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-gem" style="color: #FFD700;"></i>
+                                <span><strong style="color: #FFD700;">{{ $boosterStats['dao_tier_name'] }}:</strong> Requires <strong>2 Direct DAO</strong> (${{ number_format($boosterStats['dao_min_amount']) }}+)</span>
+                            </div>
+                            <span style="font-weight: 800; font-size: 9.5px; padding: 2px 7px; border-radius: 4px; background: {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 215, 0, 0.2)' }}; color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; border: 1px solid {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.4)' }};">
+                                {{ $boosterStats['dao_directs_count'] }} / 2 DAO {{ $boosterStats['dao_directs_met'] ? '✓' : '' }}
+                            </span>
+                        </div>
+                    @endif
+
                     <div class="booster-cards-grid">
                         <!-- BOOSTER 1 CARD: 1.0% DAILY -->
                         @php
@@ -2078,6 +2090,17 @@
                                     <div class="booster-progress-bar" style="width: {{ $b1['progress_pct'] }}%;"></div>
                                 </div>
                             </div>
+
+                            @if(!empty($boosterStats['is_dao']))
+                                <div style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i> 2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
+                                    </span>
+                                    <span style="color: #FFFFFF; font-weight: 800; font-family: 'Space Mono', monospace;">
+                                        {{ $boosterStats['dao_directs_count'] }} / 2
+                                    </span>
+                                </div>
+                            @endif
 
                             <div class="booster-footer-row">
                                 <div class="booster-timer-chip booster-countdown-live"
@@ -2133,6 +2156,17 @@
                                     <div class="booster-progress-bar" style="width: {{ $b2['progress_pct'] }}%;"></div>
                                 </div>
                             </div>
+
+                            @if(!empty($boosterStats['is_dao']))
+                                <div style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i> 2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
+                                    </span>
+                                    <span style="color: #FFFFFF; font-weight: 800; font-family: 'Space Mono', monospace;">
+                                        {{ $boosterStats['dao_directs_count'] }} / 2
+                                    </span>
+                                </div>
+                            @endif
 
                             <div class="booster-footer-row">
                                 <div class="booster-timer-chip booster-countdown-live"

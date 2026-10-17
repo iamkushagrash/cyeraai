@@ -132,7 +132,8 @@ class UserDetails extends Model
 
     public function boosterCheck()
     {
-        return ($this->booster >= 2) ? true : false;
+        $stats = $this->getBoosterStats();
+        return ($stats['booster1_active'] || $stats['booster2_active']);
     }
 
     public function levelStatus()
@@ -166,7 +167,10 @@ class UserDetails extends Model
 
     public function getLegBusiness()
     {
-        $directs = \App\UserDetails::where('sponsorid', $this->userid)->orderBy('total_investment', 'desc')->get();
+        $directs = \App\UserDetails::where(function($q) {
+            $q->where('sponsorid', $this->userid)
+              ->orWhere('sponsorid', $this->id);
+        })->where('id', '!=', $this->id)->orderBy('total_investment', 'desc')->get();
         if ($directs->count() > 0) {
             $power = (float) ($directs->first()->total_investment);
             $weaker = (float) ($directs->sum('total_investment') - $power);
@@ -209,18 +213,58 @@ class UserDetails extends Model
             : 'Window Expired';
 
         // Direct referrals sponsored by user who activated a package >= 100 in the 7-day window
-        $directs7DaysCount = \App\UserDetails::where('user_details.sponsorid', $this->userid)
+        $directs7DaysCount = \App\UserDetails::where(function($q) {
+                $q->where('user_details.sponsorid', $this->userid)
+                  ->orWhere('user_details.sponsorid', $this->id);
+            })
+            ->where('user_details.id', '!=', $this->id)
             ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
             ->where('sd.usdt', '>=', 100)
             ->whereBetween('sd.created_at', [$activationDate, $expiryDate])
             ->distinct('user_details.id')
             ->count('user_details.id');
 
+        // DAO Member Extra Qualification Check:
+        // If user is a DAO member (is_dao >= 1), they MUST have at least 2 direct referrals
+        // with the same or higher DAO package tier (direct.is_dao >= user.is_dao).
+        $userIsDao = (int) ($this->is_dao ?? 0);
+        $daoDirectsMet = true;
+        $daoDirectsCount = 0;
+        $daoDirectsNeeded = 0;
+        $daoTierName = '';
+        $daoMinPackageAmount = 0;
+
+        if ($userIsDao > 0) {
+            $daoTierMap = [
+                1 => ['name' => 'Platinum DAO', 'amount' => 3333],
+                2 => ['name' => 'Golden DAO',   'amount' => 5555],
+                3 => ['name' => 'Diamond DAO',  'amount' => 10000],
+            ];
+            $daoTierName = $daoTierMap[$userIsDao]['name'] ?? 'DAO Member';
+            $daoMinPackageAmount = $daoTierMap[$userIsDao]['amount'] ?? 0;
+
+            // Direct referrals sponsored by user with same or higher DAO package (is_dao >= $userIsDao)
+            $daoDirectsCount = \App\UserDetails::where(function($q) {
+                    $q->where('sponsorid', $this->userid)
+                      ->orWhere('sponsorid', $this->id);
+                })
+                ->where('id', '!=', $this->id)
+                ->where('is_dao', '>=', $userIsDao)
+                ->count();
+
+            $daoDirectsMet = ($daoDirectsCount >= 2);
+            $daoDirectsNeeded = max(0, 2 - $daoDirectsCount);
+        }
+
         // Booster 1: 5 Directs ($100+) in 7 Days -> 1.0% Daily ROI
         // Booster 2: 15 Directs ($100+) in 7 Days -> 1.5% Daily ROI
         $boosterTier = (int) ($this->booster);
-        $booster1Active = ($boosterTier === 2 || $directs7DaysCount >= 5);
-        $booster2Active = ($boosterTier === 3 || $directs7DaysCount >= 15);
+        $hasB1Directs = ($boosterTier === 2 || $directs7DaysCount >= 5);
+        $hasB2Directs = ($boosterTier === 3 || $directs7DaysCount >= 15);
+
+        // If user is a DAO member, they MUST also meet the 2 direct DAO requirement (same or higher package)
+        $booster1Active = $hasB1Directs && $daoDirectsMet;
+        $booster2Active = $hasB2Directs && $daoDirectsMet;
 
         // Effective active tier
         $activeTier = 1;
@@ -249,6 +293,13 @@ class UserDetails extends Model
             'active_tier' => $activeTier,
             'daily_roi_pct' => $dailyRoiPct,
             'current_rate' => $dailyRoiPct,
+            'is_dao' => ($userIsDao > 0),
+            'dao_tier' => $userIsDao,
+            'dao_tier_name' => $daoTierName,
+            'dao_min_amount' => $daoMinPackageAmount,
+            'dao_directs_count' => $daoDirectsCount,
+            'dao_directs_needed' => $daoDirectsNeeded,
+            'dao_directs_met' => $daoDirectsMet,
             'booster1' => [
                 'req_directs' => 5,
                 'min_amount' => 100,

@@ -91,18 +91,25 @@ class StackingDetailController extends Controller
 
         $boosterStats = $userDetail->getBoosterStats();
 
-        // If Booster 2 qualified
+        // If Booster 2 qualified (1.5% Daily ROI)
         if ($boosterStats['booster2_active']) {
             if ($userDetail->booster != 3) {
                 \App\UserDetails::where('id', $id)->update(['booster' => 3]);
                 \Log::info("User ID {$id} unlocked Booster 2 (1.5% Daily ROI)");
             }
         }
-        // If Booster 1 qualified
+        // If Booster 1 qualified (1.0% Daily ROI)
         elseif ($boosterStats['booster1_active']) {
-            if ($userDetail->booster != 2 && $userDetail->booster != 3) {
+            if ($userDetail->booster != 2) {
                 \App\UserDetails::where('id', $id)->update(['booster' => 2]);
                 \Log::info("User ID {$id} unlocked Booster 1 (1.0% Daily ROI)");
+            }
+        }
+        // Not qualified (e.g. DAO member lacking 2 DAO directs of same or higher tier, or expired window)
+        else {
+            if ($userDetail->booster > 1) {
+                \App\UserDetails::where('id', $id)->update(['booster' => 1]);
+                \Log::info("User ID {$id} booster reset to 1 (0.5% Base ROI) - qualification conditions not met.");
             }
         }
     }
