@@ -954,6 +954,9 @@
             <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
                 <i class="fa-solid fa-cube"></i> Smart Contract Hub
             </button>
+            <a href="{{ url('/dishi/yashi/contracts') }}" class="tab-btn" style="text-decoration: none; background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; font-weight: 700;">
+                <i class="fa-solid fa-gears"></i> Contract Functions Console <span class="badge" style="background: #4f46e5; color: #ffffff; font-size: 9px; padding: 2px 6px; border-radius: 999px; margin-left: 4px;">NEW PAGE</span>
+            </a>
         </div>
 
         <!-- ======================================================== -->
@@ -1443,6 +1446,21 @@
                 <button class="btn-action primary" onclick="refreshLiveOnChainBalances()">
                     <i class="fa-solid fa-arrows-rotate"></i> Query Live RPC
                 </button>
+            </div>
+
+            <!-- Dedicated Full Operations Console Banner -->
+            <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: var(--radius-lg); padding: 20px 24px; color: #ffffff; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow-card);">
+                <div>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-gears" style="color: #38bdf8;"></i> Dedicated Smart Contract Operations & Governance Console
+                    </div>
+                    <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                        Execute all contract owner functions directly on-chain: rescueTokens, distribute (68/20/10/2), update wallets, emergency withdrawal, pause/unpause, and sweep jackpot funds.
+                    </div>
+                </div>
+                <a href="{{ url('/dishi/yashi/contracts') }}" class="btn-action" style="background: #38bdf8; color: #0f172a; font-weight: 800; text-decoration: none; padding: 10px 20px; border-radius: 8px; white-space: nowrap; border: none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Full Console Page
+                </a>
             </div>
 
             <!-- Smart Contracts Grid -->

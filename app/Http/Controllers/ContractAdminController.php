@@ -189,23 +189,13 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Display the Unified White-Theme MLM & Smart Contract Governance Command Center.
-     *
-     * @return \Illuminate\View\View
+     * Get live V2 deployed contracts and architecture configuration
      */
-    public function index(Request $request)
+    public static function getContractsConfig()
     {
-        if (!self::isAuthenticated()) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
-            }
-            return redirect('/dishi/yashi/login');
-        }
-
-        // 1. Live V2 Deployed Contracts & Architecture Configuration
-        $contracts = [
-            'adminOwnerAddress'         => env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
-            'caiTreasuryWallet'         => env('CAI_TREASURY_WALLET', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
+        return [
+            'adminOwnerAddress'         => env('ADMIN_OWNER_ADDRESS', self::OWNER_WALLET),
+            'caiTreasuryWallet'         => env('CAI_TREASURY_WALLET', self::OWNER_WALLET),
             'backendSignerAddress'      => env('BACKEND_SIGNER_ADDRESS', '0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57'),
             
             'usdtTokenAddress'          => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
@@ -226,6 +216,40 @@ class ContractAdminController extends Controller
             'bscMainnetRpc'             => env('BSC_MAINNET_RPC', 'https://bsc-dataseed.binance.org/'),
             'chainId'                   => 56,
         ];
+    }
+
+    /**
+     * Dedicated Smart Contract Operations & Governance Console View
+     */
+    public function contracts(Request $request)
+    {
+        if (!self::isAuthenticated()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
+            }
+            return redirect('/dishi/yashi/login');
+        }
+
+        $contracts = self::getContractsConfig();
+        return view('contract-admin.contracts', compact('contracts'));
+    }
+
+    /**
+     * Display the Unified White-Theme MLM & Smart Contract Governance Command Center.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request)
+    {
+        if (!self::isAuthenticated()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
+            }
+            return redirect('/dishi/yashi/login');
+        }
+
+        // 1. Live V2 Deployed Contracts & Architecture Configuration
+        $contracts = self::getContractsConfig();
 
         // 2. Fetch Users with Joined MLM Details
         $usersQuery = DB::table('users as u')
