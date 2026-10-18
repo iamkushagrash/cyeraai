@@ -1,5 +1,6 @@
 import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
+import "@nomicfoundation/hardhat-verify";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -50,9 +51,14 @@ export default {
     bscMainnet: {
       url: process.env.BSC_MAINNET_RPC || "https://bsc-dataseed.binance.org/",
       chainId: 56,
-      accounts: process.env.LUCKYDRAW_PRIVATE_KEY 
-        ? [(process.env.LUCKYDRAW_PRIVATE_KEY.startsWith("0x") ? process.env.LUCKYDRAW_PRIVATE_KEY : "0x" + process.env.LUCKYDRAW_PRIVATE_KEY)]
-        : (process.env.PRIVATE_KEY ? [(process.env.PRIVATE_KEY.startsWith("0x") ? process.env.PRIVATE_KEY : "0x" + process.env.PRIVATE_KEY)] : []),
+      accounts: process.env.PRIVATE_KEY 
+        ? [(process.env.PRIVATE_KEY.startsWith("0x") ? process.env.PRIVATE_KEY : "0x" + process.env.PRIVATE_KEY)]
+        : (process.env.LUCKYDRAW_PRIVATE_KEY ? [(process.env.LUCKYDRAW_PRIVATE_KEY.startsWith("0x") ? process.env.LUCKYDRAW_PRIVATE_KEY : "0x" + process.env.LUCKYDRAW_PRIVATE_KEY)] : []),
+    },
+  },
+  etherscan: {
+    apiKey: {
+      bsc: process.env.BSCSCAN_API_KEY || "NJ8AVE24AK1N9MQ6B88JVKAGPKRBGJMZ13",
     },
   },
 };

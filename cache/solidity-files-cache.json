@@ -45,8 +45,8 @@
       ]
     },
     "D:\\Cyera AI\\contracts\\CAIToken.sol": {
-      "lastModificationDate": 1789156358500,
-      "contentHash": "4523c4b5e0de87f29be83845bd990900",
+      "lastModificationDate": 1792312443275,
+      "contentHash": "45c09635e5693719880ed44dfef9a40f",
       "sourceName": "contracts/CAIToken.sol",
       "solcConfig": {
         "version": "0.8.24",
@@ -520,8 +520,8 @@
       ]
     },
     "D:\\Cyera AI\\contracts\\CyeraMiningEngine.sol": {
-      "lastModificationDate": 1789158424811,
-      "contentHash": "76e52f9715d2d51d1b922485ee0cba52",
+      "lastModificationDate": 1792311400183,
+      "contentHash": "7d7e9285a0adb2064f32f631fd9c0210",
       "sourceName": "contracts/CyeraMiningEngine.sol",
       "solcConfig": {
         "version": "0.8.24",
@@ -556,7 +556,8 @@
       "artifacts": [
         "CyeraMiningEngine",
         "IERC20",
-        "IPancakeRouterV2"
+        "IPancakeRouterV2",
+        "IRevenueSplitter"
       ]
     },
     "D:\\Cyera AI\\node_modules\\@openzeppelin\\contracts\\utils\\ReentrancyGuard.sol": {
@@ -1176,6 +1177,342 @@
       "artifacts": [
         "IERC20",
         "RoyalJackpotVault"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\RevenueSplitter.sol": {
+      "lastModificationDate": 1792311368041,
+      "contentHash": "b1ac9346263032d49c08a905ff99c120",
+      "sourceName": "contracts/RevenueSplitter.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "IERC20",
+        "RevenueSplitter"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\test\\MockPancakeRouter.sol": {
+      "lastModificationDate": 1792312026540,
+      "contentHash": "f906080a58ff456ed996bbca27cccd7a",
+      "sourceName": "contracts/test/MockPancakeRouter.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "IERC20Transfer",
+        "MockPancakeFactory",
+        "MockPancakePair",
+        "MockPancakeRouter"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\CAIToken_Flattened.sol": {
+      "lastModificationDate": 1792314400412,
+      "contentHash": "1bf1280dd66940869fe7ed6260159489",
+      "sourceName": "contracts/verified_sources/CAIToken_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20",
+        "^0.8.20",
+        ">=0.8.4",
+        ">=0.4.16",
+        ">=0.6.2",
+        "^0.8.20",
+        "^0.8.20",
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "CAIToken",
+        "Context",
+        "ERC20",
+        "ERC20Burnable",
+        "IERC1155Errors",
+        "IERC20",
+        "IERC20Errors",
+        "IERC20Metadata",
+        "IERC20Rescue",
+        "IERC721Errors",
+        "IPancakeFactoryV2",
+        "IPancakeRouterV2",
+        "Ownable"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\CyeraMiningEngine_Flattened.sol": {
+      "lastModificationDate": 1792314400413,
+      "contentHash": "49617bc8903dcc9ddd7d14f6dc787d20",
+      "sourceName": "contracts/verified_sources/CyeraMiningEngine_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20",
+        "^0.8.20",
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "Context",
+        "CyeraMiningEngine",
+        "IERC20",
+        "IPancakeRouterV2",
+        "IRevenueSplitter",
+        "Ownable"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\RevenueSplitter_Flattened.sol": {
+      "lastModificationDate": 1792314400413,
+      "contentHash": "62975db9e196e9f1152883424888cd66",
+      "sourceName": "contracts/verified_sources/RevenueSplitter_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20",
+        "^0.8.20",
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "Context",
+        "IERC20",
+        "Ownable",
+        "RevenueSplitter"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\RoyalJackpotDeposit_Flattened.sol": {
+      "lastModificationDate": 1792314707184,
+      "contentHash": "22a2cadd578bde1b5d2c4f24fdd9a649",
+      "sourceName": "contracts/verified_sources/RoyalJackpotDeposit_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20",
+        "RoyalJackpotDeposit"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\RoyalJackpotVault_Flattened.sol": {
+      "lastModificationDate": 1792314709524,
+      "contentHash": "f78e9ba74dff6b8619d3ff7c53da987e",
+      "sourceName": "contracts/verified_sources/RoyalJackpotVault_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20",
+        "RoyalJackpotVault"
+      ]
+    },
+    "D:\\Cyera AI\\contracts\\verified_sources\\USDTWithdrawalVault_Flattened.sol": {
+      "lastModificationDate": 1792314400414,
+      "contentHash": "c2a739aacadf6aa74785c7bd0a95aedf",
+      "sourceName": "contracts/verified_sources/USDTWithdrawalVault_Flattened.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "cancun",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Context",
+        "ECDSA",
+        "IERC20",
+        "Ownable2Step",
+        "Pausable",
+        "ReentrancyGuard",
+        "SafeERC20",
+        "USDTWithdrawalVault"
       ]
     }
   }

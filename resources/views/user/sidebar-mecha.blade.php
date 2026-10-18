@@ -89,7 +89,7 @@
                                 @if(!empty(Session::get('user.walletaddress')))
                                     {{ substr(Session::get('user.walletaddress'), 0, 6) }}...{{ substr(Session::get('user.walletaddress'), -4) }}
                                 @else
-                                    0x4D4a...1e15
+                                    Not Connected
                                 @endif
                             </span>
                         </div>

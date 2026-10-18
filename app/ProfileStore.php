@@ -26,7 +26,7 @@ class ProfileStore extends Model
             return self::$cachedLivePrice;
         }
 
-        $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c');
+        $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730');
         $livePrice = null;
 
         // 1. Fetch live DEX price from DexScreener API with fast cURL timeout

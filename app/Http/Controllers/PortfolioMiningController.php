@@ -51,10 +51,10 @@ class PortfolioMiningController extends Controller
             ->paginate(15);
 
         $contracts = [
-            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'),
-            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x4756618F389A46819008Aff01ad0f91A38154eDB'),
+            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6'),
+            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x193149028a3C83009Ecda6D5E76f1abD62E51a43'),
             'usdtToken'    => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c'),
+            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730'),
             'chainId'      => 56,
         ];
 
@@ -196,7 +196,7 @@ class PortfolioMiningController extends Controller
             $dbPrice = $profile && $profile->price > 0 ? (float) $profile->price : 1.00;
 
             // Attempt live on-chain check via PancakeSwap Pair if possible
-            $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c');
+            $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730');
             $dexUrl = "https://api.dexscreener.com/latest/dex/pairs/bsc/" . $pairAddress;
 
             $ch = curl_init();
@@ -262,10 +262,10 @@ class PortfolioMiningController extends Controller
 
         // 7. Contracts configuration
         $contracts = [
-            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'),
-            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x4756618F389A46819008Aff01ad0f91A38154eDB'),
+            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6'),
+            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x193149028a3C83009Ecda6D5E76f1abD62E51a43'),
             'usdtToken'    => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c'),
+            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730'),
             'chainId'      => 56,
         ];
 
@@ -458,20 +458,30 @@ class PortfolioMiningController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Net claim amount after 10% protocol deduction is 0.'], 400);
         }
 
-        // Slippage Protection: 2% slippage on net DEX swap
-        $minUsdtOut = round($netUsdtValue * 0.98, 6);
+        // Slippage Configuration: Controlled via DEX_SLIPPAGE_TOLERANCE env (0 = completely removed / zero restriction, 5 = 5%, etc.)
+        $slippageTolerance = env('DEX_SLIPPAGE_TOLERANCE', '0');
+        $slippagePercent = is_numeric($slippageTolerance) ? (float) $slippageTolerance : 0.0;
 
-        // Convert to Wei (18 Decimals for CAI and BSC-USDT)
-        $caiWei = bcmul((string) $netCaiToSell, '1000000000000000000', 0);
-        $minUsdtWei = bcmul((string) $minUsdtOut, '1000000000000000000', 0);
+        if ($slippagePercent <= 0) {
+            $minUsdtOut = 0.0;
+            $minUsdtWei = '0';
+        } else {
+            $toleranceFactor = max(0, (100 - $slippagePercent) / 100);
+            $minUsdtOut = round($netUsdtValue * $toleranceFactor, 6);
+            $minUsdtWei = bcmul((string) $minUsdtOut, '1000000000000000000', 0);
+        }
 
         // Unique Nonce & Expiry (10 minutes)
         $nonce = (string) (time() . rand(1000, 9999));
         $expiry = (string) (time() + 600);
 
-        $miningContract = env('CYERA_MINING_ENGINE_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217');
+        $miningContract = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
         $chainId = "56"; // BSC Mainnet
-        $privateKey = env('SIGNER_PRIVATE_KEY', '7672820670408540bfcd0c7d34794935e4a3054455fa5c7f9cccdfdf4aca45c3');
+        $privateKey = env('SIGNER_PRIVATE_KEY');
+        if (empty($privateKey)) {
+            Log::error("SIGNER_PRIVATE_KEY not set in .env");
+            return response()->json(['status' => 'error', 'message' => 'Signer key configuration missing.'], 500);
+        }
 
         // Generate Pure PHP EIP-712 cryptographic signature (No shell_exec needed)
         try {

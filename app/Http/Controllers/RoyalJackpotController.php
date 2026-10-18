@@ -220,11 +220,11 @@ class RoyalJackpotController extends Controller
 
         // Smart Contracts Config
         $contracts = [
-            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x1C27Be1bAf6a8946755490a61250fD0e9D6A1234'),
-            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0x7B99cB95A85B3De549aE29b626E6fB2983756789'),
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
             'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
             'chainId'         => 56,
-            'demoMode'        => (bool) env('DEMO_MODE', true),
+            'demoMode'        => (bool) env('DEMO_MODE', false),
         ];
 
         return view('user.royaljackpot', compact(
@@ -543,9 +543,13 @@ class RoyalJackpotController extends Controller
         }
 
         $walletAddress = strtolower(trim($request->wallet_address));
-        $vaultContract = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0x7B99cB95A85B3De549aE29b626E6fB2983756789');
+        $vaultContract = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5');
         $chainId = 56;
-        $privateKey = env('SIGNER_PRIVATE_KEY', '38765232db1a84b6571252884f7168205f3207242cd31f99ab4e76ad76f5a67b');
+        $privateKey = env('SIGNER_PRIVATE_KEY');
+        if (empty($privateKey)) {
+            Log::error("SIGNER_PRIVATE_KEY not set in .env");
+            return response()->json(['status' => 'error', 'message' => 'Signer key configuration missing.'], 500);
+        }
 
         // Convert to Wei (18 Decimals)
         $amountWei = bcmul((string) $requestedAmount, '1000000000000000000', 0);
@@ -727,8 +731,8 @@ class RoyalJackpotController extends Controller
         $royalWalletBalance = (float) ($userDetail->royal_wallet ?? 0.00);
 
         $contracts = [
-            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5'),
-            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xF68506dAA4BD94B65112816DB41Bf0F371186B16'),
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
             'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
             'chainId'         => 56,
             'demoMode'        => (bool) env('DEMO_MODE', false),
@@ -795,7 +799,7 @@ class RoyalJackpotController extends Controller
      */
     public static function verifyJackpotDepositOnBsc($txHash, $expectedSender, $ticketPrice)
     {
-        $expectedContract = strtolower(env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5'));
+        $expectedContract = strtolower(env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'));
         $expectedUsdt     = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
 
         $rpcEndpoints = [

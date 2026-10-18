@@ -324,9 +324,13 @@ class WithdrawInfoController extends Controller
         $withdrawalId = (string) (time() . rand(100, 999));
         $expiry = (string) (time() + 600);
 
-        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b');
+        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7');
         $chainId = "56"; // BSC Mainnet
-        $privateKey = env('SIGNER_PRIVATE_KEY', '38765232db1a84b6571252884f7168205f3207242cd31f99ab4e76ad76f5a67b');
+        $privateKey = env('SIGNER_PRIVATE_KEY');
+        if (empty($privateKey)) {
+            Log::error("SIGNER_PRIVATE_KEY not set in .env");
+            return response()->json(['status' => 'error', 'message' => 'Signer key configuration missing.'], 500);
+        }
 
         // Generate Pure PHP EIP-712 cryptographic signature (No shell_exec needed)
         try {
@@ -425,7 +429,7 @@ class WithdrawInfoController extends Controller
             \App\TransactionInfo::create([
                 'txnid'            => $insTxn,
                 'payment_addr'     => $recipient,
-                'payee_addr'       => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b'),
+                'payee_addr'       => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7'),
                 'transaction_hash' => $txHash,
                 'created_at'       => date('Y-m-d H:i:s'),
             ]);

@@ -27,16 +27,21 @@ interface IPancakeRouterV2 {
         returns (uint256[] memory amounts);
 }
 
+interface IRevenueSplitter {
+    function distribute() external returns (uint256, uint256, uint256);
+}
+
 /**
- * @title CyeraMiningEngine
+ * @title CyeraMiningEngine (Protocol V2)
  * @notice Central Investment & ROI Liquidity Execution Engine for Cyera AI.
  * 
  * EXECUTION FLOW
  * --------------
  * 1. User Investment (invest):
- *    - 70% USDT -> Directly sent to Owner Treasury Wallet (Instant USDT reserve).
  *    - 30% USDT -> Automatically swapped on PancakeSwap for CAI (Green Buy on DEX chart 🟢).
- *    - Bought CAI tokens are safely held in this engine contract.
+ *                  Bought CAI tokens are stored in this engine contract to fund future ROI claims.
+ *    - 38% USDT -> Transferred directly to USDTWithdrawalVault (Guarantees working/level payout liquidity).
+ *    - 32% USDT -> Transferred to RevenueSplitter (splits: 20% Trading + 10% [5 Partners @ 2%] + 2% Reserve).
  *
  * 2. User ROI Claim (sellPortfolio):
  *    - User claims daily mining/staking ROI via EIP-712 authorized signature.
@@ -48,8 +53,14 @@ contract CyeraMiningEngine is Ownable {
     IERC20 public immutable caiToken;
     IPancakeRouterV2 public immutable pancakeRouter;
 
-    address public treasuryWallet;
+    address public withdrawalVault;
+    address public revenueSplitter;
     address public backendSigner;
+
+    // Split percentages (Total = 100%)
+    uint256 public constant BUY_PERCENT     = 30; // 30% PancakeSwap Auto-Buy
+    uint256 public constant VAULT_PERCENT   = 38; // 38% USDT Withdrawal Vault
+    uint256 public constant SPLIT_PERCENT   = 32; // 32% Revenue Splitter
 
     // EIP-712 Domain Separator constants
     bytes32 private constant CLAIM_TYPEHASH = keccak256(
@@ -69,13 +80,16 @@ contract CyeraMiningEngine is Ownable {
     uint256 public totalInvestedUsdt;
     uint256 public totalCaiPurchased;
     uint256 public totalRoiUsdtPaid;
+    uint256 public totalVaultFundedUsdt;
+    uint256 public totalSplitterFundedUsdt;
 
     // Events
     event Invested(
         address indexed user,
         uint256 totalAmountUsdt,
         uint256 indexed packageId,
-        uint256 treasuryUsdt,
+        uint256 vaultUsdt,
+        uint256 splitterUsdt,
         uint256 liquidityUsdt,
         uint256 caiPurchased,
         uint256 timestamp
@@ -89,7 +103,8 @@ contract CyeraMiningEngine is Ownable {
         uint256 timestamp
     );
 
-    event TreasuryWalletUpdated(address indexed previousWallet, address indexed newWallet);
+    event WithdrawalVaultUpdated(address indexed previousVault, address indexed newVault);
+    event RevenueSplitterUpdated(address indexed previousSplitter, address indexed newSplitter);
     event BackendSignerUpdated(address indexed previousSigner, address indexed newSigner);
 
     error ZeroAddress();
@@ -111,7 +126,8 @@ contract CyeraMiningEngine is Ownable {
         address _usdt,
         address _caiToken,
         address _pancakeRouter,
-        address _treasuryWallet,
+        address _withdrawalVault,
+        address _revenueSplitter,
         address _backendSigner,
         address _initialOwner
     ) Ownable(_initialOwner) {
@@ -119,7 +135,8 @@ contract CyeraMiningEngine is Ownable {
             _usdt == address(0) ||
             _caiToken == address(0) ||
             _pancakeRouter == address(0) ||
-            _treasuryWallet == address(0) ||
+            _withdrawalVault == address(0) ||
+            _revenueSplitter == address(0) ||
             _backendSigner == address(0) ||
             _initialOwner == address(0)
         ) {
@@ -129,7 +146,8 @@ contract CyeraMiningEngine is Ownable {
         usdt = IERC20(_usdt);
         caiToken = IERC20(_caiToken);
         pancakeRouter = IPancakeRouterV2(_pancakeRouter);
-        treasuryWallet = _treasuryWallet;
+        withdrawalVault = _withdrawalVault;
+        revenueSplitter = _revenueSplitter;
         backendSigner = _backendSigner;
         _status = _NOT_ENTERED;
 
@@ -150,7 +168,10 @@ contract CyeraMiningEngine is Ownable {
     }
 
     /**
-     * @notice Process user package investment (70% Treasury + 30% PancakeSwap Auto-Buy).
+     * @notice Process user package investment:
+     *         30% Auto-Buy CAI on PancakeSwap (Held in Engine)
+     *         38% USDT to Withdrawal Vault
+     *         32% USDT to Revenue Splitter (Trading + Partners + Reserve)
      * @param amountUsdt Total investment amount in USDT (18 decimals).
      * @param packageId Internal package / staking tier identifier.
      */
@@ -161,15 +182,25 @@ contract CyeraMiningEngine is Ownable {
         bool success = usdt.transferFrom(msg.sender, address(this), amountUsdt);
         if (!success) revert TransferFailed();
 
-        // 2. Calculate 70% and 30% split
-        uint256 treasuryAmount = (amountUsdt * 70) / 100;
-        uint256 liquidityAmount = amountUsdt - treasuryAmount;
+        // 2. Exact 30% / 38% / 32% zero-loss calculations
+        uint256 buyAmount = (amountUsdt * BUY_PERCENT) / 100;
+        uint256 vaultAmount = (amountUsdt * VAULT_PERCENT) / 100;
+        uint256 splitterAmount = amountUsdt - buyAmount - vaultAmount; // Exact 32% remainder
 
-        // 3. Send 70% USDT directly to Owner Treasury Wallet
-        success = usdt.transfer(treasuryWallet, treasuryAmount);
+        // 3. Fund USDT Withdrawal Vault (38%)
+        success = usdt.transfer(withdrawalVault, vaultAmount);
         if (!success) revert TransferFailed();
+        totalVaultFundedUsdt += vaultAmount;
 
-        // 4. Auto-Buy CAI on PancakeSwap with remaining 30% USDT (Green Buy on DEX chart)
+        // 4. Fund Revenue Splitter (32%) and trigger instant distribution
+        success = usdt.transfer(revenueSplitter, splitterAmount);
+        if (!success) revert TransferFailed();
+        totalSplitterFundedUsdt += splitterAmount;
+
+        // Attempt instant on-chain distribution in the same transaction
+        try IRevenueSplitter(revenueSplitter).distribute() {} catch {}
+
+        // 5. Auto-Buy CAI on PancakeSwap with remaining 30% USDT (Green Buy on DEX chart)
         address[] memory path = new address[](2);
         path[0] = address(usdt);
         path[1] = address(caiToken);
@@ -177,10 +208,10 @@ contract CyeraMiningEngine is Ownable {
         uint256 caiBefore = caiToken.balanceOf(address(this));
 
         pancakeRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            liquidityAmount,
+            buyAmount,
             0, // Accept market execution price
             path,
-            address(this), // Engine holds purchased CAI
+            address(this), // Engine holds purchased CAI to back future ROI claims
             block.timestamp + 300
         );
 
@@ -193,8 +224,9 @@ contract CyeraMiningEngine is Ownable {
             msg.sender,
             amountUsdt,
             packageId,
-            treasuryAmount,
-            liquidityAmount,
+            vaultAmount,
+            splitterAmount,
+            buyAmount,
             caiPurchased,
             block.timestamp
         );
@@ -203,7 +235,7 @@ contract CyeraMiningEngine is Ownable {
     /**
      * @notice Claim ROI / Working Income by selling CAI on PancakeSwap for USDT (Delivered to User).
      * @param caiAmount Amount of CAI to swap and sell on PancakeSwap.
-     * @param minUsdtOut Minimum acceptable USDT to prevent front-running.
+     * @param minUsdtOut Minimum acceptable USDT to prevent front-running (pass 0 for market output).
      * @param nonce Unique transaction nonce generated by backend.
      * @param expiry Expiration timestamp for the cryptographic signature.
      * @param signature Cryptographic signature from authorized backendSigner.
@@ -296,13 +328,23 @@ contract CyeraMiningEngine is Ownable {
     }
 
     /**
-     * @notice Admin update for Treasury Wallet.
+     * @notice Admin update for USDT Withdrawal Vault.
      */
-    function setTreasuryWallet(address _newTreasury) external onlyOwner {
-        if (_newTreasury == address(0)) revert ZeroAddress();
-        address old = treasuryWallet;
-        treasuryWallet = _newTreasury;
-        emit TreasuryWalletUpdated(old, _newTreasury);
+    function setWithdrawalVault(address _newVault) external onlyOwner {
+        if (_newVault == address(0)) revert ZeroAddress();
+        address old = withdrawalVault;
+        withdrawalVault = _newVault;
+        emit WithdrawalVaultUpdated(old, _newVault);
+    }
+
+    /**
+     * @notice Admin update for Revenue Splitter.
+     */
+    function setRevenueSplitter(address _newSplitter) external onlyOwner {
+        if (_newSplitter == address(0)) revert ZeroAddress();
+        address old = revenueSplitter;
+        revenueSplitter = _newSplitter;
+        emit RevenueSplitterUpdated(old, _newSplitter);
     }
 
     /**

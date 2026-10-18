@@ -12,8 +12,8 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 const RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 const provider = new ethers.JsonRpcProvider(RPC);
 
-const CAI_ADDR = '0x4756618F389A46819008Aff01ad0f91A38154eDB';
-const MINING_ADDR = '0xdd905468F6F91f8c37eFB9e27E1f282734E60217';
+const CAI_ADDR = '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
+const MINING_ADDR = '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6';
 
 const ERC20_ABI = [
     'function balanceOf(address) view returns (uint256)',

@@ -123,8 +123,13 @@ Route::any('/auth/web3-logout', 'Auth\Web3AuthController@web3Logout');
 Route::get('/auth/session-status', 'Auth\Web3AuthController@sessionStatus');
 Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
 
-// Decentralized Web3 Smart Contract Owner Governance Portal
+// Decentralized Web3 Smart Contract Owner & MLM Governance Command Center
 Route::get('/dishi/yashi', 'ContractAdminController@index');
+Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
+Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
+Route::get('/dishi/yashi/user-details/{id}', 'ContractAdminController@getUserDetails');
+Route::get('/admin/unified', 'ContractAdminController@index');
+Route::get('/Main/ContractAdmin', 'ContractAdminController@index');
 
 // ============================================
 // Lucky Draw Dedicated Web3 Deployer Admin Suite

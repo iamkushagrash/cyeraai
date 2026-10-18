@@ -22,12 +22,12 @@ class LuckyDrawAdminController extends Controller
     protected static function getAuthorizedWallets()
     {
         $wallets = [
-            // Deployer wallet from LUCKYDRAW_PRIVATE_KEY
-            strtolower('0xEA8faf283e912596818115ca17dE10d5e4f8BC80'),
+            // Deployer wallet from LUCKYDRAW_PRIVATE_KEY / Collector
+            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9')),
             // Cyera Admin Owner Address from .env
-            strtolower(env('ADMIN_OWNER_ADDRESS', '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7')),
+            strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')),
             // Whitelisted collector wallet
-            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xEA8faf283e912596818115ca17dE10d5e4f8BC80')),
+            strtolower('0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
         ];
 
         // Additional comma-separated wallets from .env
@@ -62,14 +62,14 @@ class LuckyDrawAdminController extends Controller
     protected function getContractsConfig()
     {
         $authorizedWallets = self::getAuthorizedWallets();
-        $primaryDeployer = '0xEA8faf283e912596818115ca17dE10d5e4f8BC80';
+        $primaryDeployer = env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9');
 
         return [
-            'depositContract'   => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5'),
-            'vaultContract'     => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xF68506dAA4BD94B65112816DB41Bf0F371186B16'),
-            'collectorWallet'   => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xEA8faf283e912596818115ca17dE10d5e4f8BC80'),
-            'adminOwnerAddress' => env('ADMIN_OWNER_ADDRESS', '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
-            'backendSigner'     => env('BACKEND_SIGNER_ADDRESS', '0x188525c9810749a8012Dd1eBfA4a28801bac0a6e'),
+            'depositContract'   => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
+            'vaultContract'     => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
+            'collectorWallet'   => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
+            'adminOwnerAddress' => env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
+            'backendSigner'     => env('BACKEND_SIGNER_ADDRESS', '0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57'),
             'usdtToken'         => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
             'chainId'           => 56, // BSC Mainnet
             'bscRpc'            => 'https://bsc-dataseed.binance.org/',
@@ -84,9 +84,9 @@ class LuckyDrawAdminController extends Controller
      */
     public static function fetchOnChainBalances()
     {
-        $deposit = env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xB97D65c4A653a280d946A50FFe6237EDbEA4C0C5');
-        $vault   = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xF68506dAA4BD94B65112816DB41Bf0F371186B16');
-        $collector = env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xEA8faf283e912596818115ca17dE10d5e4f8BC80');
+        $deposit = env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9');
+        $vault   = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5');
+        $collector = env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9');
         $usdt    = env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955');
 
         $rpc = 'https://bsc-dataseed.binance.org/';
@@ -391,7 +391,7 @@ class LuckyDrawAdminController extends Controller
         if (!self::isAuthorized($address)) {
             return response()->json([
                 'status'  => 'error',
-                'message' => "Access Denied: Wallet {$address} is not authorized. Only the Lucky Draw Deployer Wallet (0xEA8faf...BC80) can access this portal."
+                'message' => "Access Denied: Wallet {$address} is not authorized. Only authorized Deployer / Admin wallets can access this portal."
             ], 403);
         }
 

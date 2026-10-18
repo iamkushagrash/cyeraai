@@ -50,7 +50,7 @@ interface IPancakeRouterV2 {
 contract CAIToken is ERC20, ERC20Burnable, Ownable {
     uint8 private constant TOKEN_DECIMALS = 18;
 
-    uint256 public constant MAX_SUPPLY = 300_000 * 10 ** TOKEN_DECIMALS;
+    uint256 public constant MAX_SUPPLY = 777_777 * 10 ** TOKEN_DECIMALS;
 
     address public immutable usdt;
     IPancakeRouterV2 public immutable pancakeRouter;
@@ -95,7 +95,7 @@ contract CAIToken is ERC20, ERC20Burnable, Ownable {
         address usdtAddress,
         address routerAddress
     )
-        ERC20("Cyera", "CAI")
+        ERC20("Cyera AI", "CAAI")
         Ownable(msg.sender)
     {
         if (

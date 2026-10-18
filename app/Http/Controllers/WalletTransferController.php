@@ -440,7 +440,7 @@ class WalletTransferController extends Controller
 
         $targetUserId = $targetUserDetail->id;
         $price = \App\ProfileStore::where('id', 1)->first() ?: (object)['price' => 1];
-        $splitterAddress = env('CYERA_MINING_ENGINE_ADDRESS', env('INVESTMENT_SPLITTER_ADDRESS', '0xdd905468F6F91f8c37eFB9e27E1f282734E60217'));
+        $splitterAddress = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
         $senderAddr = !empty($request->senderAddress) ? strtolower($request->senderAddress) : null;
 
         // Comprehensive On-Chain BSC Mainnet Receipt, Freshness & Amount Verification

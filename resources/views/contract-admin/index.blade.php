@@ -2,3471 +2,1964 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>CYERA AI | Decentralized Smart Contract Owner Governance</title>
-    <meta name="description" content="Decentralized Smart Contract Owner Admin Portal for Cyera Protocol on BNB Smart Chain.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CYERA AI — Executive Governance & MLM Command Center</title>
+    <meta name="description" content="Decentralized Smart Contract Owner & MLM Administrative Command Center for Cyera Protocol on BNB Smart Chain.">
     <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Ethers.js for Web3 Blockchain Controls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+
     <style>
         :root {
-            --bg-base: #040508;
-            --bg-card: rgba(10, 13, 22, 0.85);
-            --bg-card-elevated: rgba(14, 18, 30, 0.95);
-            --border-gold: rgba(255, 215, 0, 0.35);
-            --border-dim: rgba(255, 255, 255, 0.08);
-            --gold-primary: #FFD700;
-            --gold-glow: rgba(255, 215, 0, 0.15);
-            --green-neon: #00FF88;
-            --green-glow: rgba(0, 255, 136, 0.15);
-            --cyan-neon: #00E5FF;
-            --red-neon: #FF3366;
-            --text-primary: #FFFFFF;
-            --text-muted: #94A3B8;
-            --text-dim: #64748B;
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-elevated: #f1f5f9;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-soft: #eef2ff;
+            --primary-border: #c7d2fe;
+            
+            --emerald: #10b981;
+            --emerald-soft: #ecfdf5;
+            --emerald-border: #a7f3d0;
+            --emerald-text: #047857;
+            
+            --amber: #f59e0b;
+            --amber-soft: #fffbeb;
+            --amber-border: #fde68a;
+            --amber-text: #b45309;
+            
+            --rose: #ef4444;
+            --rose-soft: #fef2f2;
+            --rose-border: #fecaca;
+            --rose-text: #b91c1c;
+
+            --cyan: #06b6d4;
+            --cyan-soft: #ecfeff;
+            --cyan-border: #a5f3fc;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-float: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-base);
-            color: var(--text-primary);
+            color: var(--text-body);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Ambient Glow & Canvas */
-        .cyber-bg {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            background: 
-                radial-gradient(circle at 15% 15%, rgba(255, 215, 0, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(0, 255, 136, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.04) 0%, transparent 60%);
+        /* Top Navigation Header */
+        .admin-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
         }
 
-        .cyber-grid {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 32px 32px;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .app-container {
-            position: relative;
-            z-index: 2;
-            max-width: 1400px;
+        .nav-inner {
+            max-width: 1540px;
             margin: 0 auto;
-            padding: 24px 20px 80px;
-        }
-
-        /* Header Bar */
-        .portal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 18px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-gold);
-            border-radius: 16px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
             gap: 16px;
         }
 
-        .portal-brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .portal-logo-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(255, 215, 0, 0.12);
-            border: 1px solid var(--border-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold-primary);
-            font-size: 20px;
-            box-shadow: 0 0 15px var(--gold-glow);
-        }
-
-        .portal-title-wrap h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .portal-title-wrap h1 span.badge-decentralized {
-            font-size: 9px;
-            background: rgba(0, 255, 136, 0.15);
-            color: var(--green-neon);
-            border: 1px solid rgba(0, 255, 136, 0.35);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-        }
-
-        .portal-title-wrap p {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .portal-header-actions {
+        .brand-cluster {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-wrap: wrap;
         }
 
-        /* Buttons */
-        .btn-web3 {
-            display: inline-flex;
+        .brand-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+            display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
-            font-size: 12px;
+        }
+
+        .brand-badge {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border: 1px solid var(--primary-border);
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            padding: 2px 8px;
+            border-radius: 999px;
             text-transform: uppercase;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border: none;
-            outline: none;
+            letter-spacing: 0.05em;
         }
 
-        .btn-web3-gold {
-            background: linear-gradient(135deg, #FFD700 0%, #D97706 100%);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(245, 166, 35, 0.3);
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .btn-web3-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 166, 35, 0.5);
-        }
-
-        .btn-web3-outline {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-dim);
-            color: var(--text-primary);
-        }
-
-        .btn-web3-outline:hover {
-            border-color: var(--border-gold);
-            color: var(--gold-primary);
-            background: rgba(255, 215, 0, 0.08);
-        }
-
-        .btn-web3-red {
-            background: rgba(255, 51, 102, 0.15);
-            border: 1px solid rgba(255, 51, 102, 0.4);
-            color: var(--red-neon);
-        }
-
-        .btn-web3-red:hover {
-            background: rgba(255, 51, 102, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .btn-web3-green {
-            background: rgba(0, 255, 136, 0.15);
-            border: 1px solid rgba(0, 255, 136, 0.4);
-            color: var(--green-neon);
-        }
-
-        .btn-web3-green:hover {
-            background: rgba(0, 255, 136, 0.25);
-            transform: translateY(-1px);
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .network-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--emerald-soft);
+            border: 1px solid var(--emerald-border);
+            color: var(--emerald-text);
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        .status-dot {
+        .network-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #64748B;
+            background: var(--emerald);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            animation: pulse-dot 2s infinite;
         }
 
-        .status-dot.active {
-            background: var(--green-neon);
-            box-shadow: 0 0 8px var(--green-neon);
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
         }
 
-        /* LOCKED OVERLAY / ACCESS BARRIER */
-        .lock-barrier-container {
-            display: flex;
+        .btn-wallet {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-wallet:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-wallet.connected {
+            background: #ffffff;
+            color: var(--text-heading);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .btn-mobile-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-body);
             align-items: center;
             justify-content: center;
-            padding: 60px 20px;
-            min-height: 60vh;
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        .lock-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-gold);
-            border-radius: 24px;
-            padding: 44px 36px;
-            max-width: 540px;
+        /* Layout Container */
+        .portal-layout {
+            max-width: 1540px;
+            margin: 0 auto;
             width: 100%;
-            text-align: center;
-            backdrop-filter: blur(24px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px var(--gold-glow);
-            animation: lockCardZoom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            padding: 24px 20px 60px;
+            flex: 1;
         }
 
-        @keyframes lockCardZoom {
-            from { opacity: 0; transform: scale(0.94) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .lock-icon-box {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid var(--border-gold);
-            color: var(--gold-primary);
-            font-size: 36px;
+        /* Navigation Tabs Bar */
+        .tab-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 30px var(--gold-glow);
+            gap: 6px;
+            background: #ffffff;
+            padding: 6px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
 
-        .lock-icon-box.unauthorized {
-            background: rgba(255, 51, 102, 0.1);
-            border-color: rgba(255, 51, 102, 0.4);
-            color: var(--red-neon);
-            box-shadow: 0 0 30px rgba(255, 51, 102, 0.2);
+        .tab-bar::-webkit-scrollbar {
+            display: none;
         }
 
-        .lock-card h2 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .lock-card p {
-            font-size: 0.88rem;
+        .tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: transparent;
             color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 24px;
-        }
-
-        .lock-details-box {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-dim);
-            border-radius: 12px;
-            padding: 14px;
-            text-align: left;
-            margin-bottom: 24px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-        }
-
-        .lock-details-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-        }
-
-        .lock-details-row:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .lock-details-row .lbl {
-            color: var(--text-dim);
-        }
-
-        .lock-details-row .val {
-            color: var(--gold-primary);
+            font-size: 0.84rem;
             font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
         }
 
-        /* Top Metrics Row */
-        .metrics-grid {
+        .tab-btn i {
+            font-size: 14px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-heading);
+            background: var(--bg-elevated);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+        }
+
+        /* Metric Grid */
+        .metric-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
 
         .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dim);
-            border-radius: 16px;
-            padding: 18px 20px;
-            backdrop-filter: blur(16px);
-            transition: all 0.25s ease;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-subtle);
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
         }
 
         .metric-card:hover {
-            border-color: var(--border-gold);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--shadow-card);
+            border-color: var(--border-hover);
         }
 
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--gold-primary);
-        }
-
-        .metric-card.green::before { background: var(--green-neon); }
-        .metric-card.cyan::before { background: var(--cyan-neon); }
-        .metric-card.red::before { background: var(--red-neon); }
-
-        .metric-lbl {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .metric-val {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.45rem;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .metric-sub {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Main Admin Tabs */
-        .admin-nav-tabs {
-            display: flex;
-            gap: 8px;
-            background: var(--bg-card);
-            padding: 8px;
-            border-radius: 14px;
-            border: 1px solid var(--border-dim);
-            margin-bottom: 24px;
-            overflow-x: auto;
-        }
-
-        .nav-tab-btn {
-            padding: 10px 18px;
-            border-radius: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-tab-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-tab-btn.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(245, 166, 35, 0.1) 100%);
-            border: 1px solid var(--border-gold);
-            color: var(--gold-primary);
-            box-shadow: 0 0 15px var(--gold-glow);
-        }
-
-        /* Tab Content Panel */
-        .tab-panel-section {
-            display: none;
-            animation: tabFadeIn 0.3s ease forwards;
-        }
-
-        .tab-panel-section.active {
-            display: block;
-        }
-
-        @keyframes tabFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Control Card */
-        .control-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dim);
-            border-radius: 18px;
-            padding: 24px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(16px);
-        }
-
-        .control-card-header {
+        .metric-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid var(--border-dim);
-            flex-wrap: wrap;
-            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .control-card-title {
+        .metric-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            font-size: 15px;
         }
 
-        .control-card-title i {
-            font-size: 20px;
-            color: var(--gold-primary);
-        }
+        .metric-icon-box.indigo { background: var(--primary-soft); color: var(--primary); }
+        .metric-icon-box.emerald { background: var(--emerald-soft); color: var(--emerald); }
+        .metric-icon-box.amber { background: var(--amber-soft); color: var(--amber); }
+        .metric-icon-box.rose { background: var(--rose-soft); color: var(--rose); }
+        .metric-icon-box.cyan { background: var(--cyan-soft); color: var(--cyan); }
 
-        .control-card-title h3 {
+        .metric-value {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.75rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-
-        .control-card-title p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .card-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(255, 215, 0, 0.12);
-            color: var(--gold-primary);
-            border: 1px solid var(--border-gold);
-            text-transform: uppercase;
-        }
-
-        /* Grid inside tab */
-        .control-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        /* Form Group */
-        .control-form-group {
-            margin-bottom: 16px;
-        }
-
-        .control-label {
-            display: block;
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
             margin-bottom: 6px;
         }
 
-        .control-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            padding: 12px 14px;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .control-input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 12px var(--gold-glow);
-        }
-
-        .control-help {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            margin-top: 4px;
-        }
-
-        /* Info Box */
-        .info-matrix-box {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-dim);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .info-matrix-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 12px;
-        }
-
-        .info-matrix-row:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .info-matrix-row .k {
+        .metric-sub {
+            font-size: 0.76rem;
             color: var(--text-muted);
-        }
-
-        .info-matrix-row .v {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Event Stream Table */
-        .event-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-        .event-table th {
-            text-align: left;
-            padding: 10px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            color: var(--text-dim);
-            font-weight: 700;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-dim);
-        }
-
-        .event-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .event-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .event-badge.invest { background: rgba(0, 255, 136, 0.15); color: var(--green-neon); }
-        .event-badge.claim { background: rgba(255, 215, 0, 0.15); color: var(--gold-primary); }
-        .event-badge.withdraw { background: rgba(0, 229, 255, 0.15); color: var(--cyan-neon); }
-        .event-badge.whitelist { background: rgba(179, 75, 254, 0.15); color: #B34BFE; }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 999999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast-msg {
-            background: #0d111d;
-            border: 1px solid var(--border-gold);
-            border-radius: 12px;
-            padding: 14px 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow);
-            font-size: 12px;
-            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 10px;
-            animation: toastSlideIn 0.3s ease forwards;
-            max-width: 380px;
+            gap: 6px;
         }
 
-        @keyframes toastSlideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        /* Section Cards */
+        .portal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
         }
 
-        .toast-msg.success { border-color: var(--green-neon); }
-        .toast-msg.error { border-color: var(--red-neon); }
-
-        /* Loading Spinner */
-        .spin-loader {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ============================================================
-           SIDEBAR LAYOUT STYLES
-           ============================================================ */
-        .admin-layout-wrapper {
-            display: flex;
-            min-height: 100vh;
-            position: relative;
-            z-index: 2;
-        }
-
-        .admin-sidebar {
-            width: 275px;
-            background: rgba(8, 11, 20, 0.96);
-            border-right: 1px solid var(--border-gold);
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            z-index: 1000;
-            flex-shrink: 0;
-            box-shadow: 6px 0 25px rgba(0, 0, 0, 0.6);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .sidebar-header {
-            padding: 20px 18px 16px;
+        .portal-card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-dim);
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar-logo {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: rgba(255, 215, 0, 0.12);
-            border: 1px solid var(--border-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold-primary);
-            font-size: 18px;
-            box-shadow: 0 0 15px var(--gold-glow);
-        }
-
-        .sidebar-brand-text h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            line-height: 1.1;
-            color: #FFFFFF;
-        }
-
-        .sidebar-sub {
-            font-size: 9.5px;
-            color: var(--gold-primary);
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .sidebar-close-btn {
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-dim);
-            color: var(--text-muted);
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .sidebar-chain-badge {
-            margin: 12px 16px 8px;
-            padding: 6px 12px;
-            background: rgba(0, 255, 136, 0.08);
-            border: 1px solid rgba(0, 255, 136, 0.25);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 10.5px;
-            font-weight: 700;
-            color: var(--green-neon);
-            letter-spacing: 0.5px;
-        }
-
-        .chain-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--green-neon);
-            box-shadow: 0 0 8px var(--green-neon);
-            animation: pulseDot 2s infinite;
-        }
-
-        @keyframes pulseDot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
-
-        .sidebar-nav-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 12px 20px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 215, 0, 0.2) transparent;
-        }
-
-        .sidebar-nav-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar-nav-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.2);
-            border-radius: 4px;
-        }
-
-        .sidebar-group-title {
-            font-size: 9.5px;
-            font-weight: 800;
-            letter-spacing: 1.2px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            padding: 12px 8px 6px;
-        }
-
-        .sidebar-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 9px 12px;
-            border-radius: 10px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            position: relative;
-            margin-bottom: 3px;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .sidebar-nav-item:hover {
-            color: #FFFFFF;
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.08);
-            transform: translateX(3px);
-        }
-
-        .sidebar-nav-item i:first-child {
-            width: 18px;
-            font-size: 14px;
-            text-align: center;
-            color: var(--gold-primary);
-            opacity: 0.85;
-            transition: transform 0.2s ease;
-        }
-
-        .sidebar-nav-item:hover i:first-child {
-            transform: scale(1.15);
-            opacity: 1;
-        }
-
-        .sidebar-nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.16) 0%, rgba(245, 166, 35, 0.06) 100%);
-            border: 1px solid var(--border-gold);
-            color: var(--gold-primary);
-            font-weight: 700;
-            box-shadow: 0 0 16px var(--gold-glow);
-        }
-
-        .sidebar-nav-item.highlight-item {
-            background: rgba(0, 255, 136, 0.08);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: #FFFFFF;
-        }
-        .sidebar-nav-item.highlight-item i:first-child {
-            color: var(--green-neon);
-        }
-        .sidebar-nav-item.highlight-item.active {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 229, 255, 0.1) 100%);
-            border-color: var(--green-neon);
-            color: var(--green-neon);
-            box-shadow: 0 0 18px var(--green-glow);
-        }
-
-        .sidebar-item-badge {
-            margin-left: auto;
-            padding: 2px 7px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 800;
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--green-neon);
-            border: 1px solid rgba(0, 255, 136, 0.4);
-        }
-
-        .ext-ico {
-            margin-left: auto;
-            font-size: 9.5px;
-            color: var(--text-dim);
-            opacity: 0.7;
-        }
-
-        .sidebar-footer {
-            padding: 14px 16px;
-            border-top: 1px solid var(--border-dim);
-            background: rgba(4, 5, 8, 0.6);
-        }
-
-        .sidebar-owner-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 10px;
-            background: rgba(255, 215, 0, 0.06);
-            border: 1px solid rgba(255, 215, 0, 0.25);
-        }
-
-        .owner-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: rgba(255, 215, 0, 0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold-primary);
-            font-size: 12px;
-        }
-
-        .owner-info {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .owner-lbl {
-            font-size: 8.5px;
-            color: var(--gold-primary);
-            font-weight: 800;
-            letter-spacing: 0.8px;
-        }
-
-        .owner-addr {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #FFFFFF;
-            font-weight: 600;
-        }
-
-        .admin-content-area {
-            flex: 1;
-            min-width: 0;
-            padding: 24px 24px 80px;
-            max-width: 1480px;
-        }
-
-        .sidebar-toggle-btn {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid var(--border-gold);
-            color: var(--gold-primary);
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-            margin-right: 6px;
-        }
-
-        .sidebar-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 999;
-        }
-
-        @media (max-width: 1024px) {
-            .admin-sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                transform: translateX(-100%);
-            }
-            .admin-sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-close-btn {
-                display: flex;
-            }
-            .sidebar-toggle-btn {
-                display: inline-flex;
-            }
-            .sidebar-backdrop.active {
-                display: block;
-            }
-            .admin-content-area {
-                padding: 16px 12px 60px;
-            }
-        }
-
-        /* ============================================================
-           STAKING KPI CARDS & TABLE STYLES
-           ============================================================ */
-        .staking-kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-
-        .staking-kpi-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dim);
-            border-radius: 16px;
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(16px);
-            transition: all 0.25s ease;
-        }
-
-        .staking-kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-color: var(--border-gold);
-        }
-
-        .staking-kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-        }
-
-        .staking-kpi-card.gold::before { background: var(--gold-primary); }
-        .staking-kpi-card.green::before { background: var(--green-neon); }
-        .staking-kpi-card.cyan::before { background: var(--cyan-neon); }
-        .staking-kpi-card.purple::before { background: #B34BFE; }
-
-        .staking-kpi-card .kpi-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .staking-kpi-card.gold .kpi-icon { background: rgba(255, 215, 0, 0.12); color: var(--gold-primary); border: 1px solid var(--border-gold); }
-        .staking-kpi-card.green .kpi-icon { background: rgba(0, 255, 136, 0.12); color: var(--green-neon); border: 1px solid rgba(0, 255, 136, 0.3); }
-        .staking-kpi-card.cyan .kpi-icon { background: rgba(0, 229, 255, 0.12); color: var(--cyan-neon); border: 1px solid rgba(0, 229, 255, 0.3); }
-        .staking-kpi-card.purple .kpi-icon { background: rgba(179, 75, 254, 0.12); color: #B34BFE; border: 1px solid rgba(179, 75, 254, 0.3); }
-
-        .kpi-data {
-            min-width: 0;
-        }
-
-        .kpi-label {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            color: var(--text-dim);
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .kpi-val {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: #FFFFFF;
-            line-height: 1.1;
-        }
-
-        .kpi-val small {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .kpi-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-            display: block;
-        }
-
-        /* Filter Toolbar */
-        .staking-filter-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            margin-bottom: 16px;
-            padding: 12px 14px;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--border-dim);
-            border-radius: 12px;
+            gap: 12px;
         }
 
-        .staking-search-wrap {
+        .card-heading {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-heading i {
+            color: var(--primary);
+        }
+
+        .card-caption {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Filter Controls Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
             position: relative;
             flex: 1;
-            min-width: 260px;
+            min-width: 240px;
         }
 
-        .staking-search-wrap .search-ico {
+        .search-box i {
             position: absolute;
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gold-primary);
-            font-size: 13px;
+            color: var(--text-light);
+            font-size: 14px;
         }
 
-        .staking-search-input {
+        .search-input {
             width: 100%;
-            background: rgba(10, 13, 22, 0.8);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            padding: 10px 36px 10px 38px;
-            color: #FFFFFF;
-            font-size: 12px;
+            padding: 10px 14px 10px 38px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: #ffffff;
+            font-size: 0.84rem;
+            color: var(--text-heading);
             outline: none;
-            transition: all 0.2s ease;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .staking-search-input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 12px var(--gold-glow);
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
         }
 
-        .search-clear-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-dim);
+        .filter-select {
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: #ffffff;
+            font-size: 0.84rem;
+            color: var(--text-body);
+            font-weight: 500;
+            outline: none;
             cursor: pointer;
-            font-size: 12px;
         }
 
-        .staking-status-filters {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .status-chip-btn {
-            padding: 7px 14px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-dim);
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .status-chip-btn:hover {
-            color: #FFFFFF;
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .status-chip-btn.active {
-            background: rgba(255, 215, 0, 0.16);
-            border-color: var(--border-gold);
-            color: var(--gold-primary);
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
-
-        /* Staking Data Table */
-        .staking-table-responsive {
+        /* Tables */
+        .table-responsive {
+            width: 100%;
             overflow-x: auto;
-            border: 1px solid var(--border-dim);
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: #ffffff;
         }
 
-        .staking-data-table {
+        table.admin-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            min-width: 980px;
+            text-align: left;
+            font-size: 0.82rem;
         }
 
-        .staking-data-table th {
-            background: rgba(14, 18, 30, 0.95);
-            padding: 12px 14px;
-            text-align: left;
-            font-weight: 800;
-            color: var(--text-dim);
+        table.admin-table th {
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 10.5px;
-            letter-spacing: 0.7px;
-            border-bottom: 1px solid var(--border-dim);
+            letter-spacing: 0.06em;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
 
-        .staking-data-table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        table.admin-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-body);
             vertical-align: middle;
+            white-space: nowrap;
         }
 
-        .staking-row:hover td {
-            background: rgba(255, 215, 0, 0.03);
+        table.admin-table tbody tr:hover {
+            background-color: #f8fafc;
         }
 
-        .deposit-id-badge {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            color: var(--gold-primary);
-            font-size: 12px;
-            padding: 2px 7px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.25);
-            border-radius: 6px;
+        table.admin-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
-        .uuid-badge {
-            font-family: 'JetBrains Mono', monospace;
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
             font-weight: 700;
-            color: var(--cyan-neon);
-            font-size: 11.5px;
-            padding: 2px 6px;
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            border-radius: 6px;
+            line-height: 1;
         }
 
-        .user-name-cell {
+        .badge-active { background: var(--emerald-soft); color: var(--emerald-text); border: 1px solid var(--emerald-border); }
+        .badge-inactive { background: var(--amber-soft); color: var(--amber-text); border: 1px solid var(--amber-border); }
+        .badge-blocked { background: var(--rose-soft); color: var(--rose-text); border: 1px solid var(--rose-border); }
+        .badge-indigo { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-border); }
+        .badge-cyan { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-border); }
+
+        /* Buttons & Actions */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text-body);
+            font-size: 0.74rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-action:hover {
+            background: var(--bg-elevated);
+            border-color: var(--border-hover);
+            color: var(--text-heading);
+        }
+
+        .btn-action.primary {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: var(--primary-border);
+        }
+
+        .btn-action.primary:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-action.danger {
+            background: var(--rose-soft);
+            color: var(--rose-text);
+            border-color: var(--rose-border);
+        }
+
+        .btn-action.danger:hover {
+            background: var(--rose);
+            color: #ffffff;
+        }
+
+        /* Typography & Helpers */
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .user-cell {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .user-avatar-mini {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #1f5eff, #00d2ff);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-soft);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #FFFFFF;
-            font-weight: 800;
-            font-size: 12px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 210, 255, 0.3);
-        }
-
-        .user-name-txt {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .name-line {
             font-weight: 700;
-            color: #FFFFFF;
-            font-size: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
+            font-size: 0.78rem;
         }
 
-        .userid-sub {
-            font-size: 10px;
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .email-cell {
-            color: var(--text-muted);
-            font-size: 11.5px;
-            max-width: 170px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .wallet-cell {
+        /* Live Pool Box */
+        .pool-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #2563eb 50%, #06b6d4 100%);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: #ffffff;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
         }
 
-        .wallet-link {
-            color: var(--green-neon);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: color 0.15s;
-        }
-
-        .wallet-link:hover {
-            color: #FFFFFF;
-            text-decoration: underline;
-        }
-
-        .copy-wallet-btn {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
-            transition: all 0.15s;
-        }
-
-        .copy-wallet-btn:hover {
-            color: var(--gold-primary);
-            background: rgba(255, 215, 0, 0.12);
-        }
-
-        .usdt-amount-cell {
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--gold-primary);
+        .pool-stats-row {
             display: flex;
-            align-items: baseline;
-            gap: 4px;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        .usdt-curr {
-            font-size: 10px;
-            color: #FFFFFF;
+        .pool-stat-col {
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding-left: 16px;
+        }
+
+        .pool-stat-col:first-child {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .pool-stat-label {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 600;
         }
 
-        .mult-badge {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+        .pool-stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
             font-weight: 800;
-            color: var(--cyan-neon);
-            padding: 2px 7px;
-            background: rgba(0, 229, 255, 0.1);
-            border-radius: 6px;
-            border: 1px solid rgba(0, 229, 255, 0.25);
+            line-height: 1.1;
+            margin-top: 4px;
         }
 
-        .dao-pill {
-            display: inline-flex;
+        /* Contract Cards Grid */
+        .contracts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .contract-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s;
+        }
+
+        .contract-box:hover {
+            border-color: var(--primary-border);
+            box-shadow: var(--shadow-card);
+        }
+
+        .contract-box-top {
+            display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
-        .dao-pill.diamond {
-            background: rgba(255, 215, 0, 0.15);
-            color: var(--gold-primary);
-            border: 1px solid var(--border-gold);
-        }
-
-        .dao-pill.gold {
-            background: rgba(245, 158, 11, 0.15);
-            color: #F59E0B;
-            border: 1px solid rgba(245, 158, 11, 0.35);
-        }
-
-        .dao-pill.plat {
-            background: rgba(56, 189, 248, 0.15);
-            color: #38BDF8;
-            border: 1px solid rgba(56, 189, 248, 0.35);
-        }
-
-        .dao-pill.standard {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-dim);
-            border: 1px solid var(--border-dim);
-        }
-
-        .status-badge {
-            display: inline-flex;
+        .contract-box-title {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 3px 9px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
+            gap: 8px;
         }
 
-        .status-badge.active {
-            background: rgba(0, 255, 136, 0.15);
-            color: var(--green-neon);
-            border: 1px solid rgba(0, 255, 136, 0.35);
-        }
-
-        .status-badge.completed {
-            background: rgba(100, 116, 139, 0.15);
-            color: var(--text-dim);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-        }
-
-        .live-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green-neon);
-            box-shadow: 0 0 6px var(--green-neon);
-            display: inline-block;
-        }
-
-        .date-cell {
+        .contract-addr-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-elevated);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.76rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+            color: var(--text-body);
+            margin-bottom: 10px;
+        }
+
+        .contract-metrics-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.76rem;
             color: var(--text-muted);
-            white-space: nowrap;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
         }
 
-        .date-cell small {
-            display: block;
-            font-size: 9.5px;
-            color: var(--text-dim);
+        /* Interactive Genealogy Visual Tree Explorer */
+        .tree-container {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            min-height: 500px;
+            overflow-x: auto;
+        }
+
+        .tree-node-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            width: 260px;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tree-node-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-card);
+            transform: translateY(-2px);
+        }
+
+        .tree-node-card.root-card {
+            border: 2px solid var(--primary);
+            background: #faf5ff;
+        }
+
+        .tree-level-block {
+            margin-bottom: 24px;
+        }
+
+        .tree-level-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tree-cards-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* Modal Dialog */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-float);
+            border: 1px solid var(--border);
+            animation: modalIn 0.2s ease-out;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.96); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Responsive Mobile Drawer */
+        @media (max-width: 992px) {
+            .btn-mobile-toggle {
+                display: flex;
+            }
+            .header-actions .network-pill {
+                display: none;
+            }
+            .pool-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pool-stat-col {
+                border-left: none;
+                padding-left: 0;
+            }
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .portal-layout {
+                padding: 16px 12px 60px;
+            }
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 0.78rem;
+            }
+            .btn-wallet span {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="cyber-bg"></div>
-    <div class="cyber-grid"></div>
-
-    <!-- Mobile Drawer Backdrop -->
-    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-
-    <div class="admin-layout-wrapper">
-
-        <!-- ============================================================
-             CYERA GOLD / CYBER ADMIN SIDEBAR
-             ============================================================ -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-brand">
-                    <div class="sidebar-logo">
-                        <i class="fas fa-shield-halved"></i>
-                    </div>
-                    <div class="sidebar-brand-text">
-                        <h3>CYERA</h3>
-                        <span class="sidebar-sub">GOVERNANCE &amp; VAULTS</span>
-                    </div>
+    <!-- Top Sticky Header -->
+    <nav class="admin-nav">
+        <div class="nav-inner">
+            <div class="brand-cluster">
+                <div class="brand-avatar">
+                    <i class="fa-solid fa-gem"></i>
                 </div>
-                <button type="button" class="sidebar-close-btn" onclick="toggleSidebar()" title="Close Sidebar">
-                    <i class="fas fa-times"></i>
+                <div>
+                    <div class="brand-title">
+                        CYERA AI <span class="brand-badge">Protocol V2</span>
+                    </div>
+                    <div class="brand-sub">MLM & Smart Contract Command Center</div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="network-pill">
+                    <span class="network-dot"></span>
+                    <span>BNB Smart Chain (56)</span>
+                </div>
+
+                <button class="btn-wallet" id="btnConnectWallet" onclick="connectAdminWallet()">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span id="walletBtnText">Connect Wallet</span>
+                </button>
+
+                <button class="btn-mobile-toggle" onclick="toggleMobileTabs()">
+                    <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
+        </div>
+    </nav>
 
-            <div class="sidebar-nav-scroll">
-                <!-- Group 1: On-Chain Governance -->
-                <div class="sidebar-group-title">Contract Governance</div>
-                <a href="javascript:void(0)" class="sidebar-nav-item active" data-tab-target="tab-treasury-splitter" onclick="switchSidebarTab('tab-treasury-splitter')">
-                    <i class="fas fa-divide"></i>
-                    <span>Treasury Splitter (65/5)</span>
-                </a>
-                <a href="javascript:void(0)" class="sidebar-nav-item" data-tab-target="tab-splitter" onclick="switchSidebarTab('tab-splitter')">
-                    <i class="fas fa-arrows-split-up-and-left"></i>
-                    <span>70/30 Splitter</span>
-                </a>
-                <a href="javascript:void(0)" class="sidebar-nav-item" data-tab-target="tab-treasury" onclick="switchSidebarTab('tab-treasury')">
-                    <i class="fas fa-vault"></i>
-                    <span>70% Treasury Vault</span>
-                </a>
-                <a href="javascript:void(0)" class="sidebar-nav-item" data-tab-target="tab-cai" onclick="switchSidebarTab('tab-cai')">
-                    <i class="fas fa-coins"></i>
-                    <span>CAI Token &amp; DEX</span>
-                </a>
-                <a href="javascript:void(0)" class="sidebar-nav-item" data-tab-target="tab-claim-vaults" onclick="switchSidebarTab('tab-claim-vaults')">
-                    <i class="fas fa-key"></i>
-                    <span>EIP-712 Claim Vaults</span>
-                </a>
-                <a href="javascript:void(0)" class="sidebar-nav-item" data-tab-target="tab-events" onclick="switchSidebarTab('tab-events')">
-                    <i class="fas fa-satellite-dish"></i>
-                    <span>Live Event Explorer</span>
-                </a>
+    <!-- Main App Container -->
+    <main class="portal-layout">
 
-                <!-- Group 2: Staking & Members -->
-                <div class="sidebar-group-title">Staking &amp; Protocol Data</div>
-                <a href="javascript:void(0)" class="sidebar-nav-item highlight-item" data-tab-target="tab-staking-deposits" onclick="switchSidebarTab('tab-staking-deposits')">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Staking Deposits</span>
-                    <span class="sidebar-item-badge">{{ $stakingSummary['totalCount'] ?? 0 }} IDs</span>
-                </a>
+        <!-- Navigation Tabs -->
+        <div class="tab-bar" id="portalTabBar">
+            <button class="tab-btn active" onclick="switchTab('tab-overview', this)">
+                <i class="fa-solid fa-chart-pie"></i> Overview Dashboard
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-users', this)">
+                <i class="fa-solid fa-users"></i> Users ({{ $userSummary['totalUsers'] }})
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-genealogy', this)">
+                <i class="fa-solid fa-network-wired"></i> Genealogy Tree
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-directs', this)">
+                <i class="fa-solid fa-user-check"></i> Active Directs ({{ $userSummary['activeDirects'] }})
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-stakings', this)">
+                <i class="fa-solid fa-vault"></i> Stakings (${{ number_format($stakingSummary['totalUsdt'], 0) }})
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
+                <i class="fa-solid fa-cube"></i> Smart Contract Hub
+            </button>
+        </div>
 
-                <!-- Group 3: Protocol Admin Suites -->
-                <div class="sidebar-group-title">Protocol Admin Suites</div>
-                <a href="/luckydraw/admin" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-dice"></i>
-                    <span>Royal Jackpot Admin</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="/luckydraw/admin/funds" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-wallet"></i>
-                    <span>Jackpot Vault Funds</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="/luckydraw/admin/winners" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-trophy"></i>
-                    <span>Jackpot Winners Ledger</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="/luckydraw/admin/settings" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-sliders"></i>
-                    <span>Jackpot Settings</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-
-                <!-- Group 4: Ecosystem & Verified Contracts -->
-                <div class="sidebar-group-title">Ecosystem &amp; BscScan</div>
-                <a href="/home" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-globe"></i>
-                    <span>User DApp Portal</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="/User/RoyalJackpot" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-crown"></i>
-                    <span>User Royal Jackpot</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="https://bscscan.com/address/{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-file-contract"></i>
-                    <span>Splitter Contract</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="https://bscscan.com/address/{{ $contracts['treasuryClaimVaultAddress'] }}" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-vault"></i>
-                    <span>Treasury Vault (70%)</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-coins"></i>
-                    <span>CAI Token (BscScan)</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-                <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" class="sidebar-nav-item">
-                    <i class="fas fa-hand-holding-dollar"></i>
-                    <span>USDT Payout Vault</span>
-                    <i class="fas fa-arrow-up-right-from-square ext-ico"></i>
-                </a>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="sidebar-owner-pill">
-                    <div class="owner-avatar">
-                        <i class="fas fa-crown"></i>
+        <!-- ======================================================== -->
+        <!-- TAB 1: OVERVIEW DASHBOARD                                 -->
+        <!-- ======================================================== -->
+        <div id="tab-overview" class="tab-content-panel">
+            
+            <!-- Live Pool Banner -->
+            <div class="pool-banner">
+                <div>
+                    <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; opacity: 0.9; letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-water"></i> PancakeSwap V2 Verified Liquidity Pool
                     </div>
-                    <div class="owner-info">
-                        <span class="owner-lbl">AUTHORIZED OWNER</span>
-                        <span class="owner-addr">{{ substr($contracts['adminOwnerAddress'], 0, 6) . '...' . substr($contracts['adminOwnerAddress'], -4) }}</span>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; margin: 4px 0 2px;">
+                        CAAI / USDT Official Pair
                     </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- ============================================================
-             MAIN CONTENT AREA
-             ============================================================ -->
-        <div class="admin-content-area">
-
-            <!-- ============================================================
-                 1. HEADER BAR & WEB3 CONNECTIVITY
-                 ============================================================ -->
-            <header class="portal-header">
-                <div class="portal-brand">
-                    <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="portal-logo-icon">
-                        <i class="fas fa-shield-halved"></i>
-                    </div>
-                    <div class="portal-title-wrap">
-                        <h1>
-                            CYERA PROTOCOL <span class="badge-decentralized">Contract Owner Admin</span>
-                        </h1>
-                        <p>Decentralized Governance &amp; Multi-Vault Management Engine</p>
+                    <div style="font-size: 0.8rem; opacity: 0.85;" class="font-mono">
+                        {{ $contracts['pancakePairAddress'] }}
                     </div>
                 </div>
 
-                <div class="portal-header-actions">
-                    <div class="network-pill" id="networkPill">
-                        <span class="status-dot" id="networkDot"></span>
-                        <span id="networkText">BSC Mainnet (Chain 56)</span>
+                <div class="pool-stats-row">
+                    <div class="pool-stat-col">
+                        <div class="pool-stat-label">Live CAAI Price</div>
+                        <div class="pool-stat-num" id="livePoolPrice">$0.8276</div>
                     </div>
-
-                    <button type="button" class="btn-web3 btn-web3-gold" id="btnConnectWallet" onclick="connectWallet()">
-                        <i class="fas fa-wallet"></i>
-                        <span id="btnConnectText">Connect Owner Wallet</span>
-                    </button>
-
-                    <button type="button" class="btn-web3 btn-web3-outline" id="btnDisconnectWallet" onclick="disconnectWallet()" style="display: none;">
-                        <i class="fas fa-power-off"></i> Disconnect
-                    </button>
+                    <div class="pool-stat-col">
+                        <div class="pool-stat-label">Pool Liquidity</div>
+                        <div class="pool-stat-num" id="livePoolLiq">~$6,573.98</div>
+                    </div>
+                    <div class="pool-stat-col">
+                        <div class="pool-stat-label">CAAI Reserves</div>
+                        <div class="pool-stat-num" id="livePoolCaai">3,971.58 CAAI</div>
+                    </div>
+                    <div class="pool-stat-col">
+                        <div class="pool-stat-label">USDT Reserves</div>
+                        <div class="pool-stat-num" id="livePoolUsdt">3,286.99 USDT</div>
+                    </div>
                 </div>
-            </header>
 
-            <!-- ============================================================
-                 2. ACCESS BARRIER / LOCKED STATE (Shown when Not Connected or Not Owner)
-                 ============================================================ -->
-            <div id="lockBarrier" class="lock-barrier-container">
-                <div class="lock-card">
-                    <div class="lock-icon-box" id="lockIconBox">
-                        <i class="fas fa-lock" id="lockIcon"></i>
-                    </div>
-                    <h2 id="lockTitle">Contract Owner Access Only</h2>
-                    <p id="lockDesc">
-                        This decentralized portal connects directly to Cyera smart contracts on BNB Smart Chain. You must connect the authorized <strong>Contract Owner Wallet</strong> to execute protocol commands.
-                    </p>
-
-                    <div class="lock-details-box">
-                        <div class="lock-details-row">
-                            <span class="lbl">Authorized Owner:</span>
-                            <span class="val" id="dispExpectedOwner">{{ substr($contracts['adminOwnerAddress'], 0, 8) . '...' . substr($contracts['adminOwnerAddress'], -6) }}</span>
-                        </div>
-                        <div class="lock-details-row">
-                            <span class="lbl">Connected Wallet:</span>
-                            <span class="val" id="dispConnectedWallet">Not Connected</span>
-                        </div>
-                        <div class="lock-details-row">
-                            <span class="lbl">Authorization Status:</span>
-                            <span class="val" id="dispAuthStatus" style="color: var(--red-neon);">Locked</span>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 46px;" onclick="connectWallet()">
-                        <i class="fas fa-wallet"></i> Connect Contract Owner Wallet
-                    </button>
-
-                    <button type="button" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center; height: 42px; margin-top: 10px; border-color: rgba(0, 255, 136, 0.4); color: var(--green-neon); background: rgba(0, 255, 136, 0.08);" onclick="unlockReadOnlyView('tab-staking-deposits')">
-                        <i class="fas fa-layer-group"></i> View Staking Deposits Ledger ({{ $stakingSummary['totalCount'] ?? 0 }} Records)
-                    </button>
+                <div style="display: flex; gap: 8px;">
+                    <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank" class="btn-action primary" style="background: rgba(255,255,255,0.9); color: var(--primary); font-weight: 700;">
+                        <i class="fa-solid fa-chart-line"></i> DexScreener
+                    </a>
+                    <a href="https://bscscan.com/address/{{ $contracts['pancakePairAddress'] }}" target="_blank" class="btn-action" style="background: rgba(255,255,255,0.2); color: #ffffff; border-color: rgba(255,255,255,0.3);">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> BscScan
+                    </a>
                 </div>
             </div>
 
-        <!-- ============================================================
-             3. UNLOCKED ADMIN DASHBOARD (Visible Only to Verified Owner)
-             ============================================================ -->
-        <main id="adminMain" style="display: none;">
-
-            <!-- Live Metrics Grid -->
-            <div class="metrics-grid">
-                <div class="metric-card gold">
-                    <div class="metric-lbl">
-                        <span>70% Treasury Vault</span>
-                        <i class="fas fa-vault" style="color: var(--gold-primary);"></i>
+            <!-- Key Metric KPI Cards -->
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Total Registered Users</div>
+                        <div class="metric-icon-box indigo"><i class="fa-solid fa-users"></i></div>
                     </div>
-                    <div class="metric-val" id="metricTreasuryUsdt">0.00 <small style="font-size: 13px;">USDT</small></div>
-                    <div class="metric-sub">TreasuryClaimVault Reserves</div>
-                </div>
-
-                <div class="metric-card green">
-                    <div class="metric-lbl">
-                        <span>Splitter Total Volume</span>
-                        <i class="fas fa-chart-line" style="color: var(--green-neon);"></i>
+                    <div class="metric-value">{{ $userSummary['totalUsers'] }}</div>
+                    <div class="metric-sub">
+                        <span class="badge badge-active"><i class="fa-solid fa-check"></i> {{ $userSummary['activeUsers'] }} Paid</span>
+                        <span class="badge badge-inactive">{{ $userSummary['inactiveUsers'] }} Free</span>
                     </div>
-                    <div class="metric-val" id="metricSplitterTotal">0.00 <small style="font-size: 13px;">USDT</small></div>
-                    <div class="metric-sub"><span id="metricInvestmentCount">0</span> Total Staking Actions</div>
-                </div>
-
-                <div class="metric-card cyan">
-                    <div class="metric-lbl">
-                        <span>CAI Reward Vault</span>
-                        <i class="fas fa-coins" style="color: var(--cyan-neon);"></i>
-                    </div>
-                    <div class="metric-val" id="metricRewardCai">0.00 <small style="font-size: 13px;">CAI</small></div>
-                    <div class="metric-sub">CAIRewardClaimVault Reserves</div>
                 </div>
 
                 <div class="metric-card">
-                    <div class="metric-lbl">
-                        <span>USDT Payout Vault</span>
-                        <i class="fas fa-money-bill-transfer" style="color: var(--gold-primary);"></i>
+                    <div class="metric-header">
+                        <div class="metric-title">Total Business Volume</div>
+                        <div class="metric-icon-box emerald"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                     </div>
-                    <div class="metric-val" id="metricPayoutUsdt">0.00 <small style="font-size: 13px;">USDT</small></div>
-                    <div class="metric-sub">USDTWithdrawalVault Reserves</div>
+                    <div class="metric-value">${{ number_format($stakingSummary['totalUsdt'], 2) }}</div>
+                    <div class="metric-sub">
+                        <span class="badge badge-active">${{ number_format($stakingSummary['activeUsdt'], 2) }} Active Locked</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Active Direct Sponsors</div>
+                        <div class="metric-icon-box amber"><i class="fa-solid fa-user-check"></i></div>
+                    </div>
+                    <div class="metric-value">{{ $userSummary['activeDirects'] }}</div>
+                    <div class="metric-sub">
+                        <span>Total Direct Connections: <strong>{{ $userSummary['totalDirects'] }}</strong></span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Mining Buffer Reserves</div>
+                        <div class="metric-icon-box cyan"><i class="fa-solid fa-microchip"></i></div>
+                    </div>
+                    <div class="metric-value" id="miningBufferVal">40,454 CAAI</div>
+                    <div class="metric-sub">
+                        <span class="badge badge-cyan">In Mining Engine Buffer</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Protocol Smart Contracts Directory (Complete Overview) -->
-            <div style="background: rgba(14, 18, 30, 0.95); border: 1px solid var(--border-gold); border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 215, 0, 0.15); padding-bottom: 8px;">
-                    <div style="font-size: 13px; font-weight: 800; color: var(--gold-primary); display: flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif;">
-                        <i class="fas fa-network-wired"></i> CYERA PROTOCOL — LIVE BSC MAINNET SMART CONTRACTS
+            <!-- Quick Actions & Protocol Status -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                
+                <div class="portal-card">
+                    <div class="portal-card-header">
+                        <div>
+                            <div class="card-heading"><i class="fa-solid fa-bolt"></i> Fast Administrative Actions</div>
+                            <div class="card-caption">Execute immediate protocol, MLM and blockchain controls</div>
+                        </div>
                     </div>
-                    <span style="font-size: 10px; color: var(--green-neon); font-weight: 700; background: rgba(0, 255, 136, 0.12); border: 1px solid rgba(0, 255, 136, 0.3); padding: 2px 8px; border-radius: 20px;">
-                        CHAIN ID: 56
-                    </span>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">👑 Admin Owner (3E7):</span>
-                        <a href="https://bscscan.com/address/{{ $contracts['adminOwnerAddress'] }}" target="_blank" style="color: var(--gold-primary); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['adminOwnerAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn-action primary" style="padding: 12px 16px; font-size: 0.85rem;" onclick="switchTab('tab-genealogy', document.querySelectorAll('.tab-btn')[2])">
+                            <i class="fa-solid fa-network-wired"></i> Open Full Interactive Genealogy Downline Tree
+                        </button>
+                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;" onclick="triggerSplitterDistribute()">
+                            <i class="fa-solid fa-code-fork"></i> Trigger Revenue Splitter On-Chain (68/20/10/2)
+                        </button>
+                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;" onclick="refreshLiveOnChainBalances()">
+                            <i class="fa-solid fa-arrows-rotate"></i> Sync Real-Time Blockchain Pool Reserves & Balances
+                        </button>
+                        <a href="/Main/Dashboard" class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;">
+                            <i class="fa-solid fa-sliders"></i> Access Legacy Control Panel
                         </a>
                     </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">💸 USDT Payout Vault (USDTWithdrawalVault):</span>
-                        <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--green-neon); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['usdtWithdrawalVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                        </a>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">⚡ Mining Engine (Invest &amp; Sell):</span>
-                        <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['miningEngineAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                        </a>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🪙 CAI Token Contract:</span>
-                        <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank" style="color: var(--gold-primary); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['caiTokenAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                        </a>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🥞 PancakeSwap V2 Pair:</span>
-                        <a href="https://bscscan.com/address/{{ $contracts['pancakePairAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['pancakePairAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                        </a>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-gold); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--gold-primary); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">⚡ Treasury Splitter (65% / 5%):</span>
-                        <a href="https://bscscan.com/address/{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}" target="_blank" style="color: var(--green-neon); text-decoration: none; word-break: break-all;">
-                            {{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                        </a>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-dim); border-radius: 8px; padding: 8px 10px;">
-                        <span style="color: var(--text-muted); font-size: 10px; display: block; font-family: 'Inter', sans-serif;">🔑 Backend EIP-712 Signer:</span>
-                        <span style="color: #FFE082; word-break: break-all;">{{ $contracts['backendSignerAddress'] }}</span>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Navigation Tabs -->
-            <nav class="admin-nav-tabs">
-                <button type="button" class="nav-tab-btn active" data-tab="tab-treasury-splitter" onclick="switchTab('tab-treasury-splitter')">
-                    <i class="fas fa-divide"></i> Treasury Splitter (65% / 5%)
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-splitter" onclick="switchTab('tab-splitter')">
-                    <i class="fas fa-arrows-split-up-and-left"></i> 70/30 Investment Splitter
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-treasury" onclick="switchTab('tab-treasury')">
-                    <i class="fas fa-vault"></i> 70% Treasury Vault
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-cai" onclick="switchTab('tab-cai')">
-                    <i class="fas fa-coins"></i> CAI Token &amp; DEX Whitelist
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-claim-vaults" onclick="switchTab('tab-claim-vaults')">
-                    <i class="fas fa-key"></i> EIP-712 Claim &amp; Payout Vaults
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-events" onclick="switchTab('tab-events')">
-                    <i class="fas fa-satellite-dish"></i> Live Event Explorer
-                </button>
-                <button type="button" class="nav-tab-btn" data-tab="tab-staking-deposits" onclick="switchTab('tab-staking-deposits')" style="border-color: rgba(0, 255, 136, 0.4); color: var(--green-neon); background: rgba(0, 255, 136, 0.08);">
-                    <i class="fas fa-layer-group"></i> Staking Deposits ({{ $stakingSummary['totalCount'] ?? 0 }})
-                </button>
-            </nav>
-
-            <!-- TAB 0: TREASURY SPLITTER (65% Owner / 5% Secondary) -->
-            <div id="tab-treasury-splitter" class="tab-panel-section active">
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-divide" style="color: var(--gold-primary);"></i>
-                            <div>
-                                <h3>Treasury Splitter (65% Owner / 5% Secondary)</h3>
-                                <p>On-Chain Splitter: Automatically calculates and splits 70% deposit funds into 65% Owner and 5% Secondary</p>
-                            </div>
+                <div class="portal-card">
+                    <div class="portal-card-header">
+                        <div>
+                            <div class="card-heading"><i class="fa-solid fa-shield-halved"></i> V2 Security & Architecture Audit</div>
+                            <div class="card-caption">All 7 smart contracts fully verified on BSC Mainnet</div>
                         </div>
-                        <span class="card-badge" style="background: rgba(0, 255, 136, 0.15); color: var(--green-neon); border-color: rgba(0, 255, 136, 0.35);">SPLITTER LIVE</span>
                     </div>
 
-                    <div class="control-grid-2">
-                        <!-- Left: Live State & Balances Matrix -->
-                        <div>
-                            <div class="info-matrix-box">
-                                <div class="info-matrix-row">
-                                    <span class="k">Splitter Contract Address:</span>
-                                    <a href="https://bscscan.com/address/{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}" target="_blank" class="v" style="color: var(--gold-primary); text-decoration: underline;">
-                                        {{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 8px;"></i>
-                                    </a>
-                                </div>
-                                <div class="info-matrix-row" style="background: rgba(0, 255, 136, 0.08); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(0, 255, 136, 0.25); margin: 6px 0;">
-                                    <span class="k" style="font-weight: 800; color: #FFF; font-size: 12px;">Undistributed Splitter Balance:</span>
-                                    <span class="v" id="dispSplitterUsdtBal" style="color: var(--green-neon); font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace;">0.00 USDT</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Owner Main Share (65%):</span>
-                                    <span class="v" id="dispSplitterOwnerShare" style="color: var(--gold-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace;">≈ 0.00 USDT <small style="color: var(--text-muted); font-size: 10px;">({{ substr($contracts['adminOwnerAddress'], 0, 6) }}...{{ substr($contracts['adminOwnerAddress'], -4) }})</small></span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Secondary Share (5%):</span>
-                                    <span class="v" id="dispSplitterSecShare" style="color: var(--cyan-neon); font-weight: 700; font-family: 'JetBrains Mono', monospace;">≈ 0.00 USDT <small style="color: var(--text-muted); font-size: 10px;">({{ substr($contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2', 0, 6) }}...{{ substr($contracts['secondaryTreasuryWallet'] ?? '0x629FF4ccc833d7F11AEcE0C02945B67dfa5cfFf2', -4) }})</small></span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Total Distributed to Date:</span>
-                                    <span class="v" id="dispSplitterTotalDistributed" style="color: #FFF; font-family: 'JetBrains Mono', monospace;">0.00 USDT</span>
-                                </div>
-                            </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.82rem;">
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                            <span>CAAI Token Supply</span>
+                            <strong class="font-mono">777,777 CAAI (Fixed)</strong>
                         </div>
-
-                        <!-- Right: 1-Click Distribute Box -->
-                        <div>
-                            <div style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--border-gold); border-radius: 14px; padding: 24px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                                <div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                        <div style="font-size: 15px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #FFF; display: flex; align-items: center; gap: 8px;">
-                                            <i class="fas fa-bolt" style="color: var(--gold-primary);"></i> Distribute Treasury Funds
-                                        </div>
-                                        <span style="font-size: 10px; color: var(--gold-primary); font-weight: 800; background: rgba(255, 215, 0, 0.12); border: 1px solid var(--border-gold); padding: 4px 10px; border-radius: 20px;">65% / 5% ON-CHAIN</span>
-                                    </div>
-                                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
-                                        Triggers the smart contract execution on BSC Mainnet to automatically split and transfer <strong>65% to Owner Main Wallet</strong> and <strong>5% to Secondary Wallet</strong>.
-                                    </p>
-                                </div>
-                                <button type="button" id="btnExecuteDistribute" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 48px; font-size: 14px; font-weight: 800; box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);" onclick="handleDistributeSplitterFunds()">
-                                    <i class="fas fa-paper-plane"></i> Distribute Splitter Funds Now
-                                </button>
-                            </div>
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                            <span>Token Ownership</span>
+                            <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced (0x000...000)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                            <span>Revenue Split Formula</span>
+                            <strong>68% Mining, 20% Trading, 10% Partners, 2% Reserve</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                            <span>Royal Jackpot Auto-Forward</span>
+                            <span class="badge badge-active"><i class="fa-solid fa-check"></i> Enabled (to Collector)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>USDT Withdrawal Vault</span>
+                            <span class="badge badge-indigo">EIP-712 Cryptographic Signature</span>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- TAB 1: CYERA INVESTMENT SPLITTER (70/30 Splitter) -->
-            <div id="tab-splitter" class="tab-panel-section">
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-arrows-split-up-and-left"></i>
-                            <div>
-                                <h3>CyeraInvestmentSplitter Control</h3>
-                                <p>Automated 70% Treasury Claim Vault &amp; 30% Liquidity Treasury routing on every user stake</p>
-                            </div>
-                        </div>
-                        <span class="card-badge" id="badgeSplitterStatus">ACTIVE</span>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB 2: USERS & DIRECTS                                    -->
+        <!-- ======================================================== -->
+        <div id="tab-users" class="tab-content-panel" style="display: none;">
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <div>
+                        <div class="card-heading"><i class="fa-solid fa-users"></i> Member Network & MLM Registry</div>
+                        <div class="card-caption">Comprehensive overview of all registered members, investments and downline stats</div>
                     </div>
 
-                    <div class="control-grid-2">
-                        <!-- Left: Live State Matrix -->
-                        <div>
-                            <div class="info-matrix-box">
-                                <div class="info-matrix-row">
-                                    <span class="k">Splitter Contract:</span>
-                                    <span class="v" id="dispSplitterAddr">{{ $contracts['investmentSplitterAddress'] ?? $contracts['treasurySplitterAddress'] ?? $contracts['miningEngineAddress'] ?? '0xdd905468F6F91f8c37eFB9e27E1f282734E60217' }}</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">70% Treasury Vault:</span>
-                                    <span class="v" id="dispSplitter70Vault" style="color: var(--gold-primary);">Reading...</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">30% Liquidity Wallet:</span>
-                                    <span class="v" id="dispSplitter30Wallet" style="color: var(--cyan-neon);">Reading...</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Investment Limits:</span>
-                                    <span class="v" id="dispSplitterLimits">$50 - $2,000 USDT</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Contract Owner:</span>
-                                    <span class="v" id="dispSplitterOwner">Reading...</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Paused State:</span>
-                                    <span class="v" id="dispSplitterPaused">No</span>
-                                </div>
-                            </div>
-
-                            <!-- Emergency Pause/Unpause -->
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('splitter', true)">
-                                    <i class="fas fa-pause"></i> Pause Splitter
-                                </button>
-                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('splitter', false)">
-                                    <i class="fas fa-play"></i> Unpause Splitter
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Right: Actions & Setters -->
-                        <div>
-                            <!-- Update 70% Vault -->
-                            <form onsubmit="handleSetTreasuryVault(event)" class="control-form-group">
-                                <label class="control-label">Update 70% Treasury Claim Vault Destination</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="control-input" id="inputNew70Vault" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap; opacity: 0.5; cursor: not-allowed;" disabled>
-                                        <i class="fas fa-check"></i> Update
-                                    </button>
-                                </div>
-                                <p class="control-help">Updates the on-chain destination for the 70% investment allocation.</p>
-                            </form>
-
-                            <!-- Update 30% Liquidity Wallet -->
-                            <form onsubmit="handleSetLiquidityWallet(event)" class="control-form-group">
-                                <label class="control-label">Update 30% Liquidity Treasury Wallet</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="control-input" id="inputNew30Wallet" placeholder="0x..." required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" style="white-space: nowrap; opacity: 0.5; cursor: not-allowed;" disabled>
-                                        <i class="fas fa-check"></i> Update
-                                    </button>
-                                </div>
-                                <p class="control-help">Updates the on-chain destination for the 30% liquidity allocation.</p>
-                            </form>
-
-                            <!-- Update Investment Limits -->
-                            <form onsubmit="handleSetInvestmentLimits(event)" class="control-form-group">
-                                <label class="control-label">Update Investment Limits (Min &amp; Max USDT)</label>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
-                                    <input type="number" class="control-input" id="inputMinInv" placeholder="Min (e.g. 50)" required>
-                                    <input type="number" class="control-input" id="inputMaxInv" placeholder="Max (e.g. 2000)" required>
-                                    <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>
-                                        <i class="fas fa-sliders"></i> Apply
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: TREASURY CLAIM VAULT (70% USDT) -->
-            <div id="tab-treasury" class="tab-panel-section">
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-vault"></i>
-                            <div>
-                                <h3>TreasuryClaimVault (70% USDT Reserve)</h3>
-                                <p>Secures the 70% treasury fund. Only the verified Owner can release funds.</p>
-                            </div>
-                        </div>
-                        <span class="card-badge">SECURE VAULT</span>
-                    </div>
-
-                    <div class="control-grid-2">
-                        <!-- Left: Vault Status & Rescue -->
-                        <div>
-                            <div class="info-matrix-box">
-                                <div class="info-matrix-row">
-                                    <span class="k">Treasury Vault Address:</span>
-                                    <span class="v">{{ $contracts['treasuryClaimVaultAddress'] }}</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Live Vault USDT Balance:</span>
-                                    <span class="v" id="dispTreasuryBalance" style="color: var(--green-neon); font-size: 14px;">0.00 USDT</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Vault Owner:</span>
-                                    <span class="v" id="dispTreasuryOwner">Reading...</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Vault Paused:</span>
-                                    <span class="v" id="dispTreasuryPaused">No</span>
-                                </div>
-                            </div>
-
-                            <!-- Rescue Accidentally Sent Non-Treasury Tokens -->
-                            <form onsubmit="handleRescueTokens(event)" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 14px;">
-                                <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">
-                                    <i class="fas fa-hand-holding-dollar"></i> Rescue Non-Treasury Tokens
-                                </div>
-                                <div style="display: grid; gap: 8px; margin-bottom: 8px;">
-                                    <input type="text" class="control-input" id="inputRescueTokenAddr" placeholder="Token Contract Address (0x...)" required>
-                                    <input type="text" class="control-input" id="inputRescueDestAddr" placeholder="Recipient Address (0x...)" required>
-                                    <input type="number" step="any" class="control-input" id="inputRescueAmount" placeholder="Amount" required>
-                                </div>
-                                <button type="submit" class="btn-web3 btn-web3-outline" style="width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled>
-                                    <i class="fas fa-life-ring"></i> Execute Rescue
-                                </button>
-                                <p class="control-help" style="color: #F59E0B; margin-top: 6px;">Note: Treasury USDT cannot be extracted via rescue. It moves exclusively via authorized fund transfer.</p>
-                            </form>
-                        </div>
-
-                        <!-- Right: Transfer / Release Funds -->
-                        <div>
-                            <form onsubmit="handleTransferTreasuryFunds(event)" class="control-form-group" style="background: rgba(255, 215, 0, 0.03); border: 1px solid var(--border-gold); border-radius: 14px; padding: 18px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                                    <i class="fas fa-paper-plane" style="color: var(--gold-primary);"></i>
-                                    <span style="font-size: 13px; font-weight: 800; font-family: 'Outfit';">Authorize &amp; Release Treasury Funds</span>
-                                </div>
-
-                                <div class="control-form-group">
-                                    <label class="control-label">Recipient Destination Address</label>
-                                    <input type="text" class="control-input" id="inputTransferRecipient" value="{{ $contracts['adminOwnerAddress'] ?? '0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7' }}" placeholder="0x..." required>
-                                </div>
-
-                                <div class="control-form-group">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                        <label class="control-label" style="margin-bottom: 0;">USDT Amount (Max: <span id="dispMaxTransferable">0.00</span> USDT)</label>
-                                        <button type="button" class="btn-web3 btn-web3-outline" style="padding: 2px 10px; font-size: 10px; height: 22px; border-color: var(--gold-primary); color: var(--gold-primary); font-weight: 800;" onclick="setMaxTransferAmount()">MAX</button>
-                                    </div>
-                                    <input type="number" step="any" min="0.0001" class="control-input" id="inputTransferAmount" placeholder="0.00" oninput="this.dataset.userEdited = 'true'" required>
-                                </div>
-
-                                <div class="control-form-group">
-                                    <label class="control-label">Reason / Memo (Logged On-Chain)</label>
-                                    <input type="text" class="control-input" id="inputTransferReason" value="Treasury Fund" placeholder="e.g. Treasury Fund" required>
-                                </div>
-
-                                <button type="submit" class="btn-web3 btn-web3-gold" style="width: 100%; justify-content: center; height: 42px;">
-                                    <i class="fas fa-bolt"></i> Transfer Treasury Funds
-                                </button>
-                            </form>
-
-                            <!-- Emergency Pause/Unpause -->
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('treasury', true)">
-                                    <i class="fas fa-pause"></i> Pause Treasury
-                                </button>
-                                <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled onclick="togglePause('treasury', false)">
-                                    <i class="fas fa-play"></i> Unpause Treasury
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: CAI TOKEN & DEX BUY WHITELIST -->
-            <div id="tab-cai" class="tab-panel-section">
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-coins"></i>
-                            <div>
-                                <h3>CAIToken (BEP-20) &amp; DEX Protection</h3>
-                                <p>Fixed supply 300,000 CAI, PancakeSwap pair permanent locking, and AMM Buy Whitelist management.</p>
-                            </div>
-                        </div>
-                        <span class="card-badge">BEP-20 TOKEN</span>
-                    </div>
-
-                    <div class="control-grid-2">
-                        <!-- Left: Whitelist Controls -->
-                        <div>
-                            <!-- Single Whitelist Form -->
-                            <form onsubmit="event.preventDefault()" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
-                                <div style="font-size: 11px; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">
-                                    <i class="fas fa-user-check"></i> DEX Buy Whitelist (Single Wallet)
-                                </div>
-                                <div style="margin-bottom: 8px;">
-                                    <input type="text" class="control-input" id="inputWhitelistAddr" placeholder="Wallet Address (0x...)" required>
-                                </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(true)">
-                                        <i class="fas fa-check"></i> Whitelist
-                                    </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitSingleWhitelist(false)">
-                                        <i class="fas fa-ban"></i> Remove
-                                    </button>
-                                </div>
-                            </form>
-
-                            <!-- Batch Whitelist Form -->
-                            <form onsubmit="event.preventDefault()" class="control-form-group" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 16px;">
-                                <div style="font-size: 11px; font-weight: 700; color: var(--green-neon); margin-bottom: 8px;">
-                                    <i class="fas fa-users-viewfinder"></i> Batch Whitelist Upload (Multiple Wallets)
-                                </div>
-                                <textarea class="control-input" id="inputBatchWhitelist" rows="4" placeholder="Enter addresses separated by comma or new line...&#10;0x1111...&#10;0x2222..." style="resize: vertical; margin-bottom: 8px;" required></textarea>
-                                <div style="display: flex; gap: 8px;">
-                                    <button type="button" class="btn-web3 btn-web3-green" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(true)">
-                                        <i class="fas fa-plus"></i> Batch Enable
-                                    </button>
-                                    <button type="button" class="btn-web3 btn-web3-red" style="flex: 1; justify-content: center;" onclick="submitBatchWhitelist(false)">
-                                        <i class="fas fa-minus"></i> Batch Remove
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Right: PancakeSwap & AMM Pair Security -->
-                        <div>
-                            <div class="info-matrix-box">
-                                <div class="info-matrix-row">
-                                    <span class="k">CAI Token Address:</span>
-                                    <span class="v">{{ $contracts['caiTokenAddress'] }}</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Total Fixed Supply:</span>
-                                    <span class="v">300,000 CAI</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">PancakeSwap Pair:</span>
-                                    <span class="v" id="dispPancakePair" style="color: var(--cyan-neon);">Reading...</span>
-                                </div>
-                                <div class="info-matrix-row">
-                                    <span class="k">Pair Lock Status:</span>
-                                    <span class="v" id="dispPancakePairLocked">Unlocked</span>
-                                </div>
-                            </div>
-
-                            <!-- Aethera-Standard Architecture Configuration -->
-                            <form onsubmit="handleSetMiningContractAndRenounce(event)" class="control-form-group" style="background: rgba(0, 255, 136, 0.04); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 12px; padding: 16px; margin-top: 10px;">
-                                <div style="font-size: 12px; font-weight: 800; color: var(--green-neon); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                                    <i class="fas fa-shield-halved"></i> Set Mining Engine &amp; Renounce Ownership
-                                </div>
-                                <p style="font-size: 10.5px; color: var(--text-muted); margin-bottom: 10px;">
-                                    Binds the Cyera Mining Engine to allow 30% DEX Auto-Buys, locks configuration, and renounces token ownership for a <strong>100% Clean Green Score (0 Issues)</strong> on Go+ Security &amp; Quick Intel.
-                                </p>
-                                <div style="margin-bottom: 8px;">
-                                    <label class="control-label" style="font-size: 10px;">Mining Engine Address</label>
-                                    <input type="text" class="control-input" id="inputMiningEngineAddr" placeholder="0x..." required>
-                                </div>
-                                <button type="submit" class="btn-web3 btn-web3-green" id="btnSetMiningRenounce" style="width: 100%; justify-content: center;">
-                                    <i class="fas fa-lock"></i> Set Mining Engine &amp; Renounce Ownership
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: EIP-712 REWARD CLAIM & WITHDRAWAL VAULTS -->
-            <div id="tab-claim-vaults" class="tab-panel-section">
-                <div class="control-grid-2">
-                    <!-- Vault 1: CAIRewardClaimVault -->
-                    <div class="control-card">
-                        <div class="control-card-header">
-                            <div class="control-card-title">
-                                <i class="fas fa-bolt" style="color: var(--gold-primary);"></i>
-                                <div>
-                                    <h3>CAIRewardClaimVault</h3>
-                                    <p>EIP-712 CAI Staking ROI Claims</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="info-matrix-box">
-                            <div class="info-matrix-row">
-                                <span class="k">Contract Address:</span>
-                                <span class="v">
-                                    <a href="https://bscscan.com/address/{{ $contracts['caiRewardClaimVaultAddress'] }}" target="_blank" style="color: var(--cyan-neon); text-decoration: none; font-size: 11px; word-break: break-all;">
-                                        {{ $contracts['caiRewardClaimVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                                    </a>
-                                </span>
-                            </div>
-                            <div class="info-matrix-row">
-                                <span class="k">Vault CAI Balance:</span>
-                                <span class="v" id="dispRewardVaultBal" style="color: var(--cyan-neon);">0.00 CAI</span>
-                            </div>
-                            <div class="info-matrix-row">
-                                <span class="k">Hot Backend Signer:</span>
-                                <span class="v" id="dispRewardSigner" style="color: var(--gold-primary);">Reading...</span>
-                            </div>
-                        </div>
-
-                        <!-- Update Signer -->
-                        <form onsubmit="handleSetBackendSigner('reward', event)" class="control-form-group">
-                            <label class="control-label">Update Backend Signer</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" class="control-input" id="inputNewRewardSigner" placeholder="New Hot Signer (0x...)" required>
-                                <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>Set</button>
-                            </div>
-                        </form>
-
-                        <!-- Emergency Withdraw CAI -->
-                        <form onsubmit="handleEmergencyWithdraw('reward', event)" class="control-form-group">
-                            <label class="control-label">Emergency Recover CAI</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
-                                <input type="text" class="control-input" id="inputEmDestReward" placeholder="To Address" required>
-                                <input type="number" step="any" class="control-input" id="inputEmAmtReward" placeholder="Amount CAI" required>
-                                <button type="submit" class="btn-web3 btn-web3-outline" style="opacity: 0.5; cursor: not-allowed;" disabled>Withdraw</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Vault 2: USDTWithdrawalVault -->
-                    <div class="control-card">
-                        <div class="control-card-header">
-                            <div class="control-card-title">
-                                <i class="fas fa-hand-holding-dollar" style="color: var(--green-neon);"></i>
-                                <div>
-                                    <h3>USDTWithdrawalVault</h3>
-                                    <p>EIP-712 USDT Working Income Payouts</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="info-matrix-box">
-                            <div class="info-matrix-row">
-                                <span class="k">Contract Address:</span>
-                                <span class="v">
-                                    <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--green-neon); text-decoration: none; font-size: 11px; word-break: break-all;">
-                                        {{ $contracts['usdtWithdrawalVaultAddress'] }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                                    </a>
-                                </span>
-                            </div>
-                            <div class="info-matrix-row">
-                                <span class="k">Vault USDT Balance:</span>
-                                <span class="v" id="dispWithdrawalVaultBal" style="color: var(--green-neon);">0.00 USDT</span>
-                            </div>
-                            <div class="info-matrix-row">
-                                <span class="k">Hot Backend Signer:</span>
-                                <span class="v" id="dispWithdrawalSigner" style="color: var(--gold-primary);">Reading...</span>
-                            </div>
-                        </div>
-
-                        <!-- Update Signer -->
-                        <form onsubmit="handleSetBackendSigner('withdrawal', event)" class="control-form-group">
-                            <label class="control-label">Update Backend Signer</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" class="control-input" id="inputNewWithdrawalSigner" placeholder="New Hot Signer (0x...)" required>
-                                <button type="submit" class="btn-web3 btn-web3-gold" style="opacity: 0.5; cursor: not-allowed;" disabled>Set</button>
-                            </div>
-                        </form>
-
-                        <!-- Emergency Withdraw USDT -->
-                        <form onsubmit="handleEmergencyWithdraw('withdrawal', event)" class="control-form-group">
-                            <label class="control-label">Emergency Recover USDT</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
-                                <input type="text" class="control-input" id="inputEmDestWithdrawal" placeholder="To Address" required>
-                                <input type="number" step="any" class="control-input" id="inputEmAmtWithdrawal" placeholder="Amount USDT" required>
-                                <button type="submit" class="btn-web3 btn-web3-outline" style="opacity: 0.5; cursor: not-allowed;" disabled>Withdraw</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 5: LIVE EVENT EXPLORER -->
-            <div id="tab-events" class="tab-panel-section">
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-satellite-dish" style="color: var(--cyan-neon);"></i>
-                            <div>
-                                <h3>Real-Time Protocol Event Stream</h3>
-                                <p>Live listener querying on-chain events from Cyera smart contracts</p>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-web3 btn-web3-outline" onclick="fetchRecentEvents()">
-                            <i class="fas fa-rotate-right"></i> Refresh Logs
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-action primary" onclick="exportUsersToCSV()">
+                            <i class="fa-solid fa-file-csv"></i> Export CSV
                         </button>
                     </div>
+                </div>
 
-                    <div style="overflow-x: auto;">
-                        <table class="event-table">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Contract</th>
-                                    <th>Details / Parameters</th>
-                                    <th>Block</th>
-                                    <th>Transaction</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eventLogsBody">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-dim);">
-                                        <i class="fas fa-circle-notch fa-spin" style="margin-right: 6px;"></i> Subscribing to live BSC event stream...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Filter Controls -->
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="userSearchInput" class="search-input" placeholder="Search by UUID, Name, Sponsor, or Wallet..." onkeyup="filterUsersTable()">
+                    </div>
+
+                    <select id="userStatusFilter" class="filter-select" onchange="filterUsersTable()">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active (Paid)</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+
+                <!-- Users Table -->
+                <div class="table-responsive">
+                    <table class="admin-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>User (UUID / Name)</th>
+                                <th>Sponsor</th>
+                                <th>Self Staking</th>
+                                <th>Team Volume</th>
+                                <th>Directs</th>
+                                <th>Active Directs</th>
+                                <th>Status</th>
+                                <th>Registered</th>
+                                <th>Wallet Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $u)
+                            <tr data-status="{{ $u->permission == 0 ? 'blocked' : ($u->is_active ? 'active' : 'inactive') }}" data-search="{{ strtolower($u->uuid . ' ' . $u->name . ' ' . $u->sponsor_uuid . ' ' . $u->wallet) }}">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-mini">{{ substr($u->uuid, -2) }}</div>
+                                        <div>
+                                            <div style="font-weight: 700; color: var(--text-heading);">{{ $u->uuid }}</div>
+                                            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $u->name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-indigo">{{ $u->sponsor_uuid }}</span>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--emerald-text);">${{ number_format($u->self_investment, 2) }}</strong>
+                                </td>
+                                <td>
+                                    <strong>${{ number_format($u->team_investment, 2) }}</strong>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 700;">{{ $u->total_direct }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ $u->active_direct > 0 ? 'badge-active' : 'badge-inactive' }}">
+                                        {{ $u->active_direct }} Active
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($u->permission == 0)
+                                        <span class="badge badge-blocked"><i class="fa-solid fa-ban"></i> Blocked</span>
+                                    @elseif($u->is_active)
+                                        <span class="badge badge-active"><i class="fa-solid fa-circle-check"></i> Paid</span>
+                                    @else
+                                        <span class="badge badge-inactive">Inactive</span>
+                                    @endif
+                                </td>
+                                <td>{{ $u->doj }}</td>
+                                <td>
+                                    @if($u->wallet)
+                                        <span class="font-mono" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ $u->wallet }}">
+                                            {{ substr($u->wallet, 0, 6) }}...{{ substr($u->wallet, -4) }}
+                                        </span>
+                                    @else
+                                        <span style="color: var(--text-light); font-size: 0.72rem;">None</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button class="btn-action primary" onclick="viewUserGenealogy('{{ $u->uuid }}')" title="View Tree">
+                                            <i class="fa-solid fa-network-wired"></i>
+                                        </button>
+                                        <button class="btn-action" onclick="openUserModal('{{ $u->id }}')" title="View Profile">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="btn-action {{ $u->permission == 1 ? 'danger' : 'primary' }}" onclick="toggleUserPermission('{{ $u->id }}', this)" title="{{ $u->permission == 1 ? 'Block User' : 'Unblock User' }}">
+                                            <i class="fa-solid {{ $u->permission == 1 ? 'fa-lock' : 'fa-unlock' }}"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB 3: INTERACTIVE GENEALOGY TREE                         -->
+        <!-- ======================================================== -->
+        <div id="tab-genealogy" class="tab-content-panel" style="display: none;">
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <div>
+                        <div class="card-heading"><i class="fa-solid fa-network-wired"></i> Interactive MLM Genealogy Tree Explorer</div>
+                        <div class="card-caption">Visual hierarchical network downline viewer with direct & multi-level tree branching</div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-action" onclick="loadGenealogyTree('')">
+                            <i class="fa-solid fa-house"></i> Root Sponsor
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tree Search Box -->
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="genealogySearchInput" class="search-input" placeholder="Enter User UUID (e.g. CAI9999999 or CAI4729062)...">
+                    </div>
+                    <button class="btn-action primary" style="padding: 10px 20px;" onclick="searchGenealogy()">
+                        <i class="fa-solid fa-sitemap"></i> Load Downline Tree
+                    </button>
+                </div>
+
+                <!-- Tree Canvas -->
+                <div class="tree-container" id="treeViewerCanvas">
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                        <div style="margin-top: 12px; font-weight: 600;">Loading interactive genealogy downline...</div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- TAB 6: STAKING DEPOSITS LEDGER (Full List with Name, UUID, Wallet & USDT Amount) -->
-            <div id="tab-staking-deposits" class="tab-panel-section">
-                <!-- Staking Summary KPI Cards -->
-                <div class="staking-kpi-grid">
-                    <div class="staking-kpi-card gold">
-                        <div class="kpi-icon">
-                            <i class="fas fa-vault"></i>
-                        </div>
-                        <div class="kpi-data">
-                            <span class="kpi-label">TOTAL STAKED VOLUME</span>
-                            <div class="kpi-val">$ {{ number_format($stakingSummary['totalUsdt'] ?? 0, 2) }} <small>USDT</small></div>
-                            <span class="kpi-sub">Active Staked: ${{ number_format($stakingSummary['activeUsdt'] ?? 0, 2) }} USDT</span>
-                        </div>
-                    </div>
-
-                    <div class="staking-kpi-card green">
-                        <div class="kpi-icon">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <div class="kpi-data">
-                            <span class="kpi-label">TOTAL STAKING IDS</span>
-                            <div class="kpi-val">{{ number_format($stakingSummary['totalCount'] ?? 0) }}</div>
-                            <span class="kpi-sub">Active: {{ $stakingSummary['activeCount'] ?? 0 }} | Completed: {{ $stakingSummary['completedCount'] ?? 0 }}</span>
-                        </div>
-                    </div>
-
-                    <div class="staking-kpi-card cyan">
-                        <div class="kpi-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="kpi-data">
-                            <span class="kpi-label">UNIQUE STAKER ACCOUNTS</span>
-                            <div class="kpi-val">{{ number_format($stakingSummary['uniqueUsers'] ?? 0) }}</div>
-                            <span class="kpi-sub">Avg Stake: ${{ number_format($stakingSummary['avgStake'] ?? 0, 2) }} USDT</span>
-                        </div>
-                    </div>
-
-                    <div class="staking-kpi-card purple">
-                        <div class="kpi-icon">
-                            <i class="fas fa-gem"></i>
-                        </div>
-                        <div class="kpi-data">
-                            <span class="kpi-label">HIGHEST SINGLE STAKE</span>
-                            <div class="kpi-val">$ {{ number_format($stakingSummary['topStake'] ?? 0, 2) }} <small>USDT</small></div>
-                            <span class="kpi-sub">Top Tier Staker on BSC</span>
-                        </div>
+        <!-- ======================================================== -->
+        <!-- TAB 4: ACTIVE DIRECTS & SPONSORS                          -->
+        <!-- ======================================================== -->
+        <div id="tab-directs" class="tab-content-panel" style="display: none;">
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <div>
+                        <div class="card-heading"><i class="fa-solid fa-user-check"></i> Network Leaders & Active Directs</div>
+                        <div class="card-caption">Ranking of top sponsors and active referral connections across the protocol</div>
                     </div>
                 </div>
 
-                <!-- Main Ledger Card -->
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="control-card-title">
-                            <i class="fas fa-layer-group" style="color: var(--gold-primary);"></i>
-                            <div>
-                                <h3>Protocol Staking Deposits Ledger</h3>
-                                <p>Live verified records of all staking deposits with Member Names, UUIDs, Wallets, and Staked USDT</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="card-badge" style="background: rgba(0, 255, 136, 0.15); color: var(--green-neon); border-color: rgba(0, 255, 136, 0.35);">
-                                <i class="fas fa-database"></i> {{ $stakingSummary['totalCount'] ?? 0 }} TOTAL RECORDS
-                            </span>
-                            <button type="button" class="btn-web3 btn-web3-outline" style="padding: 6px 14px; font-size: 11px;" onclick="exportStakingCsv()">
-                                <i class="fas fa-file-csv" style="color: var(--green-neon);"></i> Export CSV
-                            </button>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Leader (UUID / Name)</th>
+                                <th>Active Directs</th>
+                                <th>Total Directs</th>
+                                <th>Direct Business Volume</th>
+                                <th>Total Team Business</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users->sortByDesc('active_direct') as $leader)
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-mini">{{ substr($leader->uuid, -2) }}</div>
+                                        <div>
+                                            <div style="font-weight: 700; color: var(--text-heading);">{{ $leader->uuid }}</div>
+                                            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $leader->name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-active" style="font-size: 0.8rem; padding: 5px 12px;">
+                                        <i class="fa-solid fa-bolt"></i> {{ $leader->active_direct }} Active
+                                    </span>
+                                </td>
+                                <td><strong>{{ $leader->total_direct }}</strong> Referrals</td>
+                                <td><strong style="color: var(--emerald-text);">${{ number_format($leader->self_investment, 2) }}</strong></td>
+                                <td><strong>${{ number_format($leader->team_investment, 2) }}</strong></td>
+                                <td>
+                                    <button class="btn-action primary" onclick="viewUserGenealogy('{{ $leader->uuid }}')">
+                                        <i class="fa-solid fa-network-wired"></i> View Direct Downline
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Filter & Search Toolbar -->
-                    <div class="staking-filter-toolbar">
-                        <div class="staking-search-wrap">
-                            <i class="fas fa-magnifying-glass search-ico"></i>
-                            <input type="text" id="stakingSearchInput" class="staking-search-input" placeholder="Search by Member Name, UUID, Wallet (0x...), or USDT Amount..." oninput="filterStakingTable()">
-                        </div>
-
-                        <div class="filter-btn-group">
-                            <button type="button" class="filter-btn active" data-filter="all" onclick="setStatusFilter('all', this)">
-                                All ({{ $stakingSummary['totalCount'] ?? 0 }})
-                            </button>
-                            <button type="button" class="filter-btn" data-filter="active" onclick="setStatusFilter('active', this)">
-                                Active ({{ $stakingSummary['activeCount'] ?? 0 }})
-                            </button>
-                            <button type="button" class="filter-btn" data-filter="completed" onclick="setStatusFilter('completed', this)">
-                                Completed ({{ $stakingSummary['completedCount'] ?? 0 }})
-                            </button>
-                            <button type="button" class="filter-btn" data-filter="dao" onclick="setStatusFilter('dao', this)">
-                                DAO Tiers
-                            </button>
-                            <button type="button" class="filter-btn" onclick="clearStakingSearch()" title="Reset Filters">
-                                <i class="fas fa-rotate-left"></i> Reset
-                            </button>
-                        </div>
+        <!-- ======================================================== -->
+        <!-- TAB 5: STAKINGS & BUSINESS                                -->
+        <!-- ======================================================== -->
+        <div id="tab-stakings" class="tab-content-panel" style="display: none;">
+            
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Total Staking Deposits</div>
+                        <div class="metric-icon-box indigo"><i class="fa-solid fa-layer-group"></i></div>
                     </div>
+                    <div class="metric-value">${{ number_format($stakingSummary['totalUsdt'], 2) }}</div>
+                    <div class="metric-sub">{{ $stakingSummary['totalCount'] }} Total Records</div>
+                </div>
 
-                    <!-- Search Result Live Counter -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 11.5px; color: var(--text-dim);">
-                        <span>Showing <strong id="showingCount" style="color: var(--gold-primary);">{{ $stakingList->count() }}</strong> of {{ $stakingSummary['totalCount'] ?? 0 }} deposits</span>
-                        <span id="filteredVolumeSum" style="font-family: 'JetBrains Mono', monospace; color: var(--green-neon); font-weight: 700;">Filtered Volume: ${{ number_format($stakingSummary['totalUsdt'] ?? 0, 2) }} USDT</span>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Active Locked Staking</div>
+                        <div class="metric-icon-box emerald"><i class="fa-solid fa-lock"></i></div>
                     </div>
+                    <div class="metric-value">${{ number_format($stakingSummary['activeUsdt'], 2) }}</div>
+                    <div class="metric-sub">{{ $stakingSummary['activeCount'] }} Active Contracts</div>
+                </div>
 
-                    <!-- Data Table -->
-                    <div class="staking-table-container">
-                        <table class="staking-data-table" id="stakingDataTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 70px;"># ID</th>
-                                    <th>Member ID (UUID)</th>
-                                    <th>Member Name</th>
-                                    <th>Email</th>
-                                    <th>BEP-20 Wallet Address</th>
-                                    <th style="text-align: right;">Staked USDT</th>
-                                    <th style="text-align: center;">Multiplier</th>
-                                    <th style="text-align: center;">DAO Tier</th>
-                                    <th style="text-align: center;">Status</th>
-                                    <th>Staked Date &amp; Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="stakingTableBody">
-                                @forelse($stakingList as $item)
-                                    @php
-                                        $initial = strtoupper(substr($item->name, 0, 1) ?: 'U');
-                                        $daoClass = 'standard';
-                                        $daoText = 'Standard';
-                                        if ($item->usdt >= 10000 || $item->is_dao) {
-                                            $daoClass = 'diamond';
-                                            $daoText = 'Diamond DAO';
-                                        } elseif ($item->usdt >= 5000) {
-                                            $daoClass = 'gold';
-                                            $daoText = 'Gold DAO';
-                                        } elseif ($item->usdt >= 3333) {
-                                            $daoClass = 'plat';
-                                            $daoText = 'Platinum DAO';
-                                        }
-                                    @endphp
-                                    <tr class="staking-row" 
-                                        data-status="{{ strtolower($item->status_label) }}" 
-                                        data-dao="{{ $item->usdt >= 3333 || $item->is_dao ? 'dao' : 'standard' }}"
-                                        data-search="{{ strtolower($item->id . ' ' . $item->uuid . ' ' . $item->name . ' ' . $item->email . ' ' . $item->wallet . ' ' . $item->usdt . ' ' . $item->status_label . ' ' . $daoText) }}"
-                                        data-usdt="{{ $item->usdt }}">
-                                        <td>
-                                            <span class="deposit-id-badge">#{{ $item->id }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="uuid-badge">{{ $item->uuid }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="user-name-cell">
-                                                <div class="user-avatar-mini">{{ $initial }}</div>
-                                                <div class="user-name-txt">
-                                                    <span class="name-line" title="{{ $item->name }}">{{ $item->name }}</span>
-                                                    <span class="userid-sub">User #{{ $item->userid }}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="email-cell" title="{{ $item->email }}">{{ $item->email }}</span>
-                                        </td>
-                                        <td>
-                                            @if($item->wallet)
-                                                <div class="wallet-cell">
-                                                    <a href="https://bscscan.com/address/{{ $item->wallet }}" target="_blank" class="wallet-link" title="{{ $item->wallet }}">
-                                                        <span>{{ substr($item->wallet, 0, 6) . '...' . substr($item->wallet, -4) }}</span>
-                                                        <i class="fas fa-arrow-up-right-from-square" style="font-size: 8px;"></i>
-                                                    </a>
-                                                    <button type="button" class="copy-wallet-btn" onclick="copyToClipboard('{{ $item->wallet }}')" title="Copy Address">
-                                                        <i class="fas fa-copy"></i>
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <span style="color: var(--text-dim); font-size: 11px;">Not Linked</span>
-                                            @endif
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <div class="usdt-amount-cell" style="justify-content: flex-end;">
-                                                <span>{{ number_format($item->usdt, 2) }}</span>
-                                                <span class="usdt-curr">USDT</span>
-                                            </div>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <span class="mult-badge">{{ $item->multiplier }}x</span>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <span class="dao-pill {{ $daoClass }}">
-                                                @if($daoClass !== 'standard')<i class="fas fa-crown" style="font-size: 9px;"></i>@endif
-                                                {{ $daoText }}
-                                            </span>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            @if($item->status == 1)
-                                                <span class="status-badge active">
-                                                    <span class="live-dot"></span> Active
-                                                </span>
-                                            @else
-                                                <span class="status-badge completed">
-                                                    Completed
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="date-cell">
-                                                <span>{{ $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'N/A' }}</span>
-                                                <small>{{ $item->created_at ? date('H:i:s', strtotime($item->created_at)) : '' }}</small>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="10" style="text-align: center; padding: 36px 20px; color: var(--text-muted);">
-                                            <i class="fas fa-folder-open" style="font-size: 32px; color: var(--gold-primary); margin-bottom: 12px; display: block; opacity: 0.6;"></i>
-                                            <strong>No Staking Deposits Found</strong>
-                                            <p style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">There are currently no staking deposit records registered in the system database.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                                <tr id="noResultsRow" style="display: none;">
-                                    <td colspan="10" style="text-align: center; padding: 32px 20px; color: var(--text-muted);">
-                                        <i class="fas fa-filter-circle-xmark" style="font-size: 28px; color: var(--red-neon); margin-bottom: 10px; display: block; opacity: 0.7;"></i>
-                                        <strong>No Matching Deposits Found</strong>
-                                        <p style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Try modifying your search keywords or clearing active filters.</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Average Stake Amount</div>
+                        <div class="metric-icon-box amber"><i class="fa-solid fa-calculator"></i></div>
                     </div>
+                    <div class="metric-value">${{ number_format($stakingSummary['avgStake'], 2) }}</div>
+                    <div class="metric-sub">Top Stake: ${{ number_format($stakingSummary['topStake'], 2) }}</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Unique Stakers</div>
+                        <div class="metric-icon-box cyan"><i class="fa-solid fa-user-shield"></i></div>
+                    </div>
+                    <div class="metric-value">{{ $stakingSummary['uniqueUsers'] }} Members</div>
+                    <div class="metric-sub">Active Network Stakers</div>
                 </div>
             </div>
 
-        </main>
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <div>
+                        <div class="card-heading"><i class="fa-solid fa-vault"></i> Real-Time Staking Deposits Ledger</div>
+                        <div class="card-caption">All mining package stakings and multiplier allocations</div>
+                    </div>
+                </div>
 
-        </div> <!-- /.admin-content-area -->
-    </div> <!-- /.admin-layout-wrapper -->
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Member (UUID / Name)</th>
+                                <th>Staked USDT</th>
+                                <th>Allocated CAAI</th>
+                                <th>Multiplier</th>
+                                <th>Status</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($stakingList as $stk)
+                            <tr>
+                                <td class="font-mono">#{{ $stk->id }}</td>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text-heading);">{{ $stk->uuid }}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $stk->name }}</div>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--emerald-text); font-size: 0.9rem;">${{ number_format($stk->usdt, 2) }}</strong>
+                                </td>
+                                <td>
+                                    <strong class="font-mono">{{ number_format($stk->cai, 2) }} CAAI</strong>
+                                </td>
+                                <td>
+                                    <span class="badge badge-indigo">{{ $stk->multiplier }}x Multiplier</span>
+                                </td>
+                                <td>
+                                    @if($stk->status == 1)
+                                        <span class="badge badge-active"><i class="fa-solid fa-check"></i> Active</span>
+                                    @else
+                                        <span class="badge badge-inactive">Completed</span>
+                                    @endif
+                                </td>
+                                <td style="font-size: 0.74rem; color: var(--text-muted);">{{ $stk->created_at }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <!-- Toast Notifications Area -->
-    <div class="toast-container" id="toastBox"></div>
+        </div>
 
-    <!-- ============================================================
-         WEB3 & ETHERS.JS CLIENT SCRIPT
-         ============================================================ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+        <!-- ======================================================== -->
+        <!-- TAB 6: SMART CONTRACT HUB                                 -->
+        <!-- ======================================================== -->
+        <div id="tab-contracts" class="tab-content-panel" style="display: none;">
+            
+            <div class="portal-card-header" style="margin-bottom: 16px;">
+                <div>
+                    <div class="card-heading"><i class="fa-solid fa-cube"></i> Deployed Smart Contract Infrastructure</div>
+                    <div class="card-caption">Real-time on-chain verifiable addresses and status on BSC Mainnet (Chain ID 56)</div>
+                </div>
+
+                <button class="btn-action primary" onclick="refreshLiveOnChainBalances()">
+                    <i class="fa-solid fa-arrows-rotate"></i> Query Live RPC
+                </button>
+            </div>
+
+            <!-- Smart Contracts Grid -->
+            <div class="contracts-grid">
+                
+                <!-- CAAI Token -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-coins" style="color: #4f46e5;"></i> CAAI Token (BEP-20)
+                        </div>
+                        <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['caiTokenAddress'], 0, 8) }}...{{ substr($contracts['caiTokenAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['caiTokenAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Total Supply: <strong>777,777 CAAI</strong></span>
+                        <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PancakeSwap Pair -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-water" style="color: #06b6d4;"></i> PancakeSwap V2 Pair
+                        </div>
+                        <span class="badge badge-active">Live Pool</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['pancakePairAddress'], 0, 8) }}...{{ substr($contracts['pancakePairAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['pancakePairAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Live Price: <strong id="boxPrice">$0.8276</strong></span>
+                        <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank" style="color: var(--emerald); text-decoration: none; font-weight: 600;">
+                            Chart <i class="fa-solid fa-chart-line" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cyera Mining Engine -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-microchip" style="color: #10b981;"></i> Cyera Mining Engine
+                        </div>
+                        <span class="badge badge-active">Verified</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['miningEngineAddress'], 0, 8) }}...{{ substr($contracts['miningEngineAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Buffer: <strong id="boxBuffer">40,454 CAAI</strong></span>
+                        <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Revenue Splitter -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-code-fork" style="color: #f59e0b;"></i> Revenue Splitter V2
+                        </div>
+                        <span class="badge badge-active">Active</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['revenueSplitterAddress'], 0, 8) }}...{{ substr($contracts['revenueSplitterAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Split: <strong>68/20/10/2</strong></span>
+                        <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- USDT Withdrawal Vault -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-vault" style="color: #8b5cf6;"></i> USDT Withdrawal Vault
+                        </div>
+                        <span class="badge badge-active">Secure</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 8) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>USDT: <strong id="boxVaultUsdt">0.00 USDT</strong></span>
+                        <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Royal Jackpot Deposit -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> Royal Jackpot Deposit
+                        </div>
+                        <span class="badge badge-active">Auto-Forward</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['royalJackpotDepositAddress'], 0, 8) }}...{{ substr($contracts['royalJackpotDepositAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['royalJackpotDepositAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Collector: <strong>0xBb83...</strong></span>
+                        <a href="https://bscscan.com/address/{{ $contracts['royalJackpotDepositAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Royal Jackpot Vault -->
+                <div class="contract-box">
+                    <div class="contract-box-top">
+                        <div class="contract-box-title">
+                            <i class="fa-solid fa-crown" style="color: #ef4444;"></i> Royal Jackpot Vault
+                        </div>
+                        <span class="badge badge-active">Claim Ready</span>
+                    </div>
+                    <div class="contract-addr-row">
+                        <span>{{ substr($contracts['royalJackpotVaultAddress'], 0, 8) }}...{{ substr($contracts['royalJackpotVaultAddress'], -6) }}</span>
+                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['royalJackpotVaultAddress'] }}')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="contract-metrics-row">
+                        <span>Signer: <strong>0xEf53...</strong></span>
+                        <a href="https://bscscan.com/address/{{ $contracts['royalJackpotVaultAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- User Profile Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="modalUserName">Member Profile</div>
+                <button class="modal-close" onclick="closeUserModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="modalUserContent">
+                <div style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic & Scripts -->
     <script>
-        // Configuration from backend
+        // Contract configuration from Laravel backend
         const CONFIG = {
-            ADMIN_OWNER: "{{ strtolower($contracts['adminOwnerAddress']) }}",
-            CHAIN_ID: {{ $contracts['chainId'] }},
-            CONTRACTS: {
-                USDT: "{{ $contracts['usdtTokenAddress'] }}",
-                CAI: "{{ $contracts['caiTokenAddress'] }}",
-                TREASURY_VAULT: "{{ $contracts['treasuryClaimVaultAddress'] }}",
-                SPLITTER: "{{ $contracts['investmentSplitterAddress'] ?? $contracts['treasurySplitterAddress'] ?? $contracts['miningEngineAddress'] ?? '0xdd905468F6F91f8c37eFB9e27E1f282734E60217' }}",
-                TREASURY_SPLITTER: "{{ $contracts['treasurySplitterAddress'] ?? '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5' }}",
-                REWARD_VAULT: "{{ $contracts['caiRewardClaimVaultAddress'] }}",
-                WITHDRAWAL_VAULT: "{{ $contracts['usdtWithdrawalVaultAddress'] }}"
-            }
+            caiToken: "{{ $contracts['caiTokenAddress'] }}",
+            pancakePair: "{{ $contracts['pancakePairAddress'] }}",
+            miningEngine: "{{ $contracts['miningEngineAddress'] }}",
+            revenueSplitter: "{{ $contracts['revenueSplitterAddress'] }}",
+            usdtVault: "{{ $contracts['usdtWithdrawalVaultAddress'] }}",
+            jackpotDeposit: "{{ $contracts['royalJackpotDepositAddress'] }}",
+            jackpotVault: "{{ $contracts['royalJackpotVaultAddress'] }}",
+            usdtToken: "{{ $contracts['usdtTokenAddress'] }}",
+            rpcUrl: "{{ $contracts['bscMainnetRpc'] }}",
+            chainId: 56
         };
 
-        // ABIs
-        const ERC20_ABI = [
-            "function balanceOf(address account) view returns (uint256)",
-            "function decimals() view returns (uint8)"
-        ];
-
-        const TREASURY_SPLITTER_ABI = [
-            "function distribute() external returns (uint256, uint256)",
-            "function ownerWallet() view returns (address)",
-            "function secondaryWallet() view returns (address)",
-            "function totalDistributedUsdt() view returns (uint256)",
-            "function totalOwnerPaid() view returns (uint256)",
-            "function totalSecondaryPaid() view returns (uint256)",
-            "function owner() view returns (address)",
-            "function setWallets(address _newOwnerWallet, address _newSecondaryWallet) external",
-            "event FundsDistributed(uint256 totalAmount, uint256 ownerAmount, uint256 secondaryAmount, uint256 timestamp)"
-        ];
-
-        const SPLITTER_ABI = [
-            "function treasuryClaimVault() view returns (address)",
-            "function liquidityTreasuryWallet() view returns (address)",
-            "function minInvestment() view returns (uint256)",
-            "function maxInvestment() view returns (uint256)",
-            "function totalInvested() view returns (uint256)",
-            "function investmentCount() view returns (uint256)",
-            "function owner() view returns (address)",
-            "function paused() view returns (bool)",
-            "function setTreasuryClaimVault(address _vault) external",
-            "function setLiquidityTreasuryWallet(address _wallet) external",
-            "function setInvestmentLimits(uint256 _min, uint256 _max) external",
-            "function pause() external",
-            "function unpause() external",
-            "event Invested(address indexed user, uint256 amountUSDT, uint256 timestamp, uint256 investmentId)"
-        ];
-
-        const TREASURY_VAULT_ABI = [
-            "function getVaultBalance() view returns (uint256)",
-            "function owner() view returns (address)",
-            "function paused() view returns (bool)",
-            "function transferFunds(address recipient, uint256 amount, string reason) external",
-            "function rescueTokens(address tokenAddress, address to, uint256 amount) external",
-            "function pause() external",
-            "function unpause() external",
-            "event FundsClaimed(address indexed recipient, uint256 amount, string reason, uint256 timestamp)"
-        ];
-
-        const CAI_TOKEN_ABI = [
-            "function pancakePair() view returns (address)",
-            "function miningContract() view returns (address)",
-            "function configurationLocked() view returns (bool)",
-            "function owner() view returns (address)",
-            "function setMiningContractAndRenounceOwnership(address miningAddress) external",
-            "function recoverUSDT() external",
-            "event MiningContractConfigured(address indexed miningContract, address indexed configuredBy)",
-            "event FinalConfigurationLocked(address indexed miningContract, address indexed pancakePair)"
-        ];
-
-        const REWARD_VAULT_ABI = [
-            "function backendSigner() view returns (address)",
-            "function owner() view returns (address)",
-            "function paused() view returns (bool)",
-            "function setBackendSigner(address _newSigner) external",
-            "function emergencyWithdrawCAI(address to, uint256 amount) external",
-            "function pause() external",
-            "function unpause() external",
-            "event RewardClaimed(address indexed user, uint256 caiAmount, uint256 indexed nonce, uint256 timestamp)"
-        ];
-
-        const WITHDRAWAL_VAULT_ABI = [
-            "function backendSigner() view returns (address)",
-            "function owner() view returns (address)",
-            "function paused() view returns (bool)",
-            "function setBackendSigner(address _newSigner) external",
-            "function emergencyWithdraw(address to, uint256 amount) external",
-            "function pause() external",
-            "function unpause() external",
-            "event WithdrawalPaid(address indexed recipient, uint256 amount, uint256 indexed withdrawalId, uint256 timestamp)"
-        ];
-
-        // Web3 State
-        let provider = null;
-        let signer = null;
-        let currentAccount = null;
-        let isAuthorized = false;
-
-        // Toast Helper
-        function showToast(msg, type = 'info') {
-            const box = document.getElementById('toastBox');
-            const el = document.createElement('div');
-            el.className = `toast-msg ${type}`;
-            el.innerHTML = `<i class="fas ${type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info')}"></i> <span>${msg}</span>`;
-            box.appendChild(el);
-            setTimeout(() => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateX(100%)';
-                setTimeout(() => el.remove(), 300);
-            }, 4500);
-        }
-
-        // Sidebar Toggle (Mobile Drawer)
-        function toggleSidebar() {
-            const sidebar = document.getElementById('adminSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (sidebar) sidebar.classList.toggle('open');
-            if (backdrop) backdrop.classList.toggle('active');
-        }
-
-        // Tab Switcher with Sidebar Synchronization
-        function switchTab(tabId) {
-            // Activate Tab Panel
-            document.querySelectorAll('.tab-panel-section').forEach(el => el.classList.remove('active'));
+        // Tab Switching
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
             const target = document.getElementById(tabId);
-            if (target) target.classList.add('active');
+            if (target) target.style.display = 'block';
+            if (btn) btn.classList.add('active');
 
-            // Sync Top Nav Tab Buttons
-            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-                if (btn.getAttribute('data-tab') === tabId) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Sync Sidebar Nav Links
-            document.querySelectorAll('.sidebar-nav-item').forEach(item => {
-                if (item.getAttribute('data-tab-target') === tabId) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            // Auto-close mobile drawer if open
-            const sidebar = document.getElementById('adminSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (sidebar && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                if (backdrop) backdrop.classList.remove('active');
-            }
-
-            // Auto-fetch live events if switched to Event Explorer
-            if (tabId === 'tab-events') {
-                fetchRecentEvents();
+            if (tabId === 'tab-genealogy') {
+                loadGenealogyTree('');
             }
         }
 
-        // Switch Tab from Sidebar (permits read-only browsing even if wallet is locked)
-        function switchSidebarTab(tabId) {
-            const adminMain = document.getElementById('adminMain');
-            const lockBarrier = document.getElementById('lockBarrier');
-            if (adminMain && adminMain.style.display === 'none') {
-                unlockReadOnlyView(tabId);
+        function toggleMobileTabs() {
+            const bar = document.getElementById('portalTabBar');
+            bar.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Live Search Filter for Users Table
+        function filterUsersTable() {
+            const search = document.getElementById('userSearchInput').value.toLowerCase();
+            const status = document.getElementById('userStatusFilter').value;
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+
+            rows.forEach(r => {
+                const text = r.getAttribute('data-search') || '';
+                const rStatus = r.getAttribute('data-status') || '';
+                const matchSearch = text.includes(search);
+                const matchStatus = status === 'all' || rStatus === status;
+
+                r.style.display = (matchSearch && matchStatus) ? '' : 'none';
+            });
+        }
+
+        // Interactive Genealogy Tree Fetcher & Renderer
+        async function loadGenealogyTree(searchQuery) {
+            const canvas = document.getElementById('treeViewerCanvas');
+            canvas.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                    <div style="margin-top: 12px; font-weight: 600;">Fetching downline network hierarchy...</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/dishi/yashi/genealogy?search=${encodeURIComponent(searchQuery)}`);
+                const data = await res.json();
+
+                if (!data.success || !data.data) {
+                    canvas.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--rose); font-weight: 600;">User not found or no downline available.</div>`;
+                    return;
+                }
+
+                renderTreeHierarchy(data.data, canvas);
+            } catch (err) {
+                canvas.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--rose);">Error loading genealogy: ${err.message}</div>`;
+            }
+        }
+
+        function searchGenealogy() {
+            const input = document.getElementById('genealogySearchInput').value.trim();
+            loadGenealogyTree(input);
+        }
+
+        function viewUserGenealogy(uuid) {
+            switchTab('tab-genealogy', document.querySelectorAll('.tab-btn')[2]);
+            document.getElementById('genealogySearchInput').value = uuid;
+            loadGenealogyTree(uuid);
+        }
+
+        function renderTreeHierarchy(root, container) {
+            let html = `
+                <div class="tree-level-block">
+                    <div class="tree-level-header">
+                        <i class="fa-solid fa-crown"></i> Root Sponsor Node
+                    </div>
+                    <div class="tree-cards-row">
+                        <div class="tree-node-card root-card" onclick="loadGenealogyTree('${root.uuid}')">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <strong style="font-size: 0.95rem; color: var(--primary);">${root.uuid}</strong>
+                                <span class="badge ${root.userstatus == 1 ? 'badge-active' : 'badge-inactive'}">
+                                    ${root.userstatus == 1 ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                            <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-heading); margin-bottom: 6px;">
+                                ${root.name || 'Member'}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 6px;">
+                                <span>Self: <strong style="color: var(--emerald-text);">$${Number(root.self_inv || 0).toFixed(0)}</strong></span>
+                                <span>Team: <strong>$${Number(root.team_inv || 0).toFixed(0)}</strong></span>
+                                <span>Directs: <strong>${root.active_direct || 0}/${root.total_direct || 0}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (root.children && root.children.length > 0) {
+                html += renderTreeChildrenLevels(root.children, 1);
             } else {
-                switchTab(tabId);
+                html += `<div style="color: var(--text-muted); font-size: 0.82rem; padding: 12px 0;">No active direct team members enrolled under this user.</div>`;
             }
+
+            container.innerHTML = html;
         }
 
-        // Unlock Read-Only Ledger View (View Staking List without MetaMask)
-        function unlockReadOnlyView(tabId = 'tab-staking-deposits') {
-            const adminMain = document.getElementById('adminMain');
-            const lockBarrier = document.getElementById('lockBarrier');
-            if (lockBarrier) lockBarrier.style.display = 'none';
-            if (adminMain) adminMain.style.display = 'block';
-            switchTab(tabId);
-            showToast("Protocol view unlocked in Read-Only Mode", "info");
-        }
+        function renderTreeChildrenLevels(children, level) {
+            let html = `
+                <div class="tree-level-block">
+                    <div class="tree-level-header">
+                        <i class="fa-solid fa-turn-down"></i> Level ${level} Downline (${children.length} Members)
+                    </div>
+                    <div class="tree-cards-row">
+            `;
 
-        // Copy Text / Wallet to Clipboard
-        function copyToClipboard(text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast("Address copied: " + text.substring(0, 8) + "...", "success");
-                }).catch(() => fallbackCopy(text));
-            } else {
-                fallbackCopy(text);
-            }
-        }
+            children.forEach(c => {
+                html += `
+                    <div class="tree-node-card" onclick="loadGenealogyTree('${c.uuid}')">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <strong style="font-size: 0.88rem; color: var(--text-heading);">${c.uuid}</strong>
+                            <span class="badge ${c.userstatus == 1 ? 'badge-active' : 'badge-inactive'}">
+                                ${c.userstatus == 1 ? 'Paid' : 'Free'}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.76rem; font-weight: 600; color: var(--text-body); margin-bottom: 6px;">
+                            ${c.name || 'Member'}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 6px;">
+                            <span>Self: <strong style="color: var(--emerald-text);">$${Number(c.self_inv || 0).toFixed(0)}</strong></span>
+                            <span>Team: <strong>$${Number(c.team_inv || 0).toFixed(0)}</strong></span>
+                            <span>Directs: <strong>${c.active_direct || 0}</strong></span>
+                        </div>
+                    </div>
+                `;
+            });
 
-        function fallbackCopy(text) {
-            const temp = document.createElement("input");
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand("copy");
-            document.body.removeChild(temp);
-            showToast("Address copied: " + text.substring(0, 8) + "...", "success");
-        }
+            html += `</div></div>`;
 
-        // Staking Deposits Table: Client-Side Live Search & Filter
-        let currentStatusFilter = 'all';
-
-        function filterStakingTable() {
-            const input = document.getElementById('stakingSearchInput');
-            const query = input ? input.value.trim().toLowerCase() : '';
-            const rows = document.querySelectorAll('#stakingTableBody .staking-row');
-            const noResultsRow = document.getElementById('noResultsRow');
-
-            let visibleCount = 0;
-            let visibleUsdt = 0;
-
-            rows.forEach(row => {
-                const searchData = row.getAttribute('data-search') || '';
-                const rowStatus = row.getAttribute('data-status') || '';
-                const rowDao = row.getAttribute('data-dao') || '';
-                const rowUsdt = parseFloat(row.getAttribute('data-usdt') || '0');
-
-                // Search query match
-                const matchesQuery = (!query || searchData.includes(query));
-
-                // Status / DAO Filter match
-                let matchesFilter = true;
-                if (currentStatusFilter === 'active') {
-                    matchesFilter = (rowStatus === 'active');
-                } else if (currentStatusFilter === 'completed') {
-                    matchesFilter = (rowStatus === 'completed');
-                } else if (currentStatusFilter === 'dao') {
-                    matchesFilter = (rowDao === 'dao');
+            // Nested Next Levels
+            children.forEach(c => {
+                if (c.children && c.children.length > 0) {
+                    html += renderTreeChildrenLevels(c.children, level + 1);
                 }
+            });
 
-                if (matchesQuery && matchesFilter) {
-                    row.style.display = '';
-                    visibleCount++;
-                    visibleUsdt += rowUsdt;
+            return html;
+        }
+
+        // Toggle User Block/Unblock
+        async function toggleUserPermission(userId, btn) {
+            if (!confirm("Are you sure you want to change this member's permission?")) return;
+
+            try {
+                btn.disabled = true;
+                const token = "{{ csrf_token() }}";
+                const res = await fetch('/dishi/yashi/toggle-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({ userId: userId })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
                 } else {
-                    row.style.display = 'none';
+                    alert("Error: " + data.message);
                 }
-            });
-
-            // Update live counter & sum
-            const showingCountEl = document.getElementById('showingCount');
-            if (showingCountEl) showingCountEl.innerText = visibleCount;
-
-            const filteredVolumeEl = document.getElementById('filteredVolumeSum');
-            if (filteredVolumeEl) {
-                filteredVolumeEl.innerText = `Filtered Volume: $${visibleUsdt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
-            }
-
-            if (noResultsRow) {
-                noResultsRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+            } catch (e) {
+                alert("Failed: " + e.message);
+            } finally {
+                btn.disabled = false;
             }
         }
 
-        function setStatusFilter(filter, btnEl) {
-            currentStatusFilter = filter;
-            document.querySelectorAll('.filter-btn-group .filter-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-            filterStakingTable();
+        // User Detail Modal
+        async function openUserModal(userId) {
+            const modal = document.getElementById('userModal');
+            const content = document.getElementById('modalUserContent');
+            modal.classList.add('open');
+            content.innerHTML = `<div style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
+
+            try {
+                const res = await fetch(`/dishi/yashi/user-details/${userId}`);
+                const data = await res.json();
+                if (data.success) {
+                    const u = data.user;
+                    document.getElementById('modalUserName').innerText = `${u.uuid} — ${u.name}`;
+                    content.innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; font-size: 0.82rem;">
+                            <div style="background: var(--bg-elevated); padding: 10px; border-radius: var(--radius-sm);">
+                                <div style="color: var(--text-muted); font-size: 0.72rem;">Sponsor</div>
+                                <strong>${u.sponsor_uuid || 'Root'} (${u.sponsor_name || 'System'})</strong>
+                            </div>
+                            <div style="background: var(--bg-elevated); padding: 10px; border-radius: var(--radius-sm);">
+                                <div style="color: var(--text-muted); font-size: 0.72rem;">Wallet Address</div>
+                                <strong class="font-mono" style="font-size: 0.74rem;">${u.wallet || 'None'}</strong>
+                            </div>
+                            <div style="background: var(--bg-elevated); padding: 10px; border-radius: var(--radius-sm);">
+                                <div style="color: var(--text-muted); font-size: 0.72rem;">Self Investment</div>
+                                <strong style="color: var(--emerald-text);">$${Number(u.self_inv).toFixed(2)}</strong>
+                            </div>
+                            <div style="background: var(--bg-elevated); padding: 10px; border-radius: var(--radius-sm);">
+                                <div style="color: var(--text-muted); font-size: 0.72rem;">Team Turnover</div>
+                                <strong>$${Number(u.team_inv).toFixed(2)}</strong>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.84rem; font-weight: 700; margin-bottom: 8px;">Staking History (${data.stakings.length})</div>
+                        <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 16px;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr><th>#ID</th><th>Amount</th><th>Multiplier</th><th>Date</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${data.stakings.map(s => `
+                                        <tr>
+                                            <td>#${s.id}</td>
+                                            <td>$${s.usdt}</td>
+                                            <td>${s.istatus || 2.0}x</td>
+                                            <td>${s.created_at}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <button class="btn-action primary" onclick="viewUserGenealogy('${u.uuid}'); closeUserModal();">
+                                <i class="fa-solid fa-network-wired"></i> View Tree
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                content.innerHTML = `<div style="color: var(--rose);">Failed to load user info.</div>`;
+            }
         }
 
-        function clearStakingSearch() {
-            const input = document.getElementById('stakingSearchInput');
-            if (input) input.value = '';
-            const allBtn = document.querySelector('.filter-btn-group .filter-btn[data-filter="all"]');
-            setStatusFilter('all', allBtn);
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('open');
         }
 
-        // Export Staking Deposits to CSV
-        function exportStakingCsv() {
-            const rows = document.querySelectorAll('#stakingTableBody .staking-row');
-            if (!rows.length) return showToast("No staking records available to export", "error");
-
-            const csvRows = [
-                ['# ID', 'Member UUID', 'Member Name', 'Email', 'Wallet Address', 'Staked USDT', 'Multiplier', 'DAO Tier', 'Status', 'Staked Date Time']
-            ];
-
-            rows.forEach(row => {
-                if (row.style.display === 'none') return; // only export currently filtered rows
-
-                const id = row.querySelector('.deposit-id-badge')?.innerText.replace('#', '').trim() || '';
-                const uuid = row.querySelector('.uuid-badge')?.innerText.trim() || '';
-                const name = row.querySelector('.name-line')?.innerText.trim() || '';
-                const email = row.querySelector('.email-cell')?.innerText.trim() || '';
-                const walletLink = row.querySelector('.wallet-link')?.getAttribute('title') || '';
-                const usdt = row.getAttribute('data-usdt') || '0';
-                const mult = row.querySelector('.mult-badge')?.innerText.trim() || '';
-                const dao = row.querySelector('.dao-pill')?.innerText.trim() || '';
-                const status = row.querySelector('.status-badge')?.innerText.trim() || '';
-                const date = row.querySelector('.date-cell span')?.innerText.trim() || '';
-                const time = row.querySelector('.date-cell small')?.innerText.trim() || '';
-
-                csvRows.push([
-                    `"${id}"`,
-                    `"${uuid}"`,
-                    `"${name.replace(/"/g, '""')}"`,
-                    `"${email}"`,
-                    `"${walletLink}"`,
-                    `"${usdt}"`,
-                    `"${mult}"`,
-                    `"${dao}"`,
-                    `"${status}"`,
-                    `"${date} ${time}"`
-                ]);
-            });
-
-            const csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `cyera_staking_deposits_${new Date().toISOString().slice(0, 10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            showToast("Staking Deposits CSV exported successfully! 📄✅", "success");
-        }
-
-        // Connect Wallet
-        async function connectWallet() {
-            if (!window.ethereum) {
-                showToast("No Web3 wallet detected! Please install MetaMask or TrustWallet.", "error");
+        // Web3 Wallet Connect
+        let userWalletAddress = null;
+        async function connectAdminWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert("Please install MetaMask or a Web3 compatible browser wallet.");
                 return;
             }
 
             try {
-                provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                if (accounts.length === 0) {
-                    showToast("No accounts authorized.", "error");
-                    return;
-                }
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userWalletAddress = accounts[0];
+                const btn = document.getElementById('btnConnectWallet');
+                btn.classList.add('connected');
+                document.getElementById('walletBtnText').innerText = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
-                signer = await provider.getSigner();
-                currentAccount = accounts[0].toLowerCase();
-                
-                await verifyAccess();
+        // Copy Helper
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            alert("Copied to clipboard: " + text);
+        }
+
+        // Trigger Splitter Distribute On-Chain
+        async function triggerSplitterDistribute() {
+            if (!window.ethereum) {
+                alert("Please connect MetaMask with an authorized wallet.");
+                return;
+            }
+
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const splitterAbi = ["function distribute() external"];
+                const splitterContract = new ethers.Contract(CONFIG.revenueSplitter, splitterAbi, signer);
+
+                const tx = await splitterContract.distribute();
+                alert("Transaction submitted: " + tx.hash);
+                await tx.wait();
+                alert("Revenue Splitter distribute() confirmed successfully!");
+                refreshLiveOnChainBalances();
             } catch (err) {
-                console.error("Wallet connect error:", err);
-                showToast(err.message || "Failed to connect wallet", "error");
+                alert("Distribute failed: " + (err.reason || err.message));
             }
         }
 
-        // Disconnect Wallet
-        function disconnectWallet() {
-            signer = null;
-            currentAccount = null;
-            isAuthorized = false;
-            
-            document.getElementById('lockBarrier').style.display = 'flex';
-            document.getElementById('adminMain').style.display = 'none';
-            document.getElementById('btnConnectWallet').style.display = 'inline-flex';
-            document.getElementById('btnDisconnectWallet').style.display = 'none';
-            document.getElementById('btnConnectText').innerText = 'Connect Owner Wallet';
-            document.getElementById('dispConnectedWallet').innerText = 'Not Connected';
-            document.getElementById('dispAuthStatus').innerText = 'Locked';
-            document.getElementById('dispAuthStatus').style.color = 'var(--red-neon)';
-            document.getElementById('networkDot').className = 'status-dot';
-            
-            showToast("Wallet disconnected. Dashboard locked.", "info");
-        }
+        // Real-Time On-Chain Balance Sync via BSC Provider
+        async function refreshLiveOnChainBalances() {
+            try {
+                const provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                const pairAbi = [
+                    "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+                    "function token0() view returns (address)"
+                ];
+                const erc20Abi = ["function balanceOf(address) view returns (uint256)"];
 
-        // Verify On-Chain Owner
-        async function verifyAccess() {
-            if (!currentAccount) return;
+                const pair = new ethers.Contract(CONFIG.pancakePair, pairAbi, provider);
+                const cai = new ethers.Contract(CONFIG.caiToken, erc20Abi, provider);
+                const usdt = new ethers.Contract(CONFIG.usdtToken, erc20Abi, provider);
 
-            document.getElementById('dispConnectedWallet').innerText = currentAccount.substring(0, 8) + '...' + currentAccount.substring(currentAccount.length - 6);
-            
-            // Check Network Chain ID
-            const network = await provider.getNetwork();
-            const chainId = Number(network.chainId);
-            document.getElementById('networkText').innerText = `BSC (${chainId === 56 ? 'Mainnet' : 'Chain ' + chainId})`;
+                // Pool reserves
+                const reserves = await pair.getReserves();
+                const token0 = await pair.token0();
+                const isCaaiToken0 = token0.toLowerCase() === CONFIG.caiToken.toLowerCase();
+                const rCaai = isCaaiToken0 ? reserves[0] : reserves[1];
+                const rUsdt = isCaaiToken0 ? reserves[1] : reserves[0];
 
-            // Check against configured admin or on-chain owner (3E7 Wallet)
-            const targetAdmin = (CONFIG.ADMIN_OWNER || '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7').toLowerCase();
-            let isContractOwner = (currentAccount.toLowerCase() === targetAdmin);
+                const caaiNum = Number(ethers.formatEther(rCaai));
+                const usdtNum = Number(ethers.formatEther(rUsdt));
+                const price = (usdtNum / caaiNum).toFixed(4);
+                const totalLiq = (usdtNum * 2).toFixed(2);
 
-            if (!isContractOwner) {
-                try {
-                    const engine = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, ["function owner() view returns (address)"], provider);
-                    const onChainOwner = (await engine.owner()).toLowerCase();
-                    if (currentAccount.toLowerCase() === onChainOwner) {
-                        isContractOwner = true;
-                    }
-                } catch (e) {
-                    try {
-                        const vault = new ethers.Contract(CONFIG.CONTRACTS.WITHDRAWAL_VAULT, ["function owner() view returns (address)"], provider);
-                        const vaultOwner = (await vault.owner()).toLowerCase();
-                        if (currentAccount.toLowerCase() === vaultOwner) {
-                            isContractOwner = true;
-                        }
-                    } catch (err2) {
-                        console.warn("Could not query contract owner on-chain:", err2);
-                    }
-                }
-            }
+                document.getElementById('livePoolPrice').innerText = `$${price}`;
+                document.getElementById('livePoolLiq').innerText = `~$${totalLiq}`;
+                document.getElementById('livePoolCaai').innerText = `${caaiNum.toFixed(2)} CAAI`;
+                document.getElementById('livePoolUsdt').innerText = `${usdtNum.toFixed(2)} USDT`;
+                document.getElementById('boxPrice').innerText = `$${price}`;
 
-            if (isContractOwner) {
-                isAuthorized = true;
-                document.getElementById('lockBarrier').style.display = 'none';
-                document.getElementById('adminMain').style.display = 'block';
-                document.getElementById('btnConnectWallet').style.display = 'none';
-                document.getElementById('btnDisconnectWallet').style.display = 'inline-flex';
-                document.getElementById('dispAuthStatus').innerText = 'Authorized Owner';
-                document.getElementById('dispAuthStatus').style.color = 'var(--green-neon)';
-                document.getElementById('networkDot').className = 'status-dot active';
+                // Mining Buffer
+                const bufferBal = await cai.balanceOf(CONFIG.miningEngine);
+                const bufferFormatted = Number(ethers.formatEther(bufferBal)).toFixed(0) + " CAAI";
+                document.getElementById('miningBufferVal').innerText = bufferFormatted;
+                document.getElementById('boxBuffer').innerText = bufferFormatted;
 
-                showToast("Contract Owner verified! Access granted.", "success");
-                loadDashboardData();
-            } else {
-                isAuthorized = false;
-                document.getElementById('lockBarrier').style.display = 'flex';
-                document.getElementById('adminMain').style.display = 'none';
-                document.getElementById('lockTitle').innerText = "Access Denied: Not Contract Owner";
-                document.getElementById('lockDesc').innerText = "The connected wallet is not the authorized owner of the Cyera smart contracts suite. Please switch to the Owner wallet in MetaMask.";
-                document.getElementById('lockIconBox').className = "lock-icon-box unauthorized";
-                document.getElementById('lockIcon').className = "fas fa-ban";
-                document.getElementById('dispAuthStatus').innerText = 'Unauthorized';
-                document.getElementById('dispAuthStatus').style.color = 'var(--red-neon)';
-                
-                showToast("Connected wallet is not the Contract Owner!", "error");
+                // USDT Vault Balance
+                const vaultBal = await usdt.balanceOf(CONFIG.usdtVault);
+                document.getElementById('boxVaultUsdt').innerText = Number(ethers.formatEther(vaultBal)).toFixed(2) + " USDT";
+
+                console.log("✔ Real-time on-chain stats synchronized!");
+            } catch (err) {
+                console.warn("Could not sync live RPC:", err.message);
             }
         }
 
-        // Listen for Wallet Account / Chain Switch (Auto-lock guard)
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                    disconnectWallet();
-                } else {
-                    currentAccount = accounts[0].toLowerCase();
-                    verifyAccess();
+        // Export Users CSV
+        function exportUsersToCSV() {
+            let csv = "UUID,Name,Sponsor,Self_Investment,Team_Investment,Directs,Active_Directs,Status,Registered,Wallet\n";
+            document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 9) {
+                    const uuid = cols[0].innerText.replace(/\n/g, ' - ').trim();
+                    const sponsor = cols[1].innerText.trim();
+                    const self = cols[2].innerText.replace('$', '').trim();
+                    const team = cols[3].innerText.replace('$', '').trim();
+                    const directs = cols[4].innerText.trim();
+                    const activeDirects = cols[5].innerText.trim();
+                    const status = cols[6].innerText.trim();
+                    const reg = cols[7].innerText.trim();
+                    const wallet = cols[8].innerText.trim();
+                    csv += `"${uuid}","${sponsor}","${self}","${team}","${directs}","${activeDirects}","${status}","${reg}","${wallet}"\n`;
                 }
             });
 
-            window.ethereum.on('chainChanged', () => {
-                window.location.reload();
-            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cyera_users_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
         }
 
-        // Load all live on-chain balances & parameters
-        async function loadDashboardData() {
-            let activeProvider = provider;
-            if (!activeProvider) {
-                try {
-                    activeProvider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
-                } catch (e) {
-                    console.warn("Fallback provider creation error:", e);
-                }
-            }
-            if (!activeProvider) return;
-
-            // 1. Treasury Balances
-            try {
-                const usdt = new ethers.Contract(CONFIG.CONTRACTS.USDT, ERC20_ABI, activeProvider);
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, activeProvider);
-                
-                const [treasuryBalRaw, rewardBalRaw, withdrawalBalRaw] = await Promise.all([
-                    usdt.balanceOf(CONFIG.CONTRACTS.TREASURY_VAULT).catch(() => 0n),
-                    usdt.balanceOf(CONFIG.CONTRACTS.REWARD_VAULT).catch(() => 0n),
-                    usdt.balanceOf(CONFIG.CONTRACTS.WITHDRAWAL_VAULT).catch(() => 0n)
-                ]);
-
-                const caiVaultBal = await (new ethers.Contract(CONFIG.CONTRACTS.CAI, ERC20_ABI, activeProvider))
-                    .balanceOf(CONFIG.CONTRACTS.REWARD_VAULT).catch(() => 0n);
-
-                const treasuryBal = ethers.formatUnits(treasuryBalRaw, 18);
-                const rewardCaiBal = ethers.formatUnits(caiVaultBal, 18);
-                const withdrawalBal = ethers.formatUnits(withdrawalBalRaw, 18);
-
-                const maxTransferable = parseFloat(treasuryBal) > 0 ? parseFloat(treasuryBal).toFixed(2) : '0.00';
-                const elTreasuryUsdt = document.getElementById('metricTreasuryUsdt');
-                if (elTreasuryUsdt) elTreasuryUsdt.innerHTML = `${parseFloat(treasuryBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                const elDispTreasury = document.getElementById('dispTreasuryBalance');
-                if (elDispTreasury) elDispTreasury.innerText = `${parseFloat(treasuryBal).toFixed(2)} USDT`;
-                const elDispMax = document.getElementById('dispMaxTransferable');
-                if (elDispMax) elDispMax.innerText = maxTransferable;
-
-                const transferAmtInput = document.getElementById('inputTransferAmount');
-                if (transferAmtInput && (!transferAmtInput.value || transferAmtInput.dataset.userEdited !== 'true')) {
-                    transferAmtInput.value = maxTransferable;
-                }
-
-                const elMetricRewardCai = document.getElementById('metricRewardCai');
-                if (elMetricRewardCai) elMetricRewardCai.innerHTML = `${parseFloat(rewardCaiBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">CAI</small>`;
-                const elDispRewardVault = document.getElementById('dispRewardVaultBal');
-                if (elDispRewardVault) elDispRewardVault.innerText = `${parseFloat(rewardCaiBal).toFixed(4)} CAI`;
-
-                const elMetricPayout = document.getElementById('metricPayoutUsdt');
-                if (elMetricPayout) elMetricPayout.innerHTML = `${parseFloat(withdrawalBal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                const elDispWithdrawalVault = document.getElementById('dispWithdrawalVaultBal');
-                if (elDispWithdrawalVault) elDispWithdrawalVault.innerText = `${parseFloat(withdrawalBal).toFixed(2)} USDT`;
-            } catch (err) {
-                console.warn("Treasury balances read error:", err);
-            }
-
-            // 2. Investment Splitter (70/30) Stats
-            try {
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, activeProvider);
-                const [splitter70, splitter30, minInvRaw, maxInvRaw, totalInvRaw, invCount] = await Promise.all([
-                    splitter.treasuryClaimVault().catch(() => 'N/A'),
-                    splitter.liquidityTreasuryWallet().catch(() => 'N/A'),
-                    splitter.minInvestment().catch(() => 0n),
-                    splitter.maxInvestment().catch(() => 0n),
-                    splitter.totalInvested().catch(() => 0n),
-                    splitter.investmentCount().catch(() => 0n)
-                ]);
-
-                const el70 = document.getElementById('dispSplitter70Vault');
-                if (el70) el70.innerText = splitter70;
-                const el30 = document.getElementById('dispSplitter30Wallet');
-                if (el30) el30.innerText = splitter30;
-                
-                const minInv = ethers.formatUnits(minInvRaw, 18);
-                const maxInv = ethers.formatUnits(maxInvRaw, 18);
-                const elLimits = document.getElementById('dispSplitterLimits');
-                if (elLimits) elLimits.innerText = `$${parseFloat(minInv).toFixed(0)} - $${parseFloat(maxInv).toFixed(0)} USDT`;
-
-                const totalInv = ethers.formatUnits(totalInvRaw, 18);
-                const elTotal = document.getElementById('metricSplitterTotal');
-                if (elTotal) elTotal.innerHTML = `${parseFloat(totalInv).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 13px;">USDT</small>`;
-                const elCount = document.getElementById('metricInvestmentCount');
-                if (elCount) elCount.innerText = invCount.toString();
-            } catch (err) {
-                console.warn("Splitter stats read error:", err);
-            }
-
-            // 3. CAI Token Stats
-            try {
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, activeProvider);
-                const [pairAddr, isConfigLocked] = await Promise.all([
-                    cai.pancakePair().catch(() => '0x0000000000000000000000000000000000000000'),
-                    cai.configurationLocked().catch(() => false)
-                ]);
-
-                const elPair = document.getElementById('dispPancakePair');
-                if (elPair) elPair.innerText = (pairAddr && pairAddr !== '0x0000000000000000000000000000000000000000') ? pairAddr : 'Not Set';
-                const elPairLocked = document.getElementById('dispPancakePairLocked');
-                if (elPairLocked) elPairLocked.innerText = isConfigLocked ? 'Permanently Locked 🔒' : 'Unlocked';
-            } catch (err) {
-                console.warn("CAI token stats read error:", err);
-            }
-
-            // 4. Signers
-            try {
-                const rewardVault = new ethers.Contract(CONFIG.CONTRACTS.REWARD_VAULT, REWARD_VAULT_ABI, activeProvider);
-                const withdrawalVault = new ethers.Contract(CONFIG.CONTRACTS.WITHDRAWAL_VAULT, WITHDRAWAL_VAULT_ABI, activeProvider);
-                const [rewardSigner, withdrawalSigner] = await Promise.all([
-                    rewardVault.backendSigner().catch(() => 'N/A'),
-                    withdrawalVault.backendSigner().catch(() => 'N/A')
-                ]);
-
-                const elRewardSig = document.getElementById('dispRewardSigner');
-                if (elRewardSig) elRewardSig.innerText = rewardSigner;
-                const elWithdrawSig = document.getElementById('dispWithdrawalSigner');
-                if (elWithdrawSig) elWithdrawSig.innerText = withdrawalSigner;
-            } catch (err) {
-                console.warn("Vault signers read error:", err);
-            }
-
-            // 5. Treasury Splitter Live Balances & Breakdown (65% Owner / 5% Secondary)
-            try {
-                const usdt = new ethers.Contract(CONFIG.CONTRACTS.USDT, ERC20_ABI, activeProvider);
-                const treasurySplitterAddr = CONFIG.CONTRACTS.TREASURY_SPLITTER || '0xcC3902345ad939df1C072E5D7fFD12d3d84c8Fc5';
-                
-                const splitterUsdtBalRaw = await usdt.balanceOf(treasurySplitterAddr).catch(() => 0n);
-                const splitterUsdtBal = parseFloat(ethers.formatUnits(splitterUsdtBalRaw, 18));
-                
-                const elBal = document.getElementById('dispSplitterUsdtBal');
-                if (elBal) elBal.innerText = `${splitterUsdtBal.toFixed(2)} USDT`;
-                
-                const ownerShare = (splitterUsdtBal * 65) / 70;
-                const secShare = (splitterUsdtBal * 5) / 70;
-                
-                const elOwnerShare = document.getElementById('dispSplitterOwnerShare');
-                if (elOwnerShare) {
-                    elOwnerShare.innerHTML = `≈ ${ownerShare.toFixed(2)} USDT <small style="color: var(--text-muted); font-size: 10px;">(${CONFIG.ADMIN_OWNER.substring(0, 6)}...${CONFIG.ADMIN_OWNER.substring(CONFIG.ADMIN_OWNER.length - 4)})</small>`;
-                }
-                
-                const elSecShare = document.getElementById('dispSplitterSecShare');
-                if (elSecShare) {
-                    elSecShare.innerHTML = `≈ ${secShare.toFixed(2)} USDT`;
-                }
-
-                const treasurySplitterContract = new ethers.Contract(treasurySplitterAddr, TREASURY_SPLITTER_ABI, activeProvider);
-                const totalDistRaw = await treasurySplitterContract.totalDistributedUsdt().catch(() => 0n);
-                const elTotalDist = document.getElementById('dispSplitterTotalDistributed');
-                if (elTotalDist) elTotalDist.innerText = `${parseFloat(ethers.formatUnits(totalDistRaw, 18)).toFixed(2)} USDT`;
-            } catch (e) {
-                console.warn("Treasury Splitter read error:", e);
-            }
-
-            // Load event logs
-            fetchRecentEvents();
-        }
-
-        // ============================================================
-        // SMART CONTRACT WRITE ACTIONS
-        // ============================================================
-
-        // 0. Treasury Splitter: Execute 1-Click Distribute (65% / 5%)
-        async function handleDistributeSplitterFunds() {
-            if (!signer) return showToast("Please connect your Admin Web3 wallet first!", "error");
-
-            const btn = document.getElementById('btnExecuteDistribute');
-            const originalHtml = btn ? btn.innerHTML : '';
-
-            try {
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Confirming in MetaMask...`;
-                }
-
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, signer);
-                showToast("Please approve the transaction in your wallet...", "info");
-                
-                const tx = await splitter.distribute();
-                showToast(`Distribution submitted! Hash: ${tx.hash.substring(0, 10)}...`, "info");
-                
-                if (btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Waiting Confirmation...`;
-                await tx.wait();
-
-                showToast("Treasury funds distributed successfully (65% to Owner / 5% to Secondary)!", "success");
-                loadDashboardData();
-            } catch (e) {
-                console.error(e);
-                showToast(e.reason || e.message || "Failed to distribute funds.", "error");
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = originalHtml;
-                }
-            }
-        }
-
-        // 0.1 Treasury Splitter: Update Destination Wallets
-        async function handleUpdateSplitterWallets(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Please connect your Admin Web3 wallet first!", "error");
-
-            const ownerWallet = document.getElementById('inputSplitterOwnerWallet').value.trim();
-            const secWallet = document.getElementById('inputSplitterSecWallet').value.trim();
-
-            if (!ethers.isAddress(ownerWallet) || !ethers.isAddress(secWallet)) {
-                return showToast("Invalid wallet address provided!", "error");
-            }
-
-            try {
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_SPLITTER, TREASURY_SPLITTER_ABI, signer);
-                showToast("Please approve wallet update in MetaMask...", "info");
-                const tx = await splitter.setWallets(ownerWallet, secWallet);
-                showToast(`Update submitted: ${tx.hash.substring(0, 10)}...`, "info");
-                await tx.wait();
-                showToast("Splitter destination wallets updated successfully!", "success");
-                loadDashboardData();
-            } catch (e) {
-                console.error(e);
-                showToast(e.reason || e.message || "Failed to update wallets.", "error");
-            }
-        }
-
-        // 1. Splitter: Update 70% Vault
-        async function handleSetTreasuryVault(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            
-            const addr = document.getElementById('inputNew70Vault').value.trim();
-            if (!ethers.isAddress(addr)) return showToast("Invalid wallet address", "error");
-
-            try {
-                showToast("Submitting setTreasuryClaimVault...", "info");
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, signer);
-                const tx = await splitter.setTreasuryClaimVault(addr);
-                showToast("Transaction submitted: " + tx.hash.substring(0, 10) + "...", "info");
-                await tx.wait();
-                showToast("70% Treasury Claim Vault destination updated!", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Transaction failed", "error");
-            }
-        }
-
-        // 2. Splitter: Update 30% Liquidity Wallet
-        async function handleSetLiquidityWallet(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-
-            const addr = document.getElementById('inputNew30Wallet').value.trim();
-            if (!ethers.isAddress(addr)) return showToast("Invalid wallet address", "error");
-
-            try {
-                showToast("Submitting setLiquidityTreasuryWallet...", "info");
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, signer);
-                const tx = await splitter.setLiquidityTreasuryWallet(addr);
-                showToast("Transaction submitted: " + tx.hash.substring(0, 10) + "...", "info");
-                await tx.wait();
-                showToast("30% Liquidity Treasury Wallet updated!", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Transaction failed", "error");
-            }
-        }
-
-        // 3. Splitter: Update Investment Limits
-        async function handleSetInvestmentLimits(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-
-            const min = parseFloat(document.getElementById('inputMinInv').value);
-            const max = parseFloat(document.getElementById('inputMaxInv').value);
-
-            if (min <= 0 || max < min) return showToast("Invalid limit parameters", "error");
-
-            try {
-                showToast("Submitting setInvestmentLimits...", "info");
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, signer);
-                const minRaw = ethers.parseUnits(min.toString(), 18);
-                const maxRaw = ethers.parseUnits(max.toString(), 18);
-                const tx = await splitter.setInvestmentLimits(minRaw, maxRaw);
-                await tx.wait();
-                showToast("Investment limits updated successfully!", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Transaction failed", "error");
-            }
-        }
-
-        // Helper: Set MAX Treasury Amount
-        function setMaxTransferAmount() {
-            const maxVal = document.getElementById('dispMaxTransferable').innerText;
-            const input = document.getElementById('inputTransferAmount');
-            if (input) {
-                input.value = parseFloat(maxVal) > 0 ? maxVal : '0.00';
-                input.dataset.userEdited = 'true';
-            }
-        }
-
-        // 4. Treasury: Transfer / Claim Funds
-        async function handleTransferTreasuryFunds(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-
-            const recipient = document.getElementById('inputTransferRecipient').value.trim();
-            const amount = parseFloat(document.getElementById('inputTransferAmount').value);
-            const reason = document.getElementById('inputTransferReason').value.trim();
-
-            if (!ethers.isAddress(recipient)) return showToast("Invalid recipient address", "error");
-            if (amount <= 0) return showToast("Amount must be greater than zero", "error");
-
-            try {
-                showToast("Authorizing Treasury transfer on-chain...", "info");
-                const treasury = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_VAULT, TREASURY_VAULT_ABI, signer);
-                const amountRaw = ethers.parseUnits(amount.toString(), 18);
-                const tx = await treasury.transferFunds(recipient, amountRaw, reason);
-                showToast("Transaction broadcast: " + tx.hash.substring(0, 10) + "...", "info");
-                await tx.wait();
-                showToast(`Transferred ${amount} USDT to recipient!`, "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Transfer failed", "error");
-            }
-        }
-
-        // 5. CAI Token: Single Whitelist Toggle
-        async function submitSingleWhitelist(status) {
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            const addr = document.getElementById('inputWhitelistAddr').value.trim();
-            if (!ethers.isAddress(addr)) return showToast("Invalid wallet address", "error");
-
-            try {
-                showToast(`Setting whitelist status = ${status}...`, "info");
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.setWhitelist(addr, status);
-                await tx.wait();
-                showToast(`Address ${status ? 'whitelisted' : 'removed'} for DEX buys!`, "success");
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Whitelist update failed", "error");
-            }
-        }
-
-        // 6. CAI Token: Batch Whitelist
-        async function submitBatchWhitelist(status) {
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            const raw = document.getElementById('inputBatchWhitelist').value;
-            const lines = raw.split(/[\n,]/).map(s => s.trim()).filter(s => s.length > 0);
-
-            const validAddrs = [];
-            for (let l of lines) {
-                if (ethers.isAddress(l)) validAddrs.push(l);
-            }
-
-            if (validAddrs.length === 0) return showToast("No valid addresses entered", "error");
-
-            try {
-                showToast(`Batch updating ${validAddrs.length} addresses...`, "info");
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.setBatchWhitelist(validAddrs, status);
-                await tx.wait();
-                showToast(`Batch whitelist (${validAddrs.length} wallets) updated!`, "success");
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Batch whitelist failed", "error");
-            }
-        }
-
-        // 7. Aethera Architecture: Set Mining Engine & Renounce Ownership
-        async function handleSetMiningContractAndRenounce(e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-            const miningAddr = document.getElementById('inputMiningEngineAddr').value.trim();
-            if (!ethers.isAddress(miningAddr)) return showToast("Invalid Mining Engine address", "error");
-
-            if (!confirm("⚠️ CAUTION: This will bind the Mining Engine, lock token configuration, and RENOUNCE ownership for 100% Green Score on Go+ Security / DexScreener! Proceed?")) return;
-
-            try {
-                showToast("Setting Mining Engine & Renouncing Ownership on-chain...", "info");
-                const cai = new ethers.Contract(CONFIG.CONTRACTS.CAI, CAI_TOKEN_ABI, signer);
-                const tx = await cai.setMiningContractAndRenounceOwnership(miningAddr);
-                showToast("Transaction broadcast: " + tx.hash.substring(0, 10) + "...", "info");
-                await tx.wait();
-                showToast("Mining Engine configured & Token Ownership renounced successfully! 🔒✅", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Execution failed", "error");
-            }
-        }
-
-        // 10. Update Backend Signer (Reward / Withdrawal Vaults)
-        async function handleSetBackendSigner(vaultType, e) {
-            e.preventDefault();
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-
-            const isReward = (vaultType === 'reward');
-            const inputId = isReward ? 'inputNewRewardSigner' : 'inputNewWithdrawalSigner';
-            const newSigner = document.getElementById(inputId).value.trim();
-
-            if (!ethers.isAddress(newSigner)) return showToast("Invalid signer address", "error");
-
-            try {
-                showToast(`Updating ${vaultType} backend signer...`, "info");
-                const targetContractAddr = isReward ? CONFIG.CONTRACTS.REWARD_VAULT : CONFIG.CONTRACTS.WITHDRAWAL_VAULT;
-                const targetAbi = isReward ? REWARD_VAULT_ABI : WITHDRAWAL_VAULT_ABI;
-                const vault = new ethers.Contract(targetContractAddr, targetAbi, signer);
-                const tx = await vault.setBackendSigner(newSigner);
-                await tx.wait();
-                showToast("Backend Signer key updated!", "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Failed to set signer", "error");
-            }
-        }
-
-        // 11. Emergency Pause / Unpause
-        async function togglePause(contractKey, doPause) {
-            if (!signer) return showToast("Connect Owner wallet first", "error");
-
-            let targetAddr = null;
-            let targetAbi = null;
-
-            if (contractKey === 'splitter') {
-                targetAddr = CONFIG.CONTRACTS.SPLITTER;
-                targetAbi = SPLITTER_ABI;
-            } else if (contractKey === 'treasury') {
-                targetAddr = CONFIG.CONTRACTS.TREASURY_VAULT;
-                targetAbi = TREASURY_VAULT_ABI;
-            }
-
-            try {
-                showToast(`Submitting ${doPause ? 'pause' : 'unpause'} transaction...`, "info");
-                const c = new ethers.Contract(targetAddr, targetAbi, signer);
-                const tx = doPause ? await c.pause() : await c.unpause();
-                await tx.wait();
-                showToast(`Contract ${doPause ? 'paused' : 'unpaused'} successfully!`, "success");
-                loadDashboardData();
-            } catch (err) {
-                console.error(err);
-                showToast(err.reason || err.message || "Pause action failed", "error");
-            }
-        }
-
-        // 12. Fetch Recent Events
-        async function fetchRecentEvents() {
-            const tbody = document.getElementById('eventLogsBody');
-            if (!provider) return;
-
-            try {
-                const currentBlock = await provider.getBlockNumber();
-                const fromBlock = Math.max(0, currentBlock - 5000); // Last ~5000 blocks
-
-                const splitter = new ethers.Contract(CONFIG.CONTRACTS.SPLITTER, SPLITTER_ABI, provider);
-                const treasury = new ethers.Contract(CONFIG.CONTRACTS.TREASURY_VAULT, TREASURY_VAULT_ABI, provider);
-
-                const [investLogs, claimLogs] = await Promise.all([
-                    splitter.queryFilter(splitter.filters.Invested(), fromBlock, currentBlock).catch(() => []),
-                    treasury.queryFilter(treasury.filters.FundsClaimed(), fromBlock, currentBlock).catch(() => [])
-                ]);
-
-                const allLogs = [];
-                investLogs.forEach(l => {
-                    allLogs.push({
-                        type: 'INVEST',
-                        badge: 'invest',
-                        contract: 'Splitter',
-                        desc: `User: ${l.args[0].substring(0,6)}... | Amount: $${ethers.formatUnits(l.args[1], 18)} USDT | ID: #${l.args[3]}`,
-                        block: l.blockNumber,
-                        txHash: l.transactionHash
-                    });
-                });
-
-                claimLogs.forEach(l => {
-                    allLogs.push({
-                        type: 'FUNDS CLAIMED',
-                        badge: 'claim',
-                        contract: 'TreasuryVault',
-                        desc: `To: ${l.args[0].substring(0,6)}... | Amount: $${ethers.formatUnits(l.args[1], 18)} USDT | Reason: "${l.args[2]}"`,
-                        block: l.blockNumber,
-                        txHash: l.transactionHash
-                    });
-                });
-
-                allLogs.sort((a, b) => b.block - a.block);
-
-                if (allLogs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-dim);">No recent on-chain events in the last ${currentBlock - fromBlock} blocks.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = allLogs.map(item => `
-                    <tr>
-                        <td><span class="event-badge ${item.badge}">${item.type}</span></td>
-                        <td>${item.contract}</td>
-                        <td style="color: var(--text-primary); font-size: 11px;">${item.desc}</td>
-                        <td>#${item.block}</td>
-                        <td>
-                            <a href="https://bscscan.com/tx/${item.txHash}" target="_blank" style="color: var(--gold-primary); text-decoration: none;">
-                                ${item.txHash.substring(0, 10)}... <i class="fas fa-arrow-up-right-from-square" style="font-size: 9px;"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `).join('');
-
-            } catch (err) {
-                console.error("Events fetch error:", err);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--red-neon); padding: 14px;">Failed to query event logs: ${err.message}</td></tr>`;
-            }
-        }
-
-        // Auto-check on page load if wallet already injected & connected
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDashboardData();
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                connectWallet();
-            }
+        // Initial Load Actions
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshLiveOnChainBalances();
+            loadGenealogyTree('');
         });
     </script>
 </body>

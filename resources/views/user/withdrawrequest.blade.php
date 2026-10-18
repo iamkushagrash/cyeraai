@@ -23,7 +23,7 @@
                 $destWallet = $u->uuid;
             }
         }
-        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x0D1Cf84DcB6Ad9dF2d2f7a5998C441569e87684b');
+        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7');
     @endphp
 
     <!-- Top Balance Card -->

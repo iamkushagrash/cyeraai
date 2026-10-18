@@ -19,10 +19,10 @@ async function main() {
     console.log("Deployer Balance:", ethers.formatEther(balance), "BNB");
 
     const USDT_ADDRESS = process.env.USDT_TOKEN_ADDRESS || "0x55d398326f99059fF775485246999027B3197955";
-    const WHITELISTED_COLLECTOR = process.env.ROYAL_JACKPOT_COLLECTOR_WALLET || deployer.address;
-    const ADMIN_OWNER = deployer.address;
-    const BACKEND_SIGNER = process.env.BACKEND_SIGNER_ADDRESS || "0x188525c9810749a8012Dd1eBfA4a28801bac0a6e";
-    const AUTO_FORWARD = false; // default false to hold funds until owner sweeps or sets true
+    const WHITELISTED_COLLECTOR = process.env.ROYAL_JACKPOT_COLLECTOR_WALLET || "0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9";
+    const ADMIN_OWNER = "0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9";
+    const BACKEND_SIGNER = process.env.BACKEND_SIGNER_ADDRESS || "0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57";
+    const AUTO_FORWARD = true; // Auto-forwards all ticket deposits immediately to collector wallet!
 
     console.log("\nConfiguration:");
     console.log("• USDT Token Address:      ", USDT_ADDRESS);
@@ -33,7 +33,7 @@ async function main() {
 
     // 1. Deploy RoyalJackpotDeposit
     console.log("\n1️⃣ Deploying RoyalJackpotDeposit...");
-    const DepositFactory = await ethers.getContractFactory("RoyalJackpotDeposit");
+    const DepositFactory = await ethers.getContractFactory("contracts/RoyalJackpotDeposit.sol:RoyalJackpotDeposit");
     const depositContract = await DepositFactory.deploy(
         USDT_ADDRESS,
         WHITELISTED_COLLECTOR,
@@ -46,7 +46,7 @@ async function main() {
 
     // 2. Deploy RoyalJackpotVault
     console.log("\n2️⃣ Deploying RoyalJackpotVault...");
-    const VaultFactory = await ethers.getContractFactory("RoyalJackpotVault");
+    const VaultFactory = await ethers.getContractFactory("contracts/RoyalJackpotVault.sol:RoyalJackpotVault");
     const vaultContract = await VaultFactory.deploy(
         USDT_ADDRESS,
         BACKEND_SIGNER,

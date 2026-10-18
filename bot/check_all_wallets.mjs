@@ -13,7 +13,7 @@ const RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 const provider = new ethers.JsonRpcProvider(RPC);
 
 const USDT_ADDR = '0x55d398326f99059fF775485246999027B3197955';
-const CAI_ADDR = '0x4756618F389A46819008Aff01ad0f91A38154eDB';
+const CAI_ADDR = '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
 
 const ERC20_ABI = [
     'function balanceOf(address) view returns (uint256)',

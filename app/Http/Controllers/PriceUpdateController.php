@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Log;
 class PriceUpdateController extends Controller
 {
     /**
-     * Official PancakeSwap V2 Pair Address for CAI/USDT on BSC Mainnet.
+     * Official PancakeSwap V2 Pair Address for CAAI/USDT on BSC Mainnet.
      */
-    const PAIR_ADDRESS = '0x4B33d9a80AEAe68aD6d9EE84FD816DB9A29D6A2c';
+    const PAIR_ADDRESS = '0x17C405d90e8d112c340698EE2b09EB31FF72f730';
 
     /**
-     * CAI Token Contract Address.
+     * CAAI Token Contract Address.
      */
-    const CAI_ADDRESS = '0x4756618F389A46819008Aff01ad0f91A38154eDB';
+    const CAI_ADDRESS = '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
 
     /**
      * Fetch live CAI/USDT price from DEX (DexScreener API with On-chain RPC Fallback)
