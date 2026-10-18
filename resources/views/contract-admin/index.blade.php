@@ -210,6 +210,45 @@
             box-shadow: var(--shadow-subtle);
         }
 
+        .auth-wallet-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-heading);
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #ffffff;
+            color: var(--rose-text);
+            border: 1px solid var(--rose-border);
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .btn-logout:hover {
+            background: var(--rose-soft);
+            border-color: var(--rose);
+            color: var(--rose);
+            transform: translateY(-1px);
+        }
+
         .btn-mobile-toggle {
             display: none;
             width: 40px;
@@ -868,10 +907,22 @@
                     <span>BNB Smart Chain (56)</span>
                 </div>
 
+                @if(Session::has('contract_admin_wallet'))
+                <div class="auth-wallet-pill" title="Authenticated Admin Wallet: {{ Session::get('contract_admin_wallet') }}">
+                    <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i>
+                    <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
+                </div>
+                @endif
+
                 <button class="btn-wallet" id="btnConnectWallet" onclick="connectAdminWallet()">
                     <i class="fa-solid fa-wallet"></i>
                     <span id="walletBtnText">Connect Wallet</span>
                 </button>
+
+                <a href="{{ url('/dishi/yashi/logout') }}" class="btn-logout" title="Sign Out of Command Center">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
 
                 <button class="btn-mobile-toggle" onclick="toggleMobileTabs()">
                     <i class="fa-solid fa-bars"></i>

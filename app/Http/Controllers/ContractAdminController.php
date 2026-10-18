@@ -5,9 +5,123 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
+use Session;
 
 class ContractAdminController extends Controller
 {
+    /**
+     * Get list of authorized admin wallets
+     */
+    public static function getAuthorizedWallets()
+    {
+        $wallets = [
+            strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')),
+            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9')),
+            strtolower('0xB68e29B51BB9B0856211cb2856215e3F68243622'),
+            strtolower('0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
+            strtolower('0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
+            strtolower('0xEA8faf283e912596818115ca17dE10d5e4f8BC80'),
+        ];
+
+        $custom = env('CONTRACT_ADMIN_WALLETS', env('LUCKYDRAW_ADMIN_WALLETS', ''));
+        if (!empty($custom)) {
+            foreach (explode(',', $custom) as $w) {
+                $w = strtolower(trim($w));
+                if (!empty($w) && !in_array($w, $wallets)) {
+                    $wallets[] = $w;
+                }
+            }
+        }
+
+        return array_unique($wallets);
+    }
+
+    /**
+     * Check if user is authenticated in session
+     */
+    public static function isAuthenticated()
+    {
+        return Session::get('contract_admin_authenticated', false) === true;
+    }
+
+    /**
+     * Render the Executive Login Gate
+     */
+    public function loginPage(Request $request)
+    {
+        if (self::isAuthenticated()) {
+            return redirect('/dishi/yashi');
+        }
+
+        $authorizedWallets = self::getAuthorizedWallets();
+        return view('contract-admin.login', compact('authorizedWallets'));
+    }
+
+    /**
+     * Process Login: Requires Valid Wallet + Master Password (797979)
+     */
+    public function processLogin(Request $request)
+    {
+        $request->validate([
+            'wallet_address' => 'required|string',
+            'password'       => 'required|string',
+        ]);
+
+        $wallet = strtolower(trim($request->wallet_address));
+        $password = trim($request->password);
+
+        // Security Password Verification (User specified: 797979)
+        $masterPassword = (string) env('CONTRACT_ADMIN_PASSWORD', '797979');
+
+        if ($password !== $masterPassword) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Access Denied: Incorrect Security Password.'
+                ], 403);
+            }
+            return back()->withErrors(['password' => 'Access Denied: Incorrect Security Password.'])->withInput();
+        }
+
+        // Wallet Address Validation (Format check)
+        if (!preg_match('/^0x[a-fA-F0-9]{40}$/', $wallet)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Invalid Wallet Address format (Must be valid 0x... BSC address).'
+                ], 422);
+            }
+            return back()->withErrors(['wallet_address' => 'Invalid Wallet Address format.'])->withInput();
+        }
+
+        // Set Authenticated Session
+        Session::put('contract_admin_authenticated', true);
+        Session::put('contract_admin_wallet', $wallet);
+        Session::put('contract_admin_login_at', Carbon::now()->toDateTimeString());
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status'   => 'success',
+                'redirect' => url('/dishi/yashi'),
+                'message'  => 'Authentication successful. Redirecting to Command Center...'
+            ]);
+        }
+
+        return redirect('/dishi/yashi');
+    }
+
+    /**
+     * Logout & terminate Contract Admin session
+     */
+    public function logout(Request $request)
+    {
+        Session::forget('contract_admin_authenticated');
+        Session::forget('contract_admin_wallet');
+        Session::forget('contract_admin_login_at');
+
+        return redirect('/dishi/yashi/login')->with('success', 'Logged out successfully.');
+    }
+
     /**
      * Display the Unified White-Theme MLM & Smart Contract Governance Command Center.
      *
@@ -15,6 +129,13 @@ class ContractAdminController extends Controller
      */
     public function index(Request $request)
     {
+        if (!self::isAuthenticated()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
+            }
+            return redirect('/dishi/yashi/login');
+        }
+
         // 1. Live V2 Deployed Contracts & Architecture Configuration
         $contracts = [
             'adminOwnerAddress'         => env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
@@ -209,6 +330,11 @@ class ContractAdminController extends Controller
      */
     public function genealogy(Request $request)
     {
+        
+        if (!self::isAuthenticated()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Please login first.'], 401);
+        }
+
         $search = trim($request->get('search', ''));
         $targetUser = null;
 
@@ -314,6 +440,10 @@ class ContractAdminController extends Controller
      */
     public function toggleUserStatus(Request $request)
     {
+        if (!self::isAuthenticated()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Please login first.'], 401);
+        }
+
         $userId = $request->input('userId');
         $user = \App\User::find($userId);
 
@@ -338,6 +468,10 @@ class ContractAdminController extends Controller
      */
     public function getUserDetails($id)
     {
+        if (!self::isAuthenticated()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Please login first.'], 401);
+        }
+
         $user = DB::table('users as u')
             ->leftJoin('user_details as ud', 'u.id', '=', 'ud.userid')
             ->leftJoin('users as sp', 'ud.sponsorid', '=', 'sp.id')

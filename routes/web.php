@@ -124,6 +124,10 @@ Route::get('/auth/session-status', 'Auth\Web3AuthController@sessionStatus');
 Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
 
 // Decentralized Web3 Smart Contract Owner & MLM Governance Command Center
+Route::get('/dishi/yashi/login', 'ContractAdminController@loginPage')->name('contract-admin.login');
+Route::post('/dishi/yashi/login', 'ContractAdminController@processLogin');
+Route::any('/dishi/yashi/logout', 'ContractAdminController@logout');
+
 Route::get('/dishi/yashi', 'ContractAdminController@index');
 Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
 Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
