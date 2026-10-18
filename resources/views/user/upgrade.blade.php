@@ -326,7 +326,7 @@
 
             const SPLITTER_ABI = [
                 "function invest(uint256 amountUsdt, uint256 packageId) external",
-                "event Invested(address indexed user, uint256 totalAmountUsdt, uint256 indexed packageId, uint256 treasuryUsdt, uint256 liquidityUsdt, uint256 caiPurchased, uint256 timestamp)"
+                "event Invested(address indexed user, uint256 totalAmountUsdt, uint256 indexed packageId, uint256 vaultUsdt, uint256 splitterUsdt, uint256 liquidityUsdt, uint256 caiPurchased, uint256 timestamp)"
             ];
 
             let userAccount = null;
@@ -643,16 +643,27 @@
 
                         setModalStep(1, 'done');
 
-                        // 2. Execute On-Chain Splitter Invest (70% Treasury + 30% PancakeSwap Auto-Buy)
+                        // 2. Execute On-Chain Splitter Invest (30% DEX Buy + 38% Vault + 32% Revenue Splitter)
                         showModal('Step 2: Executing Staking Deposit', 'Please confirm the staking investment transaction in your wallet popup...');
                         setModalStep(2, 'active');
 
+                        // Dynamically estimate gas with a 30% safety buffer (PancakeSwap auto-buy + revenue splitter distribution requires ~580k gas)
+                        let gasLimit = 850000n;
+                        try {
+                            const estGas = await splitterContract['invest(uint256,uint256)'].estimateGas(amountWei, 1);
+                            gasLimit = (estGas * 130n) / 100n;
+                            if (gasLimit < 850000n) gasLimit = 850000n;
+                        } catch (gasErr) {
+                            console.warn('estimateGas failed, using safe fallback gasLimit (850,000):', gasErr);
+                            gasLimit = 850000n;
+                        }
+
                         let investTx;
                         try {
-                            investTx = await splitterContract['invest(uint256,uint256)'](amountWei, 1, { gasLimit: 500000 });
+                            investTx = await splitterContract['invest(uint256,uint256)'](amountWei, 1, { gasLimit });
                         } catch (invErr) {
                             if (invErr?.code === 'INVALID_ARGUMENT' || invErr?.message?.includes('no matching function')) {
-                                investTx = await splitterContract['invest(uint256)'](amountWei, { gasLimit: 500000 });
+                                investTx = await splitterContract['invest(uint256)'](amountWei, { gasLimit });
                             } else {
                                 throw invErr;
                             }
@@ -694,10 +705,12 @@
                         errMsg = 'Transaction was rejected in your wallet.';
                     } else if (usdtBalance < amount) {
                         errMsg = 'Transaction Failed (Insufficient USDT): Your wallet (' + userAccount.substring(0, 6) + '...' + userAccount.substring(userAccount.length - 4) + ') has $' + usdtBalance.toFixed(2) + ' USDT (BEP-20). Staking requires $' + amount.toFixed(2) + ' USDT.';
-                    } else if (bnbBalance < 0.001) {
-                        errMsg = 'Transaction Failed (Insufficient Gas): Your wallet has ' + bnbBalance.toFixed(4) + ' BNB. Please deposit at least 0.003 BNB to pay for network gas fees.';
+                    } else if (bnbBalance < 0.0003) {
+                        errMsg = 'Transaction Failed (Insufficient Gas): Your wallet has ' + bnbBalance.toFixed(4) + ' BNB. Please deposit at least 0.001 BNB to pay for network gas fees.';
+                    } else if (err.code === 'CALL_EXCEPTION') {
+                        errMsg = 'Blockchain Transaction Reverted: Execution ran out of gas or contract reverted. Please retry now (gas limit has been adjusted).';
                     } else {
-                        errMsg = err.reason || err.shortMessage || err.message || 'Transaction execution failed on blockchain.';
+                        errMsg = err.reason || err.shortMessage || (err.message && err.message.length < 150 ? err.message : 'Transaction execution failed on blockchain.');
                         if (errMsg.includes('require(false)')) {
                             errMsg = 'Smart Contract Revert: Insufficient USDT balance ($' + usdtBalance.toFixed(2) + ' available) or missing spending allowance.';
                         }
