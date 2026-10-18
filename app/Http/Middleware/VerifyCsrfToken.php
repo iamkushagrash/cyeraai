@@ -19,6 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        'dishi/yashi/login',
+        'dishi/yashi/logout',
     ];
 }

@@ -128,12 +128,14 @@ Route::get('/dishi/yashi/login', 'ContractAdminController@loginPage')->name('con
 Route::post('/dishi/yashi/login', 'ContractAdminController@processLogin');
 Route::any('/dishi/yashi/logout', 'ContractAdminController@logout');
 
-Route::get('/dishi/yashi', 'ContractAdminController@index');
-Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
-Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
-Route::get('/dishi/yashi/user-details/{id}', 'ContractAdminController@getUserDetails');
-Route::get('/admin/unified', 'ContractAdminController@index');
-Route::get('/Main/ContractAdmin', 'ContractAdminController@index');
+Route::group(['middleware' => ['contract.admin']], function () {
+    Route::get('/dishi/yashi', 'ContractAdminController@index');
+    Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
+    Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
+    Route::get('/dishi/yashi/user-details/{id}', 'ContractAdminController@getUserDetails');
+    Route::get('/admin/unified', 'ContractAdminController@index');
+    Route::get('/Main/ContractAdmin', 'ContractAdminController@index');
+});
 
 // ============================================
 // Lucky Draw Dedicated Web3 Deployer Admin Suite

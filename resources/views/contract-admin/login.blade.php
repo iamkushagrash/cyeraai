@@ -407,6 +407,53 @@
             to { transform: rotate(360deg); }
         }
 
+        .btn-autofill {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border: 1px solid var(--primary-border);
+            font-size: 0.70rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-autofill:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .owner-capsule-notice {
+            background: #ffffff;
+            border: 1px dashed var(--primary-border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .owner-capsule-notice .oc-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .owner-capsule-notice .oc-address {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+            word-break: break-all;
+        }
+
         @media (max-width: 480px) {
             .login-card {
                 padding: 30px 20px;
@@ -468,6 +515,17 @@
             @endif
         </div>
 
+        <!-- Protocol Owner Target Capsule -->
+        <div class="owner-capsule-notice">
+            <div>
+                <div class="oc-title"><i class="fa-solid fa-crown" style="color: #f59e0b; margin-right: 4px;"></i> Designated Protocol Owner</div>
+                <div class="oc-address">{{ $ownerWallet ?? '0xB68e29B51BB9B0856211cb2856215e3F68243622' }}</div>
+            </div>
+            <button type="button" class="btn-autofill" onclick="autofillOwnerWallet()" title="Click to auto-fill Owner Wallet">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Fill
+            </button>
+        </div>
+
         <!-- Web3 Quick Connect Bar -->
         <div class="web3-connect-bar">
             <div class="web3-connect-left">
@@ -492,7 +550,7 @@
             <!-- Factor 1: Wallet Address -->
             <div class="form-group">
                 <label class="form-label" for="wallet_address">
-                    <span><i class="fa-solid fa-wallet" style="margin-right: 4px; color: var(--primary);"></i> Admin Wallet Address</span>
+                    <span><i class="fa-solid fa-user-shield" style="margin-right: 4px; color: var(--primary);"></i> Protocol Owner Wallet Address</span>
                     <span class="label-badge">FACTOR 1</span>
                 </label>
                 <div class="input-wrap">
@@ -523,7 +581,7 @@
                         id="password" 
                         name="password" 
                         class="form-input font-mono" 
-                        placeholder="••••••" 
+                        placeholder="Enter Security Passcode (797979)" 
                         required 
                         autocomplete="current-password"
                     >
@@ -551,6 +609,15 @@
     </div>
 
     <script>
+        const TARGET_OWNER = "{{ strtolower($ownerWallet ?? '0xB68e29B51BB9B0856211cb2856215e3F68243622') }}";
+
+        function autofillOwnerWallet() {
+            const input = document.getElementById('wallet_address');
+            input.value = "{{ $ownerWallet ?? '0xB68e29B51BB9B0856211cb2856215e3F68243622' }}";
+            document.getElementById('password').focus();
+            showAlert('Owner Wallet filled: ' + input.value, 'success');
+        }
+
         // Web3 Wallet Connect Logic
         async function handleWeb3Connect() {
             const btn = document.getElementById('btnConnectWeb3');
@@ -559,7 +626,7 @@
             const walletInput = document.getElementById('wallet_address');
 
             if (typeof window.ethereum === 'undefined') {
-                showAlert('MetaMask / Web3 provider not detected in browser. Please type or paste your wallet address manually.', 'danger');
+                showAlert('MetaMask / Web3 provider not detected in browser. You can click Auto-Fill or paste the Owner Wallet manually.', 'danger');
                 return;
             }
 
@@ -573,11 +640,15 @@
                     
                     btn.classList.add('connected');
                     btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + selected.substring(0, 6) + '...' + selected.substring(selected.length - 4);
-                    statusText.innerText = 'Wallet linked successfully';
                     
-                    // Focus passcode input
-                    document.getElementById('password').focus();
-                    showAlert('Wallet linked: ' + selected, 'success');
+                    if (selected.toLowerCase() !== TARGET_OWNER) {
+                        statusText.innerText = 'Non-Owner Wallet Connected';
+                        showAlert('Notice: Connected wallet (' + selected.substring(0,6) + '...' + selected.substring(selected.length - 4) + ') is NOT the Owner Wallet (0xB68e...3622). Please switch account in MetaMask or click Auto-Fill.', 'danger');
+                    } else {
+                        statusText.innerText = 'Owner Wallet Connected & Verified';
+                        showAlert('Owner Wallet linked successfully!', 'success');
+                        document.getElementById('password').focus();
+                    }
                 }
             } catch (err) {
                 console.error(err);

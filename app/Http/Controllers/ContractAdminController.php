@@ -10,38 +10,23 @@ use Session;
 class ContractAdminController extends Controller
 {
     /**
-     * Get list of authorized admin wallets
+     * Get list of authorized admin wallets (Strictly Owner Wallet)
      */
     public static function getAuthorizedWallets()
     {
-        $wallets = [
+        return [
             strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')),
-            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9')),
-            strtolower('0xB68e29B51BB9B0856211cb2856215e3F68243622'),
-            strtolower('0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
-            strtolower('0x0a4e1ecF7df23fCD369A836763E5A791E84F03E7'),
-            strtolower('0xEA8faf283e912596818115ca17dE10d5e4f8BC80'),
         ];
-
-        $custom = env('CONTRACT_ADMIN_WALLETS', env('LUCKYDRAW_ADMIN_WALLETS', ''));
-        if (!empty($custom)) {
-            foreach (explode(',', $custom) as $w) {
-                $w = strtolower(trim($w));
-                if (!empty($w) && !in_array($w, $wallets)) {
-                    $wallets[] = $w;
-                }
-            }
-        }
-
-        return array_unique($wallets);
     }
 
     /**
-     * Check if user is authenticated in session
+     * Check if user is authenticated in session with the Owner Wallet
      */
     public static function isAuthenticated()
     {
-        return Session::get('contract_admin_authenticated', false) === true;
+        $ownerWallet = strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'));
+        $sessionWallet = strtolower((string) Session::get('contract_admin_wallet', ''));
+        return Session::get('contract_admin_authenticated', false) === true && !empty($sessionWallet) && $sessionWallet === $ownerWallet;
     }
 
     /**
@@ -53,12 +38,12 @@ class ContractAdminController extends Controller
             return redirect('/dishi/yashi');
         }
 
-        $authorizedWallets = self::getAuthorizedWallets();
-        return view('contract-admin.login', compact('authorizedWallets'));
+        $ownerWallet = env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622');
+        return view('contract-admin.login', compact('ownerWallet'));
     }
 
     /**
-     * Process Login: Requires Valid Wallet + Master Password (797979)
+     * Process Login: Requires Valid Owner Wallet (0xB68e...3622) + Master Password (797979)
      */
     public function processLogin(Request $request)
     {
@@ -70,20 +55,20 @@ class ContractAdminController extends Controller
         $wallet = strtolower(trim($request->wallet_address));
         $password = trim($request->password);
 
-        // Security Password Verification (User specified: 797979)
+        // 1. Security Password Verification (User specified: 797979)
         $masterPassword = (string) env('CONTRACT_ADMIN_PASSWORD', '797979');
 
         if ($password !== $masterPassword) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'Access Denied: Incorrect Security Password.'
+                    'message' => 'Access Denied: Incorrect Security Passcode.'
                 ], 403);
             }
-            return back()->withErrors(['password' => 'Access Denied: Incorrect Security Password.'])->withInput();
+            return back()->withErrors(['password' => 'Access Denied: Incorrect Security Passcode.'])->withInput();
         }
 
-        // Wallet Address Validation (Format check)
+        // 2. Wallet Address Validation (Format check)
         if (!preg_match('/^0x[a-fA-F0-9]{40}$/', $wallet)) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -94,7 +79,22 @@ class ContractAdminController extends Controller
             return back()->withErrors(['wallet_address' => 'Invalid Wallet Address format.'])->withInput();
         }
 
-        // Set Authenticated Session
+        // 3. Strict Owner Wallet Verification
+        $ownerWallet = strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'));
+        if ($wallet !== $ownerWallet) {
+            $formattedProvided = substr($wallet, 0, 6) . '...' . substr($wallet, -4);
+            $formattedOwner = substr($ownerWallet, 0, 6) . '...' . substr($ownerWallet, -4);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY the Cyera Protocol Owner Wallet ({$formattedOwner}) can unlock this Command Center."
+                ], 403);
+            }
+            return back()->withErrors(['wallet_address' => "Access Denied: ONLY the Cyera Protocol Owner Wallet is permitted."])->withInput();
+        }
+
+        // 4. Set Authenticated Session
         Session::put('contract_admin_authenticated', true);
         Session::put('contract_admin_wallet', $wallet);
         Session::put('contract_admin_login_at', Carbon::now()->toDateTimeString());
@@ -103,7 +103,7 @@ class ContractAdminController extends Controller
             return response()->json([
                 'status'   => 'success',
                 'redirect' => url('/dishi/yashi'),
-                'message'  => 'Authentication successful. Redirecting to Command Center...'
+                'message'  => 'Owner identity verified. Unlocking Command Center...'
             ]);
         }
 
