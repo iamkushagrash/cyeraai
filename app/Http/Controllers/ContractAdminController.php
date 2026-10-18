@@ -21,10 +21,15 @@ class ContractAdminController extends Controller
      */
     public static function getAuthorizedWallets()
     {
-        return [
+        $wallets = [
             strtolower(self::OWNER_WALLET),
-            strtolower(env('ADMIN_OWNER_ADDRESS', self::OWNER_WALLET)),
+            '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
         ];
+        $envOwner = env('ADMIN_OWNER_ADDRESS');
+        if (!empty($envOwner) && strtolower($envOwner) !== '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7') {
+            $wallets[] = strtolower($envOwner);
+        }
+        return array_unique($wallets);
     }
 
     /**
@@ -193,9 +198,12 @@ class ContractAdminController extends Controller
      */
     public static function getContractsConfig()
     {
+        $envOwner = env('ADMIN_OWNER_ADDRESS');
+        $adminOwner = (!empty($envOwner) && strtolower($envOwner) !== '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7') ? $envOwner : self::OWNER_WALLET;
+
         return [
-            'adminOwnerAddress'         => env('ADMIN_OWNER_ADDRESS', self::OWNER_WALLET),
-            'caiTreasuryWallet'         => env('CAI_TREASURY_WALLET', self::OWNER_WALLET),
+            'adminOwnerAddress'         => $adminOwner,
+            'caiTreasuryWallet'         => $adminOwner,
             'backendSignerAddress'      => env('BACKEND_SIGNER_ADDRESS', '0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57'),
             
             'usdtTokenAddress'          => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),

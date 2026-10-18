@@ -1621,7 +1621,12 @@
             chainId: 56
         };
 
-        const TARGET_OWNER = CONFIG.adminOwner.toLowerCase();
+        const PRIMARY_V2_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
+        const AUTHORIZED_OWNERS = [
+            PRIMARY_V2_OWNER,
+            '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9',
+            (CONFIG.adminOwner ? CONFIG.adminOwner.toLowerCase() : PRIMARY_V2_OWNER)
+        ];
 
         // Standard Minimal ABIs
         const ERC20_ABI = [
@@ -1760,11 +1765,40 @@
                 throw new Error('No account');
             }
 
-            const activeAccount = accounts[0].toLowerCase();
-            if (activeAccount !== TARGET_OWNER) {
+            const activeAccount = accounts[0].trim().toLowerCase();
+            if (!AUTHORIZED_OWNERS.includes(activeAccount)) {
                 const shortAddr = activeAccount.substring(0, 6) + '...' + activeAccount.substring(activeAccount.length - 4);
-                showToast(`Access Denied: Connected wallet (${shortAddr}) is NOT the Owner Wallet. Switch to 0xB68e...3622 in MetaMask.`, 'error');
+                showToast(`Access Denied: Connected wallet (${shortAddr}) is NOT an Owner Wallet. Switch to 0xB68e...3622 in MetaMask.`, 'error');
                 throw new Error('Unauthorized wallet');
+            }
+
+            // Ensure connected network is BSC Mainnet (Chain ID 56)
+            try {
+                const network = await browserProvider.getNetwork();
+                if (Number(network.chainId) !== 56) {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }]
+                    });
+                }
+            } catch (switchErr) {
+                if (switchErr.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain Mainnet',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                blockExplorerUrls: ['https://bscscan.com']
+                            }]
+                        });
+                    } catch (addErr) {
+                        showToast('Please switch MetaMask network to BNB Smart Chain (Chain ID 56).', 'error');
+                        throw addErr;
+                    }
+                }
             }
 
             return await browserProvider.getSigner();

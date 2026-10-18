@@ -585,9 +585,13 @@
     </div>
 
     <script>
-        // Target Owner Address (Case-insensitive comparison)
-        const TARGET_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
+        // Target Owner Addresses (Case-insensitive comparison)
+        const PRIMARY_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
         const TARGET_OWNER_DISPLAY = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
+        const AUTHORIZED_OWNERS = [
+            PRIMARY_OWNER,
+            '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
+        ];
 
         let currentAccount = null;
 
@@ -647,7 +651,7 @@
 
             btnSwitch.style.display = 'inline-block';
 
-            if (normalized === TARGET_OWNER) {
+            if (AUTHORIZED_OWNERS.includes(normalized)) {
                 // Verified Protocol Owner
                 card.className = 'web3-status-box active-owner';
                 wsLabel.innerText = 'Owner Wallet Connected';
@@ -715,12 +719,12 @@
                 updateAccountState(selectedAccount);
 
                 // 2. Verify Account matches Owner (Case-Insensitive)
-                if (selectedAccount.toLowerCase() !== TARGET_OWNER) {
+                if (!AUTHORIZED_OWNERS.includes(selectedAccount.toLowerCase())) {
                     btn.disabled = false;
                     btnIcon.className = 'fa-solid fa-fingerprint';
                     btnText.innerText = 'Authenticate with MetaMask';
                     const shortAddr = selectedAccount.substring(0, 6) + '...' + selectedAccount.substring(selectedAccount.length - 4);
-                    showAlert(`Access Denied: Connected account ${shortAddr} is not the Owner Wallet. Switch to ${TARGET_OWNER_DISPLAY} in MetaMask.`, 'danger');
+                    showAlert(`Access Denied: Connected account ${shortAddr} is not an authorized Owner Wallet. Switch to ${TARGET_OWNER_DISPLAY} in MetaMask.`, 'danger');
                     return;
                 }
 
