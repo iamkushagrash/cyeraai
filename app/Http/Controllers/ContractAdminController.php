@@ -6,16 +6,24 @@ use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
 use Session;
+use Elliptic\EC;
+use kornrunner\Keccak;
 
 class ContractAdminController extends Controller
 {
+    /**
+     * Primary V2 Owner Wallet
+     */
+    const OWNER_WALLET = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
+
     /**
      * Get list of authorized admin wallets (Strictly Owner Wallet)
      */
     public static function getAuthorizedWallets()
     {
         return [
-            strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')),
+            strtolower(self::OWNER_WALLET),
+            strtolower(env('ADMIN_OWNER_ADDRESS', self::OWNER_WALLET)),
         ];
     }
 
@@ -24,9 +32,9 @@ class ContractAdminController extends Controller
      */
     public static function isAuthenticated()
     {
-        $ownerWallet = strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'));
+        $owner = strtolower(self::OWNER_WALLET);
         $sessionWallet = strtolower((string) Session::get('contract_admin_wallet', ''));
-        return Session::get('contract_admin_authenticated', false) === true && !empty($sessionWallet) && $sessionWallet === $ownerWallet;
+        return Session::get('contract_admin_authenticated', false) === true && !empty($sessionWallet) && ($sessionWallet === $owner || in_array($sessionWallet, self::getAuthorizedWallets()));
     }
 
     /**
@@ -38,76 +46,134 @@ class ContractAdminController extends Controller
             return redirect('/dishi/yashi');
         }
 
-        $ownerWallet = env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622');
+        $ownerWallet = self::OWNER_WALLET;
         return view('contract-admin.login', compact('ownerWallet'));
     }
 
     /**
-     * Process Login: Requires Valid Owner Wallet (0xB68e...3622) + Master Password (797979)
+     * Issue cryptographic challenge nonce for MetaMask authentication
+     */
+    public function getChallenge(Request $request)
+    {
+        $owner = self::OWNER_WALLET;
+        $nonce = bin2hex(random_bytes(16));
+        $time = gmdate('Y-m-d H:i:s') . ' UTC';
+        
+        $message = "CYERA PROTOCOL V2 — SECURE ADMIN AUTHENTICATION\n\n" .
+                   "Designated Owner: {$owner}\n" .
+                   "Timestamp: {$time}\n" .
+                   "Nonce: {$nonce}\n\n" .
+                   "Sign this message with your MetaMask wallet to authenticate as the Cyera Protocol Owner.";
+
+        Session::put('contract_admin_nonce', $nonce);
+        Session::put('contract_admin_challenge_msg', $message);
+        Session::put('contract_admin_challenge_created_at', time());
+
+        return response()->json([
+            'status'  => 'success',
+            'owner'   => $owner,
+            'nonce'   => $nonce,
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Cryptographically verify an Ethereum personal_sign (EIP-191) signature using secp256k1 and Keccak-256
+     */
+    public static function verifyPersonalSignature($message, $signature, $expectedAddress)
+    {
+        if (empty($message) || empty($signature) || empty($expectedAddress)) {
+            return false;
+        }
+
+        // 1. Ethereum Signed Message Prefix
+        $prefix = "\x19Ethereum Signed Message:\n" . strlen($message);
+        $hashHex = Keccak::hash($prefix . $message, 256);
+
+        // 2. Format signature
+        $sig = $signature;
+        if (strpos($sig, '0x') === 0) {
+            $sig = substr($sig, 2);
+        }
+        if (strlen($sig) !== 130) {
+            return false;
+        }
+
+        $r = substr($sig, 0, 64);
+        $s = substr($sig, 64, 64);
+        $v = hexdec(substr($sig, 128, 2));
+        if ($v >= 27) {
+            $v -= 27;
+        }
+
+        try {
+            $ec = new EC('secp256k1');
+            $pubKey = $ec->recoverPubKey($hashHex, ['r' => $r, 's' => $s], $v);
+            $pubHex = $pubKey->encode('hex');
+            $pubBytes = substr(hex2bin($pubHex), 1);
+            $recoveredAddress = '0x' . substr(Keccak::hash($pubBytes, 256), -40);
+
+            return strtolower(trim($recoveredAddress)) === strtolower(trim($expectedAddress));
+        } catch (\Exception $e) {
+            \Log::warning('MetaMask Signature Verification Failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Process Login: MetaMask Cryptographic Authentication (Strictly Owner 0xB68e...3622, case-insensitive)
      */
     public function processLogin(Request $request)
     {
-        $request->validate([
-            'wallet_address' => 'required|string',
-            'password'       => 'required|string',
-        ]);
+        // Support both input names: address or wallet_address
+        $wallet = strtolower(trim((string) ($request->input('address') ?: $request->input('wallet_address'))));
+        $signature = trim((string) $request->input('signature', ''));
+        $message = (string) $request->input('message', '');
 
-        $wallet = strtolower(trim($request->wallet_address));
-        $password = trim($request->password);
+        $primaryOwner = strtolower(self::OWNER_WALLET);
+        $authorized = self::getAuthorizedWallets();
 
-        // 1. Security Password Verification (User specified: 797979)
-        $masterPassword = (string) env('CONTRACT_ADMIN_PASSWORD', '797979');
-
-        if ($password !== $masterPassword) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'Access Denied: Incorrect Security Passcode.'
-                ], 403);
-            }
-            return back()->withErrors(['password' => 'Access Denied: Incorrect Security Passcode.'])->withInput();
-        }
-
-        // 2. Wallet Address Validation (Format check)
-        if (!preg_match('/^0x[a-fA-F0-9]{40}$/', $wallet)) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'Invalid Wallet Address format (Must be valid 0x... BSC address).'
-                ], 422);
-            }
-            return back()->withErrors(['wallet_address' => 'Invalid Wallet Address format.'])->withInput();
-        }
-
-        // 3. Strict Owner Wallet Verification
-        $ownerWallet = strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'));
-        if ($wallet !== $ownerWallet) {
-            $formattedProvided = substr($wallet, 0, 6) . '...' . substr($wallet, -4);
-            $formattedOwner = substr($ownerWallet, 0, 6) . '...' . substr($ownerWallet, -4);
+        // 1. Strict Owner Wallet Verification (Case-Insensitive)
+        if (empty($wallet) || ($wallet !== $primaryOwner && !in_array($wallet, $authorized))) {
+            $formattedProvided = !empty($wallet) ? substr($wallet, 0, 6) . '...' . substr($wallet, -4) : 'Empty';
+            $formattedOwner = substr(self::OWNER_WALLET, 0, 6) . '...' . substr(self::OWNER_WALLET, -4);
             
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY the Cyera Protocol Owner Wallet ({$formattedOwner}) can unlock this Command Center."
-                ], 403);
-            }
-            return back()->withErrors(['wallet_address' => "Access Denied: ONLY the Cyera Protocol Owner Wallet is permitted."])->withInput();
+            return response()->json([
+                'status'  => 'error',
+                'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY the Cyera Protocol Owner Wallet ({$formattedOwner}) can unlock this Command Center."
+            ], 403);
         }
 
-        // 4. Set Authenticated Session
+        // 2. MetaMask Cryptographic Signature Verification
+        if (!empty($signature)) {
+            $isValid = self::verifyPersonalSignature($message, $signature, $wallet);
+            
+            if (!$isValid) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'MetaMask Cryptographic Verification Failed: Signature does not match the Protocol Owner Wallet.'
+                ], 401);
+            }
+        } else {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'MetaMask Signature Required: Please click "Authenticate with MetaMask" to sign the authentication challenge.'
+            ], 400);
+        }
+
+        // 3. Set Authenticated Session
         Session::put('contract_admin_authenticated', true);
-        Session::put('contract_admin_wallet', $wallet);
+        Session::put('contract_admin_wallet', self::OWNER_WALLET);
         Session::put('contract_admin_login_at', Carbon::now()->toDateTimeString());
 
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'status'   => 'success',
-                'redirect' => url('/dishi/yashi'),
-                'message'  => 'Owner identity verified. Unlocking Command Center...'
-            ]);
-        }
+        // Clear used challenge
+        Session::forget(['contract_admin_nonce', 'contract_admin_challenge_msg']);
 
-        return redirect('/dishi/yashi');
+        return response()->json([
+            'status'   => 'success',
+            'redirect' => url('/dishi/yashi'),
+            'message'  => 'MetaMask verification successful! Access granted. Unlocking Command Center...'
+        ]);
     }
 
     /**

@@ -21,5 +21,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'dishi/yashi/login',
         'dishi/yashi/logout',
+        'dishi/yashi/challenge',
     ];
 }
