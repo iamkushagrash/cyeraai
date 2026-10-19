@@ -458,6 +458,9 @@ class PortfolioMiningController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Net claim amount after 10% protocol deduction is 0.'], 400);
         }
 
+        // Calculate Net CAI amount in Wei (18 decimals)
+        $caiWei = bcmul(sprintf('%.6f', $netCaiToSell), '1000000000000000000', 0);
+
         // Slippage Configuration: Controlled via DEX_SLIPPAGE_TOLERANCE env (0 = completely removed / zero restriction, 5 = 5%, etc.)
         $slippageTolerance = env('DEX_SLIPPAGE_TOLERANCE', '0');
         $slippagePercent = is_numeric($slippageTolerance) ? (float) $slippageTolerance : 0.0;
@@ -468,7 +471,7 @@ class PortfolioMiningController extends Controller
         } else {
             $toleranceFactor = max(0, (100 - $slippagePercent) / 100);
             $minUsdtOut = round($netUsdtValue * $toleranceFactor, 6);
-            $minUsdtWei = bcmul((string) $minUsdtOut, '1000000000000000000', 0);
+            $minUsdtWei = bcmul(sprintf('%.6f', $minUsdtOut), '1000000000000000000', 0);
         }
 
         // Unique Nonce & Expiry (10 minutes)

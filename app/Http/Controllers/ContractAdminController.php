@@ -216,7 +216,7 @@ class ContractAdminController extends Controller
             
             'royalJackpotDepositAddress'=> env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
             'royalJackpotVaultAddress'  => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
-            'royalJackpotCollector'     => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
+            'royalJackpotCollector'     => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
             
             'tradingWallet'             => env('TRADING_WALLET_ADDRESS', '0xAC2aa717c6f4c18D2e4b1DD11aa17BFCA8cc8D53'),
             'reserveWallet'             => env('RESERVE_WALLET_ADDRESS', '0x63BAF2Aa307DC8a456690a705c40d63194C0dd70'),
