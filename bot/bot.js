@@ -20,9 +20,15 @@ const RPC_LIST = [
 ];
 
 const USDT_ADDR = process.env.USDT_TOKEN_ADDRESS || '0x55d398326f99059fF775485246999027B3197955';
-const CAI_ADDR = process.env.CAI_TOKEN_ADDRESS || '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
+const rawCai = process.env.CAI_TOKEN_ADDRESS;
+const CAI_ADDR = (rawCai && rawCai.toLowerCase() !== '0x4756618f389a46819008aff01ad0f91a38154edb')
+    ? rawCai
+    : '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
 const ROUTER_ADDR = process.env.PANCAKE_ROUTER_ADDRESS || '0x10ED43C718714eb63d5aA57B78B54704E256024E';
-const MINING_ADDR = process.env.CYERA_MINING_ENGINE_ADDRESS || '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6';
+const rawMining = process.env.CYERA_MINING_ENGINE_ADDRESS || process.env.MINING_CONTRACT_ADDRESS;
+const MINING_ADDR = (rawMining && rawMining.toLowerCase() !== '0xdd905468f6f91f8c37efb9e27e1f282734e60217')
+    ? rawMining
+    : '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6';
 
 // Random Trade Amount Range (In USDT)
 const MIN_TRADE = parseFloat(process.env.MIN_TRADE_USDT || process.env.MIN_BUY_USDT || '1.00');
