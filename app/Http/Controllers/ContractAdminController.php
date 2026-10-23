@@ -265,6 +265,13 @@ class ContractAdminController extends Controller
             
             'tradingWallet'             => env('TRADING_WALLET_ADDRESS', '0xAC2aa717c6f4c18D2e4b1DD11aa17BFCA8cc8D53'),
             'reserveWallet'             => env('RESERVE_WALLET_ADDRESS', '0x63BAF2Aa307DC8a456690a705c40d63194C0dd70'),
+            'partnerWallets'            => [
+                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
+                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
+                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
+                '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
+                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
+            ],
             
             'bscMainnetRpc'             => env('BSC_MAINNET_RPC', 'https://bsc-dataseed.binance.org/'),
             'chainId'                   => 56,

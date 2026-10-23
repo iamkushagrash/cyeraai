@@ -275,6 +275,15 @@
             flex: 1;
         }
 
+        .balance-card-hover {
+            box-shadow: var(--shadow-subtle);
+        }
+        .balance-card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-float);
+            border-color: var(--primary-border);
+        }
+
         /* Navigation Tabs Bar */
         .tab-bar {
             display: flex;
@@ -1072,6 +1081,268 @@
                 </div>
             </div>
 
+            <!-- ======================================================== -->
+            <!-- LIVE PROTOCOL & VAULT ON-CHAIN BALANCES                   -->
+            <!-- ======================================================== -->
+            <div class="portal-card" style="margin-bottom: 24px;">
+                <div class="portal-card-header" style="flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div class="card-heading" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-wallet" style="color: #4f46e5;"></i>
+                            <span>Live Protocol & Ecosystem On-Chain Balances</span>
+                        </div>
+                        <div class="card-caption">Real-time BSC blockchain balances across withdrawal vaults, trading wallets, reserves & partner allocations</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span class="badge badge-active" style="padding: 6px 12px; font-size: 0.74rem;">
+                            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 6px; box-shadow: 0 0 8px #10b981;"></span>
+                            BSC Mainnet (56)
+                        </span>
+                        <button type="button" class="btn-action primary" style="padding: 6px 14px; font-size: 0.78rem;" onclick="refreshLiveOnChainBalances()">
+                            <i class="fa-solid fa-arrows-rotate" id="balanceSyncSpinner"></i> Refresh All Balances
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Balances Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                    
+                    <!-- 1. USDT Withdrawal Vault -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">USDT Withdrawal Vault</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;" id="dashVaultUsdt">
+                                    $5,629.03 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-vault"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-indigo">ROI & Working Payouts</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 6) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 20% Trading Wallet -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">20% Trading Wallet</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;" id="dashTradingUsdt">
+                                    $362.19 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-active">20% Auto Split</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['tradingWallet'], 0, 6) }}...{{ substr($contracts['tradingWallet'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['tradingWallet'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['tradingWallet'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 2% Reserve Wallet -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">2% Reserve Wallet</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b; font-family: 'JetBrains Mono', monospace;" id="dashReserveUsdt">
+                                    $115.41 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-amber">2% Protocol Reserve</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['reserveWallet'], 0, 6) }}...{{ substr($contracts['reserveWallet'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['reserveWallet'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['reserveWallet'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Mining Engine Buffer Reserves -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Mining Engine Reserves</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #06b6d4; font-family: 'JetBrains Mono', monospace;" id="dashMiningCaai">
+                                    42,720 <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #cffafe; color: #0891b2; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-cyan">30% DEX Buy Buffer • <span id="dashMiningUsdt">$0.00 USDT</span></span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['miningEngineAddress'], 0, 6) }}...{{ substr($contracts['miningEngineAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Revenue Splitter Contract -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Revenue Splitter (32%)</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashSplitterUsdt">
+                                    $0.00 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-code-fork"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge" style="background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;">20/10/2% Auto-Split</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['revenueSplitterAddress'], 0, 6) }}...{{ substr($contracts['revenueSplitterAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Royal Jackpot Vault & Deposit -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Royal Jackpot Vault</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashJackpotVaultUsdt">
+                                    $0.00 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-amber">Deposit: <span id="dashJackpotDepositUsdt">$0.00 USDT</span></span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['royalJackpotVaultAddress'], 0, 6) }}...{{ substr($contracts['royalJackpotVaultAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['royalJackpotVaultAddress'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['royalJackpotVaultAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. Protocol Treasury (Owner) -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Protocol Treasury (Owner)</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5; font-family: 'JetBrains Mono', monospace;" id="dashTreasuryCaai">
+                                    733,350 <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>
+                                </div>
+                            </div>
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-indigo">USDT: <strong id="dashTreasuryUsdt">$4.40</strong></span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['adminOwnerAddress'], 0, 6) }}...{{ substr($contracts['adminOwnerAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['adminOwnerAddress'] }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['adminOwnerAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 8. Partner Wallets Sub-Section (10% Allocation @ 2% each) -->
+                <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-handshake" style="color: #4f46e5;"></i>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-heading);">10% Partner Incomes (5 Designated Wallets @ 2% each)</span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">
+                            Combined Partner Total: <strong id="dashTotalPartnerUsdt" style="color: var(--emerald-text); font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">$299.81 USDT</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+                        @php
+                            $pList = $contracts['partnerWallets'] ?? [
+                                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
+                                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
+                                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
+                                '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
+                                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
+                            ];
+                        @endphp
+                        @foreach($pList as $idx => $pAddr)
+                        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Partner #{{ $idx + 1 }} (2%)</div>
+                                <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashPartner{{ $idx + 1 }}Usdt">Loading...</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span style="font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">{{ substr($pAddr, 0, 4) }}...{{ substr($pAddr, -3) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 4px; font-size: 8px;" onclick="copyToClipboard('{{ $pAddr }}')" title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $pAddr }}" target="_blank" style="color: var(--primary); font-size: 9px;" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+            </div>
+
             <!-- Quick Actions & Protocol Status -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
                 
@@ -1685,6 +1956,16 @@
             usdtVault: "{{ $contracts['usdtWithdrawalVaultAddress'] }}",
             jackpotDeposit: "{{ $contracts['royalJackpotDepositAddress'] }}",
             jackpotVault: "{{ $contracts['royalJackpotVaultAddress'] }}",
+            tradingWallet: "{{ $contracts['tradingWallet'] ?? '0xAC2aa717c6f4c18D2e4b1DD11aa17BFCA8cc8D53' }}",
+            reserveWallet: "{{ $contracts['reserveWallet'] ?? '0x63BAF2Aa307DC8a456690a705c40d63194C0dd70' }}",
+            treasuryWallet: "{{ $contracts['adminOwnerAddress'] ?? '0xB68e29B51BB9B0856211cb2856215e3F68243622' }}",
+            partnerWallets: {!! json_encode($contracts['partnerWallets'] ?? [
+                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
+                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
+                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
+                '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
+                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
+            ]) !!},
             usdtToken: "{{ $contracts['usdtTokenAddress'] }}",
             rpcUrl: "{{ $contracts['bscMainnetRpc'] }}",
             chainId: 56
@@ -1999,6 +2280,9 @@
 
         // Real-Time On-Chain Balance Sync via BSC Provider
         async function refreshLiveOnChainBalances() {
+            const spinner = document.getElementById('balanceSyncSpinner');
+            if (spinner) spinner.classList.add('fa-spin');
+
             try {
                 const provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
                 const pairAbi = [
@@ -2011,37 +2295,137 @@
                 const cai = new ethers.Contract(CONFIG.caiToken, erc20Abi, provider);
                 const usdt = new ethers.Contract(CONFIG.usdtToken, erc20Abi, provider);
 
-                // Pool reserves
-                const reserves = await pair.getReserves();
-                const token0 = await pair.token0();
+                // Fetch all on-chain balances in parallel
+                const [
+                    reserves,
+                    token0,
+                    vaultUsdt,
+                    tradingUsdt,
+                    reserveUsdt,
+                    miningCaai,
+                    miningUsdt,
+                    splitterUsdt,
+                    jackpotVaultUsdt,
+                    jackpotDepUsdt,
+                    treasuryCaai,
+                    treasuryUsdt,
+                    p1Usdt,
+                    p2Usdt,
+                    p3Usdt,
+                    p4Usdt,
+                    p5Usdt
+                ] = await Promise.all([
+                    pair.getReserves(),
+                    pair.token0(),
+                    usdt.balanceOf(CONFIG.usdtVault),
+                    usdt.balanceOf(CONFIG.tradingWallet),
+                    usdt.balanceOf(CONFIG.reserveWallet),
+                    cai.balanceOf(CONFIG.miningEngine),
+                    usdt.balanceOf(CONFIG.miningEngine),
+                    usdt.balanceOf(CONFIG.revenueSplitter),
+                    usdt.balanceOf(CONFIG.jackpotVault),
+                    usdt.balanceOf(CONFIG.jackpotDeposit),
+                    cai.balanceOf(CONFIG.treasuryWallet),
+                    usdt.balanceOf(CONFIG.treasuryWallet),
+                    usdt.balanceOf(CONFIG.partnerWallets[0]),
+                    usdt.balanceOf(CONFIG.partnerWallets[1]),
+                    usdt.balanceOf(CONFIG.partnerWallets[2]),
+                    usdt.balanceOf(CONFIG.partnerWallets[3]),
+                    usdt.balanceOf(CONFIG.partnerWallets[4]),
+                ]);
+
+                // 1. PancakeSwap Pool
                 const isCaaiToken0 = token0.toLowerCase() === CONFIG.caiToken.toLowerCase();
                 const rCaai = isCaaiToken0 ? reserves[0] : reserves[1];
                 const rUsdt = isCaaiToken0 ? reserves[1] : reserves[0];
-
                 const caaiNum = Number(ethers.formatEther(rCaai));
                 const usdtNum = Number(ethers.formatEther(rUsdt));
-                const price = (usdtNum / caaiNum).toFixed(4);
+                const price = (usdtNum / (caaiNum || 1)).toFixed(4);
                 const totalLiq = (usdtNum * 2).toFixed(2);
 
-                document.getElementById('livePoolPrice').innerText = `$${price}`;
-                document.getElementById('livePoolLiq').innerText = `~$${totalLiq}`;
-                document.getElementById('livePoolCaai').innerText = `${caaiNum.toFixed(2)} CAAI`;
-                document.getElementById('livePoolUsdt').innerText = `${usdtNum.toFixed(2)} USDT`;
-                document.getElementById('boxPrice').innerText = `$${price}`;
+                const livePoolPriceEl = document.getElementById('livePoolPrice');
+                if (livePoolPriceEl) livePoolPriceEl.innerText = `$${price}`;
+                const livePoolLiqEl = document.getElementById('livePoolLiq');
+                if (livePoolLiqEl) livePoolLiqEl.innerText = `~$${totalLiq}`;
+                const livePoolCaaiEl = document.getElementById('livePoolCaai');
+                if (livePoolCaaiEl) livePoolCaaiEl.innerText = `${caaiNum.toFixed(2)} CAAI`;
+                const livePoolUsdtEl = document.getElementById('livePoolUsdt');
+                if (livePoolUsdtEl) livePoolUsdtEl.innerText = `${usdtNum.toFixed(2)} USDT`;
+                const boxPriceEl = document.getElementById('boxPrice');
+                if (boxPriceEl) boxPriceEl.innerText = `$${price}`;
 
-                // Mining Buffer
-                const bufferBal = await cai.balanceOf(CONFIG.miningEngine);
-                const bufferFormatted = Number(ethers.formatEther(bufferBal)).toFixed(0) + " CAAI";
-                document.getElementById('miningBufferVal').innerText = bufferFormatted;
-                document.getElementById('boxBuffer').innerText = bufferFormatted;
+                // 2. USDT Withdrawal Vault
+                const vUsdtNum = Number(ethers.formatEther(vaultUsdt));
+                const dashVaultUsdt = document.getElementById('dashVaultUsdt');
+                if (dashVaultUsdt) dashVaultUsdt.innerHTML = `$${vUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+                const boxVaultUsdt = document.getElementById('boxVaultUsdt');
+                if (boxVaultUsdt) boxVaultUsdt.innerText = `${vUsdtNum.toFixed(2)} USDT`;
 
-                // USDT Vault Balance
-                const vaultBal = await usdt.balanceOf(CONFIG.usdtVault);
-                document.getElementById('boxVaultUsdt').innerText = Number(ethers.formatEther(vaultBal)).toFixed(2) + " USDT";
+                // 3. 20% Trading Wallet
+                const tUsdtNum = Number(ethers.formatEther(tradingUsdt));
+                const dashTradingUsdt = document.getElementById('dashTradingUsdt');
+                if (dashTradingUsdt) dashTradingUsdt.innerHTML = `$${tUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
 
-                console.log("✔ Real-time on-chain stats synchronized!");
+                // 4. 2% Reserve Wallet
+                const rUsdtNum = Number(ethers.formatEther(reserveUsdt));
+                const dashReserveUsdt = document.getElementById('dashReserveUsdt');
+                if (dashReserveUsdt) dashReserveUsdt.innerHTML = `$${rUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+
+                // 5. Mining Engine Buffer
+                const mCaaiNum = Number(ethers.formatEther(miningCaai));
+                const mUsdtNum = Number(ethers.formatEther(miningUsdt));
+                const dashMiningCaai = document.getElementById('dashMiningCaai');
+                if (dashMiningCaai) dashMiningCaai.innerHTML = `${mCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
+                const dashMiningUsdt = document.getElementById('dashMiningUsdt');
+                if (dashMiningUsdt) dashMiningUsdt.innerText = `$${mUsdtNum.toFixed(2)} USDT`;
+                const miningBufferVal = document.getElementById('miningBufferVal');
+                if (miningBufferVal) miningBufferVal.innerText = `${mCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} CAAI`;
+                const boxBuffer = document.getElementById('boxBuffer');
+                if (boxBuffer) boxBuffer.innerText = `${mCaaiNum.toFixed(0)} CAAI`;
+
+                // 6. Revenue Splitter
+                const sUsdtNum = Number(ethers.formatEther(splitterUsdt));
+                const dashSplitterUsdt = document.getElementById('dashSplitterUsdt');
+                if (dashSplitterUsdt) dashSplitterUsdt.innerHTML = `$${sUsdtNum.toFixed(2)} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+
+                // 7. Jackpot Vault & Deposit
+                const jVaultUsdtNum = Number(ethers.formatEther(jackpotVaultUsdt));
+                const jDepUsdtNum = Number(ethers.formatEther(jackpotDepUsdt));
+                const dashJackpotVaultUsdt = document.getElementById('dashJackpotVaultUsdt');
+                if (dashJackpotVaultUsdt) dashJackpotVaultUsdt.innerHTML = `$${jVaultUsdtNum.toFixed(2)} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+                const dashJackpotDepositUsdt = document.getElementById('dashJackpotDepositUsdt');
+                if (dashJackpotDepositUsdt) dashJackpotDepositUsdt.innerText = `$${jDepUsdtNum.toFixed(2)} USDT`;
+
+                // 8. Protocol Treasury
+                const trCaaiNum = Number(ethers.formatEther(treasuryCaai));
+                const trUsdtNum = Number(ethers.formatEther(treasuryUsdt));
+                const dashTreasuryCaai = document.getElementById('dashTreasuryCaai');
+                if (dashTreasuryCaai) dashTreasuryCaai.innerHTML = `${trCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
+                const dashTreasuryUsdt = document.getElementById('dashTreasuryUsdt');
+                if (dashTreasuryUsdt) dashTreasuryUsdt.innerText = `$${trUsdtNum.toFixed(2)}`;
+
+                // 9. Partner Wallets
+                const pNums = [
+                    Number(ethers.formatEther(p1Usdt)),
+                    Number(ethers.formatEther(p2Usdt)),
+                    Number(ethers.formatEther(p3Usdt)),
+                    Number(ethers.formatEther(p4Usdt)),
+                    Number(ethers.formatEther(p5Usdt)),
+                ];
+                let totalPartner = 0;
+                pNums.forEach((num, idx) => {
+                    totalPartner += num;
+                    const pEl = document.getElementById(`dashPartner${idx + 1}Usdt`);
+                    if (pEl) pEl.innerText = `$${num.toFixed(2)} USDT`;
+                });
+                const totalPartnerEl = document.getElementById('dashTotalPartnerUsdt');
+                if (totalPartnerEl) totalPartnerEl.innerText = `$${totalPartner.toFixed(2)} USDT`;
+
+                console.log("✔ Real-time protocol balances synchronized via BSC RPC!");
             } catch (err) {
                 console.warn("Could not sync live RPC:", err.message);
+            } finally {
+                if (spinner) spinner.classList.remove('fa-spin');
             }
         }
 
