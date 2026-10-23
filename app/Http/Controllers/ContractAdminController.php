@@ -17,20 +17,34 @@ class ContractAdminController extends Controller
     const OWNER_WALLET = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
 
     /**
-     * Subadmin Wallet (MLM Access Only - No Contract Operations)
+     * Subadmin Wallets (MLM Access Only - No Contract Operations)
      */
+    const SUBADMIN_WALLETS = [
+        '0x7e4238D74Ef4ba31242ed6D58aC4fc9178f20FA8',
+        '0xC2591a47F92BDDe0227FE05A99e5b50BFF2c5e8D',
+    ];
     const SUBADMIN_WALLET = '0x7e4238D74Ef4ba31242ed6D58aC4fc9178f20FA8';
 
     /**
-     * Get list of authorized admin wallets (Owner + Subadmin)
+     * Get list of lowercase subadmin wallets
+     */
+    public static function getSubadminWallets()
+    {
+        return array_map('strtolower', self::SUBADMIN_WALLETS);
+    }
+
+    /**
+     * Get list of authorized admin wallets (Owner + Subadmins)
      */
     public static function getAuthorizedWallets()
     {
         $wallets = [
             strtolower(self::OWNER_WALLET),
-            strtolower(self::SUBADMIN_WALLET),
             '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
         ];
+        foreach (self::getSubadminWallets() as $sub) {
+            $wallets[] = $sub;
+        }
         $envOwner = env('ADMIN_OWNER_ADDRESS');
         if (!empty($envOwner) && strtolower($envOwner) !== '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7') {
             $wallets[] = strtolower($envOwner);
@@ -53,7 +67,7 @@ class ContractAdminController extends Controller
     public static function isSubAdmin()
     {
         $wallet = strtolower((string) Session::get('contract_admin_wallet', ''));
-        return $wallet === strtolower(self::SUBADMIN_WALLET) || Session::get('contract_admin_role') === 'subadmin';
+        return in_array($wallet, self::getSubadminWallets()) || Session::get('contract_admin_role') === 'subadmin';
     }
 
     /**
@@ -62,7 +76,7 @@ class ContractAdminController extends Controller
     public static function isOwner()
     {
         $wallet = strtolower((string) Session::get('contract_admin_wallet', ''));
-        return ($wallet !== strtolower(self::SUBADMIN_WALLET)) && (
+        return (!in_array($wallet, self::getSubadminWallets())) && (
             $wallet === strtolower(self::OWNER_WALLET) ||
             $wallet === '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9' ||
             Session::get('contract_admin_role') === 'owner'
@@ -80,7 +94,8 @@ class ContractAdminController extends Controller
 
         $ownerWallet = self::OWNER_WALLET;
         $subadminWallet = self::SUBADMIN_WALLET;
-        return view('contract-admin.login', compact('ownerWallet', 'subadminWallet'));
+        $subadminWallets = self::SUBADMIN_WALLETS;
+        return view('contract-admin.login', compact('ownerWallet', 'subadminWallet', 'subadminWallets'));
     }
 
     /**
@@ -162,9 +177,9 @@ class ContractAdminController extends Controller
         $signature = trim((string) $request->input('signature', ''));
         $message = (string) $request->input('message', '');
 
-        $primaryOwner   = strtolower(self::OWNER_WALLET);
-        $subAdminWallet = strtolower(self::SUBADMIN_WALLET);
-        $authorized     = self::getAuthorizedWallets();
+        $primaryOwner    = strtolower(self::OWNER_WALLET);
+        $subAdminWallets = self::getSubadminWallets();
+        $authorized      = self::getAuthorizedWallets();
 
         // 1. Strict Wallet Verification (Case-Insensitive)
         if (empty($wallet) || !in_array($wallet, $authorized)) {
@@ -194,7 +209,7 @@ class ContractAdminController extends Controller
         }
 
         // 3. Set Authenticated Session with Role Differentiation
-        $isSubadmin = ($wallet === $subAdminWallet);
+        $isSubadmin = in_array($wallet, $subAdminWallets);
         $role = $isSubadmin ? 'subadmin' : 'owner';
 
         Session::put('contract_admin_authenticated', true);

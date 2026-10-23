@@ -21,9 +21,9 @@ class ContractOwnerOnly
     {
         $sessionWallet = strtolower(trim((string) Session::get('contract_admin_wallet', '')));
         $sessionRole   = Session::get('contract_admin_role', '');
-        $subAdmin      = strtolower(ContractAdminController::SUBADMIN_WALLET);
+        $subAdmins     = ContractAdminController::getSubadminWallets();
 
-        if ($sessionWallet === $subAdmin || $sessionRole === 'subadmin') {
+        if (in_array($sessionWallet, $subAdmins) || $sessionRole === 'subadmin') {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status'  => 'forbidden',

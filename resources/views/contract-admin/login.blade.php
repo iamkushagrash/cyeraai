@@ -531,9 +531,15 @@
                 <span class="oc-badge">Owner Whitelist</span>
             </div>
             <div class="oc-address" id="targetOwnerText">0xB68e29B51BB9B0856211cb2856215e3F68243622</div>
-            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
-                <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
-                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x7e42...20FA8</span>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.72rem; color: var(--text-muted);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x7e42...20FA8</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0xC259...c5e8D</span>
+                </div>
             </div>
         </div>
 
@@ -591,11 +597,14 @@
     <script>
         // Target Owner & Subadmin Addresses (Case-insensitive comparison)
         const PRIMARY_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
-        const SUBADMIN_WALLET = '0x7e4238d74ef4ba31242ed6d58ac4fc9178f20fa8';
+        const SUBADMIN_WALLETS = [
+            '0x7e4238d74ef4ba31242ed6d58ac4fc9178f20fa8',
+            '0xc2591a47f92bdde0227fe05a99e5b50bff2c5e8d'
+        ];
         const TARGET_OWNER_DISPLAY = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
         const AUTHORIZED_OWNERS = [
             PRIMARY_OWNER,
-            SUBADMIN_WALLET,
+            ...SUBADMIN_WALLETS,
             '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
         ];
 
@@ -657,7 +666,7 @@
 
             btnSwitch.style.display = 'inline-block';
 
-            if (normalized === SUBADMIN_WALLET) {
+            if (SUBADMIN_WALLETS.includes(normalized)) {
                 // Verified Subadmin (MLM Only)
                 card.className = 'web3-status-box active-owner';
                 wsLabel.innerText = 'Subadmin Wallet Connected';
