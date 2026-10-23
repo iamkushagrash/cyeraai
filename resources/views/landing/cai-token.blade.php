@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyera AI — CAAI Token | The Future of Decentralized Intelligence</title>
     <meta name="description"
-        content="CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain. Total Supply: 300000 CAAI.">
+        content="CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain. Total Supply: 777,777 CAAI.">
     <meta property="og:title" content="Cyera AI — CAAI Token">
-    <meta property="og:description" content="Power the Future. Own the Protocol. CAAI Token on BNB Smart Chain. Total Supply: 300000 CAAI.">
+    <meta property="og:description" content="Power the Future. Own the Protocol. CAAI Token on BNB Smart Chain. Total Supply: 777,777 CAAI.">
     <meta property="og:image" content="{{ asset('images/cai-token-coin.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/cai-spartan-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -398,7 +398,7 @@
             <span class="grad-txt">Power The Future</span><br>
             Own The Protocol
         </h1>
-        <p class="hero-sub">CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain with a capped supply of 300000 CAAI.</p>
+        <p class="hero-sub">CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain with a capped supply of 777,777 CAAI.</p>
         
         <div class="hero-btns">
             <a href="{{ url('/register') }}" class="btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
@@ -540,7 +540,7 @@
                 </div>
                 <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
                     <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Capped Supply</div>
-                    <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAAI</div>
+                    <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">777,777 CAAI</div>
                 </div>
             </div>
 
@@ -601,13 +601,13 @@
                     <div class="a-ring a-ring2"></div>
                     <img src="{{ asset('images/cai-token-coin.png') }}" alt="Cyera AI CAAI Token">
                     <div class="fl-badge b1"><div class="bv">BNB Chain</div><div class="bl">Powered By</div></div>
-                    <div class="fl-badge b2"><div class="bv">300000 CAAI</div><div class="bl">Total Supply</div></div>
+                    <div class="fl-badge b2"><div class="bv">777,777 CAAI</div><div class="bl">Total Supply</div></div>
                 </div>
             </div>
             <div class="reveal" style="transition-delay:.2s">
                 <div class="sec-eyebrow"><i class="fas fa-cube"></i> What Is CAAI</div>
                 <h2 class="sec-title">Meet the Token<br>Powering <span>Decentralized AI</span></h2>
-                <p class="sec-desc">CAAI (Cyera AI Token) is an exclusive BEP-20 digital asset built on BNB Smart Chain with a strictly capped total supply of 300000 tokens. It serves as the native utility and governance asset of the Cyera AI protocol — engineered for ultra-fast, audited on-chain participation.</p>
+                <p class="sec-desc">CAAI (Cyera AI Token) is an exclusive BEP-20 digital asset built on BNB Smart Chain with a strictly capped total supply of 777,777 tokens. It serves as the native utility and governance asset of the Cyera AI protocol — engineered for ultra-fast, audited on-chain participation.</p>
                 <div class="about-feats">
                     <div class="feat-row">
                         <div class="feat-ico ico-gold"><i class="fas fa-shield-halved"></i></div>
@@ -743,7 +743,7 @@
                 <div class="spec-list">
                     <div class="spec-row"><span class="sk">Blockchain</span><span class="sv gold">BNB Smart Chain</span></div>
                     <div class="spec-row"><span class="sk">Token Standard</span><span class="sv gold">BEP-20</span></div>
-                    <div class="spec-row"><span class="sk">Total Supply</span><span class="sv gold">300000 CAAI</span></div>
+                    <div class="spec-row"><span class="sk">Total Supply</span><span class="sv gold">777,777 CAAI</span></div>
                     <div class="spec-row"><span class="sk">Consensus</span><span class="sv">PoSA (21 Validators)</span></div>
                     <div class="spec-row"><span class="sk">Block Time</span><span class="sv green">~3 Seconds</span></div>
                     <div class="spec-row"><span class="sk">Transaction Fees</span><span class="sv green">&lt; $0.01 USD</span></div>
@@ -836,7 +836,7 @@
         <li><a href="#technology">Technology</a></li>
         <li><a href="{{ url('/login') }}">Login</a></li>
     </ul>
-    <p class="ft-copy">&copy; {{ date('Y') }} Cyera AI Protocol. All rights reserved. CAAI Token operates on BNB Smart Chain. Total Supply: 300000 CAAI.</p>
+    <p class="ft-copy">&copy; {{ date('Y') }} Cyera AI Protocol. All rights reserved. CAAI Token operates on BNB Smart Chain. Total Supply: 777,777 CAAI.</p>
 </footer>
 
 <script>
