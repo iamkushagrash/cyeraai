@@ -165,19 +165,78 @@ class UserDetails extends Model
         return $maxLvl;
     }
 
-    public function getLegBusiness()
+    public function getLegBusiness($startDate = null, $endDate = null)
     {
-        $directs = \App\UserDetails::where(function($q) {
+        $directs = \App\UserDetails::where(function ($q) {
             $q->where('sponsorid', $this->userid)
-              ->orWhere('sponsorid', $this->id);
-        })->where('id', '!=', $this->id)->orderBy('total_investment', 'desc')->get();
-        if ($directs->count() > 0) {
-            $power = (float) ($directs->first()->total_investment);
-            $weaker = (float) ($directs->sum('total_investment') - $power);
-        } else {
-            $power = 0;
-            $weaker = 0;
+                ->orWhere('sponsorid', $this->id);
+        })->where('id', '!=', $this->id)->get();
+
+        if ($directs->count() == 0) {
+            return [
+                'power' => 0,
+                'weaker' => 0,
+                'total' => 0,
+                'power_leg' => 0,
+                'weaker_leg' => 0,
+                'total_leg_business' => 0
+            ];
         }
+
+        // Period-specific calculation (for live / monthly pool calculations)
+        if ($startDate && $endDate) {
+            $allUsers = \App\UserDetails::select('id', 'userid', 'sponsorid')->get();
+            $childrenMap = [];
+            foreach ($allUsers as $u) {
+                $p = $u->sponsorid;
+                if ($p > 0) {
+                    $childrenMap[$p][] = $u->id;
+                }
+            }
+
+            $legVolumes = [];
+            foreach ($directs as $direct) {
+                $ids = [$direct->id];
+                $queue = [$direct->id];
+                while (!empty($queue)) {
+                    $curr = array_pop($queue);
+                    if (isset($childrenMap[$curr])) {
+                        foreach ($childrenMap[$curr] as $c) {
+                            $ids[] = $c;
+                            $queue[] = $c;
+                        }
+                    }
+                }
+
+                $vol = (float) \App\StackingDeposite::whereIn('userid', $ids)
+                    ->where('status', 1)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->sum('usdt');
+                $legVolumes[] = $vol;
+            }
+
+            rsort($legVolumes);
+            $power = $legVolumes[0] ?? 0.0;
+            $weaker = 0.0;
+            for ($i = 1; $i < count($legVolumes); $i++) {
+                $weaker += $legVolumes[$i];
+            }
+            $total = $power + $weaker;
+
+            return [
+                'power' => $power,
+                'weaker' => $weaker,
+                'total' => $total,
+                'power_leg' => $power,
+                'weaker_leg' => $weaker,
+                'total_leg_business' => $total
+            ];
+        }
+
+        // All-time fallback
+        $directsByInv = $directs->sortByDesc('total_investment');
+        $power = (float) ($directsByInv->first()->total_investment);
+        $weaker = (float) ($directsByInv->sum('total_investment') - $power);
         $total = $power + $weaker;
         return [
             'power' => $power,
@@ -213,10 +272,10 @@ class UserDetails extends Model
             : 'Window Expired';
 
         // Direct referrals sponsored by user who activated a package >= 100 in the 7-day window
-        $directs7DaysCount = \App\UserDetails::where(function($q) {
-                $q->where('user_details.sponsorid', $this->userid)
-                  ->orWhere('user_details.sponsorid', $this->id);
-            })
+        $directs7DaysCount = \App\UserDetails::where(function ($q) {
+            $q->where('user_details.sponsorid', $this->userid)
+                ->orWhere('user_details.sponsorid', $this->id);
+        })
             ->where('user_details.id', '!=', $this->id)
             ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
             ->where('sd.usdt', '>=', 100)
@@ -237,17 +296,17 @@ class UserDetails extends Model
         if ($userIsDao > 0) {
             $daoTierMap = [
                 1 => ['name' => 'Platinum DAO', 'amount' => 3333],
-                2 => ['name' => 'Golden DAO',   'amount' => 5555],
-                3 => ['name' => 'Diamond DAO',  'amount' => 10000],
+                2 => ['name' => 'Golden DAO', 'amount' => 5555],
+                3 => ['name' => 'Diamond DAO', 'amount' => 10000],
             ];
             $daoTierName = $daoTierMap[$userIsDao]['name'] ?? 'DAO Member';
             $daoMinPackageAmount = $daoTierMap[$userIsDao]['amount'] ?? 0;
 
             // Direct referrals sponsored by user with same or higher DAO package (is_dao >= $userIsDao)
-            $daoDirectsCount = \App\UserDetails::where(function($q) {
-                    $q->where('sponsorid', $this->userid)
-                      ->orWhere('sponsorid', $this->id);
-                })
+            $daoDirectsCount = \App\UserDetails::where(function ($q) {
+                $q->where('sponsorid', $this->userid)
+                    ->orWhere('sponsorid', $this->id);
+            })
                 ->where('id', '!=', $this->id)
                 ->where('is_dao', '>=', $userIsDao)
                 ->count();
@@ -606,38 +665,68 @@ class UserDetails extends Model
         return $this->getDaoDetails();
     }
 
-    public function getPoolQualifications()
+    public function getPoolQualifications($weeklyStart = null, $weeklyEnd = null, $monthlyStart = null, $monthlyEnd = null)
     {
         $selfInv = (float) ($this->current_self_investment);
-        $legs = $this->getLegBusiness();
-        $power = $legs['power'];
-        $weaker = $legs['weaker'];
 
-        $directs100 = \App\UserDetails::where('user_details.sponsorid', $this->userid)
-            ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
-            ->where('sd.usdt', '>=', 100)
-            ->where('sd.status', 1)
-            ->distinct('user_details.id')
-            ->count('user_details.id');
-
+        // 1. Daily: Today (00:00 to 23:59)
         $todayStart = \Carbon\Carbon::today()->startOfDay();
         $todayEnd = \Carbon\Carbon::today()->endOfDay();
-        $todayDirects100 = \App\UserDetails::where('user_details.sponsorid', $this->userid)
+        $todayDirects100 = \App\UserDetails::where(function ($q) {
+            $q->where('user_details.sponsorid', $this->userid)
+                ->orWhere('user_details.sponsorid', $this->id);
+        })
             ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
             ->where('sd.usdt', '>=', 100)
             ->where('sd.status', 1)
             ->whereBetween('sd.created_at', [$todayStart, $todayEnd])
             ->distinct('user_details.id')
             ->count('user_details.id');
-
         $dailyQual = ($selfInv >= 100 && $todayDirects100 >= 1);
-        $weeklyQual = ($selfInv >= 100 && $directs100 >= 5);
-        $monthlyQual = ($selfInv >= 100 && $directs100 >= 15 && $power >= 5000 && $weaker >= 5000);
+
+        // 2. Weekly: Hafta to hafta (Current Week: Monday 00:00 to Sunday 23:59)
+        $wStart = $weeklyStart ? \Carbon\Carbon::parse($weeklyStart) : \Carbon\Carbon::now()->startOfWeek();
+        $wEnd = $weeklyEnd ? \Carbon\Carbon::parse($weeklyEnd) : \Carbon\Carbon::now()->endOfWeek();
+        $weekDirects100 = \App\UserDetails::where(function ($q) {
+            $q->where('user_details.sponsorid', $this->userid)
+                ->orWhere('user_details.sponsorid', $this->id);
+        })
+            ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
+            ->where('sd.usdt', '>=', 100)
+            ->where('sd.status', 1)
+            ->whereBetween('sd.created_at', [$wStart, $wEnd])
+            ->distinct('user_details.id')
+            ->count('user_details.id');
+        $weeklyQual = ($selfInv >= 100 && $weekDirects100 >= 5);
+
+        // 3. Monthly: Mahina to mahina (Current Month: 1st 00:00 to last day 23:59)
+        $mStart = $monthlyStart ? \Carbon\Carbon::parse($monthlyStart) : \Carbon\Carbon::now()->startOfMonth();
+        $mEnd = $monthlyEnd ? \Carbon\Carbon::parse($monthlyEnd) : \Carbon\Carbon::now()->endOfMonth();
+        $monthDirects100 = \App\UserDetails::where(function ($q) {
+            $q->where('user_details.sponsorid', $this->userid)
+                ->orWhere('user_details.sponsorid', $this->id);
+        })
+            ->join('stacking_deposites as sd', 'sd.userid', '=', 'user_details.id')
+            ->where('sd.usdt', '>=', 100)
+            ->where('sd.status', 1)
+            ->whereBetween('sd.created_at', [$mStart, $mEnd])
+            ->distinct('user_details.id')
+            ->count('user_details.id');
+
+        $legs = $this->getLegBusiness($mStart, $mEnd);
+        $power = $legs['power'];
+        $weaker = $legs['weaker'];
+
+        $monthlyDirQual = ($selfInv >= 100 && $monthDirects100 >= 15);
+        $monthlyVolQual = ($selfInv >= 100 && $power >= 5000 && $weaker >= 5000);
+        $monthlyQual = ($monthlyDirQual && $monthlyVolQual);
 
         return [
             'self_investment' => $selfInv,
-            'directs_100' => $directs100,
+            'directs_100' => $weekDirects100,
             'today_directs_100' => $todayDirects100,
+            'week_directs_100' => $weekDirects100,
+            'month_directs_100' => $monthDirects100,
             'power_leg' => $power,
             'weaker_leg' => $weaker,
             'daily' => [
@@ -657,23 +746,27 @@ class UserDetails extends Model
                 'percent' => '1.5%',
                 'is_qualified' => $weeklyQual,
                 'req_self' => 100,
+                'current_self' => $selfInv,
                 'req_directs' => 5,
-                'current_directs' => $directs100,
-                'progress_pct' => min(100, round(($directs100 / 5) * 100)),
+                'current_directs' => $weekDirects100,
+                'progress_pct' => min(100, round(($weekDirects100 / 5) * 100)),
             ],
             'monthly' => [
                 'name' => 'Monthly Pool',
                 'pool_type' => 3,
                 'percent' => '2.0%',
                 'is_qualified' => $monthlyQual,
+                'is_dir_qualified' => $monthlyDirQual,
+                'is_vol_qualified' => $monthlyVolQual,
                 'req_self' => 100,
+                'current_self' => $selfInv,
                 'req_directs' => 15,
-                'current_directs' => $directs100,
+                'current_directs' => $monthDirects100,
                 'req_power' => 5000,
                 'req_weaker' => 5000,
                 'current_power' => $power,
                 'current_weaker' => $weaker,
-                'progress_pct' => min(100, round((min($directs100 / 15, $power / 5000, $weaker / 5000)) * 100)),
+                'progress_pct' => min(100, round((min($monthDirects100 / 15, $power / 5000, $weaker / 5000)) * 100)),
             ]
         ];
     }

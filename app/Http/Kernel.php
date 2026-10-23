@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
         'adminverification' => \App\Http\Middleware\AdminVerification::class,
         'subadminverification' => \App\Http\Middleware\SubAdminVerification::class,
         'contract.admin' => \App\Http\Middleware\ContractAdminAuth::class,
+        'contract.owner' => \App\Http\Middleware\ContractOwnerOnly::class,
     ];
 
     /**

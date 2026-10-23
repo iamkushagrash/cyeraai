@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         /*$schedule->call('App\Http\Controllers\TransactionInfoController@sftcTransactioncheck')->everyMinute()->timezone('Asia/Kolkata');*/
         //$schedule->call('App\Http\Controllers\TransactionInfoController@npGatewayTansactionStatus')->everyFiveMinute()->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\CpsIncomeController@ProductCpsGeneration')->daily()->at('00:00')->timezone('Asia/Kolkata');
-        $schedule->call('App\Http\Controllers\CpsIncomeController@cpsGeneration')->daily()->at('04:30')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\CpsIncomeController@cpsGeneration')->daily()->at('04:30')->name('dailyCpsGen')->withoutOverlapping()->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\LevelIncomeController@levelDistribution')->daily()->at('00:30')->timezone('Asia/Kolkata');
         //  $schedule->call('App\Http\Controllers\ClubIncomeController@clubDistribution')->daily()->at('11:15')->timezone('Asia/Kolkata');
         // $schedule->call('App\Http\Controllers\AppUpdateController@AdminROITopupIncomeReturn')->daily()->at('10:45')->timezone('Asia/Kolkata');
@@ -39,18 +39,18 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\StackingDetailController@businessUpdate')->hourly()->name('topupBusinessUpdate')->withoutOverlapping()/*->at('23:00')*/ ->timezone('Asia/Kolkata');
 
         // Global Pool Income Distribution Crons (Total 5%)
-        $schedule->call('App\Http\Controllers\PoolIncomeController@dailyPoolDistribution')->daily()->at('00:45')->timezone('Asia/Kolkata');
-        $schedule->call('App\Http\Controllers\PoolIncomeController@weeklyPoolDistribution')->weekly()->mondays()->at('00:55')->timezone('Asia/Kolkata');
-        $schedule->call('App\Http\Controllers\PoolIncomeController@monthlyPoolDistribution')->monthlyOn(1, '01:10')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\PoolIncomeController@dailyPoolDistribution')->daily()->at('00:45')->name('dailyPoolDist')->withoutOverlapping()->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\PoolIncomeController@weeklyPoolDistribution')->weekly()->mondays()->at('00:55')->name('weeklyPoolDist')->withoutOverlapping()->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\PoolIncomeController@monthlyPoolDistribution')->monthlyOn(1, '01:10')->name('monthlyPoolDist')->withoutOverlapping()->timezone('Asia/Kolkata');
 
         // Rank Engine: Daily Qualification Check Cron (Syncs V1 to V8 into user_details)
-        $schedule->call('App\Http\Controllers\RankIncomeController@dailyRankQualificationCheck')->daily()->at('00:20')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\RankIncomeController@dailyRankQualificationCheck')->daily()->at('00:20')->name('dailyRankCheck')->withoutOverlapping()->timezone('Asia/Kolkata');
 
         // Weekly Rank Income Distribution Cron (V1 to V8, Non-Cumulative, Highest Active Rank)
-        $schedule->call('App\Http\Controllers\RankIncomeController@weeklyRankDistribution')->weekly()->mondays()->at('01:30')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\RankIncomeController@weeklyRankDistribution')->weekly()->mondays()->at('01:30')->name('weeklyRankDist')->withoutOverlapping()->timezone('Asia/Kolkata');
 
         // Weekly DAO Income Distribution Cron (Diamond 4.0%, Golden 3.0%, Platinum 2.5% - Runs Sundays, Starts 5 Nov 2026)
-        $schedule->call('App\Http\Controllers\DaoIncomeController@weeklyDaoDistribution')->weekly()->sundays()->at('23:55')->timezone('Asia/Kolkata');
+        $schedule->call('App\Http\Controllers\DaoIncomeController@weeklyDaoDistribution')->weekly()->sundays()->at('23:55')->name('weeklyDaoDist')->withoutOverlapping()->timezone('Asia/Kolkata');
 
         // CAI Real-Time DEX Price Sync (Every 5 Minutes from PancakeSwap / DexScreener)
         $schedule->call('App\Http\Controllers\PriceUpdateController@updateCaiPrice')->everyFiveMinutes()->name('caiLivePriceUpdate')->withoutOverlapping()->timezone('Asia/Kolkata');

@@ -5,11 +5,13 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Session;
 
+use App\Http\Controllers\ContractAdminController;
+
 class ContractAdminAuth
 {
     /**
      * Handle an incoming request.
-     * Enforces strict session authentication AND Owner Wallet verification (0xB68e29B51BB9B0856211cb2856215e3F68243622).
+     * Enforces strict session authentication AND Authorized Wallet verification (Owner & Subadmin).
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
@@ -17,27 +19,25 @@ class ContractAdminAuth
      */
     public function handle($request, Closure $next)
     {
-        $primaryOwner = strtolower('0xB68e29B51BB9B0856211cb2856215e3F68243622');
-        $envOwner = strtolower(trim((string) env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')));
-        
         $isAuthenticated = Session::get('contract_admin_authenticated', false) === true;
         $sessionWallet   = strtolower(trim((string) Session::get('contract_admin_wallet', '')));
+        $authorized      = ContractAdminController::getAuthorizedWallets();
 
-        // Strict Check: Must be authenticated AND session wallet must match the Owner Wallet
-        if (!$isAuthenticated || empty($sessionWallet) || ($sessionWallet !== $primaryOwner && $sessionWallet !== $envOwner)) {
+        // Strict Check: Must be authenticated AND session wallet must be authorized
+        if (!$isAuthenticated || empty($sessionWallet) || !in_array($sessionWallet, $authorized)) {
             // Clean any stale session data
             if ($isAuthenticated) {
-                Session::forget(['contract_admin_authenticated', 'contract_admin_wallet', 'contract_admin_login_at']);
+                Session::forget(['contract_admin_authenticated', 'contract_admin_wallet', 'contract_admin_role', 'contract_admin_login_at']);
             }
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status'  => 'unauthorized',
-                    'message' => 'Restricted Access: Valid Owner Wallet session required.'
+                    'message' => 'Restricted Access: Valid Admin/Subadmin Wallet session required.'
                 ], 401);
             }
 
-            return redirect()->route('contract-admin.login')->with('error', 'Restricted Access: You must authenticate with the Owner Wallet (0xB68e...3622).');
+            return redirect()->route('contract-admin.login')->with('error', 'Restricted Access: Please authenticate with an authorized wallet.');
         }
 
         return $next($request);

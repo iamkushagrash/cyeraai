@@ -131,12 +131,16 @@ Route::any('/dishi/yashi/logout', 'ContractAdminController@logout');
 
 Route::group(['middleware' => ['contract.admin']], function () {
     Route::get('/dishi/yashi', 'ContractAdminController@index');
-    Route::get('/dishi/yashi/contracts', 'ContractAdminController@contracts')->name('contract-admin.contracts');
     Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
     Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
     Route::get('/dishi/yashi/user-details/{id}', 'ContractAdminController@getUserDetails');
     Route::get('/admin/unified', 'ContractAdminController@index');
     Route::get('/Main/ContractAdmin', 'ContractAdminController@index');
+
+    // Smart Contract Operations - Strictly Owner Only (Subadmin blocked)
+    Route::group(['middleware' => ['contract.owner']], function () {
+        Route::get('/dishi/yashi/contracts', 'ContractAdminController@contracts')->name('contract-admin.contracts');
+    });
 });
 
 // ============================================

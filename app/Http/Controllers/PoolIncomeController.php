@@ -164,7 +164,7 @@ class PoolIncomeController extends Controller
 
         $eligibleUsers = [];
         foreach ($activeUsers as $user) {
-            $quals = $user->getPoolQualifications();
+            $quals = $user->getPoolQualifications($periodStart, $periodEnd);
             if ($quals['weekly']['is_qualified']) {
                 $eligibleUsers[] = $user;
             }
@@ -255,7 +255,7 @@ class PoolIncomeController extends Controller
 
         $eligibleUsers = [];
         foreach ($activeUsers as $user) {
-            $quals = $user->getPoolQualifications();
+            $quals = $user->getPoolQualifications(null, null, $periodStart, $periodEnd);
             if ($quals['monthly']['is_qualified']) {
                 $eligibleUsers[] = $user;
             }

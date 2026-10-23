@@ -524,13 +524,17 @@
             @endif
         </div>
 
-        <!-- Designated Protocol Owner Capsule -->
+        <!-- Designated Protocol Owner & Subadmin Capsule -->
         <div class="owner-capsule-notice">
             <div class="oc-header">
                 <span class="oc-title"><i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Designated Protocol Owner</span>
-                <span class="oc-badge">Strict Whitelist</span>
+                <span class="oc-badge">Owner Whitelist</span>
             </div>
             <div class="oc-address" id="targetOwnerText">0xB68e29B51BB9B0856211cb2856215e3F68243622</div>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+                <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x7e42...20FA8</span>
+            </div>
         </div>
 
         <!-- Live Web3 Connection Status Box -->
@@ -585,11 +589,13 @@
     </div>
 
     <script>
-        // Target Owner Addresses (Case-insensitive comparison)
+        // Target Owner & Subadmin Addresses (Case-insensitive comparison)
         const PRIMARY_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
+        const SUBADMIN_WALLET = '0x7e4238d74ef4ba31242ed6d58ac4fc9178f20fa8';
         const TARGET_OWNER_DISPLAY = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
         const AUTHORIZED_OWNERS = [
             PRIMARY_OWNER,
+            SUBADMIN_WALLET,
             '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
         ];
 
@@ -651,24 +657,33 @@
 
             btnSwitch.style.display = 'inline-block';
 
-            if (AUTHORIZED_OWNERS.includes(normalized)) {
+            if (normalized === SUBADMIN_WALLET) {
+                // Verified Subadmin (MLM Only)
+                card.className = 'web3-status-box active-owner';
+                wsLabel.innerText = 'Subadmin Wallet Connected';
+                wsValue.innerText = shortAddr + ' (Subadmin - MLM Only)';
+                wsIcon.innerHTML = '<i class="fa-solid fa-user-shield"></i>';
+                wsIcon.style.color = '#4f46e5';
+                setStep(2);
+                showAlert('Subadmin Wallet detected! Click "Authenticate with MetaMask" to sign in to MLM Admin.', 'success');
+            } else if (AUTHORIZED_OWNERS.includes(normalized)) {
                 // Verified Protocol Owner
                 card.className = 'web3-status-box active-owner';
                 wsLabel.innerText = 'Owner Wallet Connected';
-                wsValue.innerText = shortAddr + ' (Verified)';
+                wsValue.innerText = shortAddr + ' (Verified Owner)';
                 wsIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
                 wsIcon.style.color = '#10b981';
                 setStep(2);
                 showAlert('Owner Wallet detected! Click "Authenticate with MetaMask" to sign in.', 'success');
             } else {
-                // Non-Owner Connected
+                // Non-Authorized Connected
                 card.className = 'web3-status-box wrong-account';
                 wsLabel.innerText = 'Unauthorized Wallet';
                 wsValue.innerText = shortAddr;
                 wsIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 wsIcon.style.color = '#ef4444';
                 setStep(1);
-                showAlert(`Notice: Connected wallet (${shortAddr}) is NOT the Protocol Owner. Please switch account to ${TARGET_OWNER_DISPLAY} in MetaMask.`, 'warning');
+                showAlert(`Notice: Connected wallet (${shortAddr}) is NOT authorized. Please connect an Owner or Subadmin wallet in MetaMask.`, 'warning');
             }
         }
 
@@ -724,7 +739,7 @@
                     btnIcon.className = 'fa-solid fa-fingerprint';
                     btnText.innerText = 'Authenticate with MetaMask';
                     const shortAddr = selectedAccount.substring(0, 6) + '...' + selectedAccount.substring(selectedAccount.length - 4);
-                    showAlert(`Access Denied: Connected account ${shortAddr} is not an authorized Owner Wallet. Switch to ${TARGET_OWNER_DISPLAY} in MetaMask.`, 'danger');
+                    showAlert(`Access Denied: Connected account ${shortAddr} is not authorized for Admin / Subadmin access. Switch account in MetaMask.`, 'danger');
                     return;
                 }
 

@@ -17,12 +17,18 @@ class ContractAdminController extends Controller
     const OWNER_WALLET = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
 
     /**
-     * Get list of authorized admin wallets (Strictly Owner Wallet)
+     * Subadmin Wallet (MLM Access Only - No Contract Operations)
+     */
+    const SUBADMIN_WALLET = '0x7e4238D74Ef4ba31242ed6D58aC4fc9178f20FA8';
+
+    /**
+     * Get list of authorized admin wallets (Owner + Subadmin)
      */
     public static function getAuthorizedWallets()
     {
         $wallets = [
             strtolower(self::OWNER_WALLET),
+            strtolower(self::SUBADMIN_WALLET),
             '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
         ];
         $envOwner = env('ADMIN_OWNER_ADDRESS');
@@ -33,13 +39,34 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Check if user is authenticated in session with the Owner Wallet
+     * Check if user is authenticated in session with an Authorized Wallet
      */
     public static function isAuthenticated()
     {
-        $owner = strtolower(self::OWNER_WALLET);
         $sessionWallet = strtolower((string) Session::get('contract_admin_wallet', ''));
-        return Session::get('contract_admin_authenticated', false) === true && !empty($sessionWallet) && ($sessionWallet === $owner || in_array($sessionWallet, self::getAuthorizedWallets()));
+        return Session::get('contract_admin_authenticated', false) === true && !empty($sessionWallet) && in_array($sessionWallet, self::getAuthorizedWallets());
+    }
+
+    /**
+     * Check if active session belongs to the Subadmin role
+     */
+    public static function isSubAdmin()
+    {
+        $wallet = strtolower((string) Session::get('contract_admin_wallet', ''));
+        return $wallet === strtolower(self::SUBADMIN_WALLET) || Session::get('contract_admin_role') === 'subadmin';
+    }
+
+    /**
+     * Check if active session belongs to the Owner role
+     */
+    public static function isOwner()
+    {
+        $wallet = strtolower((string) Session::get('contract_admin_wallet', ''));
+        return ($wallet !== strtolower(self::SUBADMIN_WALLET)) && (
+            $wallet === strtolower(self::OWNER_WALLET) ||
+            $wallet === '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9' ||
+            Session::get('contract_admin_role') === 'owner'
+        );
     }
 
     /**
@@ -52,7 +79,8 @@ class ContractAdminController extends Controller
         }
 
         $ownerWallet = self::OWNER_WALLET;
-        return view('contract-admin.login', compact('ownerWallet'));
+        $subadminWallet = self::SUBADMIN_WALLET;
+        return view('contract-admin.login', compact('ownerWallet', 'subadminWallet'));
     }
 
     /**
@@ -65,10 +93,9 @@ class ContractAdminController extends Controller
         $time = gmdate('Y-m-d H:i:s') . ' UTC';
         
         $message = "CYERA PROTOCOL V2 — SECURE ADMIN AUTHENTICATION\n\n" .
-                   "Designated Owner: {$owner}\n" .
                    "Timestamp: {$time}\n" .
                    "Nonce: {$nonce}\n\n" .
-                   "Sign this message with your MetaMask wallet to authenticate as the Cyera Protocol Owner.";
+                   "Sign this message with your MetaMask wallet to authenticate to the Cyera Protocol Command Center.";
 
         Session::put('contract_admin_nonce', $nonce);
         Session::put('contract_admin_challenge_msg', $message);
@@ -126,7 +153,7 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Process Login: MetaMask Cryptographic Authentication (Strictly Owner 0xB68e...3622, case-insensitive)
+     * Process Login: MetaMask Cryptographic Authentication (Owner or Subadmin)
      */
     public function processLogin(Request $request)
     {
@@ -135,17 +162,17 @@ class ContractAdminController extends Controller
         $signature = trim((string) $request->input('signature', ''));
         $message = (string) $request->input('message', '');
 
-        $primaryOwner = strtolower(self::OWNER_WALLET);
-        $authorized = self::getAuthorizedWallets();
+        $primaryOwner   = strtolower(self::OWNER_WALLET);
+        $subAdminWallet = strtolower(self::SUBADMIN_WALLET);
+        $authorized     = self::getAuthorizedWallets();
 
-        // 1. Strict Owner Wallet Verification (Case-Insensitive)
-        if (empty($wallet) || ($wallet !== $primaryOwner && !in_array($wallet, $authorized))) {
+        // 1. Strict Wallet Verification (Case-Insensitive)
+        if (empty($wallet) || !in_array($wallet, $authorized)) {
             $formattedProvided = !empty($wallet) ? substr($wallet, 0, 6) . '...' . substr($wallet, -4) : 'Empty';
-            $formattedOwner = substr(self::OWNER_WALLET, 0, 6) . '...' . substr(self::OWNER_WALLET, -4);
             
             return response()->json([
                 'status'  => 'error',
-                'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY the Cyera Protocol Owner Wallet ({$formattedOwner}) can unlock this Command Center."
+                'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY designated Owner or Subadmin wallets can unlock this Command Center."
             ], 403);
         }
 
@@ -156,7 +183,7 @@ class ContractAdminController extends Controller
             if (!$isValid) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'MetaMask Cryptographic Verification Failed: Signature does not match the Protocol Owner Wallet.'
+                    'message' => 'MetaMask Cryptographic Verification Failed: Signature does not match the connected wallet.'
                 ], 401);
             }
         } else {
@@ -166,9 +193,13 @@ class ContractAdminController extends Controller
             ], 400);
         }
 
-        // 3. Set Authenticated Session
+        // 3. Set Authenticated Session with Role Differentiation
+        $isSubadmin = ($wallet === $subAdminWallet);
+        $role = $isSubadmin ? 'subadmin' : 'owner';
+
         Session::put('contract_admin_authenticated', true);
-        Session::put('contract_admin_wallet', self::OWNER_WALLET);
+        Session::put('contract_admin_wallet', $wallet);
+        Session::put('contract_admin_role', $role);
         Session::put('contract_admin_login_at', Carbon::now()->toDateTimeString());
 
         // Clear used challenge
@@ -176,8 +207,9 @@ class ContractAdminController extends Controller
 
         return response()->json([
             'status'   => 'success',
+            'role'     => $role,
             'redirect' => url('/dishi/yashi'),
-            'message'  => 'MetaMask verification successful! Access granted. Unlocking Command Center...'
+            'message'  => 'MetaMask verification successful! Access granted as ' . ($isSubadmin ? 'Subadmin (MLM Management)' : 'Protocol Owner') . '. Unlocking Command Center...'
         ]);
     }
 
@@ -186,9 +218,7 @@ class ContractAdminController extends Controller
      */
     public function logout(Request $request)
     {
-        Session::forget('contract_admin_authenticated');
-        Session::forget('contract_admin_wallet');
-        Session::forget('contract_admin_login_at');
+        Session::forget(['contract_admin_authenticated', 'contract_admin_wallet', 'contract_admin_role', 'contract_admin_login_at']);
 
         return redirect('/dishi/yashi/login')->with('success', 'Logged out successfully.');
     }
@@ -227,7 +257,7 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Dedicated Smart Contract Operations & Governance Console View
+     * Dedicated Smart Contract Operations & Governance Console View (Strictly Owner Only)
      */
     public function contracts(Request $request)
     {
@@ -236,6 +266,16 @@ class ContractAdminController extends Controller
                 return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
             }
             return redirect('/dishi/yashi/login');
+        }
+
+        if (self::isSubAdmin()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'forbidden',
+                    'message' => 'Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.'
+                ], 403);
+            }
+            return redirect('/dishi/yashi')->with('error', 'Access Denied: Subadmins are strictly restricted from performing Smart Contract operations.');
         }
 
         $contracts = self::getContractsConfig();

@@ -1,3 +1,6 @@
+@php
+    $isSubAdminUser = \App\Http\Controllers\ContractAdminController::isSubAdmin();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -908,10 +911,18 @@
                 </div>
 
                 @if(Session::has('contract_admin_wallet'))
-                <div class="auth-wallet-pill" title="Authenticated Admin Wallet: {{ Session::get('contract_admin_wallet') }}">
-                    <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i>
-                    <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
-                </div>
+                    @if($isSubAdminUser)
+                    <div class="auth-wallet-pill" style="border-color: #fde68a; background: #fffbeb;" title="Subadmin Wallet: {{ Session::get('contract_admin_wallet') }}">
+                        <i class="fa-solid fa-user-shield" style="color: #b45309;"></i>
+                        <span style="font-weight: 700; color: #b45309; font-size: 0.72rem;">SUBADMIN:</span>
+                        <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
+                    </div>
+                    @else
+                    <div class="auth-wallet-pill" title="Authenticated Admin Wallet: {{ Session::get('contract_admin_wallet') }}">
+                        <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i>
+                        <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
+                    </div>
+                    @endif
                 @endif
 
                 <button class="btn-wallet" id="btnConnectWallet" onclick="connectAdminWallet()">
@@ -951,12 +962,18 @@
             <button class="tab-btn" onclick="switchTab('tab-stakings', this)">
                 <i class="fa-solid fa-vault"></i> Stakings (${{ number_format($stakingSummary['totalUsdt'], 0) }})
             </button>
+            @if(!$isSubAdminUser)
             <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
                 <i class="fa-solid fa-cube"></i> Smart Contract Hub
             </button>
             <a href="{{ url('/dishi/yashi/contracts') }}" class="tab-btn" style="text-decoration: none; background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; font-weight: 700;">
                 <i class="fa-solid fa-gears"></i> Contract Functions Console <span class="badge" style="background: #4f46e5; color: #ffffff; font-size: 9px; padding: 2px 6px; border-radius: 999px; margin-left: 4px;">NEW PAGE</span>
             </a>
+            @else
+            <button class="tab-btn" style="opacity: 0.6; cursor: not-allowed; background: #f8fafc; color: var(--text-muted);" title="Smart contract operations restricted to Owner" onclick="alert('Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.')">
+                <i class="fa-solid fa-lock"></i> Smart Contracts (Owner Only)
+            </button>
+            @endif
         </div>
 
         <!-- ======================================================== -->
@@ -1432,6 +1449,7 @@
 
         </div>
 
+        @if(!$isSubAdminUser)
         <!-- ======================================================== -->
         <!-- TAB 6: SMART CONTRACT HUB                                 -->
         <!-- ======================================================== -->
@@ -1623,6 +1641,23 @@
             </div>
 
         </div>
+        @else
+        <!-- Subadmin Restricted Placeholder -->
+        <div id="tab-contracts" class="tab-content-panel" style="display: none;">
+            <div class="portal-card" style="text-align: center; padding: 60px 24px;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px;">Smart Contract Operations Restricted</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 20px; line-height: 1.5;">
+                    Your subadmin account has full management access for MLM members, genealogy trees, stakings, and directs. All smart contract executions, parameters, and on-chain functions are strictly restricted to the Protocol Owner.
+                </p>
+                <button class="btn-action primary" onclick="switchTab('tab-overview', document.querySelector('.tab-bar .tab-btn'))">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Overview
+                </button>
+            </div>
+        </div>
+        @endif
 
     </main>
 
@@ -1655,8 +1690,15 @@
             chainId: 56
         };
 
+        const IS_SUBADMIN = {{ $isSubAdminUser ? 'true' : 'false' }};
+
         // Tab Switching
         function switchTab(tabId, btn) {
+            if (IS_SUBADMIN && tabId === 'tab-contracts') {
+                alert('Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.');
+                return;
+            }
+
             document.querySelectorAll('.tab-content-panel').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             
@@ -1929,6 +1971,11 @@
 
         // Trigger Splitter Distribute On-Chain
         async function triggerSplitterDistribute() {
+            if (IS_SUBADMIN) {
+                alert("Access Denied: Subadmins are strictly restricted from executing contract transactions.");
+                return;
+            }
+
             if (!window.ethereum) {
                 alert("Please connect MetaMask with an authorized wallet.");
                 return;

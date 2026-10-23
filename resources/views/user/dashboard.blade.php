@@ -564,15 +564,21 @@
                                             <i class="fas fa-crown"></i> {{ $userRankName }}
                                         </span>
                                         @if(($data['userDetail']->is_dao ?? 0) == 3)
-                                            <span class="strip-status-pill" style="background: rgba(255, 215, 0, 0.18); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.4); font-weight: 800;" title="Diamond DAO Member">
+                                            <span class="strip-status-pill"
+                                                style="background: rgba(255, 215, 0, 0.18); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.4); font-weight: 800;"
+                                                title="Diamond DAO Member">
                                                 <i class="fas fa-gem"></i> DIAMOND DAO
                                             </span>
                                         @elseif(($data['userDetail']->is_dao ?? 0) == 2)
-                                            <span class="strip-status-pill" style="background: rgba(245, 158, 11, 0.18); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800;" title="Golden DAO Member">
+                                            <span class="strip-status-pill"
+                                                style="background: rgba(245, 158, 11, 0.18); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800;"
+                                                title="Golden DAO Member">
                                                 <i class="fas fa-award"></i> GOLDEN DAO
                                             </span>
                                         @elseif(($data['userDetail']->is_dao ?? 0) == 1)
-                                            <span class="strip-status-pill" style="background: rgba(56, 189, 248, 0.18); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 800;" title="Platinum DAO Member">
+                                            <span class="strip-status-pill"
+                                                style="background: rgba(56, 189, 248, 0.18); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 800;"
+                                                title="Platinum DAO Member">
                                                 <i class="fas fa-shield-alt"></i> PLATINUM DAO
                                             </span>
                                         @endif
@@ -619,241 +625,334 @@
                     $gCount = $data['goldenDaoCount'] ?? 0;
                     $pCount = $data['platinumDaoCount'] ?? 0;
 
-                    $daoTiers  = $data['daoTiers'] ?? (\App\DaoDetail::where('status', 1)->get()->keyBy('dao_type'));
-                    $tDiamond  = $daoTiers[3] ?? null;
-                    $tGolden   = $daoTiers[2] ?? null;
+                    $daoTiers = $data['daoTiers'] ?? (\App\DaoDetail::where('status', 1)->get()->keyBy('dao_type'));
+                    $tDiamond = $daoTiers[3] ?? null;
+                    $tGolden = $daoTiers[2] ?? null;
                     $tPlatinum = $daoTiers[1] ?? null;
 
-                    $dPct  = $tDiamond ? rtrim(rtrim(number_format($tDiamond->pool_percent, 2), '0'), '.') : '4';
+                    $dPct = $tDiamond ? rtrim(rtrim(number_format($tDiamond->pool_percent, 2), '0'), '.') : '4';
                     $dRank = $tDiamond->rank_required ?? 5;
                     $dDays = $tDiamond->days_limit ?? 60;
-                    $dCap  = $tDiamond ? rtrim(rtrim($tDiamond->capping_multiplier, '0'), '.') : '4';
-                    $dPkg  = $tDiamond ? number_format($tDiamond->package_amount, 0) : '10,000';
-                    $dMax  = $tDiamond ? number_format(($tDiamond->package_amount * $tDiamond->capping_multiplier) / 1000, 0) . 'K' : '40K';
+                    $dCap = $tDiamond ? rtrim(rtrim($tDiamond->capping_multiplier, '0'), '.') : '4';
+                    $dPkg = $tDiamond ? number_format($tDiamond->package_amount, 0) : '10,000';
+                    $dMax = $tDiamond ? number_format(($tDiamond->package_amount * $tDiamond->capping_multiplier) / 1000, 0) . 'K' : '40K';
                     $dSlots = $tDiamond->max_members ?? 50;
 
-                    $gPct  = $tGolden ? rtrim(rtrim(number_format($tGolden->pool_percent, 2), '0'), '.') : '3';
+                    $gPct = $tGolden ? rtrim(rtrim(number_format($tGolden->pool_percent, 2), '0'), '.') : '3';
                     $gRank = $tGolden->rank_required ?? 4;
                     $gDays = $tGolden->days_limit ?? 60;
-                    $gCap  = $tGolden ? rtrim(rtrim($tGolden->capping_multiplier, '0'), '.') : '3.5';
-                    $gPkg  = $tGolden ? number_format($tGolden->package_amount, 0) : '5,555';
-                    $gMax  = $tGolden ? number_format(($tGolden->package_amount * $tGolden->capping_multiplier) / 1000, 1) . 'K' : '19.4K';
+                    $gCap = $tGolden ? rtrim(rtrim($tGolden->capping_multiplier, '0'), '.') : '3.5';
+                    $gPkg = $tGolden ? number_format($tGolden->package_amount, 0) : '5,555';
+                    $gMax = $tGolden ? number_format(($tGolden->package_amount * $tGolden->capping_multiplier) / 1000, 1) . 'K' : '19.4K';
                     $gSlots = $tGolden->max_members ?? 100;
 
-                    $pPct  = $tPlatinum ? rtrim(rtrim(number_format($tPlatinum->pool_percent, 2), '0'), '.') : '2.5';
+                    $pPct = $tPlatinum ? rtrim(rtrim(number_format($tPlatinum->pool_percent, 2), '0'), '.') : '2.5';
                     $pRank = $tPlatinum->rank_required ?? 3;
                     $pDays = $tPlatinum->days_limit ?? 60;
-                    $pCap  = $tPlatinum ? rtrim(rtrim($tPlatinum->capping_multiplier, '0'), '.') : '3';
-                    $pPkg  = $tPlatinum ? number_format($tPlatinum->package_amount, 0) : '3,333';
-                    $pMax  = $tPlatinum ? number_format($tPlatinum->package_amount * $tPlatinum->capping_multiplier, 0) : '9,999';
+                    $pCap = $tPlatinum ? rtrim(rtrim($tPlatinum->capping_multiplier, '0'), '.') : '3';
+                    $pPkg = $tPlatinum ? number_format($tPlatinum->package_amount, 0) : '3,333';
+                    $pMax = $tPlatinum ? number_format($tPlatinum->package_amount * $tPlatinum->capping_multiplier, 0) : '9,999';
                     $pSlots = $tPlatinum->max_members ?? 100;
 
                     $userDaoQuals = $data['userDaoDetails'] ?? ($data['userDaoQualifications'] ?? ($data['userDetail']->getDaoDetails() ?? []));
                     $isDiamondQual = ($data['userDetail']->is_dao == 3);
-                    $isGoldenQual  = ($data['userDetail']->is_dao == 2);
-                    $isPlatQual    = ($data['userDetail']->is_dao == 1);
+                    $isGoldenQual = ($data['userDetail']->is_dao == 2);
+                    $isPlatQual = ($data['userDetail']->is_dao == 1);
                 @endphp
 
                 @if($isDiamondQual)
                     <!-- QUALIFIED DIAMOND DAO MEMBER BANNER -->
-                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(245, 166, 35, 0.05) 100%); border: 1px solid rgba(255, 215, 0, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
+                    <div class="hud-dao-qualified-banner"
+                        style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(245, 166, 35, 0.05) 100%); border: 1px solid rgba(255, 215, 0, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);">
+                        </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(255, 215, 0, 0.15); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div
+                                style="width: 34px; height: 34px; border-radius: 8px; background: rgba(255, 215, 0, 0.15); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <i class="fas fa-gem" style="color: #FFD700; font-size: 15px;"></i>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    <span style="font-size: 0.82rem; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; text-transform: uppercase;">DIAMOND DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 5px; border-radius: 3px;">{{ $dCap }}X CAPPING</span>
+                                    <span
+                                        style="font-size: 0.82rem; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; text-transform: uppercase;">DIAMOND
+                                        DAO MEMBER</span>
+                                    <span
+                                        style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 5px; border-radius: 3px;">{{ $dCap }}X
+                                        CAPPING</span>
                                 </div>
-                                <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
-                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
+                                <div
+                                    style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i>
+                                        QUALIFIED</span>
                                     <span>•</span>
                                     <span>{{ $dPct }}% Weekly Global Pool (V{{ $dRank }} in {{ $dDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
-                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">${{ $dPkg }}</div>
+                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">
+                                DAO STAKE</div>
+                            <div
+                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">
+                                ${{ $dPkg }}</div>
                         </div>
                     </div>
                 @elseif($isGoldenQual)
                     <!-- QUALIFIED GOLDEN DAO MEMBER BANNER -->
-                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);"></div>
+                    <div class="hud-dao-qualified-banner"
+                        style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);">
+                        </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div
+                                style="width: 34px; height: 34px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <i class="fas fa-award" style="color: #F59E0B; font-size: 15px;"></i>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    <span style="font-size: 0.82rem; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px; text-transform: uppercase;">GOLDEN DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 5px; border-radius: 3px;">{{ $gCap }}X CAPPING</span>
+                                    <span
+                                        style="font-size: 0.82rem; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px; text-transform: uppercase;">GOLDEN
+                                        DAO MEMBER</span>
+                                    <span
+                                        style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 5px; border-radius: 3px;">{{ $gCap }}X
+                                        CAPPING</span>
                                 </div>
-                                <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
-                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
+                                <div
+                                    style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i>
+                                        QUALIFIED</span>
                                     <span>•</span>
                                     <span>{{ $gPct }}% Weekly Global Pool (V{{ $gRank }} in {{ $gDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
-                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">${{ $gPkg }}</div>
+                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">
+                                DAO STAKE</div>
+                            <div
+                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">
+                                ${{ $gPkg }}</div>
                         </div>
                     </div>
                 @elseif($isPlatQual)
                     <!-- QUALIFIED PLATINUM DAO MEMBER BANNER -->
-                    <div class="hud-dao-qualified-banner" style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(2, 132, 199, 0.05) 100%); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);"></div>
+                    <div class="hud-dao-qualified-banner"
+                        style="margin-bottom: 14px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(2, 132, 199, 0.05) 100%); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.4); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);">
+                        </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div
+                                style="width: 34px; height: 34px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <i class="fas fa-shield-alt" style="color: #38BDF8; font-size: 15px;"></i>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    <span style="font-size: 0.82rem; font-weight: 900; color: #38BDF8; letter-spacing: 0.5px; text-transform: uppercase;">PLATINUM DAO MEMBER</span>
-                                    <span style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 5px; border-radius: 3px;">{{ $pCap }}X CAPPING</span>
+                                    <span
+                                        style="font-size: 0.82rem; font-weight: 900; color: #38BDF8; letter-spacing: 0.5px; text-transform: uppercase;">PLATINUM
+                                        DAO MEMBER</span>
+                                    <span
+                                        style="font-size: 0.52rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 5px; border-radius: 3px;">{{ $pCap }}X
+                                        CAPPING</span>
                                 </div>
-                                <div style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
-                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i> QUALIFIED</span>
+                                <div
+                                    style="font-size: 0.58rem; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: #00FF88; font-weight: 700;"><i class="fas fa-circle-check"></i>
+                                        QUALIFIED</span>
                                     <span>•</span>
                                     <span>{{ $pPct }}% Weekly Global Pool (V{{ $pRank }} in {{ $pDays }}d)</span>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
-                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">DAO STAKE</div>
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">${{ $pPkg }}</div>
+                            <div style="font-size: 0.50rem; color: #8E99A8; text-transform: uppercase; font-weight: 700;">
+                                DAO STAKE</div>
+                            <div
+                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">
+                                ${{ $pPkg }}</div>
                         </div>
                     </div>
                 @else
                     <!-- 3-COLUMN DAO MEMBER REGISTRATION CARDS -->
                     <div class="hud-dao-compact-wrap" style="margin-bottom: 14px;">
                         <!-- Slim Header Bar -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 2px;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 2px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-crown" style="color: #FFD700; font-size: 11px;"></i>
-                                <span style="font-size: 0.72rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px; text-transform: uppercase;">
+                                <span
+                                    style="font-size: 0.72rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px; text-transform: uppercase;">
                                     DAO Member Registration
                                 </span>
                             </div>
-                            <a href="{{ url('/User/DaoIncome') }}" style="font-size: 0.58rem; font-weight: 800; color: #F5A623; background: rgba(245, 166, 35, 0.12); border: 1px solid rgba(245, 166, 35, 0.35); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px; text-decoration: none;">
+                            <a href="{{ url('/User/DaoIncome') }}"
+                                style="font-size: 0.58rem; font-weight: 800; color: #F5A623; background: rgba(245, 166, 35, 0.12); border: 1px solid rgba(245, 166, 35, 0.35); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px; text-decoration: none;">
                                 LIMITED SLOTS • VIEW ALL <i class="fas fa-chevron-right" style="font-size: 7px;"></i>
                             </a>
                         </div>
 
                         <!-- 3 Side-by-Side Cards Grid (Diamond, Golden, Platinum) -->
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-                            
+
                             <!-- MINI CARD 1: DIAMOND DAO -->
-                            <div style="background: linear-gradient(180deg, rgba(22, 17, 6, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
-                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
+                            <div
+                                style="background: linear-gradient(180deg, rgba(22, 17, 6, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <div
+                                    style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #FFD700, transparent);">
+                                </div>
                                 <div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
                                         <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
                                             <i class="fas fa-gem" style="color: #FFD700; font-size: 10px;"></i>
-                                            <span style="font-size: 0.64rem; font-weight: 800; color: #FFD700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DIAMOND</span>
+                                            <span
+                                                style="font-size: 0.64rem; font-weight: 800; color: #FFD700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DIAMOND</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $dCap }}X CAP</span>
+                                        <span
+                                            style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #FFD700, #F5A623); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $dCap }}X
+                                            CAP</span>
                                     </div>
-                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
+                                    <div
+                                        style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">${{ $dPkg }}</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $dMax }} Max</span>
+                                            <span
+                                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #FFD700;">${{ $dPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $dMax }}
+                                                Max</span>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/{{ $dSlots }} Slots</span>
+                                            <span style="color: #FFD700; font-weight: 700;">{{ $dCount }}/{{ $dSlots }}
+                                                Slots</span>
                                         </div>
                                     </div>
-                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
+                                    <div
+                                        style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $dPct }}% Pool (V{{ $dRank }} in {{ $dDays }}d)</span>
+                                        <span
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $dPct }}%
+                                            Pool (V{{ $dRank }} in {{ $dDays }}d)</span>
                                     </div>
                                 </div>
                                 @if($dCount >= $dSlots)
-                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" disabled
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
                                         FULL ({{ $dSlots }}/{{ $dSlots }})
                                     </button>
                                 @else
-                                    <a href="{{ url('/User/Stake?dao=diamond') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
+                                    <a href="{{ url('/User/Stake?dao=diamond') }}"
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35); text-transform: uppercase;">
                                         <i class="fas fa-gem" style="font-size: 7px;"></i> UPGRADE
                                     </a>
                                 @endif
                             </div>
 
                             <!-- MINI CARD 2: GOLDEN DAO -->
-                            <div style="background: linear-gradient(180deg, rgba(24, 16, 5, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
-                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);"></div>
+                            <div
+                                style="background: linear-gradient(180deg, rgba(24, 16, 5, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <div
+                                    style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #F59E0B, transparent);">
+                                </div>
                                 <div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
                                         <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
                                             <i class="fas fa-award" style="color: #F59E0B; font-size: 10px;"></i>
-                                            <span style="font-size: 0.64rem; font-weight: 800; color: #F59E0B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GOLDEN</span>
+                                            <span
+                                                style="font-size: 0.64rem; font-weight: 800; color: #F59E0B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GOLDEN</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $gCap }}X CAP</span>
+                                        <span
+                                            style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #F59E0B, #D97706); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $gCap }}X
+                                            CAP</span>
                                     </div>
-                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
+                                    <div
+                                        style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">${{ $gPkg }}</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $gMax }} Max</span>
+                                            <span
+                                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #F59E0B;">${{ $gPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $gMax }}
+                                                Max</span>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #F59E0B; font-weight: 700;">{{ $gCount }}/{{ $gSlots }} Slots</span>
+                                            <span style="color: #F59E0B; font-weight: 700;">{{ $gCount }}/{{ $gSlots }}
+                                                Slots</span>
                                         </div>
                                     </div>
-                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
+                                    <div
+                                        style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $gPct }}% Pool (V{{ $gRank }} in {{ $gDays }}d)</span>
+                                        <span
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $gPct }}%
+                                            Pool (V{{ $gRank }} in {{ $gDays }}d)</span>
                                     </div>
                                 </div>
                                 @if($gCount >= $gSlots)
-                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" disabled
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
                                         FULL ({{ $gSlots }}/{{ $gSlots }})
                                     </button>
                                 @else
-                                    <a href="{{ url('/User/Stake?dao=golden') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); text-transform: uppercase;">
+                                    <a href="{{ url('/User/Stake?dao=golden') }}"
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); text-transform: uppercase;">
                                         <i class="fas fa-award" style="font-size: 7px;"></i> UPGRADE
                                     </a>
                                 @endif
                             </div>
 
                             <!-- MINI CARD 3: PLATINUM DAO -->
-                            <div style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
-                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);"></div>
+                            <div
+                                style="background: linear-gradient(180deg, rgba(6, 19, 28, 0.95) 0%, rgba(8, 9, 14, 0.98) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 8px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <div
+                                    style="position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: linear-gradient(90deg, transparent, #38BDF8, transparent);">
+                                </div>
                                 <div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 4px;">
                                         <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
                                             <i class="fas fa-shield-alt" style="color: #38BDF8; font-size: 10px;"></i>
-                                            <span style="font-size: 0.64rem; font-weight: 800; color: #38BDF8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PLATINUM</span>
+                                            <span
+                                                style="font-size: 0.64rem; font-weight: 800; color: #38BDF8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PLATINUM</span>
                                         </div>
-                                        <span style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $pCap }}X CAP</span>
+                                        <span
+                                            style="font-size: 0.48rem; font-weight: 800; color: #000; background: linear-gradient(135deg, #38BDF8, #0284C7); padding: 1px 4px; border-radius: 3px; flex-shrink: 0;">{{ $pCap }}X
+                                            CAP</span>
                                     </div>
-                                    <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
+                                    <div
+                                        style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 6px; padding: 4px 5px; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                            <span style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">${{ $pPkg }}</span>
-                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $pMax }} Max</span>
+                                            <span
+                                                style="font-family: 'Space Mono', monospace; font-size: 0.80rem; font-weight: 800; color: #38BDF8;">${{ $pPkg }}</span>
+                                            <span style="font-size: 0.52rem; color: #00FF88; font-weight: 700;">${{ $pMax }}
+                                                Max</span>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; font-size: 0.50rem; color: #94A3B8; margin-top: 1px;">
                                             <span>Fixed Stake</span>
-                                            <span style="color: #38BDF8; font-weight: 700;">{{ $pCount }}/{{ $pSlots }} Slots</span>
+                                            <span style="color: #38BDF8; font-weight: 700;">{{ $pCount }}/{{ $pSlots }}
+                                                Slots</span>
                                         </div>
                                     </div>
-                                    <div style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
+                                    <div
+                                        style="font-size: 0.52rem; color: #CBD5E1; line-height: 1.2; margin-bottom: 6px; display: flex; align-items: center; gap: 3px;">
                                         <i class="fas fa-bolt" style="color: #00FF88; font-size: 7px; flex-shrink: 0;"></i>
-                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $pPct }}% Pool (V{{ $pRank }} in {{ $pDays }}d)</span>
+                                        <span
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $pPct }}%
+                                            Pool (V{{ $pRank }} in {{ $pDays }}d)</span>
                                     </div>
                                 </div>
                                 @if($pCount >= $pSlots)
-                                    <button type="button" disabled style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" disabled
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #64748B; font-size: 0.58rem; font-weight: 800; cursor: not-allowed; display: flex; align-items: center; justify-content: center;">
                                         FULL ({{ $pSlots }}/{{ $pSlots }})
                                     </button>
                                 @else
-                                    <a href="{{ url('/User/Stake?dao=platinum') }}" style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35); text-transform: uppercase;">
+                                    <a href="{{ url('/User/Stake?dao=platinum') }}"
+                                        style="width: 100%; height: 24px; border-radius: 5px; background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); color: #000; font-size: 0.60rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35); text-transform: uppercase;">
                                         <i class="fas fa-shield-alt" style="font-size: 7px;"></i> UPGRADE
                                     </a>
                                 @endif
@@ -957,13 +1056,20 @@
                     <div class="live-yield-header-bar">
                         <div class="live-yield-title-wrap">
                             <span class="pulse-green-dot"></span>
-                            <span class="live-yield-title-txt" style="font-size: 0.72rem; font-weight: 800; color: #00FF88; letter-spacing: 0.5px;">LIVE ACCRUING YIELD (TODAY)</span>
-                            <span class="live-yield-rate-tag" style="font-size: 0.65rem; font-weight: 800; color: #FFE082; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.4); padding: 2px 6px; border-radius: 4px;">{{ $dailyRoiRate }}% / DAY</span>
+                            <span class="live-yield-title-txt"
+                                style="font-size: 0.72rem; font-weight: 800; color: #00FF88; letter-spacing: 0.5px;">LIVE
+                                ACCRUING YIELD (TODAY)</span>
+                            <span class="live-yield-rate-tag"
+                                style="font-size: 0.65rem; font-weight: 800; color: #FFE082; background: rgba(245, 166, 35, 0.15); border: 1px solid rgba(245, 166, 35, 0.4); padding: 2px 6px; border-radius: 4px;">{{ $dailyRoiRate }}%
+                                / DAY</span>
                         </div>
-                        <div class="live-yield-cron-timer" title="Next Cron Payout at 04:30 AM" style="background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(245, 166, 35, 0.35); padding: 4px 10px; border-radius: 7px; display: flex; align-items: center; gap: 6px;">
+                        <div class="live-yield-cron-timer" title="Next Cron Payout at 04:30 AM"
+                            style="background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(245, 166, 35, 0.35); padding: 4px 10px; border-radius: 7px; display: flex; align-items: center; gap: 6px;">
                             <i class="fas fa-clock" style="color: #FFD700; font-size: 11px;"></i>
                             <span style="font-size: 0.70rem; color: #8E99A8; font-weight: 600;">Next Credit:</span>
-                            <strong id="dashCronCountdownTxt" style="font-size: 0.88rem; font-family: 'Space Mono', monospace; color: #FFD700; font-weight: 800; letter-spacing: 0.5px;">--h : --m : --s</strong>
+                            <strong id="dashCronCountdownTxt"
+                                style="font-size: 0.88rem; font-family: 'Space Mono', monospace; color: #FFD700; font-weight: 800; letter-spacing: 0.5px;">--h
+                                : --m : --s</strong>
                         </div>
                     </div>
 
@@ -1039,87 +1145,326 @@
                             position: relative;
                             overflow: hidden;
                         }
+
                         .dash-rjx-wrap::before {
-                            content: ''; position: absolute; top: -60px; right: -40px; width: 180px; height: 180px; border-radius: 50%;
-                            background: radial-gradient(circle, rgba(245,166,35,.18) 0%, transparent 65%); pointer-events: none;
+                            content: '';
+                            position: absolute;
+                            top: -60px;
+                            right: -40px;
+                            width: 180px;
+                            height: 180px;
+                            border-radius: 50%;
+                            background: radial-gradient(circle, rgba(245, 166, 35, .18) 0%, transparent 65%);
+                            pointer-events: none;
                         }
+
                         .dash-rjx-head {
-                            display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; position: relative; z-index: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 10px;
+                            margin-bottom: 12px;
+                            position: relative;
+                            z-index: 1;
                         }
+
                         .dash-rjx-crown {
-                            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-                            display: flex; align-items: center; justify-content: center; font-size: 17px; color: #1A1203;
+                            width: 38px;
+                            height: 38px;
+                            border-radius: 10px;
+                            flex-shrink: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 17px;
+                            color: #1A1203;
                             background: linear-gradient(135deg, #FFE680 0%, #F0A500 100%);
-                            box-shadow: 0 4px 14px rgba(245,166,35,.35);
+                            box-shadow: 0 4px 14px rgba(245, 166, 35, .35);
                         }
+
                         .dash-rjx-wallet-grid {
-                            display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 6px; margin-bottom: 14px; position: relative; z-index: 1;
+                            display: grid;
+                            grid-template-columns: 1.25fr 1fr 1fr;
+                            gap: 6px;
+                            margin-bottom: 14px;
+                            position: relative;
+                            z-index: 1;
                         }
+
                         .dash-rjx-wbox {
-                            background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 8px 10px;
-                            display: flex; flex-direction: column; justify-content: center; min-width: 0;
+                            background: rgba(0, 0, 0, .6);
+                            border: 1px solid rgba(255, 255, 255, .08);
+                            border-radius: 10px;
+                            padding: 8px 10px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            min-width: 0;
                         }
+
                         .dash-rjx-wbox.main {
-                            border-color: rgba(0,255,136,.3); background: linear-gradient(160deg, rgba(0,255,136,.08), rgba(0,0,0,.6));
+                            border-color: rgba(0, 255, 136, .3);
+                            background: linear-gradient(160deg, rgba(0, 255, 136, .08), rgba(0, 0, 0, .6));
                         }
-                        .dash-rjx-wlbl { font-size: 8.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8A94A6; }
-                        .dash-rjx-wval { font-size: 15px; font-weight: 900; color: #fff; line-height: 1.2; white-space: nowrap; font-family: 'Space Mono', monospace; }
-                        .dash-rjx-wbox.main .dash-rjx-wval { color: #00FF88; }
+
+                        .dash-rjx-wlbl {
+                            font-size: 8.5px;
+                            font-weight: 700;
+                            letter-spacing: .5px;
+                            text-transform: uppercase;
+                            color: #8A94A6;
+                        }
+
+                        .dash-rjx-wval {
+                            font-size: 15px;
+                            font-weight: 900;
+                            color: #fff;
+                            line-height: 1.2;
+                            white-space: nowrap;
+                            font-family: 'Space Mono', monospace;
+                        }
+
+                        .dash-rjx-wbox.main .dash-rjx-wval {
+                            color: #00FF88;
+                        }
+
                         .dash-rjx-claim-btn {
-                            margin-top: 5px; height: 22px; border: none; border-radius: 6px; cursor: pointer;
-                            background: linear-gradient(135deg,#FFE680,#F0A500); color: #1A1203; font-size: 9.5px; font-weight: 900;
-                            letter-spacing: .3px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;
+                            margin-top: 5px;
+                            height: 22px;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            background: linear-gradient(135deg, #FFE680, #F0A500);
+                            color: #1A1203;
+                            font-size: 9.5px;
+                            font-weight: 900;
+                            letter-spacing: .3px;
+                            text-transform: uppercase;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 4px;
+                            text-decoration: none;
                         }
+
                         .dash-rjx-sec-title {
-                            display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 10px; position: relative; z-index: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin: 4px 2px 10px;
+                            position: relative;
+                            z-index: 1;
                         }
+
                         .dash-rjx-sec-title h4 {
-                            margin: 0; font-size: 11.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px;
+                            margin: 0;
+                            font-size: 11.5px;
+                            font-weight: 800;
+                            letter-spacing: .6px;
+                            text-transform: uppercase;
+                            color: #fff;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
                         }
-                        .dash-rjx-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; position: relative; z-index: 1; }
+
+                        .dash-rjx-grid {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 8px;
+                            position: relative;
+                            z-index: 1;
+                        }
+
                         .dash-rjx-card {
-                            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px;
+                            position: relative;
+                            overflow: hidden;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
                             background: linear-gradient(170deg, #0D0F15 0%, #07080C 100%);
-                            border: 1px solid rgba(255,255,255,.08); border-radius: 13px; padding: 10px 10px;
-                            text-decoration: none !important; color: inherit; transition: .2s ease;
+                            border: 1px solid rgba(255, 255, 255, .08);
+                            border-radius: 13px;
+                            padding: 10px 10px;
+                            text-decoration: none !important;
+                            color: inherit;
+                            transition: .2s ease;
                         }
-                        .dash-rjx-card:hover { transform: translateY(-2px); border-color: rgba(245,166,35,.45); }
-                        .dash-rjx-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2.5px; }
-                        .dash-rjx-card.t1::before { background: linear-gradient(135deg,#E8A061 0%,#A9622B 100%); }
-                        .dash-rjx-card.t2::before { background: linear-gradient(135deg,#F4F6F9 0%,#9AA5B5 100%); }
-                        .dash-rjx-card.t3::before { background: linear-gradient(135deg,#FFE680 0%,#F0A500 100%); }
-                        .dash-rjx-card.t4::before { background: linear-gradient(135deg,#FFC09A 0%,#E4572E 100%); }
-                        .dash-rjx-card-top { display: flex; justify-content: space-between; align-items: center; }
+
+                        .dash-rjx-card:hover {
+                            transform: translateY(-2px);
+                            border-color: rgba(245, 166, 35, .45);
+                        }
+
+                        .dash-rjx-card::before {
+                            content: '';
+                            position: absolute;
+                            left: 0;
+                            right: 0;
+                            top: 0;
+                            height: 2.5px;
+                        }
+
+                        .dash-rjx-card.t1::before {
+                            background: linear-gradient(135deg, #E8A061 0%, #A9622B 100%);
+                        }
+
+                        .dash-rjx-card.t2::before {
+                            background: linear-gradient(135deg, #F4F6F9 0%, #9AA5B5 100%);
+                        }
+
+                        .dash-rjx-card.t3::before {
+                            background: linear-gradient(135deg, #FFE680 0%, #F0A500 100%);
+                        }
+
+                        .dash-rjx-card.t4::before {
+                            background: linear-gradient(135deg, #FFC09A 0%, #E4572E 100%);
+                        }
+
+                        .dash-rjx-card-top {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+
                         .dash-rjx-tier-tag {
-                            display: inline-flex; align-items: center; gap: 4px; font-size: 8.5px; font-weight: 800; letter-spacing: .4px;
-                            text-transform: uppercase; padding: 2px 6px; border-radius: 5px;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 4px;
+                            font-size: 8.5px;
+                            font-weight: 800;
+                            letter-spacing: .4px;
+                            text-transform: uppercase;
+                            padding: 2px 6px;
+                            border-radius: 5px;
                         }
-                        .dash-rjx-card.t1 .dash-rjx-tier-tag { color: #E8A061; background: rgba(217,138,74,.15); border: 1px solid rgba(217,138,74,.35); }
-                        .dash-rjx-card.t2 .dash-rjx-tier-tag { color: #D5DCE6; background: rgba(213,220,230,.15); border: 1px solid rgba(213,220,230,.35); }
-                        .dash-rjx-card.t3 .dash-rjx-tier-tag { color: #FFD23F; background: rgba(255,210,63,.15); border: 1px solid rgba(255,210,63,.35); }
-                        .dash-rjx-card.t4 .dash-rjx-tier-tag { color: #F7A072; background: rgba(247,160,114,.15); border: 1px solid rgba(247,160,114,.35); }
-                        .dash-rjx-cname { font-size: 9.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8A94A6; margin-bottom: -4px; }
-                        .dash-rjx-price { font-size: 24px; font-weight: 900; line-height: 1; color: #fff; display: flex; align-items: baseline; gap: 3px; }
-                        .dash-rjx-price small { font-size: 9.5px; font-weight: 700; color: #5B6475; }
+
+                        .dash-rjx-card.t1 .dash-rjx-tier-tag {
+                            color: #E8A061;
+                            background: rgba(217, 138, 74, .15);
+                            border: 1px solid rgba(217, 138, 74, .35);
+                        }
+
+                        .dash-rjx-card.t2 .dash-rjx-tier-tag {
+                            color: #D5DCE6;
+                            background: rgba(213, 220, 230, .15);
+                            border: 1px solid rgba(213, 220, 230, .35);
+                        }
+
+                        .dash-rjx-card.t3 .dash-rjx-tier-tag {
+                            color: #FFD23F;
+                            background: rgba(255, 210, 63, .15);
+                            border: 1px solid rgba(255, 210, 63, .35);
+                        }
+
+                        .dash-rjx-card.t4 .dash-rjx-tier-tag {
+                            color: #F7A072;
+                            background: rgba(247, 160, 114, .15);
+                            border: 1px solid rgba(247, 160, 114, .35);
+                        }
+
+                        .dash-rjx-cname {
+                            font-size: 9.5px;
+                            font-weight: 700;
+                            letter-spacing: .5px;
+                            text-transform: uppercase;
+                            color: #8A94A6;
+                            margin-bottom: -4px;
+                        }
+
+                        .dash-rjx-price {
+                            font-size: 24px;
+                            font-weight: 900;
+                            line-height: 1;
+                            color: #fff;
+                            display: flex;
+                            align-items: baseline;
+                            gap: 3px;
+                        }
+
+                        .dash-rjx-price small {
+                            font-size: 9.5px;
+                            font-weight: 700;
+                            color: #5B6475;
+                        }
+
                         .dash-rjx-win {
-                            display: flex; justify-content: space-between; align-items: center; gap: 4px;
-                            background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.07); border-radius: 7px; padding: 5px 8px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            gap: 4px;
+                            background: rgba(0, 0, 0, .55);
+                            border: 1px solid rgba(255, 255, 255, .07);
+                            border-radius: 7px;
+                            padding: 5px 8px;
                         }
-                        .dash-rjx-win span { font-size: 8.5px; font-weight: 600; color: #8A94A6; }
-                        .dash-rjx-win b { font-size: 12.5px; font-weight: 900; color: #FFD700; }
-                        .dash-rjx-prog-track { height: 4px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
-                        .dash-rjx-prog-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #F5A623, #FFD700); }
-                        .dash-rjx-pmeta { display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; font-weight: 600; color: #8A94A6; }
-                        .dash-rjx-pmeta b { color: #fff; font-weight: 800; }
+
+                        .dash-rjx-win span {
+                            font-size: 8.5px;
+                            font-weight: 600;
+                            color: #8A94A6;
+                        }
+
+                        .dash-rjx-win b {
+                            font-size: 12.5px;
+                            font-weight: 900;
+                            color: #FFD700;
+                        }
+
+                        .dash-rjx-prog-track {
+                            height: 4px;
+                            background: rgba(255, 255, 255, .08);
+                            border-radius: 4px;
+                            overflow: hidden;
+                        }
+
+                        .dash-rjx-prog-fill {
+                            height: 100%;
+                            border-radius: 4px;
+                            background: linear-gradient(90deg, #F5A623, #FFD700);
+                        }
+
+                        .dash-rjx-pmeta {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 4px;
+                            font-size: 9px;
+                            font-weight: 600;
+                            color: #8A94A6;
+                        }
+
+                        .dash-rjx-pmeta b {
+                            color: #fff;
+                            font-weight: 800;
+                        }
+
                         .dash-rjx-cta-btn {
-                            margin-top: auto; height: 30px; border-radius: 8px;
-                            display: flex; align-items: center; justify-content: center; gap: 5px;
-                            background: linear-gradient(135deg,#FFE680,#F0A500); color: #150E02; font-size: 10.5px; font-weight: 900;
-                            letter-spacing: .3px; text-decoration: none;
+                            margin-top: auto;
+                            height: 30px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 5px;
+                            background: linear-gradient(135deg, #FFE680, #F0A500);
+                            color: #150E02;
+                            font-size: 10.5px;
+                            font-weight: 900;
+                            letter-spacing: .3px;
+                            text-decoration: none;
                         }
+
                         .dash-rjx-mine-badge {
-                            position: absolute; z-index: 2; top: 32px; right: 8px; font-size: 8px; font-weight: 800; color: #000;
-                            background: #00FF88; border-radius: 12px; padding: 1px 6px;
+                            position: absolute;
+                            z-index: 2;
+                            top: 32px;
+                            right: 8px;
+                            font-size: 8px;
+                            font-weight: 800;
+                            color: #000;
+                            background: #00FF88;
+                            border-radius: 12px;
+                            padding: 1px 6px;
                         }
                     </style>
 
@@ -1130,14 +1475,16 @@
                                 <div class="dash-rjx-crown"><i class="fas fa-crown"></i></div>
                                 <div>
                                     <div style="font-size: 14px; font-weight: 900; color: #FFF; letter-spacing: 0.4px;">
-                                        ROYAL <span style="background: linear-gradient(135deg,#FFE680,#F5A623); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">JACKPOT</span>
+                                        ROYAL <span
+                                            style="background: linear-gradient(135deg,#FFE680,#F5A623); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">JACKPOT</span>
                                     </div>
                                     <div style="font-size: 9.5px; color: #8A94A6; margin-top: 1px;">
                                         4 prize pools • 500 members each • 50 winners • instant draw
                                     </div>
                                 </div>
                             </div>
-                            <a href="{{ url('/User/RoyalJackpot') }}" style="font-size: 10px; font-weight: 800; color: #FFD700; background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.35); padding: 4px 8px; border-radius: 6px; text-decoration: none; white-space: nowrap;">
+                            <a href="{{ url('/User/RoyalJackpot') }}"
+                                style="font-size: 10px; font-weight: 800; color: #FFD700; background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.35); padding: 4px 8px; border-radius: 6px; text-decoration: none; white-space: nowrap;">
                                 Lobby <i class="fas fa-arrow-right" style="font-size: 8px;"></i>
                             </a>
                         </div>
@@ -1146,7 +1493,8 @@
                         <div class="dash-rjx-wallet-grid">
                             <div class="dash-rjx-wbox main">
                                 <span class="dash-rjx-wlbl"><i class="fas fa-wallet"></i> Royal Wallet</span>
-                                <span class="dash-rjx-wval">${{ number_format($dashRjRoyalWallet, 2) }} <small style="font-size: 8.5px; color: #8A94A6;">USDT</small></span>
+                                <span class="dash-rjx-wval">${{ number_format($dashRjRoyalWallet, 2) }} <small
+                                        style="font-size: 8.5px; color: #8A94A6;">USDT</small></span>
                                 <a href="{{ url('/User/RoyalJackpot') }}" class="dash-rjx-claim-btn">
                                     <i class="fas fa-arrow-up-right-from-square"></i> Claim
                                 </a>
@@ -1164,60 +1512,69 @@
                         <!-- Choose Your Pool Section Bar -->
                         <div class="dash-rjx-sec-title">
                             <h4><i class="fas fa-layer-group" style="color: #F5A623;"></i> Choose Your Pool</h4>
-                            <span style="font-size: 9.5px; color: #8A94A6; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                <span style="width: 5px; height: 5px; border-radius: 50%; background: #00FF88; box-shadow: 0 0 6px #00FF88; display: inline-block;"></span> Live
+                            <span
+                                style="font-size: 9.5px; color: #8A94A6; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                <span
+                                    style="width: 5px; height: 5px; border-radius: 50%; background: #00FF88; box-shadow: 0 0 6px #00FF88; display: inline-block;"></span>
+                                Live
                             </span>
                         </div>
 
                         <!-- 2x2 Pools Grid (Identical to Royal Jackpot Page) -->
                         <div class="dash-rjx-grid">
                             @foreach($dashRjPools as $p)
-                            @php
-                                $shortName = trim(preg_replace('/\s*\$\d+$/', '', $p->pool_name));
-                                $sFill = $p->slotsFilled ?? 0;
-                                $pctFill = $p->percentageFilled ?? 0;
-                                $roundNum = ($p->activeRound && $p->activeRound->round_number) ? $p->activeRound->round_number : 1;
-                                $uTickets = $p->userTicketsCount ?? 0;
-                                $winUpTo = ($p->prizes_json['rank_1'] ?? ($p->pool_tier == 1 ? 500 : ($p->pool_tier == 2 ? 1000 : ($p->pool_tier == 3 ? 2000 : 5000))));
-                            @endphp
-                            <a href="{{ url('/User/RoyalJackpot/Pool/' . $p->pool_tier) }}" class="dash-rjx-card t{{ $p->pool_tier }}">
-                                <div class="dash-rjx-card-top">
-                                    <span class="dash-rjx-tier-tag">
-                                        <i class="fas {{ $dashTierIcons[$p->pool_tier] ?? 'fa-trophy' }}"></i> Pool {{ $p->pool_tier }}
-                                    </span>
-                                    <span style="font-size: 8.5px; font-weight: 700; color: #8A94A6; display: flex; align-items: center; gap: 3px;">
-                                        <span style="width: 4px; height: 4px; border-radius: 50%; background: #00FF88;"></span> R#{{ $roundNum }}
-                                    </span>
-                                </div>
-
-                                @if($uTickets > 0)
-                                    <span class="dash-rjx-mine-badge">{{ $uTickets }} ticket{{ $uTickets > 1 ? 's' : '' }}</span>
-                                @endif
-
-                                <div class="dash-rjx-cname">{{ $shortName }}</div>
-                                <div class="dash-rjx-price">
-                                    ${{ number_format($p->ticket_price, 0) }} <small>/ ticket</small>
-                                </div>
-
-                                <div class="dash-rjx-win">
-                                    <span>Win up to</span>
-                                    <b>${{ number_format($winUpTo, 0) }}</b>
-                                </div>
-
-                                <div>
-                                    <div class="dash-rjx-prog-track">
-                                        <div class="dash-rjx-prog-fill" style="width: {{ max(2, $pctFill) }}%;"></div>
+                                @php
+                                    $shortName = trim(preg_replace('/\s*\$\d+$/', '', $p->pool_name));
+                                    $sFill = $p->slotsFilled ?? 0;
+                                    $pctFill = $p->percentageFilled ?? 0;
+                                    $roundNum = ($p->activeRound && $p->activeRound->round_number) ? $p->activeRound->round_number : 1;
+                                    $uTickets = $p->userTicketsCount ?? 0;
+                                    $winUpTo = ($p->prizes_json['rank_1'] ?? ($p->pool_tier == 1 ? 500 : ($p->pool_tier == 2 ? 1000 : ($p->pool_tier == 3 ? 2000 : 5000))));
+                                @endphp
+                                <a href="{{ url('/User/RoyalJackpot/Pool/' . $p->pool_tier) }}"
+                                    class="dash-rjx-card t{{ $p->pool_tier }}">
+                                    <div class="dash-rjx-card-top">
+                                        <span class="dash-rjx-tier-tag">
+                                            <i class="fas {{ $dashTierIcons[$p->pool_tier] ?? 'fa-trophy' }}"></i> Pool
+                                            {{ $p->pool_tier }}
+                                        </span>
+                                        <span
+                                            style="font-size: 8.5px; font-weight: 700; color: #8A94A6; display: flex; align-items: center; gap: 3px;">
+                                            <span
+                                                style="width: 4px; height: 4px; border-radius: 50%; background: #00FF88;"></span>
+                                            R#{{ $roundNum }}
+                                        </span>
                                     </div>
-                                    <div class="dash-rjx-pmeta">
-                                        <span>Filled <b>{{ $sFill }} / 500</b></span>
-                                        <span>{{ $pctFill }}%</span>
-                                    </div>
-                                </div>
 
-                                <div class="dash-rjx-cta-btn">
-                                    Open Pool <i class="fas fa-arrow-right" style="font-size: 8px;"></i>
-                                </div>
-                            </a>
+                                    @if($uTickets > 0)
+                                        <span class="dash-rjx-mine-badge">{{ $uTickets }}
+                                            ticket{{ $uTickets > 1 ? 's' : '' }}</span>
+                                    @endif
+
+                                    <div class="dash-rjx-cname">{{ $shortName }}</div>
+                                    <div class="dash-rjx-price">
+                                        ${{ number_format($p->ticket_price, 0) }} <small>/ ticket</small>
+                                    </div>
+
+                                    <div class="dash-rjx-win">
+                                        <span>Win up to</span>
+                                        <b>${{ number_format($winUpTo, 0) }}</b>
+                                    </div>
+
+                                    <div>
+                                        <div class="dash-rjx-prog-track">
+                                            <div class="dash-rjx-prog-fill" style="width: {{ max(2, $pctFill) }}%;"></div>
+                                        </div>
+                                        <div class="dash-rjx-pmeta">
+                                            <span>Filled <b>{{ $sFill }} / 500</b></span>
+                                            <span>{{ $pctFill }}%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="dash-rjx-cta-btn">
+                                        Open Pool <i class="fas fa-arrow-right" style="font-size: 8px;"></i>
+                                    </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
@@ -1281,7 +1638,8 @@
 
                                     <div
                                         style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
-                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Unmined ROI:</span>
+                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Unmined
+                                            ROI:</span>
                                         <span
                                             style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;"
                                             id="dashUnminedUsdtTxt">
@@ -1291,7 +1649,8 @@
                                     </div>
 
                                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Yield in CAI:</span>
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Yield in
+                                            CAI:</span>
                                         <span
                                             style="font-size: 0.74rem; font-weight: 700; color: #FFE082; font-family: 'Space Mono', monospace;"
                                             id="dashUnminedCaiYieldTxt">
@@ -1328,7 +1687,8 @@
 
                                     <div
                                         style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
-                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Protocol CAI:</span>
+                                        <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Protocol
+                                            CAI:</span>
                                         <span
                                             style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;"
                                             id="dashProtocolCaiTxt">
@@ -1339,22 +1699,27 @@
                                         </span>
                                     </div>
 
-                                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
-                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Max Sellable:</span>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Max
+                                            Sellable:</span>
                                         <span
                                             style="font-size: 0.74rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;"
                                             id="dashSellableLimitTxt">
                                             ${{ number_format($eligibleSellUsdt, 2) }} USDT <small
-                                                style="color: #8E99A8;">({{ number_format($eligibleSellCai, 2) }} CAI)</small>
+                                                style="color: #8E99A8;">({{ number_format($eligibleSellCai, 2) }}
+                                                CAI)</small>
                                         </span>
                                     </div>
 
                                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Est. Wallet Receive:</span>
+                                        <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Est. Wallet
+                                            Receive:</span>
                                         <span
                                             style="font-size: 0.78rem; font-weight: 800; color: #00FF88; font-family: 'Space Mono', monospace;"
                                             id="dashEstWalletUsdtTxt">
-                                            ≈ ${{ number_format($eligibleSellUsdt, 2) }} <small style="font-size: 0.60rem; color: #A0AEC0;">USDT</small>
+                                            ≈ ${{ number_format($eligibleSellUsdt, 2) }} <small
+                                                style="font-size: 0.60rem; color: #A0AEC0;">USDT</small>
                                         </span>
                                     </div>
                                 </div>
@@ -1364,7 +1729,8 @@
                                     @if($eligibleSellUsdt <= 0) disabled
                                         style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 32px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.72rem; border-radius: 6px; font-family: 'Inter', sans-serif;"
                                     @endif>
-                                    <span id="btnDashSellAllTxt">SELL CAI ON DEX (${{ number_format($eligibleSellUsdt, 2) }})</span>
+                                    <span id="btnDashSellAllTxt">SELL CAI ON DEX
+                                        (${{ number_format($eligibleSellUsdt, 2) }})</span>
                                 </button>
                             </div>
 
@@ -1413,24 +1779,73 @@
                     $todayDailyPoolFund = ($todayDepositsVolume * 1.5) / 100;
                     $todayDailyPerUserShare = ($globalDailyEligible > 0 && $todayDailyPoolFund > 0) ? ($todayDailyPoolFund / $globalDailyEligible) : 0;
 
-                    // 2. Weekly Pool (1.5%)
-                    $globalWeeklyEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('active_direct', '>=', 5)->count();
+                    // 2. Weekly Pool (1.5%) - Live Hafta to Hafta (Monday 00:00 to Sunday 23:59)
+                    $thisWeekStart = \Carbon\Carbon::now()->startOfWeek();
+                    $thisWeekEnd = \Carbon\Carbon::now()->endOfWeek();
+                    $weeklyDirectMap = \DB::table('stacking_deposites as sd')
+                        ->join('user_details as ud', 'sd.userid', '=', 'ud.id')
+                        ->where('sd.status', 1)
+                        ->where('sd.usdt', '>=', 100)
+                        ->whereBetween('sd.created_at', [$thisWeekStart, $thisWeekEnd])
+                        ->select('ud.sponsorid', \DB::raw('count(DISTINCT ud.id) as dir_count'))
+                        ->groupBy('ud.sponsorid')
+                        ->havingRaw('count(DISTINCT ud.id) >= 5')
+                        ->get();
+
+                    $globalWeeklyEligible = 0;
+                    foreach ($weeklyDirectMap as $row) {
+                        $sp = \App\UserDetails::where('id', $row->sponsorid)->orWhere('userid', $row->sponsorid)->first();
+                        if ($sp && $sp->userstatus == 1 && $sp->capping != 1 && (float) $sp->current_self_investment >= 100) {
+                            $globalWeeklyEligible++;
+                        }
+                    }
+
                     $thisWeekDepositsVolume = (float) \App\StackingDeposite::where('status', 1)
-                        ->where('created_at', '>=', \Carbon\Carbon::now()->startOfWeek())
+                        ->whereBetween('created_at', [$thisWeekStart, $thisWeekEnd])
                         ->sum('usdt');
                     $thisWeekPoolFund = ($thisWeekDepositsVolume * 1.5) / 100;
                     $thisWeekPerUserShare = ($globalWeeklyEligible > 0 && $thisWeekPoolFund > 0) ? ($thisWeekPoolFund / $globalWeeklyEligible) : 0;
 
-                    // 3. Monthly Directs Pool (2.0%)
-                    $globalMonthlyDirEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('active_direct', '>=', 15)->count();
+                    // 3. Monthly Directs Pool (2.0%) - Live Mahina to Mahina
+                    $thisMonthStart = \Carbon\Carbon::now()->startOfMonth();
+                    $thisMonthEnd = \Carbon\Carbon::now()->endOfMonth();
+                    $monthlyDirectMap = \DB::table('stacking_deposites as sd')
+                        ->join('user_details as ud', 'sd.userid', '=', 'ud.id')
+                        ->where('sd.status', 1)
+                        ->where('sd.usdt', '>=', 100)
+                        ->whereBetween('sd.created_at', [$thisMonthStart, $thisMonthEnd])
+                        ->select('ud.sponsorid', \DB::raw('count(DISTINCT ud.id) as dir_count'))
+                        ->groupBy('ud.sponsorid')
+                        ->havingRaw('count(DISTINCT ud.id) >= 15')
+                        ->get();
+
+                    $globalMonthlyDirEligible = 0;
+                    foreach ($monthlyDirectMap as $row) {
+                        $sp = \App\UserDetails::where('id', $row->sponsorid)->orWhere('userid', $row->sponsorid)->first();
+                        if ($sp && $sp->userstatus == 1 && $sp->capping != 1 && (float) $sp->current_self_investment >= 100) {
+                            $globalMonthlyDirEligible++;
+                        }
+                    }
+
                     $thisMonthDepositsVolume = (float) \App\StackingDeposite::where('status', 1)
-                        ->where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())
+                        ->whereBetween('created_at', [$thisMonthStart, $thisMonthEnd])
                         ->sum('usdt');
                     $thisMonthDirPoolFund = ($thisMonthDepositsVolume * 2.0) / 100;
                     $thisMonthDirPerUserShare = ($globalMonthlyDirEligible > 0 && $thisMonthDirPoolFund > 0) ? ($thisMonthDirPoolFund / $globalMonthlyDirEligible) : 0;
 
-                    // 4. Monthly Team Volume Pool (2.0%)
-                    $globalMonthlyVolEligible = \App\UserDetails::where('userstatus', 1)->where('capping', '!=', 1)->where('current_self_investment', '>=', 100)->where('total_investment', '>=', 10000)->count();
+                    // 4. Monthly Team Volume Pool (2.0%) - Live Mahina to Mahina ($5K Power & $5K Weaker this month)
+                    $monthVolEligibleCount = 0;
+                    $activeUsersForVol = \App\UserDetails::where('userstatus', 1)
+                        ->where('capping', '!=', 1)
+                        ->where('current_self_investment', '>=', 100)
+                        ->get();
+                    foreach ($activeUsersForVol as $uVol) {
+                        $legData = $uVol->getLegBusiness($thisMonthStart, $thisMonthEnd);
+                        if ($legData['power'] >= 5000 && $legData['weaker'] >= 5000) {
+                            $monthVolEligibleCount++;
+                        }
+                    }
+                    $globalMonthlyVolEligible = $monthVolEligibleCount;
                     $thisMonthVolPoolFund = ($thisMonthDepositsVolume * 2.0) / 100;
                     $thisMonthVolPerUserShare = ($globalMonthlyVolEligible > 0 && $thisMonthVolPoolFund > 0) ? ($thisMonthVolPoolFund / $globalMonthlyVolEligible) : 0;
 
@@ -1446,24 +1861,36 @@
                      3B. LIVE DEX MARKET & TRADINGVIEW CHART (CAI / USDT)
                      ============================================================ -->
                 <div class="hud-tradingview-section" style="margin: 0 8px 18px 8px;">
-                    <div style="background: linear-gradient(180deg, rgba(8, 10, 16, 0.98) 0%, rgba(3, 4, 8, 1) 100%); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 215, 0, 0.08); position: relative; font-family: 'Inter', sans-serif;">
-                        
+                    <div
+                        style="background: linear-gradient(180deg, rgba(8, 10, 16, 0.98) 0%, rgba(3, 4, 8, 1) 100%); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 215, 0, 0.08); position: relative; font-family: 'Inter', sans-serif;">
+
                         <!-- Header Bar: Pair Telemetry & Real-Time Stats -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
                             <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI" style="width: 20px; height: 20px; object-fit: contain;">
+                                <div
+                                    style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI"
+                                        style="width: 20px; height: 20px; object-fit: contain;">
                                 </div>
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 6px;">
-                                        <span style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.4px;">CAI / USDT</span>
-                                        <span style="font-size: 0.58rem; padding: 1px 5px; border-radius: 4px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP V2</span>
+                                        <span
+                                            style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.4px;">CAI
+                                            / USDT</span>
+                                        <span
+                                            style="font-size: 0.58rem; padding: 1px 5px; border-radius: 4px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP
+                                            V2</span>
                                     </div>
-                                    <div style="font-size: 0.64rem; color: #8E99A8; display: flex; align-items: center; gap: 4px; margin-top: 1px;">
+                                    <div
+                                        style="font-size: 0.64rem; color: #8E99A8; display: flex; align-items: center; gap: 4px; margin-top: 1px;">
                                         <span>BNB Smart Chain (BSC)</span>
                                         <span style="color: #4A5568;">•</span>
-                                        <a href="https://bscscan.com/address/0x17C405d90e8d112c340698EE2b09EB31FF72f730" target="_blank" style="color: #FFD700; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 0.60rem;">
-                                            0x17C4...f730 <i class="fas fa-external-link-alt" style="font-size: 8px;"></i>
+                                        <a href="https://bscscan.com/address/0x17C405d90e8d112c340698EE2b09EB31FF72f730"
+                                            target="_blank"
+                                            style="color: #FFD700; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 0.60rem;">
+                                            0x17C4...f730 <i class="fas fa-external-link-alt"
+                                                style="font-size: 8px;"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -1472,14 +1899,21 @@
                             <!-- Live Price & 24H Change Stats -->
                             <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
                                 <div>
-                                    <div style="font-size: 0.58rem; color: #8E99A8; text-transform: uppercase; font-weight: 600; text-align: right;">Live DEX Rate</div>
-                                    <div id="dexLivePriceDisplay" style="font-size: 1.05rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88; line-height: 1.1; text-align: right;">
+                                    <div
+                                        style="font-size: 0.58rem; color: #8E99A8; text-transform: uppercase; font-weight: 600; text-align: right;">
+                                        Live DEX Rate</div>
+                                    <div id="dexLivePriceDisplay"
+                                        style="font-size: 1.05rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88; line-height: 1.1; text-align: right;">
                                         ${{ number_format($caiPrice, 4) }}
                                     </div>
                                 </div>
-                                <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 4px 8px; text-align: center;">
-                                    <div style="font-size: 0.56rem; color: #8E99A8; text-transform: uppercase; font-weight: 600;">24h Change</div>
-                                    <div id="dex24hChangeDisplay" style="font-size: 0.76rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88;">
+                                <div
+                                    style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 4px 8px; text-align: center;">
+                                    <div
+                                        style="font-size: 0.56rem; color: #8E99A8; text-transform: uppercase; font-weight: 600;">
+                                        24h Change</div>
+                                    <div id="dex24hChangeDisplay"
+                                        style="font-size: 0.76rem; font-weight: 800; font-family: 'Space Mono', monospace; color: #00FF88;">
                                         <i class="fas fa-arrow-trend-up"></i> +0.00%
                                     </div>
                                 </div>
@@ -1494,6 +1928,7 @@
                                 gap: 6px;
                                 margin-bottom: 8px;
                             }
+
                             @media (max-width: 600px) {
                                 .dash-dex-stats-grid {
                                     grid-template-columns: repeat(2, 1fr);
@@ -1503,37 +1938,60 @@
                             }
                         </style>
                         <div class="dash-dex-stats-grid">
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
-                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">24H Volume</div>
-                                <div id="dex24hVolume" style="font-size: 0.68rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">$--</div>
+                            <div
+                                style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div
+                                    style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">
+                                    24H Volume</div>
+                                <div id="dex24hVolume"
+                                    style="font-size: 0.68rem; font-weight: 700; color: #FFFFFF; font-family: 'Space Mono', monospace;">
+                                    $--</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
-                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Total Liquidity</div>
-                                <div id="dexLiquidity" style="font-size: 0.68rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">$--</div>
+                            <div
+                                style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div
+                                    style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">
+                                    Total Liquidity</div>
+                                <div id="dexLiquidity"
+                                    style="font-size: 0.68rem; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace;">
+                                    $--</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
-                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Base Token</div>
-                                <div style="font-size: 0.68rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">CAI BEP-20</div>
+                            <div
+                                style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div
+                                    style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">
+                                    Base Token</div>
+                                <div
+                                    style="font-size: 0.68rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">
+                                    CAI BEP-20</div>
                             </div>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
-                                <div style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">Network</div>
-                                <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">BSC Mainnet</div>
+                            <div
+                                style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
+                                <div
+                                    style="font-size: 0.50rem; color: #8C9BAE; text-transform: uppercase; font-weight: 600;">
+                                    Network</div>
+                                <div
+                                    style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">
+                                    BSC Mainnet</div>
                             </div>
                         </div>
 
                         <!-- Embedded Interactive TradingView / DexScreener Candlestick Chart Container (Compact Height) -->
-                        <div style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
+                        <div
+                            style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(245, 166, 35, 0.25); background: #0c0f17;">
                             <style>
                                 #dexscreener-embed-box {
                                     position: relative;
                                     width: 100%;
                                     height: 380px;
                                 }
+
                                 @media (max-width: 600px) {
                                     #dexscreener-embed-box {
                                         height: 300px;
                                     }
                                 }
+
                                 #dexscreener-embed-box iframe {
                                     position: absolute;
                                     width: 100%;
@@ -1544,17 +2002,24 @@
                                 }
                             </style>
                             <div id="dexscreener-embed-box">
-                                <iframe src="https://www.geckoterminal.com/bsc/pools/0x17C405d90e8d112c340698EE2b09EB31FF72f730?embed=1&info=0&swaps=0&grayscale=0&light_chart=0" allowfullscreen></iframe>
+                                <iframe
+                                    src="https://www.geckoterminal.com/bsc/pools/0x17C405d90e8d112c340698EE2b09EB31FF72f730?embed=1&info=0&swaps=0&grayscale=0&light_chart=0"
+                                    allowfullscreen></iframe>
                             </div>
                         </div>
 
                         <!-- Direct Quick Actions Footer (Compact) -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                <a href="https://pancakeswap.finance/swap?outputCurrency=0x193149028a3C83009Ecda6D5E76f1abD62E51a43" target="_blank" class="btn-solid-gold-claim" style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 800;">
+                                <a href="https://pancakeswap.finance/swap?outputCurrency=0x193149028a3C83009Ecda6D5E76f1abD62E51a43"
+                                    target="_blank" class="btn-solid-gold-claim"
+                                    style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 800;">
                                     <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
                                 </a>
-                                <a href="https://dexscreener.com/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730" target="_blank" class="mecha-btn-outline" style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(245, 166, 35, 0.4); color: #FFD700;">
+                                <a href="https://dexscreener.com/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730"
+                                    target="_blank" class="mecha-btn-outline"
+                                    style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(245, 166, 35, 0.4); color: #FFD700;">
                                     <i class="fas fa-chart-line"></i> Full DexScreener
                                 </a>
                             </div>
@@ -1998,8 +2463,7 @@
                     </a>
 
                     <!-- 4. Rank & Milestone Reward -->
-                    <a href="{{ url('/User/RankIncome') }}"
-                        class="income-stream-standalone-card stream-rank">
+                    <a href="{{ url('/User/RankIncome') }}" class="income-stream-standalone-card stream-rank">
                         <div class="stream-card-top">
                             <div class="stream-icon-bubble icon-amber">
                                 <i class="fas fa-crown"></i>
@@ -2034,13 +2498,18 @@
                     </div>
 
                     @if(!empty($boosterStats['is_dao']))
-                        <div style="margin-bottom: 8px; padding: 6px 10px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 8px; font-size: 10px; color: #E2E8F0; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                        <div
+                            style="margin-bottom: 8px; padding: 6px 10px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 8px; font-size: 10px; color: #E2E8F0; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-gem" style="color: #FFD700;"></i>
-                                <span><strong style="color: #FFD700;">{{ $boosterStats['dao_tier_name'] }}:</strong> Requires <strong>2 Direct DAO</strong> (${{ number_format($boosterStats['dao_min_amount']) }}+)</span>
+                                <span><strong style="color: #FFD700;">{{ $boosterStats['dao_tier_name'] }}:</strong>
+                                    Requires <strong>2 Direct DAO</strong>
+                                    (${{ number_format($boosterStats['dao_min_amount']) }}+)</span>
                             </div>
-                            <span style="font-weight: 800; font-size: 9.5px; padding: 2px 7px; border-radius: 4px; background: {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 215, 0, 0.2)' }}; color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; border: 1px solid {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.4)' }};">
-                                {{ $boosterStats['dao_directs_count'] }} / 2 DAO {{ $boosterStats['dao_directs_met'] ? '✓' : '' }}
+                            <span
+                                style="font-weight: 800; font-size: 9.5px; padding: 2px 7px; border-radius: 4px; background: {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 215, 0, 0.2)' }}; color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; border: 1px solid {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.4)' }};">
+                                {{ $boosterStats['dao_directs_count'] }} / 2 DAO
+                                {{ $boosterStats['dao_directs_met'] ? '✓' : '' }}
                             </span>
                         </div>
                     @endif
@@ -2092,9 +2561,13 @@
                             </div>
 
                             @if(!empty($boosterStats['is_dao']))
-                                <div style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-                                        <i class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i> 2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
+                                <div
+                                    style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span
+                                        style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i
+                                            class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i>
+                                        2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
                                     </span>
                                     <span style="color: #FFFFFF; font-weight: 800; font-family: 'Space Mono', monospace;">
                                         {{ $boosterStats['dao_directs_count'] }} / 2
@@ -2158,9 +2631,13 @@
                             </div>
 
                             @if(!empty($boosterStats['is_dao']))
-                                <div style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-                                        <i class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i> 2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
+                                <div
+                                    style="margin-top: 6px; padding: 3px 6px; background: rgba(255, 215, 0, 0.06); border: 1px dashed {{ $boosterStats['dao_directs_met'] ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 215, 0, 0.35)' }}; border-radius: 6px; font-size: 9px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span
+                                        style="color: {{ $boosterStats['dao_directs_met'] ? '#00FF88' : '#FFD700' }}; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i
+                                            class="fas {{ $boosterStats['dao_directs_met'] ? 'fa-check-circle' : 'fa-circle-exclamation' }}"></i>
+                                        2 DAO (${{ number_format($boosterStats['dao_min_amount']) }}+):
                                     </span>
                                     <span style="color: #FFFFFF; font-weight: 800; font-family: 'Space Mono', monospace;">
                                         {{ $boosterStats['dao_directs_count'] }} / 2
@@ -3340,7 +3817,7 @@
             });
             try {
                 window.dispatchEvent(new Event("eip6963:requestProvider"));
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function getPureMetaMaskProvider() {
@@ -3736,7 +4213,7 @@
                     cancelButton: 'mecha-swal-cancel'
                 },
                 didOpen: () => {
-                    window.updateCustomSellCalculations = function() {
+                    window.updateCustomSellCalculations = function () {
                         const input = document.getElementById('customSellCaiInput');
                         const errBox = document.getElementById('customSellErrBox');
                         const confirmBtn = Swal.getConfirmButton();
@@ -3790,7 +4267,7 @@
                         }
                     };
 
-                    window.setCustomSellPercent = function(pct) {
+                    window.setCustomSellPercent = function (pct) {
                         const input = document.getElementById('customSellCaiInput');
                         if (!input) return;
                         let target = 0;
@@ -4064,7 +4541,7 @@
             if (!input) return;
             input.select();
             input.setSelectionRange(0, 99999);
-            
+
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(input.value).then(() => {
                     handleDashCopySuccess();
