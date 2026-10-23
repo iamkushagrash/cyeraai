@@ -81,7 +81,7 @@
 										<div class="card-body pb-2">
 												<div class="row">
 													<label class="form-label" style="text-align:center;"><h6>Available Balance : @if(!is_null($balance)){{round(\Illuminate\Support\Facades\Crypt::decrypt($balance->amount),6)}} @else 0 @endif $</h6></label>
-													<label class="form-label" style="text-align:center;"><h6>CAI Price : {{round($price->price,3)}}$</h6></label>
+													<label class="form-label" style="text-align:center;"><h6>CAAI Price : {{round($price->price,3)}}$</h6></label>
 													<div class="form-group mb-3">
 														<label class="form-label" for="exampleFormControlInput1"><h6>User ID</h6></label>
 														<input type="text" id="userid" class="form-control @error('userid') is-invalid @enderror" name="userid" value="" placeholder="Enter UserID" required>
@@ -145,7 +145,7 @@
 										<div class="card-body pb-2">
 											<div class="row">
 												<div class="col-xl-6 col-md-6 col-xs-6"><label class="form-label" style="text-align:center;"><h6>Available Balance : @if(!is_null($balance)){{round(\Illuminate\Support\Facades\Crypt::decrypt($balance->amount),6)}} @else 0 @endif $</h6></label></div>
-												<div class="col-xl-6 col-md-6 col-xs-6"><label class="form-label" style="text-align:center;"><h6>CAI Price : {{round($price->price,3)}}$</h6></label></div>
+												<div class="col-xl-6 col-md-6 col-xs-6"><label class="form-label" style="text-align:center;"><h6>CAAI Price : {{round($price->price,3)}}$</h6></label></div>
 											</div>
 											<div class="row">
 												<div class="col-xl-6 col-md-6 col-xs-6">
@@ -168,7 +168,7 @@
 			                                            @enderror
 													</div>
 													<div class="form-group mb-3">
-														<label class="form-label" for="cai"><h6>CAI</h6></label>
+														<label class="form-label" for="cai"><h6>CAAI</h6></label>
 														<input type="amount" name="cai" class="form-control @error('cai') is-invalid @enderror" id="cai" placeholder="cai" disabled>
 														@error('cai')
 			                                                <span class="invalid-feedback" role="alert">

@@ -126,7 +126,7 @@
                         <div class="content-body">    
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h4>Total : {{round($sumamount->amountusdt,2)}}$ ( {{round($sumamount->amountcoin,2)}} CAI) </h4>
+                                    <h4>Total : {{round($sumamount->amountusdt,2)}}$ ( {{round($sumamount->amountcoin,2)}} CAAI) </h4>
                                     
                                 </div>
                             </div>

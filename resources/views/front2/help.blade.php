@@ -122,7 +122,7 @@
             </div>
           </div>
           <div class="tutorial">
-            <h4 class="tutorial-title text-white-gradient w-fit">How to Sell CAI / Withdraw</h4>
+            <h4 class="tutorial-title text-white-gradient w-fit">How to Sell CAAI / Withdraw</h4>
             <div class="youtube-wrapper">
               <iframe src="https://www.youtube.com/embed/XJ_n-wNSfjY" title="YouTube video" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

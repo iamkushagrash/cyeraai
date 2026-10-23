@@ -706,7 +706,7 @@
             <div class="stream-accruing-box">
                 <span class="stream-accruing-lbl">Accrued Since 04:30 AM</span>
                 <span class="stream-accruing-num" id="liveAccruedUsdTxt">$0.0000</span>
-                <span class="stream-accruing-sub">(<span id="liveAccruedCaiTxt">0.0000</span> CAI)</span>
+                <span class="stream-accruing-sub">(<span id="liveAccruedCaiTxt">0.0000</span> CAAI)</span>
             </div>
             <div class="stream-rate-box">
                 <span class="stream-rate-lbl">24H Expected ROI</span>
@@ -722,7 +722,7 @@
             <span class="cps-summary-lbl"><i class="fas fa-wallet" style="color: #FFD700;"></i> EARNED</span>
             <span class="cps-summary-val gold">
                 {{ ($totalCaiEarned < 1 && $totalCaiEarned > 0) ? number_format($totalCaiEarned, 4) : number_format($totalCaiEarned, 2) }}
-                <span style="font-size: 0.65rem; color: #FFE082;">CAI</span>
+                <span style="font-size: 0.65rem; color: #FFE082;">CAAI</span>
             </span>
             <span style="font-size: 0.62rem; color: #00FF88; font-weight: 700; margin-top: 1px;">≈ ${{ number_format($totalLiveUsdt, 2) }}</span>
         </div>
@@ -785,7 +785,7 @@
                         <span class="reward-lbl">REWARD ACCRUED</span>
                         <span class="reward-val">
                             {{ ($caiAmount < 1 && $caiAmount > 0) ? number_format($caiAmount, 4) : number_format($caiAmount, 2) }}
-                            <small style="color: #FFD700; font-weight: 800;">CAI</small>
+                            <small style="color: #FFD700; font-weight: 800;">CAAI</small>
                         </span>
                         <span style="font-size: 0.65rem; color: #00FF88; font-weight: 700; margin-top: 2px;">
                             ≈ ${{ number_format($liveUsdtVal, 2) }} <span style="font-size: 0.58rem; color: #8E99A8;">USDT</span>
@@ -805,7 +805,7 @@
                         <span>{{ $row->created_at }}</span>
                     </div>
                     <div class="footer-token-conv" title="Live Oracle Valuation">
-                        <i class="fas fa-bolt" style="font-size: 0.55rem; color: #FFD700;"></i> 1 CAI = ${{ number_format($caiLivePrice, 2) }}
+                        <i class="fas fa-bolt" style="font-size: 0.55rem; color: #FFD700;"></i> 1 CAAI = ${{ number_format($caiLivePrice, 2) }}
                     </div>
                 </div>
             </div>

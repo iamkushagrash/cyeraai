@@ -105,10 +105,10 @@
                     </div>
                 </li>
                 
-                <!-- Stake CAI Dropdown -->
+                <!-- Stake CAAI Dropdown -->
                 <li class="nav-item dropdown">
                     <div class="dropdown-header">
-                        <i class="fas fa-coins"></i> Stake CAI
+                        <i class="fas fa-coins"></i> Stake CAAI
                         <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </div>
                     <div class="dropdown-content">

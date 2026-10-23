@@ -36,7 +36,7 @@
             </div>
             <span class="mecha-badge-green">PDF</span>
         </div>
-        <p style="font-size: 11px; color: #94A3B8; margin: 10px 0 16px;">Quick single-sheet brief outlining CAI token utility, reward mechanics, and smart contract specs.</p>
+        <p style="font-size: 11px; color: #94A3B8; margin: 10px 0 16px;">Quick single-sheet brief outlining CAAI token utility, reward mechanics, and smart contract specs.</p>
         <a href="{{ asset('main/assets/documentation/onepaper.pdf') }}" download class="mecha-btn-gold" style="height: 38px; font-size: 10px;">
             <i class="fas fa-download"></i> DOWNLOAD PDF
         </a>

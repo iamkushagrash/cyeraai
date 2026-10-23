@@ -76,7 +76,7 @@
 														<th>UserId</th>
 														<th>Name</th>
 														<th>Amount($)</th>
-														<th>Amount(CAI)</th>
+														<th>Amount(CAAI)</th>
 														<th>Return</th>
 														<th>Date</th>
 							              				<th>Status</th>

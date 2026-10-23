@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyera AI — CAI Token | The Future of Decentralized Intelligence</title>
+    <title>Cyera AI — CAAI Token | The Future of Decentralized Intelligence</title>
     <meta name="description"
-        content="CAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain. Total Supply: 300000 CAI.">
-    <meta property="og:title" content="Cyera AI — CAI Token">
-    <meta property="og:description" content="Power the Future. Own the Protocol. CAI Token on BNB Smart Chain. Total Supply: 300000 CAI.">
+        content="CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain. Total Supply: 300000 CAAI.">
+    <meta property="og:title" content="Cyera AI — CAAI Token">
+    <meta property="og:description" content="Power the Future. Own the Protocol. CAAI Token on BNB Smart Chain. Total Supply: 300000 CAAI.">
     <meta property="og:image" content="{{ asset('images/cai-token-coin.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/cai-spartan-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -354,7 +354,7 @@
 <!-- NAVBAR -->
 <nav class="nav" id="mainNav">
     <a href="#" class="nav-logo">
-        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI">
+        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAAI">
         <span class="nav-logo-txt">CYERA AI</span>
     </a>
     <ul class="nav-links">
@@ -385,7 +385,7 @@
             <div class="ring-outer"></div>
             <div class="token-halo"></div>
             <div class="token-coin">
-                <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI Token">
+                <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAAI Token">
             </div>
             <div class="pt" style="width:4px;height:4px;background:#FFD700;left:8%;bottom:18%;animation-duration:3.5s;"></div>
             <div class="pt" style="width:3px;height:3px;background:#00FF88;left:82%;bottom:28%;animation-duration:4.2s;animation-delay:-1s;"></div>
@@ -398,16 +398,16 @@
             <span class="grad-txt">Power The Future</span><br>
             Own The Protocol
         </h1>
-        <p class="hero-sub">CAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain with a capped supply of 300000 CAI.</p>
+        <p class="hero-sub">CAAI Token is the native BEP-20 digital asset powering the Cyera AI decentralized protocol on BNB Smart Chain with a capped supply of 300000 CAAI.</p>
         
         <div class="hero-btns">
             <a href="{{ url('/register') }}" class="btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
-            <a href="#about" class="btn-ghost"><i class="fas fa-play-circle"></i> Explore CAI</a>
+            <a href="#about" class="btn-ghost"><i class="fas fa-play-circle"></i> Explore CAAI</a>
         </div>
 
         <!-- DUAL SMART CONTRACT BADGES -->
         <div class="contracts-strip">
-            <!-- CAI TOKEN CONTRACT -->
+            <!-- CAAI TOKEN CONTRACT -->
             <div class="contract-pill">
                 <div class="cp-left">
                     <div class="cp-icon token"><i class="fas fa-coins"></i></div>
@@ -471,7 +471,7 @@
     <div class="container" style="max-width: 860px;">
         <div class="reveal" style="text-align: center; margin-bottom: 12px;">
             <div class="sec-eyebrow" style="margin: 0 auto 6px; font-size: 0.58rem; padding: 2px 7px;"><i class="fas fa-chart-line"></i> DEX Real-Time Market</div>
-            <h2 class="sec-title" style="font-size: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 4px;">Live <span>CAI / USDT</span> Market Chart</h2>
+            <h2 class="sec-title" style="font-size: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 4px;">Live <span>CAAI / USDT</span> Market Chart</h2>
             <p class="sec-desc" style="margin: 0 auto; font-size: 0.76rem; max-width: 480px;">Real-time streaming price, on-chain liquidity &amp; candlestick chart from PancakeSwap V2.</p>
         </div>
 
@@ -480,11 +480,11 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI" style="width: 18px; height: 18px; object-fit: contain;">
+                        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAAI" style="width: 18px; height: 18px; object-fit: contain;">
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="font-family: 'Rajdhani', sans-serif; font-size: 0.92rem; font-weight: 800; color: #FFF; letter-spacing: 0.4px;">CAI / USDT</span>
+                            <span style="font-family: 'Rajdhani', sans-serif; font-size: 0.92rem; font-weight: 800; color: #FFF; letter-spacing: 0.4px;">CAAI / USDT</span>
                             <span style="font-size: 0.52rem; padding: 1px 4px; border-radius: 3px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP</span>
                         </div>
                         <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
@@ -540,7 +540,7 @@
                 </div>
                 <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 4px 6px;">
                     <div style="font-size: 0.50rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600;">Capped Supply</div>
-                    <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAI</div>
+                    <div style="font-size: 0.68rem; font-weight: 700; color: #00E5FF; font-family: 'Space Mono', monospace;">300,000 CAAI</div>
                 </div>
             </div>
 
@@ -599,19 +599,19 @@
                 <div class="about-coin-wrap">
                     <div class="a-ring a-ring1"></div>
                     <div class="a-ring a-ring2"></div>
-                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="Cyera AI CAI Token">
+                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="Cyera AI CAAI Token">
                     <div class="fl-badge b1"><div class="bv">BNB Chain</div><div class="bl">Powered By</div></div>
-                    <div class="fl-badge b2"><div class="bv">300000 CAI</div><div class="bl">Total Supply</div></div>
+                    <div class="fl-badge b2"><div class="bv">300000 CAAI</div><div class="bl">Total Supply</div></div>
                 </div>
             </div>
             <div class="reveal" style="transition-delay:.2s">
-                <div class="sec-eyebrow"><i class="fas fa-cube"></i> What Is CAI</div>
+                <div class="sec-eyebrow"><i class="fas fa-cube"></i> What Is CAAI</div>
                 <h2 class="sec-title">Meet the Token<br>Powering <span>Decentralized AI</span></h2>
-                <p class="sec-desc">CAI (Cyera AI Token) is an exclusive BEP-20 digital asset built on BNB Smart Chain with a strictly capped total supply of 300000 tokens. It serves as the native utility and governance asset of the Cyera AI protocol — engineered for ultra-fast, audited on-chain participation.</p>
+                <p class="sec-desc">CAAI (Cyera AI Token) is an exclusive BEP-20 digital asset built on BNB Smart Chain with a strictly capped total supply of 300000 tokens. It serves as the native utility and governance asset of the Cyera AI protocol — engineered for ultra-fast, audited on-chain participation.</p>
                 <div class="about-feats">
                     <div class="feat-row">
                         <div class="feat-ico ico-gold"><i class="fas fa-shield-halved"></i></div>
-                        <div><div class="ft">Immutable Smart Contract</div><div class="fd">CAI is deployed with an audited, immutable contract on BSC — no hidden minting privileges.</div></div>
+                        <div><div class="ft">Immutable Smart Contract</div><div class="fd">CAAI is deployed with an audited, immutable contract on BSC — no hidden minting privileges.</div></div>
                     </div>
                     <div class="feat-row">
                         <div class="feat-ico ico-green"><i class="fas fa-bolt-lightning"></i></div>
@@ -635,20 +635,20 @@
         <div class="reveal" style="text-align:center">
             <div class="sec-eyebrow" style="margin:0 auto 14px"><i class="fas fa-atom"></i> The Ecosystem</div>
             <h2 class="sec-title" style="text-align:center">Built For The <span>Next Generation</span></h2>
-            <p class="sec-desc" style="margin:0 auto;text-align:center">A comprehensive suite of decentralized products and services — all powered by the CAI token.</p>
+            <p class="sec-desc" style="margin:0 auto;text-align:center">A comprehensive suite of decentralized products and services — all powered by the CAAI token.</p>
         </div>
         <div class="eco-grid">
             <div class="eco-card c-gold reveal" style="transition-delay:.05s">
                 <div class="eco-glow"></div>
                 <div class="eco-icon"><i class="fas fa-coins"></i></div>
                 <div class="eco-t">Token Staking</div>
-                <div class="eco-d">Lock your CAI tokens in the protocol and participate in the network's security and growth cycle through smart-contract driven staking mechanics.</div>
+                <div class="eco-d">Lock your CAAI tokens in the protocol and participate in the network's security and growth cycle through smart-contract driven staking mechanics.</div>
             </div>
             <div class="eco-card c-cyan reveal" style="transition-delay:.1s">
                 <div class="eco-glow"></div>
                 <div class="eco-icon"><i class="fas fa-users"></i></div>
                 <div class="eco-t">Referral Network</div>
-                <div class="eco-d">Build your decentralized network of participants. CAI rewards flow through an on-chain multi-level commission architecture.</div>
+                <div class="eco-d">Build your decentralized network of participants. CAAI rewards flow through an on-chain multi-level commission architecture.</div>
             </div>
             <div class="eco-card c-green reveal" style="transition-delay:.15s">
                 <div class="eco-glow"></div>
@@ -672,7 +672,7 @@
                 <div class="eco-glow"></div>
                 <div class="eco-icon"><i class="fas fa-wallet"></i></div>
                 <div class="eco-t">Web3 Settlement</div>
-                <div class="eco-d">All protocol transactions settle on-chain via BEP-20 USDT and CAI. Withdraw directly to your BNB Chain wallet anytime.</div>
+                <div class="eco-d">All protocol transactions settle on-chain via BEP-20 USDT and CAAI. Withdraw directly to your BNB Chain wallet anytime.</div>
             </div>
         </div>
     </div>
@@ -743,7 +743,7 @@
                 <div class="spec-list">
                     <div class="spec-row"><span class="sk">Blockchain</span><span class="sv gold">BNB Smart Chain</span></div>
                     <div class="spec-row"><span class="sk">Token Standard</span><span class="sv gold">BEP-20</span></div>
-                    <div class="spec-row"><span class="sk">Total Supply</span><span class="sv gold">300000 CAI</span></div>
+                    <div class="spec-row"><span class="sk">Total Supply</span><span class="sv gold">300000 CAAI</span></div>
                     <div class="spec-row"><span class="sk">Consensus</span><span class="sv">PoSA (21 Validators)</span></div>
                     <div class="spec-row"><span class="sk">Block Time</span><span class="sv green">~3 Seconds</span></div>
                     <div class="spec-row"><span class="sk">Transaction Fees</span><span class="sv green">&lt; $0.01 USD</span></div>
@@ -814,8 +814,8 @@
 <section class="cta-sec" id="join">
     <div class="cta-glow"></div>
     <div class="cta-box reveal">
-        <h2 class="cta-title">Ready to Join the<br><span>CAI Revolution?</span></h2>
-        <p class="cta-desc">Become part of the Cyera AI protocol. Connect your wallet, stake CAI, and participate in the decentralized future of intelligent finance.</p>
+        <h2 class="cta-title">Ready to Join the<br><span>CAAI Revolution?</span></h2>
+        <p class="cta-desc">Become part of the Cyera AI protocol. Connect your wallet, stake CAAI, and participate in the decentralized future of intelligent finance.</p>
         <div class="cta-btns">
             <a href="{{ url('/register') }}" class="btn-primary" style="font-size:.95rem"><i class="fas fa-rocket"></i> Create Account</a>
             <a href="{{ url('/login') }}" class="btn-ghost" style="font-size:.95rem"><i class="fas fa-sign-in-alt"></i> Already a Member</a>
@@ -826,7 +826,7 @@
 <!-- FOOTER -->
 <footer class="footer">
     <div class="ft-logo">
-        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI">
+        <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAAI">
         <span class="ft-logo-txt">CYERA AI</span>
     </div>
     <ul class="ft-links">
@@ -836,7 +836,7 @@
         <li><a href="#technology">Technology</a></li>
         <li><a href="{{ url('/login') }}">Login</a></li>
     </ul>
-    <p class="ft-copy">&copy; {{ date('Y') }} Cyera AI Protocol. All rights reserved. CAI Token operates on BNB Smart Chain. Total Supply: 300000 CAI.</p>
+    <p class="ft-copy">&copy; {{ date('Y') }} Cyera AI Protocol. All rights reserved. CAAI Token operates on BNB Smart Chain. Total Supply: 300000 CAAI.</p>
 </footer>
 
 <script>

@@ -89,7 +89,7 @@
 				                                            @enderror
 														</div>
 														<div class="form-group mb-3">
-															<label class="form-label" for="cai"><h6>CAI</h6></label>
+															<label class="form-label" for="cai"><h6>CAAI</h6></label>
 															<input type="number" id="cai" class="form-control @error('cai') is-invalid @enderror" name="cai" value="" step="0.000001" placeholder="Amount *" min="25" required>
 				                                            @error('cai')
 				                                                <span class="invalid-feedback" role="alert">

@@ -502,12 +502,12 @@
       </div>
     </section>
 
-    <section class="CAI-coins bg-grad-primary my-20 lg:my-28">
+    <section class="CAAI-coins bg-grad-primary my-20 lg:my-28">
       <div class="container">
         <div class="flex flex-col justify-center items-center pb-16">
           <div class="lg:w-2/3 mx-auto">
             <div data-anim="fade-up">
-              <div class="sub-title text-center mb-4 w-fit mx-auto">CAI Coin</div>
+              <div class="sub-title text-center mb-4 w-fit mx-auto">CAAI Coin</div>
             </div>
             <div data-anim="fade-up" data-delay="0.2">
               <h2 class="text-center text-white-gradient">
@@ -518,43 +518,43 @@
         </div>
       </div>
       <div class="container overflow-hidden" data-anim="fade-up" data-delay="0.4">
-        <div class="CAI-coins-swiper">
+        <div class="CAAI-coins-swiper">
           <div class="swiper-wrapper">
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-1.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Decentralized Value Layer</h4>
-              <p class="mb-4">CAI Coin is Cyera AI's native utility token enabling secure transactions, active participation, and scalable decentralized value exchange, engineered for sustainable
+              <p class="mb-4">CAAI Coin is Cyera AI's native utility token enabling secure transactions, active participation, and scalable decentralized value exchange, engineered for sustainable
                 adoption, transparency, and
                 long-term utility.</p>
             </div>
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-2.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Purpose-Built Utility</h4>
-              <p class="mb-4">CAI Coin powers the Cyera AI network by enabling value transfer, platform access, rewards, staking, and governance—strengthening ecosystem stability while giving users
+              <p class="mb-4">CAAI Coin powers the Cyera AI network by enabling value transfer, platform access, rewards, staking, and governance—strengthening ecosystem stability while giving users
                 ownership, transparency, and control.</p>
             </div>
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-3.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Market Reach & Accessibility</h4>
-              <p class="mb-4">CAI Coin is listed on CoinMarketCap and traded on DexTrade, delivering global visibility, real-time pricing, open access, and trusted transparency for worldwide
+              <p class="mb-4">CAAI Coin is listed on CoinMarketCap and traded on DexTrade, delivering global visibility, real-time pricing, open access, and trusted transparency for worldwide
                 participation.</p>
             </div>
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-4.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Token Structure</h4>
-              <p class="mb-4">CAI features 18-decimal precision for micro-transactions, with a fixed 2.10 crore supply ensuring controlled issuance, predictable economics, scalability, and long-term
+              <p class="mb-4">CAAI features 18-decimal precision for micro-transactions, with a fixed 2.10 crore supply ensuring controlled issuance, predictable economics, scalability, and long-term
                 network sustainability.</p>
             </div>
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-6.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Tokenomics Overview</h4>
-              <p class="mb-4">CAI uses a transparent allocation model supporting staking rewards, ecosystem growth, strategic reserves, contributor incentives, public participation, social impact
+              <p class="mb-4">CAAI uses a transparent allocation model supporting staking rewards, ecosystem growth, strategic reserves, contributor incentives, public participation, social impact
                 initiatives, and long-term network resilience.</p>
             </div>
             <div class="swiper-slide">
               <img src="{{ asset('front/assets/images/CAI-coins/icon-5.avif')}}" alt="" class="mb-6">
               <h4 class="text-white-gradient mb-4  w-fit">Long-Term Vision</h4>
-              <p class="mb-4">CAI Coin is a utility-first digital asset enabling real usage, decentralized participation, trust, transparency, and sustainable long-term value within Cyera AI’s
+              <p class="mb-4">CAAI Coin is a utility-first digital asset enabling real usage, decentralized participation, trust, transparency, and sustainable long-term value within Cyera AI’s
                 decentralized ecosystem.</p>
             </div>
           </div>

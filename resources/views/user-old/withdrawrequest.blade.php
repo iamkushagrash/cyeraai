@@ -115,7 +115,7 @@
                                                             <input type="hidden" name="honeypotu" value="{{\Session::get('logtime')}}">
 
                                                             <!-- <div class="form-group mb-4">
-                                                                <label class="form-label" for="amount"><h6>Sell Amount(CAI)</h6></label>
+                                                                <label class="form-label" for="amount"><h6>Sell Amount(CAAI)</h6></label>
                                                                 <input type="amount" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" min ="10" placeholder="0" max="{{ceil($user->remainingIncome())}}" @if(!is_null($remaining)) value="{{$remaining->amountsftc}}" disabled @endif step="0.01" required>
                                                                 @error('amount')
                                                                     <span class="invalid-feedback" role="alert">

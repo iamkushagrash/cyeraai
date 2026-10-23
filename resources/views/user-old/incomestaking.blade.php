@@ -71,9 +71,9 @@
 												<thead>
 													<tr>
 														<th>#</th>
-														<!-- <th>Amount(CAI)</th> -->
+														<!-- <th>Amount(CAAI)</th> -->
 														<th>Amount($)</th>
-														<th>Staking(CAI)</th>
+														<th>Staking(CAAI)</th>
 														<th>Staking($)</th>
 														<th>Date</th>
 							              <th>Status</th>

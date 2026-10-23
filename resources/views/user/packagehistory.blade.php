@@ -11,7 +11,7 @@
             <i class="fas fa-cubes-stacked"></i>
             <div>
                 <h2 class="mecha-card-title">ACTIVE & PAST STAKING PACKAGES</h2>
-                <div class="mecha-card-subtitle">On-chain locked CAI positions & daily yield metrics</div>
+                <div class="mecha-card-subtitle">On-chain locked CAAI positions & daily yield metrics</div>
             </div>
         </div>
         <a href="{{ url('/User/Stake') }}" class="mecha-btn-gold" style="width: auto; height: 32px; padding: 0 14px; font-size: 10px;">
@@ -57,8 +57,8 @@
                                         <span class="metric-val val-green">${{ number_format((float)$row->usdt, 2) }}</span>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-lbl">CAI TOKENS</span>
-                                        <span class="metric-val val-gold">{{ ((float)$row->amount < 1 && (float)$row->amount > 0) ? number_format((float)$row->amount, 4) : number_format((float)$row->amount, 2) }} <small>CAI</small></span>
+                                        <span class="metric-lbl">CAAI TOKENS</span>
+                                        <span class="metric-val val-gold">{{ ((float)$row->amount < 1 && (float)$row->amount > 0) ? number_format((float)$row->amount, 4) : number_format((float)$row->amount, 2) }} <small>CAAI</small></span>
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-lbl">YIELD RATE</span>

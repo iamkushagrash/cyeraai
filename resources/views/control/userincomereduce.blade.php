@@ -169,11 +169,11 @@
                                                     {{-- </div> --}}
                                                     <!-- <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <label class="form-label">Amount (CAI)</label>
+                                                            <label class="form-label">Amount (CAAI)</label>
                                                            
                                                             <div class="controls">
                                                                 <i class=""></i>
-                                                                <input type="number" name="amount" id="amount" class="form-control @error('amount') is-invalid @enderror" value=""placeholder="Amount CAI" max="{{floor($income->remainingIncome())}}" step="0.01">
+                                                                <input type="number" name="amount" id="amount" class="form-control @error('amount') is-invalid @enderror" value=""placeholder="Amount CAAI" max="{{floor($income->remainingIncome())}}" step="0.01">
                                                                 @error('amount')
                                                                 <span class="invalid-feedback" role="alert">
                                                                     <strong>{{ $message }}</strong>

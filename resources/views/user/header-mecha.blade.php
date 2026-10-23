@@ -18,13 +18,13 @@
 
         <!-- Right: Live Token Price Capsule -->
         <div class="header-right">
-            <div class="header-live-price-capsule" title="Real-Time CAI Valuation">
+            <div class="header-live-price-capsule" title="Real-Time CAAI Valuation">
                 <div class="price-pulse-indicator">
                     <span class="live-dot-ping"></span>
                     <span class="live-dot-solid"></span>
                 </div>
                 <div class="price-content-block">
-                    <span class="price-crypto-label">CAI</span>
+                    <span class="price-crypto-label">CAAI</span>
                     <span class="price-crypto-val">${{ number_format((float)$caiLivePrice, 4) }}</span>
                 </div>
             </div>

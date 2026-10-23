@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Cyera AI - Dashboard</title>
     <meta name="description"
-        content="CYERA AI - CAI Ecosystem Dashboard. Track your investments, incomes, and team performance.">
+        content="CYERA AI - CAAI Ecosystem Dashboard. Track your investments, incomes, and team performance.">
     <meta name="theme-color" content="#F5A623">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/cai-token-coin.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/cai-token-coin.png') }}">
@@ -311,12 +311,12 @@
                     }
                 }
 
-                // CAI Live Price & Dynamic Runtime ROI Calculations
+                // CAAI Live Price & Dynamic Runtime ROI Calculations
                 $caiPrice = \App\ProfileStore::getLivePrice();
                 if ($caiPrice <= 0)
                     $caiPrice = 1.00;
 
-                // Claimable CPS ROI in USDT and dynamic live CAI tokens
+                // Claimable CPS ROI in USDT and dynamic live CAAI tokens
                 $claimableUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('amt_usdt');
                 if ($claimableUsdt <= 0) {
                     $claimableUsdt = (float) \App\CpsIncome::where('userid', $uid)->where('status', 0)->sum('remaining');
@@ -325,7 +325,7 @@
                 $claimableUsdDynamic = $claimableUsdt;
                 $claimableUsdVal = $claimableUsdt;
 
-                // Total CPS in USDT and dynamic CAI tokens
+                // Total CPS in USDT and dynamic CAAI tokens
                 $cpsUsdtTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amt_usdt');
                 if ($cpsUsdtTotal <= 0) {
                     $cpsUsdtTotal = (float) \App\CpsIncome::where('userid', $uid)->sum('amount');
@@ -485,10 +485,10 @@
                         <div class="frame-bolt fb-br"></div>
 
                         <div class="hero-3col-grid">
-                            <!-- Left Column: CAI Live Price & Green Area Chart -->
+                            <!-- Left Column: CAAI Live Price & Green Area Chart -->
                             <div class="col-live-price">
                                 <div class="row-live-title">
-                                    <span class="txt-live-title">CAI LIVE PRICE</span>
+                                    <span class="txt-live-title">CAAI LIVE PRICE</span>
                                     <span class="tag-live-green">LIVE</span>
                                 </div>
                                 <div class="txt-price-big">
@@ -595,7 +595,7 @@
                                 </div>
                             </div>
 
-                            <!-- Bottom Tier: Unmined Daily ROI (Left) + Mine & Sell CAI Action (Right) -->
+                            <!-- Bottom Tier: Unmined Daily ROI (Left) + Mine & Sell CAAI Action (Right) -->
                             <div class="hero-strip-bottom-row">
                                 <div class="strip-item-claim-info">
                                     <span class="strip-col-lbl"><i class="fas fa-bolt" style="color: #FFD700;"></i>
@@ -608,7 +608,7 @@
                                         </span>
                                         <span class="strip-roi-amount-usd"
                                             style="color: #FFFFFF; font-family: 'Space Mono', monospace;">(≈
-                                            {{ number_format($claimableCai, 2) }} CAI)</span>
+                                            {{ number_format($claimableCai, 2) }} CAAI)</span>
                                     </div>
                                 </div>
 
@@ -1078,7 +1078,7 @@
                             <div class="live-yield-val-wrap">
                                 <span class="live-yield-val-usd" id="dashLiveAccruedUsd">$0.0000</span>
                                 <span class="live-yield-val-cai">(<span id="dashLiveAccruedCai">0.0000</span>
-                                    CAI)</span>
+                                    CAAI)</span>
                             </div>
                         </div>
                         <div class="live-yield-col-target">
@@ -1581,7 +1581,7 @@
                 </div>
 
                 <!-- ============================================================
-                     3. DECENTRALIZED CAI MINING & DEX SWAP (PURE GOLDEN & BLACK THEME)
+                     3. DECENTRALIZED CAAI MINING & DEX SWAP (PURE GOLDEN & BLACK THEME)
                      ============================================================ -->
                 <div class="hud-mining-engine-section" style="margin: 0 8px 12px 8px;">
                     <div
@@ -1598,11 +1598,11 @@
                                 <div style="min-width: 0; flex: 1;">
                                     <div
                                         style="font-size: 0.74rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px; line-height: 1.2; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                                        CAI MINING &amp; DEX SWAP
+                                        CAAI MINING &amp; DEX SWAP
                                     </div>
                                     <div
                                         style="font-size: 0.60rem; color: #8E99A8; font-weight: 500; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
-                                        <span>1 CAI = <strong id="dashLiveHeaderPrice"
+                                        <span>1 CAAI = <strong id="dashLiveHeaderPrice"
                                                 style="color: #FFD700; font-family: 'Space Mono', monospace;">${{ number_format($caiPrice, 6) }}</strong></span>
                                         <span
                                             style="font-family: 'Space Mono', monospace; font-size: 0.50rem; padding: 0 3px; border-radius: 2px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 700;">LIVE</span>
@@ -1620,7 +1620,7 @@
                         <div
                             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
 
-                            <!-- STEP 1: 1-CLICK MINE ALL CAI -->
+                            <!-- STEP 1: 1-CLICK MINE ALL CAAI -->
                             <div
                                 style="background: rgba(245, 166, 35, 0.03); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 9px; padding: 9px 11px; display: flex; flex-direction: column; justify-content: space-between; gap: 7px;">
                                 <div>
@@ -1650,11 +1650,11 @@
 
                                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                                         <span style="font-size: 0.66rem; color: #8E99A8; font-weight: 500;">Yield in
-                                            CAI:</span>
+                                            CAAI:</span>
                                         <span
                                             style="font-size: 0.74rem; font-weight: 700; color: #FFE082; font-family: 'Space Mono', monospace;"
                                             id="dashUnminedCaiYieldTxt">
-                                            ≈ {{ number_format($unminedRoiCai, 4) }} CAI
+                                            ≈ {{ number_format($unminedRoiCai, 4) }} CAAI
                                         </span>
                                     </div>
                                 </div>
@@ -1688,12 +1688,12 @@
                                     <div
                                         style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
                                         <span style="font-size: 0.68rem; color: #8E99A8; font-weight: 500;">Protocol
-                                            CAI:</span>
+                                            CAAI:</span>
                                         <span
                                             style="font-size: 0.88rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace;"
                                             id="dashProtocolCaiTxt">
                                             {{ number_format($protocolHoldingCai, 4) }} <small
-                                                style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAI</small>
+                                                style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAAI</small>
                                             <small
                                                 style="font-size: 0.66rem; color: #8E99A8;">(${{ number_format($protocolHoldingUsdt, 2) }})</small>
                                         </span>
@@ -1708,7 +1708,7 @@
                                             id="dashSellableLimitTxt">
                                             ${{ number_format($eligibleSellUsdt, 2) }} USDT <small
                                                 style="color: #8E99A8;">({{ number_format($eligibleSellCai, 2) }}
-                                                CAI)</small>
+                                                CAAI)</small>
                                         </span>
                                     </div>
 
@@ -1729,7 +1729,7 @@
                                     @if($eligibleSellUsdt <= 0) disabled
                                         style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 32px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.72rem; border-radius: 6px; font-family: 'Inter', sans-serif;"
                                     @endif>
-                                    <span id="btnDashSellAllTxt">SELL CAI ON DEX
+                                    <span id="btnDashSellAllTxt">SELL CAAI ON DEX
                                         (${{ number_format($eligibleSellUsdt, 2) }})</span>
                                 </button>
                             </div>
@@ -1741,7 +1741,7 @@
                                 style="margin-top: 7px; background: rgba(245, 166, 35, 0.06); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 7px; padding: 5px 8px; font-size: 0.64rem; color: #FFE082; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 6px; line-height: 1.35;">
                                 <i class="fas fa-shield-halved"
                                     style="flex-shrink: 0; color: #FFD700; font-size: 10px;"></i>
-                                <span><strong>Capping Hold:</strong> {{ number_format($excessReserveCai, 4) }} CAI
+                                <span><strong>Capping Hold:</strong> {{ number_format($excessReserveCai, 4) }} CAAI
                                     (~${{ number_format($excessReserveCai * $caiPrice, 2) }}) exceeds capping limit and
                                     remains safely held in protocol.</span>
                             </div>
@@ -1858,7 +1858,7 @@
                 @endphp
 
                 <!-- ============================================================
-                     3B. LIVE DEX MARKET & TRADINGVIEW CHART (CAI / USDT)
+                     3B. LIVE DEX MARKET & TRADINGVIEW CHART (CAAI / USDT)
                      ============================================================ -->
                 <div class="hud-tradingview-section" style="margin: 0 8px 18px 8px;">
                     <div
@@ -1870,13 +1870,13 @@
                             <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                                 <div
                                     style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAI"
+                                    <img src="{{ asset('images/cai-token-coin.png') }}" alt="CAAI"
                                         style="width: 20px; height: 20px; object-fit: contain;">
                                 </div>
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 6px;">
                                         <span
-                                            style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.4px;">CAI
+                                            style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.4px;">CAAI
                                             / USDT</span>
                                         <span
                                             style="font-size: 0.58rem; padding: 1px 5px; border-radius: 4px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP
@@ -1963,7 +1963,7 @@
                                     Base Token</div>
                                 <div
                                     style="font-size: 0.68rem; font-weight: 700; color: #00FF88; font-family: 'Space Mono', monospace;">
-                                    CAI BEP-20</div>
+                                    CAAI BEP-20</div>
                             </div>
                             <div
                                 style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 4px 6px;">
@@ -3613,7 +3613,7 @@
                     if (uUsdtEl) uUsdtEl.innerHTML = '$' + DASH_UNMINED_USDT.toFixed(2) + ' <small style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">USDT</small>';
 
                     const uCaiEl = document.getElementById('dashUnminedCaiYieldTxt');
-                    if (uCaiEl) uCaiEl.innerText = '≈ ' + (parseFloat(d.estimated_cai_to_mine) || 0).toFixed(4) + ' CAI';
+                    if (uCaiEl) uCaiEl.innerText = '≈ ' + (parseFloat(d.estimated_cai_to_mine) || 0).toFixed(4) + ' CAAI';
 
                     const btnMine = document.getElementById('btnDashMineAll');
                     const btnMineTxt = document.getElementById('btnDashMineAllTxt');
@@ -3634,12 +3634,12 @@
                     // 3. Update Step 2 (Sell on DEX)
                     const pHoldEl = document.getElementById('dashProtocolCaiTxt');
                     if (pHoldEl) {
-                        pHoldEl.innerHTML = DASH_PROTOCOL_HOLDING_CAI.toFixed(4) + ' <small style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAI</small> <small style="font-size: 0.66rem; color: #8E99A8;">($' + (parseFloat(d.holding_value_usdt) || 0).toFixed(2) + ')</small>';
+                        pHoldEl.innerHTML = DASH_PROTOCOL_HOLDING_CAI.toFixed(4) + ' <small style="font-size: 0.62rem; color: #FFFFFF; font-weight: 700;">CAAI</small> <small style="font-size: 0.66rem; color: #8E99A8;">($' + (parseFloat(d.holding_value_usdt) || 0).toFixed(2) + ')</small>';
                     }
 
                     const sLimEl = document.getElementById('dashSellableLimitTxt');
                     if (sLimEl) {
-                        sLimEl.innerHTML = '$' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ' USDT <small style="color: #8E99A8;">(' + DASH_ELIGIBLE_SELL_CAI.toFixed(2) + ' CAI)</small>';
+                        sLimEl.innerHTML = '$' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ' USDT <small style="color: #8E99A8;">(' + DASH_ELIGIBLE_SELL_CAI.toFixed(2) + ' CAAI)</small>';
                     }
 
                     const wRecEl = document.getElementById('dashEstWalletUsdtTxt');
@@ -3654,12 +3654,12 @@
                             btnSell.disabled = false;
                             btnSell.style.opacity = '1';
                             btnSell.style.cursor = 'pointer';
-                            btnSellTxt.innerText = 'SELL CAI ON DEX ($' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ')';
+                            btnSellTxt.innerText = 'SELL CAAI ON DEX ($' + DASH_ELIGIBLE_SELL_USDT.toFixed(2) + ')';
                         } else {
                             btnSell.disabled = true;
                             btnSell.style.opacity = '0.4';
                             btnSell.style.cursor = 'not-allowed';
-                            btnSellTxt.innerText = 'SELL CAI ON DEX ($0.00)';
+                            btnSellTxt.innerText = 'SELL CAAI ON DEX ($0.00)';
                         }
                     }
                 }
@@ -3683,7 +3683,7 @@
             const estCai = unminedUsdt > 0 ? (unminedUsdt / livePrice).toFixed(4) : '0.0000';
 
             const result = await Swal.fire({
-                title: 'MINE ALL ROI TO CAI',
+                title: 'MINE ALL ROI TO CAAI',
                 html: `
                     <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 215, 0, 0.22) 0%, rgba(245, 166, 35, 0.04) 70%); border: 1px solid rgba(255, 215, 0, 0.45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);">
                         <i class="fas fa-coins" style="color: #FFD700; font-size: 20px;"></i>
@@ -3695,11 +3695,11 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; font-size: 0.78rem;">
                             <span style="color: #8C9BAE;">Live DEX Rate:</span>
-                            <strong style="color: #FFE082; font-family: 'Space Mono', monospace; font-size: 0.80rem;">1 CAI = $${livePrice.toFixed(6)}</strong>
+                            <strong style="color: #FFE082; font-family: 'Space Mono', monospace; font-size: 0.80rem;">1 CAAI = $${livePrice.toFixed(6)}</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.80rem; border-top: 1px solid rgba(245, 166, 35, 0.18); padding-top: 7px;">
-                            <span style="color: #CBD5E1; font-weight: 600;">Estimated CAI Yield:</span>
-                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace; font-size: 0.88rem;">≈ ${estCai} CAI</strong>
+                            <span style="color: #CBD5E1; font-weight: 600;">Estimated CAAI Yield:</span>
+                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace; font-size: 0.88rem;">≈ ${estCai} CAAI</strong>
                         </div>
                     </div>
                     <div style="font-size: 0.72rem; color: #00FF88; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 8px; padding: 8px 12px; text-align: center; font-weight: 600; line-height: 1.4;">
@@ -3746,7 +3746,7 @@
                             </div>
                             <div style="font-size: 0.82rem; color: #CBD5E1; margin-bottom: 12px; text-align: center;">${data.message}</div>
                             <div style="background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); border-radius: 10px; padding: 10px 14px; font-family: 'Space Mono', monospace; color: #00FF88; font-weight: 700; font-size: 0.88rem; text-align: center;">
-                                New Balance: ${data.data.new_cai_balance} CAI
+                                New Balance: ${data.data.new_cai_balance} CAAI
                             </div>
                         `,
                         confirmButtonText: 'GREAT',
@@ -4089,8 +4089,8 @@
             }
         }
 
-        /* 1-Click Sell All Eligible CAI on DEX */
-        /* Open Interactive Custom CAI Liquidation Modal */
+        /* 1-Click Sell All Eligible CAAI on DEX */
+        /* Open Interactive Custom CAAI Liquidation Modal */
         async function openCustomSellModal() {
             if (DASH_ELIGIBLE_SELL_CAI <= 0 || DASH_ELIGIBLE_SELL_USDT <= 0) {
                 Swal.fire({
@@ -4100,7 +4100,7 @@
                             You currently have <strong style="color:#FFD700; font-family:'Space Mono', monospace;">$0.00</strong> eligible sell balance.
                         </div>
                         <div style="font-size: 0.74rem; color: #8C9BAE; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 10px; text-align: center;">
-                            Please check your protocol CAI holdings or active capping limit.
+                            Please check your protocol CAAI holdings or active capping limit.
                         </div>
                     `,
                     confirmButtonText: 'UNDERSTOOD',
@@ -4125,41 +4125,41 @@
             const defaultNetUsdt = defaultGrossUsdt - defaultFeeUsdt;
 
             const { value: customCaiAmount, isConfirmed } = await Swal.fire({
-                title: 'SWAP CAI FOR USDT ON DEX',
+                title: 'SWAP CAAI FOR USDT ON DEX',
                 html: `
                     <div style="text-align: left; font-family: 'Inter', sans-serif;">
                         <!-- Protocol Info Bar -->
                         <div style="background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.72rem;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span style="color: #8C9BAE;">Protocol CAI Holding:</span>
-                                <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">${DASH_HOLDING_CAI.toFixed(4)} CAI (~$${DASH_HOLDING_USDT.toFixed(2)})</strong>
+                                <span style="color: #8C9BAE;">Protocol CAAI Holding:</span>
+                                <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">${DASH_HOLDING_CAI.toFixed(4)} CAAI (~$${DASH_HOLDING_USDT.toFixed(2)})</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                                 <span style="color: #8C9BAE;">Active Capping Limit:</span>
-                                <strong style="color: #00FF88; font-family: 'Space Mono', monospace;">$${DASH_REMAINING_CAPPING.toFixed(2)} USDT (Max ${DASH_ELIGIBLE_SELL_CAI.toFixed(4)} CAI)</strong>
+                                <strong style="color: #00FF88; font-family: 'Space Mono', monospace;">$${DASH_REMAINING_CAPPING.toFixed(2)} USDT (Max ${DASH_ELIGIBLE_SELL_CAI.toFixed(4)} CAAI)</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="color: #8C9BAE;">Live DEX Price:</span>
-                                <strong style="color: #FFE082; font-family: 'Space Mono', monospace;">$${livePrice.toFixed(6)} / CAI</strong>
+                                <strong style="color: #FFE082; font-family: 'Space Mono', monospace;">$${livePrice.toFixed(6)} / CAAI</strong>
                             </div>
                         </div>
 
                         <!-- Amount Input Label -->
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <label style="font-size: 0.74rem; font-weight: 800; color: #FFFFFF; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">
-                                ENTER CAI TO SELL:
+                                ENTER CAAI TO SELL:
                             </label>
-                            <span style="font-size: 0.65rem; color: #8C9BAE;">Max: <strong style="color: #FFD700; cursor: pointer;" onclick="setCustomSellPercent(100)">${maxCai.toFixed(4)} CAI</strong></span>
+                            <span style="font-size: 0.65rem; color: #8C9BAE;">Max: <strong style="color: #FFD700; cursor: pointer;" onclick="setCustomSellPercent(100)">${maxCai.toFixed(4)} CAAI</strong></span>
                         </div>
 
-                        <!-- Input Box with CAI addon -->
+                        <!-- Input Box with CAAI addon -->
                         <div style="position: relative; margin-bottom: 8px;">
                             <input type="number" id="customSellCaiInput" value="${defaultCai}" step="any" min="0.0001" max="${maxCai}"
                                 style="width: 100%; height: 40px; background: rgba(5, 7, 12, 0.9); border: 1px solid rgba(245, 166, 35, 0.4); border-radius: 8px; padding: 0 54px 0 12px; color: #FFD700; font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);"
                                 oninput="updateCustomSellCalculations()"
                             />
                             <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.72rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace; pointer-events: none;">
-                                CAI
+                                CAAI
                             </span>
                         </div>
 
@@ -4186,8 +4186,8 @@
                                 <span id="cSellNetUsdt" style="color: #00FF88; font-family: 'Space Mono', monospace; font-weight: 900; font-size: 0.88rem;">$${defaultNetUsdt.toFixed(2)} USDT</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.68rem; color: #8C9BAE; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-                                <span>Remaining CAI Holding:</span>
-                                <span id="cSellRemCai" style="color: #FFE082; font-family: 'Space Mono', monospace;">${Math.max(0, DASH_HOLDING_CAI - defaultCai).toFixed(4)} CAI</span>
+                                <span>Remaining CAAI Holding:</span>
+                                <span id="cSellRemCai" style="color: #FFE082; font-family: 'Space Mono', monospace;">${Math.max(0, DASH_HOLDING_CAI - defaultCai).toFixed(4)} CAAI</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #8C9BAE;">
                                 <span>Remaining Capping:</span>
@@ -4240,24 +4240,24 @@
                         if (grossEl) grossEl.innerText = '$' + gross.toFixed(2);
                         if (feeEl) feeEl.innerText = '-$' + fee.toFixed(2);
                         if (netEl) netEl.innerText = '$' + net.toFixed(2) + ' USDT';
-                        if (remCaiEl) remCaiEl.innerText = remCai.toFixed(4) + ' CAI';
+                        if (remCaiEl) remCaiEl.innerText = remCai.toFixed(4) + ' CAAI';
                         if (remCapEl) remCapEl.innerText = '$' + remCap.toFixed(2);
 
                         if (val <= 0) {
                             if (errBox) {
-                                errBox.innerText = 'Please enter a CAI amount greater than 0.';
+                                errBox.innerText = 'Please enter a CAAI amount greater than 0.';
                                 errBox.style.display = 'block';
                             }
                             if (confirmBtn) confirmBtn.disabled = true;
                         } else if (val > DASH_HOLDING_CAI) {
                             if (errBox) {
-                                errBox.innerText = 'Amount exceeds your Protocol CAI Holding (' + DASH_HOLDING_CAI.toFixed(4) + ' CAI).';
+                                errBox.innerText = 'Amount exceeds your Protocol CAAI Holding (' + DASH_HOLDING_CAI.toFixed(4) + ' CAAI).';
                                 errBox.style.display = 'block';
                             }
                             if (confirmBtn) confirmBtn.disabled = true;
                         } else if (val > (maxAllowed + 0.0001)) {
                             if (errBox) {
-                                errBox.innerText = 'Amount exceeds your Active Capping Limit (Max ' + maxAllowed.toFixed(4) + ' CAI).';
+                                errBox.innerText = 'Amount exceeds your Active Capping Limit (Max ' + maxAllowed.toFixed(4) + ' CAAI).';
                                 errBox.style.display = 'block';
                             }
                             if (confirmBtn) confirmBtn.disabled = true;
@@ -4286,11 +4286,11 @@
                     const input = document.getElementById('customSellCaiInput');
                     const val = parseFloat(input ? input.value : 0);
                     if (isNaN(val) || val <= 0) {
-                        Swal.showValidationMessage('Please enter a valid CAI amount to sell.');
+                        Swal.showValidationMessage('Please enter a valid CAAI amount to sell.');
                         return false;
                     }
                     if (val > DASH_HOLDING_CAI) {
-                        Swal.showValidationMessage('Amount exceeds your Protocol CAI balance.');
+                        Swal.showValidationMessage('Amount exceeds your Protocol CAAI balance.');
                         return false;
                     }
                     if (val > (DASH_ELIGIBLE_SELL_CAI + 0.0001)) {
@@ -4303,11 +4303,11 @@
 
             if (!isConfirmed || !customCaiAmount) return;
 
-            // Execute On-Chain Web3 Liquidation with user-entered custom CAI amount
+            // Execute On-Chain Web3 Liquidation with user-entered custom CAAI amount
             await executeCustomSellOnDex(customCaiAmount);
         }
 
-        /* Execute On-Chain DEX Liquidation for Custom CAI Amount */
+        /* Execute On-Chain DEX Liquidation for Custom CAAI Amount */
         async function executeCustomSellOnDex(selectedCai) {
             const btn = document.getElementById('btnDashSellAll');
             const btnTxt = document.getElementById('btnDashSellAllTxt');
@@ -4316,7 +4316,7 @@
             const chosenRawProvider = await resolveWeb3Provider();
             if (!chosenRawProvider) {
                 if (btn) btn.disabled = false;
-                if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
+                if (btnTxt) btnTxt.innerText = 'SELL CAAI ON DEX';
                 return;
             }
 
@@ -4352,14 +4352,14 @@
                             }
                         });
                         if (btn) btn.disabled = false;
-                        if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
+                        if (btnTxt) btnTxt.innerText = 'SELL CAAI ON DEX';
                         return;
                     }
                 }
 
                 if (btnTxt) btnTxt.innerText = 'REQUESTING SIGNATURE...';
 
-                // 3. Request EIP-712 Signature from Backend for selected custom CAI amount
+                // 3. Request EIP-712 Signature from Backend for selected custom CAAI amount
                 const userAccount = await signer.getAddress();
                 const sigResp = await fetch('{{ url("/User/Mining/RequestSellSignature") }}', {
                     method: 'POST',
@@ -4425,7 +4425,7 @@
                             <i class="fas fa-check" style="color: #00FF88; font-size: 20px;"></i>
                         </div>
                         <div style="font-size: 0.82rem; color: #CBD5E1; margin-bottom: 12px; text-align: center; font-family: 'Inter', sans-serif;">
-                            Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAI</strong> on PancakeSwap!
+                            Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAAI</strong> on PancakeSwap!
                         </div>
                         <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; text-align: left; font-size: 0.78rem;">
                             <div style="color: #00FF88; margin-bottom: 5px;">✓ Delivered $${parseFloat(d.netUsdt).toFixed(2)} USDT directly to wallet.</div>
@@ -4470,7 +4470,7 @@
                     }
                 });
                 if (btn) btn.disabled = false;
-                if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
+                if (btnTxt) btnTxt.innerText = 'SELL CAAI ON DEX';
             }
         }
 

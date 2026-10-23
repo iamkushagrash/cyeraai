@@ -72,7 +72,7 @@
 														<th>#</th>
 														<th>UserId</th>
 														<th>Name</th>
-														<!-- <th>Amount(CAI)</th> -->
+														<!-- <th>Amount(CAAI)</th> -->
 														<th>Amount($)</th>
 														<th>Type</th>
 														<th>Date</th>

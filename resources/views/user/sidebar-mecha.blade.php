@@ -117,7 +117,7 @@
                         <span class="stat-mini-icon-circle"><i class="fas fa-bolt"></i></span>
                         <span class="stat-mini-lbl">CLAIMABLE</span>
                     </div>
-                    <div class="stat-mini-val">{{ ($sideClaimableCai < 1 && $sideClaimableCai > 0) ? number_format($sideClaimableCai, 4) : number_format($sideClaimableCai, 2) }} CAI</div>
+                    <div class="stat-mini-val">{{ ($sideClaimableCai < 1 && $sideClaimableCai > 0) ? number_format($sideClaimableCai, 4) : number_format($sideClaimableCai, 2) }} CAAI</div>
                     <div class="stat-mini-sub" style="color: #00FF88;">≈ ${{ number_format($sideClaimableUsdt, 2) }}</div>
                 </div>
 
@@ -305,7 +305,7 @@
                 </div>
                 <div class="mecha-submenu">
                     <a href="{{ url('/User/Mining') }}" class="mecha-sub-link {{ request()->is('User/Mining*') ? 'active' : '' }}">
-                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00E5FF;"></span> ⚡ Mine &amp; Sell CAI</div>
+                        <div class="sub-left-txt"><span class="sub-dot" style="background: #00E5FF;"></span> ⚡ Mine &amp; Sell CAAI</div>
                         <i class="fas fa-arrow-right sub-arr"></i>
                     </a>
                     <a href="{{ url('/User/WithdrawRequest') }}" class="mecha-sub-link {{ request()->is('User/WithdrawRequest*') || request()->is('User/Withdraw') ? 'active' : '' }}">

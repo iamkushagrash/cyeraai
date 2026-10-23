@@ -20,7 +20,7 @@
                     <i class="fas fa-wallet"></i>
                     <div>
                         <h2 class="mecha-card-title">DEPOSIT FUNDS</h2>
-                        <div class="mecha-card-subtitle">Fast on-chain deposit & CAI conversion</div>
+                        <div class="mecha-card-subtitle">Fast on-chain deposit & CAAI conversion</div>
                     </div>
                 </div>
                 <span class="mecha-card-badge">LIVE 24/7</span>
@@ -42,15 +42,15 @@
                     </div>
                 </div>
 
-                <!-- Equivalent CAI Tokens (Auto-calculated) -->
+                <!-- Equivalent CAAI Tokens (Auto-calculated) -->
                 <div class="mecha-form-group">
                     <label class="mecha-form-label" for="cai">
-                        <span>Equivalent CAI Tokens</span>
-                        <span class="label-sub">1 CAI = ${{ number_format($detail->price, 2) }}</span>
+                        <span>Equivalent CAAI Tokens</span>
+                        <span class="label-sub">1 CAAI = ${{ number_format($detail->price, 2) }}</span>
                     </label>
                     <div class="mecha-input-wrap">
                         <i class="fas fa-circle-nodes mecha-input-icon"></i>
-                        <input type="number" id="cai" class="mecha-input-control @error('cai') is-invalid @enderror" name="cai" step="0.000001" placeholder="Calculated CAI" required>
+                        <input type="number" id="cai" class="mecha-input-control @error('cai') is-invalid @enderror" name="cai" step="0.000001" placeholder="Calculated CAAI" required>
                     </div>
                 </div>
 

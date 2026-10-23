@@ -38,7 +38,7 @@
                 <span>ORACLE VALUATION</span>
                 <i class="fas fa-chart-line" style="color: #00FF88; font-size: 11px;"></i>
             </div>
-            <div class="mecha-metric-val green" style="font-size: 14px; font-weight: 800; line-height: 1.2;">${{ number_format($caiPrice, 2) }} <small style="font-size: 9px; color: #FFF;">/ CAI</small></div>
+            <div class="mecha-metric-val green" style="font-size: 14px; font-weight: 800; line-height: 1.2;">${{ number_format($caiPrice, 2) }} <small style="font-size: 9px; color: #FFF;">/ CAAI</small></div>
             <div class="mecha-metric-sub" style="font-size: 7.5px; margin-top: 1px; color: #00FF88;">Live Price Feed</div>
         </div>
     </div>

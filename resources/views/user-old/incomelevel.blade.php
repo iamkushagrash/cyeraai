@@ -70,7 +70,7 @@
 												<thead>
 													<tr>
 														<th>#</th>
-														<!-- <th>Amount(CAI)</th> -->
+														<!-- <th>Amount(CAAI)</th> -->
 														<th>Amount($)</th>
 														<th>Date</th>
 														<th>View</th>

@@ -240,15 +240,15 @@
                     </div>
                 </div>
 
-                <!-- Main Highlight Banner (Net Payout & CAI Burned) -->
+                <!-- Main Highlight Banner (Net Payout & CAAI Burned) -->
                 <div class="txn-main-banner">
                     <div class="txn-primary-metric">
                         <span class="txn-metric-lbl">Net USDT Payable</span>
                         <span class="txn-metric-val">${{ number_format((float)$row->net_amount, 2) }}</span>
                     </div>
                     <div class="txn-cai-badge">
-                        <span class="txn-metric-lbl">CAI Burned</span>
-                        <span class="txn-cai-val">{{ number_format((float)$row->amountsftc, 4) }} <small style="font-size: 10px; color: #FFE082;">CAI</small></span>
+                        <span class="txn-metric-lbl">CAAI Burned</span>
+                        <span class="txn-cai-val">{{ number_format((float)$row->amountsftc, 4) }} <small style="font-size: 10px; color: #FFE082;">CAAI</small></span>
                     </div>
                 </div>
 

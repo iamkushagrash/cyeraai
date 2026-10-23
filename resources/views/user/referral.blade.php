@@ -87,7 +87,7 @@
             </div>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
                 @php
-                    $waText = "🚀 *Join Cyera AI (CAI)* — Next-Gen Decentralized AI & Staking Ecosystem!\n\n💰 Earn daily staking yields, pool dividends & multi-tier rewards on BNB Smart Chain.\n\n👉 *Register with my invitation link:*\n" . $referralLink;
+                    $waText = "🚀 *Join Cyera AI (CAAI)* — Next-Gen Decentralized AI & Staking Ecosystem!\n\n💰 Earn daily staking yields, pool dividends & multi-tier rewards on BNB Smart Chain.\n\n👉 *Register with my invitation link:*\n" . $referralLink;
                 @endphp
                 <a href="https://api.whatsapp.com/send?text={{ urlencode($waText) }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.35); border-radius: 8px; color: #25D366; font-size: 9px; font-weight: 800; text-align: center; transition: all 0.2s;">

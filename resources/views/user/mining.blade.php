@@ -26,14 +26,14 @@
 
 <!-- Top Mini Stats Grid -->
 <div class="mecha-stat-grid-2" style="margin-bottom: 16px;">
-    <!-- 1. Protocol CAI Balance -->
+    <!-- 1. Protocol CAAI Balance -->
     <div class="mecha-metric-box" style="border-color: rgba(245, 166, 35, 0.35); background: linear-gradient(180deg, rgba(8, 10, 16, 0.95) 0%, rgba(3, 4, 8, 0.98) 100%);">
         <div class="mecha-metric-lbl">
-            <span style="color: #FFD700; font-family: 'Inter', sans-serif;">PROTOCOL CAI HOLDINGS</span>
+            <span style="color: #FFD700; font-family: 'Inter', sans-serif;">PROTOCOL CAAI HOLDINGS</span>
             <i class="fas fa-coins" style="color: #FFD700;"></i>
         </div>
         <div class="mecha-metric-val gold" style="font-size: 1.20rem; line-height: 1.2; font-family: 'Space Mono', monospace; color: #FFD700;">
-            {{ ($holding < 1 && $holding > 0) ? number_format($holding, 4) : number_format($holding, 2) }} <small style="font-size: 11px; color: #FFFFFF;">CAI</small>
+            {{ ($holding < 1 && $holding > 0) ? number_format($holding, 4) : number_format($holding, 2) }} <small style="font-size: 11px; color: #FFFFFF;">CAAI</small>
         </div>
         <div class="mecha-metric-sub" style="color: #00FF88; font-weight: 700; font-family: 'Space Mono', monospace;">
             ≈ ${{ number_format($holdingUsdt, 2) }} USDT
@@ -50,7 +50,7 @@
             ${{ number_format($capping, 2) }} <small style="font-size: 11px; color: #A7F3D0;">USDT</small>
         </div>
         <div class="mecha-metric-sub" style="color: #FFD700; font-family: 'Space Mono', monospace;">
-            Live DEX: ${{ number_format($price, 6) }} / CAI
+            Live DEX: ${{ number_format($price, 6) }} / CAAI
         </div>
     </div>
 </div>
@@ -62,7 +62,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(245, 166, 35, 0.15);">
         <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-bolt" style="color: #FFD700; font-size: 14px;"></i>
-            <span style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.3px;">CAI MINING &amp; DEX SWAP CONSOLE</span>
+            <span style="font-size: 0.85rem; font-weight: 800; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.3px;">CAAI MINING &amp; DEX SWAP CONSOLE</span>
         </div>
         <span style="font-size: 0.65rem; color: #00FF88; font-family: 'Space Mono', monospace; font-weight: 700; background: rgba(0, 255, 136, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 255, 136, 0.3);">LIVE BSC POOL</span>
     </div>
@@ -80,8 +80,8 @@
                     <strong style="font-size: 0.88rem; color: #FFD700; font-family: 'Space Mono', monospace;" id="pageUnminedUsdtTxt">${{ number_format($unmined, 2) }} USDT</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                    <span style="font-size: 0.68rem; color: #8E99A8;">Yield in CAI:</span>
-                    <strong style="font-size: 0.76rem; color: #FFE082; font-family: 'Space Mono', monospace;">≈ {{ number_format($estCai, 4) }} CAI</strong>
+                    <span style="font-size: 0.68rem; color: #8E99A8;">Yield in CAAI:</span>
+                    <strong style="font-size: 0.76rem; color: #FFE082; font-family: 'Space Mono', monospace;">≈ {{ number_format($estCai, 4) }} CAAI</strong>
                 </div>
             </div>
             <button type="button" onclick="executeDashAutoMine()" id="btnPageMineAll"
@@ -91,7 +91,7 @@
             </button>
         </div>
 
-        <!-- STEP 2: SELL CAI ON PANCAKESWAP (CUSTOM / MAX) -->
+        <!-- STEP 2: SELL CAAI ON PANCAKESWAP (CUSTOM / MAX) -->
         <div style="background: rgba(245, 166, 35, 0.03); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 9px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -100,17 +100,17 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
                     <span style="font-size: 0.68rem; color: #8E99A8;">Holding Balance:</span>
-                    <strong style="font-size: 0.88rem; color: #FFD700; font-family: 'Space Mono', monospace;">{{ number_format($holding, 4) }} CAI <small style="color:#8E99A8;">(${{ number_format($holdingUsdt, 2) }})</small></strong>
+                    <strong style="font-size: 0.88rem; color: #FFD700; font-family: 'Space Mono', monospace;">{{ number_format($holding, 4) }} CAAI <small style="color:#8E99A8;">(${{ number_format($holdingUsdt, 2) }})</small></strong>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: baseline;">
                     <span style="font-size: 0.68rem; color: #8E99A8;">Max Sellable:</span>
-                    <strong style="font-size: 0.76rem; color: #00FF88; font-family: 'Space Mono', monospace;">${{ number_format((float)($maxSellableUsdt ?? 0), 2) }} USDT ({{ number_format((float)($maxSellableCai ?? 0), 2) }} CAI)</strong>
+                    <strong style="font-size: 0.76rem; color: #00FF88; font-family: 'Space Mono', monospace;">${{ number_format((float)($maxSellableUsdt ?? 0), 2) }} USDT ({{ number_format((float)($maxSellableCai ?? 0), 2) }} CAAI)</strong>
                 </div>
             </div>
             <button type="button" onclick="openCustomSellModal()" id="btnPageSellAll"
                 style="width: 100%; height: 34px; background: linear-gradient(135deg, #F5A623 0%, #D97706 100%); color: #000000; font-weight: 800; font-size: 0.74rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; box-shadow: 0 3px 10px rgba(245, 166, 35, 0.25); text-transform: uppercase;"
                 @if((float)($maxSellableUsdt ?? 0) <= 0) disabled style="opacity: 0.4; cursor: not-allowed; width: 100%; height: 34px; background: rgba(255, 255, 255, 0.05); color: #666; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.74rem; border-radius: 6px;" @endif>
-                <span id="btnPageSellAllTxt">SELL CAI ON DEX (${{ number_format((float)($maxSellableUsdt ?? 0), 2) }})</span>
+                <span id="btnPageSellAllTxt">SELL CAAI ON DEX (${{ number_format((float)($maxSellableUsdt ?? 0), 2) }})</span>
             </button>
         </div>
     </div>
@@ -138,7 +138,7 @@
                 <tr style="background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(245, 166, 35, 0.2);">
                     <th style="padding: 10px 12px; text-align: left; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">DATE &amp; TIME</th>
                     <th style="padding: 10px 12px; text-align: left; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">ACTION</th>
-                    <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAI AMOUNT</th>
+                    <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAAI AMOUNT</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">RATE / PRICE</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">USDT AMOUNT</th>
                     <th style="padding: 10px 12px; text-align: right; font-size: 9.5px; font-weight: 800; color: #8C9BAE; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">CAP BEFORE</th>
@@ -165,7 +165,7 @@
                         @endif
                     </td>
                     <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #FFD700; font-family: 'Space Mono', monospace; white-space: nowrap;">
-                        {{ number_format((float)$entry->cai_amount, 4) }} CAI
+                        {{ number_format((float)$entry->cai_amount, 4) }} CAAI
                     </td>
                     <td style="padding: 10px 12px; text-align: right; font-family: 'Space Mono', monospace; color: #FFD700; font-weight: 700; white-space: nowrap;">
                         ${{ number_format((float)$entry->cai_price, 6) }}
@@ -244,7 +244,7 @@
                 <div>
                     <div style="font-size: 8px; font-weight: 800; color: #8C9BAE; text-transform: uppercase;">Amount</div>
                     <div style="font-size: 13px; font-weight: 800; color: {{ $entry->type == 'mine' ? '#FFD700' : '#F5A623' }}; font-family: 'Space Mono', monospace;">
-                        {{ number_format((float)$entry->cai_amount, 4) }} <small style="font-size: 9px; color: #FFFFFF;">CAI</small>
+                        {{ number_format((float)$entry->cai_amount, 4) }} <small style="font-size: 9px; color: #FFFFFF;">CAAI</small>
                     </div>
                 </div>
                 <div style="text-align: right;">
@@ -361,14 +361,14 @@
 
             const res = await resp.json();
             if (res.status !== 'success') {
-                throw new Error(res.message || 'Failed to mine ROI into CAI.');
+                throw new Error(res.message || 'Failed to mine ROI into CAAI.');
             }
 
             await Swal.fire({
                 title: 'MINING COMPLETED!',
                 html: `
                     <div style="font-size: 0.82rem; color: #CBD5E1; text-align: center; margin-bottom: 8px;">
-                        Successfully converted <strong style="color: #00FF88;">$${PAGE_UNMINED_USDT.toFixed(2)} USDT</strong> ROI into <strong style="color: #FFD700;">${res.data.mined_cai} CAI</strong>.
+                        Successfully converted <strong style="color: #00FF88;">$${PAGE_UNMINED_USDT.toFixed(2)} USDT</strong> ROI into <strong style="color: #FFD700;">${res.data.mined_cai} CAAI</strong>.
                     </div>
                 `,
                 confirmButtonText: 'GREAT',
@@ -392,7 +392,7 @@
         }
     }
 
-    /* Open Interactive Custom CAI Liquidation Modal */
+    /* Open Interactive Custom CAAI Liquidation Modal */
     async function openCustomSellModal() {
         if (PAGE_MAX_SELL_CAI <= 0 || PAGE_MAX_SELL_USDT <= 0) {
             Swal.fire({
@@ -414,29 +414,29 @@
         const defaultNetUsdt = defaultGrossUsdt - defaultFeeUsdt;
 
         const { value: customCaiAmount, isConfirmed } = await Swal.fire({
-            title: 'SWAP CAI FOR USDT ON DEX',
+            title: 'SWAP CAAI FOR USDT ON DEX',
             html: `
                 <div style="text-align: left; font-family: 'Inter', sans-serif;">
                     <div style="background: rgba(245, 166, 35, 0.05); border: 1px solid rgba(245, 166, 35, 0.22); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.72rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                            <span style="color: #8C9BAE;">Protocol CAI Holding:</span>
-                            <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">${PAGE_HOLDING_CAI.toFixed(4)} CAI (~$${PAGE_HOLDING_USDT.toFixed(2)})</strong>
+                            <span style="color: #8C9BAE;">Protocol CAAI Holding:</span>
+                            <strong style="color: #FFD700; font-family: 'Space Mono', monospace;">${PAGE_HOLDING_CAI.toFixed(4)} CAAI (~$${PAGE_HOLDING_USDT.toFixed(2)})</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <span style="color: #8C9BAE;">Active Capping Limit:</span>
-                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace;">$${PAGE_REMAINING_CAPPING.toFixed(2)} USDT (Max ${PAGE_MAX_SELL_CAI.toFixed(4)} CAI)</strong>
+                            <strong style="color: #00FF88; font-family: 'Space Mono', monospace;">$${PAGE_REMAINING_CAPPING.toFixed(2)} USDT (Max ${PAGE_MAX_SELL_CAI.toFixed(4)} CAAI)</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #8C9BAE;">Live DEX Price:</span>
-                            <strong style="color: #FFE082; font-family: 'Space Mono', monospace;">$${livePrice.toFixed(6)} / CAI</strong>
+                            <strong style="color: #FFE082; font-family: 'Space Mono', monospace;">$${livePrice.toFixed(6)} / CAAI</strong>
                         </div>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <label style="font-size: 0.74rem; font-weight: 800; color: #FFFFFF; margin: 0; text-transform: uppercase;">
-                            ENTER CAI TO SELL:
+                            ENTER CAAI TO SELL:
                         </label>
-                        <span style="font-size: 0.65rem; color: #8C9BAE;">Max: <strong style="color: #FFD700; cursor: pointer;" onclick="setPageSellPercent(100)">${maxCai.toFixed(4)} CAI</strong></span>
+                        <span style="font-size: 0.65rem; color: #8C9BAE;">Max: <strong style="color: #FFD700; cursor: pointer;" onclick="setPageSellPercent(100)">${maxCai.toFixed(4)} CAAI</strong></span>
                     </div>
 
                     <div style="position: relative; margin-bottom: 8px;">
@@ -445,7 +445,7 @@
                             oninput="updatePageSellCalculations()"
                         />
                         <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.72rem; font-weight: 800; color: #FFD700; font-family: 'Space Mono', monospace; pointer-events: none;">
-                            CAI
+                            CAAI
                         </span>
                     </div>
 
@@ -470,8 +470,8 @@
                             <span id="pageNetUsdt" style="color: #00FF88; font-family: 'Space Mono', monospace; font-weight: 900; font-size: 0.88rem;">$${defaultNetUsdt.toFixed(2)} USDT</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.68rem; color: #8C9BAE; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span>Remaining CAI Holding:</span>
-                            <span id="pageRemCai" style="color: #FFE082; font-family: 'Space Mono', monospace;">${Math.max(0, PAGE_HOLDING_CAI - defaultCai).toFixed(4)} CAI</span>
+                            <span>Remaining CAAI Holding:</span>
+                            <span id="pageRemCai" style="color: #FFE082; font-family: 'Space Mono', monospace;">${Math.max(0, PAGE_HOLDING_CAI - defaultCai).toFixed(4)} CAAI</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #8C9BAE;">
                             <span>Remaining Capping:</span>
@@ -523,24 +523,24 @@
                     if (grossEl) grossEl.innerText = '$' + gross.toFixed(2);
                     if (feeEl) feeEl.innerText = '-$' + fee.toFixed(2);
                     if (netEl) netEl.innerText = '$' + net.toFixed(2) + ' USDT';
-                    if (remCaiEl) remCaiEl.innerText = remCai.toFixed(4) + ' CAI';
+                    if (remCaiEl) remCaiEl.innerText = remCai.toFixed(4) + ' CAAI';
                     if (remCapEl) remCapEl.innerText = '$' + remCap.toFixed(2);
 
                     if (val <= 0) {
                         if (errBox) {
-                            errBox.innerText = 'Please enter a CAI amount greater than 0.';
+                            errBox.innerText = 'Please enter a CAAI amount greater than 0.';
                             errBox.style.display = 'block';
                         }
                         if (confirmBtn) confirmBtn.disabled = true;
                     } else if (val > PAGE_HOLDING_CAI) {
                         if (errBox) {
-                            errBox.innerText = 'Amount exceeds your Protocol CAI Holding (' + PAGE_HOLDING_CAI.toFixed(4) + ' CAI).';
+                            errBox.innerText = 'Amount exceeds your Protocol CAAI Holding (' + PAGE_HOLDING_CAI.toFixed(4) + ' CAAI).';
                             errBox.style.display = 'block';
                         }
                         if (confirmBtn) confirmBtn.disabled = true;
                     } else if (val > (maxAllowed + 0.0001)) {
                         if (errBox) {
-                            errBox.innerText = 'Amount exceeds your Active Capping Limit (Max ' + maxAllowed.toFixed(4) + ' CAI).';
+                            errBox.innerText = 'Amount exceeds your Active Capping Limit (Max ' + maxAllowed.toFixed(4) + ' CAAI).';
                             errBox.style.display = 'block';
                         }
                         if (confirmBtn) confirmBtn.disabled = true;
@@ -569,11 +569,11 @@
                 const input = document.getElementById('pageSellCaiInput');
                 const val = parseFloat(input ? input.value : 0);
                 if (isNaN(val) || val <= 0) {
-                    Swal.showValidationMessage('Please enter a valid CAI amount to sell.');
+                    Swal.showValidationMessage('Please enter a valid CAAI amount to sell.');
                     return false;
                 }
                 if (val > PAGE_HOLDING_CAI) {
-                    Swal.showValidationMessage('Amount exceeds your Protocol CAI balance.');
+                    Swal.showValidationMessage('Amount exceeds your Protocol CAAI balance.');
                     return false;
                 }
                 if (val > (PAGE_MAX_SELL_CAI + 0.0001)) {
@@ -622,7 +622,7 @@
                         customClass: { popup: 'mecha-swal-popup', confirmButton: 'mecha-swal-confirm' }
                     });
                     if (btn) btn.disabled = false;
-                    if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
+                    if (btnTxt) btnTxt.innerText = 'SELL CAAI ON DEX';
                     return;
                 }
             }
@@ -689,7 +689,7 @@
                 title: 'PORTFOLIO SOLD ON DEX!',
                 html: `
                     <div style="font-size: 0.82rem; color: #CBD5E1; margin-bottom: 12px; text-align: center;">
-                        Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAI</strong> on PancakeSwap!
+                        Successfully swapped <strong style="color:#FFD700; font-family:'Space Mono', monospace;">${d.caiAmount} CAAI</strong> on PancakeSwap!
                     </div>
                     <div style="background: rgba(245, 166, 35, 0.04); border: 1px solid rgba(245, 166, 35, 0.25); border-radius: 10px; padding: 10px 12px; text-align: left; font-size: 0.78rem;">
                         <div style="color: #00FF88; margin-bottom: 5px;">✓ Delivered $${parseFloat(d.netUsdt).toFixed(2)} USDT directly to wallet.</div>
@@ -717,7 +717,7 @@
                 customClass: { popup: 'mecha-swal-popup', confirmButton: 'mecha-swal-confirm' }
             });
             if (btn) btn.disabled = false;
-            if (btnTxt) btnTxt.innerText = 'SELL CAI ON DEX';
+            if (btnTxt) btnTxt.innerText = 'SELL CAAI ON DEX';
         }
     }
 </script>

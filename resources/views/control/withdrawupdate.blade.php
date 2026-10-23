@@ -155,7 +155,7 @@
                                                     <div class="col-lg-12">
                                                         <div class="col-lg-6 no-pl">
                                                             <div class="form-group">
-                                                                <label class="form-label">Withdraw Amount (CAI) </label>
+                                                                <label class="form-label">Withdraw Amount (CAAI) </label>
                                                                 <span class="desc"></span>
                                                                 <input type="text" class="form-control @error('amountsftc') is-invalid @enderror" name="amountsftc" value="{{ $withdata->amountsftc }}" required="" readonly="">
                                                                 @error('amountsftc')

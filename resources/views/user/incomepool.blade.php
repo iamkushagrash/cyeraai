@@ -530,7 +530,7 @@
                             </div>
                             <div class="pool-item-amount-row">
                                 <span class="pool-amount-usdt">+${{ number_format($inc->amt_usdt, 2) }}</span>
-                                <span class="pool-amount-tokens">{{ number_format($inc->amount, 2) }} CAI</span>
+                                <span class="pool-amount-tokens">{{ number_format($inc->amount, 2) }} CAAI</span>
                             </div>
                             @if($inc->distribution)
                                 <div class="pool-turnover-meta">

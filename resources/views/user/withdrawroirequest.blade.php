@@ -42,7 +42,7 @@
     <div style="display: flex; align-items: center; gap: 10px;">
         <i class="fas fa-microchip" style="font-size: 20px; color: #00E5FF;"></i>
         <div>
-            <strong style="color: #00E5FF; font-size: 13px;">⚡ Decentralized CAI Mining &amp; DEX Swap</strong>
+            <strong style="color: #00E5FF; font-size: 13px;">⚡ Decentralized CAAI Mining &amp; DEX Swap</strong>
             <div style="color: #8C9BAE; font-size: 10.5px;">Mine your ROI into protocol holdings with 0% capping deduction and sell on PancakeSwap with dynamic capping protection.</div>
         </div>
     </div>
@@ -59,7 +59,7 @@
             <i class="fas fa-bolt-lightning" style="color: #FFD700;"></i>
         </div>
         <div class="mecha-metric-val gold" style="font-size: 1.15rem; line-height: 1.2;">
-            {{ ($caiTokens < 1 && $caiTokens > 0) ? number_format($caiTokens, 4) : number_format($caiTokens, 2) }} <small style="font-size: 11px; color: #FFF;">CAI</small>
+            {{ ($caiTokens < 1 && $caiTokens > 0) ? number_format($caiTokens, 4) : number_format($caiTokens, 2) }} <small style="font-size: 11px; color: #FFF;">CAAI</small>
         </div>
         <div class="mecha-metric-sub" style="color: #38BDF8; font-weight: 700;">
             ≈ ${{ number_format($caiUsdVal, 2) }} USDT
@@ -75,7 +75,7 @@
             ${{ number_format($capRemain, 2) }} <small style="font-size: 11px; color: #A7F3D0;">USDT</small>
         </div>
         <div class="mecha-metric-sub" style="color: #FFD700;">
-            Max Cap: {{ ($capInCai < 1 && $capInCai > 0) ? number_format($capInCai, 4) : number_format($capInCai, 2) }} CAI
+            Max Cap: {{ ($capInCai < 1 && $capInCai > 0) ? number_format($capInCai, 4) : number_format($capInCai, 2) }} CAAI
         </div>
     </div>
 </div>
@@ -87,7 +87,7 @@
             <i class="fas fa-bolt" style="color: #FFD700;"></i>
             <div>
                 <h2 class="mecha-card-title">CLAIM STAKING ROI</h2>
-                <div class="mecha-card-subtitle">Burns CAI tokens at live rate &amp; deducts deposit capping</div>
+                <div class="mecha-card-subtitle">Burns CAAI tokens at live rate &amp; deducts deposit capping</div>
             </div>
         </div>
         <span class="mecha-card-badge">DAILY YIELD</span>
@@ -116,11 +116,11 @@
             @csrf
             <input type="hidden" name="honeypotu" value="{{ Session::get('logtime') }}">
 
-            <!-- Amount Input (CAI Tokens) -->
+            <!-- Amount Input (CAAI Tokens) -->
             <div class="mecha-form-group">
                 <label class="mecha-form-label" for="amountcai">
-                    <span>CLAIM AMOUNT (CAI)</span>
-                    <span class="label-sub" style="color: #FFD700;">Max Claimable: {{ ($maxClaimCai < 1 && $maxClaimCai > 0) ? number_format($maxClaimCai, 4) : number_format($maxClaimCai, 2) }} CAI</span>
+                    <span>CLAIM AMOUNT (CAAI)</span>
+                    <span class="label-sub" style="color: #FFD700;">Max Claimable: {{ ($maxClaimCai < 1 && $maxClaimCai > 0) ? number_format($maxClaimCai, 4) : number_format($maxClaimCai, 2) }} CAAI</span>
                 </label>
                 <div class="mecha-input-wrap">
                     <i class="fas fa-coins mecha-input-icon" style="color: #FFD700;"></i>
@@ -146,7 +146,7 @@
 
                 <div style="font-size: 10px; color: #8C9BAE; margin-top: 5px; display: flex; align-items: center; justify-content: space-between;">
                     <span><i class="fas fa-bolt" style="color: #FFD700;"></i> Live Valuation: <strong id="live-est-usdt" style="color: #00FF88;">$0.00 USDT</strong></span>
-                    <span style="color: #FFD700; font-family: monospace;">1 CAI = ${{ number_format($price, 2) }}</span>
+                    <span style="color: #FFD700; font-family: monospace;">1 CAAI = ${{ number_format($price, 2) }}</span>
                 </div>
 
                 @error('amountcai')
@@ -178,8 +178,8 @@
                     <i class="fas fa-receipt" style="color: #FFD700;"></i> SETTLEMENT BREAKDOWN
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
-                    <span style="color: #8C9BAE;">CAI Tokens Burned:</span>
-                    <span style="color: #FFD700; font-weight: 700;" id="disp-cai">0.0000 CAI</span>
+                    <span style="color: #8C9BAE;">CAAI Tokens Burned:</span>
+                    <span style="color: #FFD700; font-weight: 700;" id="disp-cai">0.0000 CAAI</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                     <span style="color: #8C9BAE;">Live Gross Equivalent:</span>
@@ -261,7 +261,7 @@ function updateLedger() {
     if (liveEst) liveEst.innerText = '$' + grossUsdt.toFixed(2) + ' USDT';
 
     const dispCai = document.getElementById('disp-cai');
-    if (dispCai) dispCai.innerText = formattedCai + ' CAI';
+    if (dispCai) dispCai.innerText = formattedCai + ' CAAI';
 
     const dispGross = document.getElementById('disp-gross');
     if (dispGross) dispGross.innerText = '$' + grossUsdt.toFixed(2);

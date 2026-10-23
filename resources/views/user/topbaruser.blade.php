@@ -13,6 +13,6 @@
                 <!--            <div class="balance-amount">$ 0</div>-->
                 <!--        </div>-->
                 <!--    </div>-->
-                <!--    <div class="user-id">Sponsor: CAI</div>-->
+                <!--    <div class="user-id">Sponsor: CAAI</div>-->
                 <!--</div>-->
             </div>

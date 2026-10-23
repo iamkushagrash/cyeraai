@@ -117,7 +117,7 @@
 													<tr>
 														<th>#</th>
 														<th>Club Name</th>
-														<!-- <th>Amount(CAI)</th> -->
+														<!-- <th>Amount(CAAI)</th> -->
 														<th>Amount($)</th>
 														<th>Date</th>
 													</tr>

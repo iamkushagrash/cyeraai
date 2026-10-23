@@ -197,7 +197,7 @@
 					<div class="menu-item has-sub">
 						<a href="#" class="menu-link">
 							<span class="menu-icon"><i class="bi bi-globe"></i></span>
-							<span class="menu-text">Stake CAI</span> 
+							<span class="menu-text">Stake CAAI</span> 
 							<span class="menu-caret"><b class="caret"></b></span>
 						</a>
 						<div class="menu-submenu">

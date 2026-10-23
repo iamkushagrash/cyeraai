@@ -54,8 +54,8 @@
                                         <span class="metric-val val-green">${{ number_format((float)$row->usdt, 2) }}</span>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-lbl">CAI TOKENS</span>
-                                        <span class="metric-val val-gold">{{ number_format((float)$row->amount, 2) }} <small>CAI</small></span>
+                                        <span class="metric-lbl">CAAI TOKENS</span>
+                                        <span class="metric-val val-gold">{{ number_format((float)$row->amount, 2) }} <small>CAAI</small></span>
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-lbl">DAILY RATE</span>

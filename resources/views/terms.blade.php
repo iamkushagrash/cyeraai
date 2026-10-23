@@ -393,17 +393,17 @@
                 </a>
                 <div class="terms-badge">
                     <i class="fas fa-shield-halved"></i>
-                    <span>CAI PROTOCOL USER AGREEMENT</span>
+                    <span>CAAI PROTOCOL USER AGREEMENT</span>
                 </div>
                 <h1 class="terms-main-title">Terms & Conditions</h1>
-                <div class="terms-meta-date">Last Updated: September 2026 • Version 2.4 (CAI Token Standard)</div>
+                <div class="terms-meta-date">Last Updated: September 2026 • Version 2.4 (CAAI Token Standard)</div>
             </div>
 
             <!-- Important Notice Banner -->
             <div class="notice-highlight-box">
                 <i class="fas fa-triangle-exclamation"></i>
                 <div>
-                    <strong>Decentralized Smart Contract Disclaimer:</strong> Cyera AI operates as an autonomous decentralized AI & Web3 tokenized ecosystem powered by the <strong>CAI Token</strong>. Staking, yield release, dynamic capping, and automated vaults execute purely on-chain via algorithmic protocol rules.
+                    <strong>Decentralized Smart Contract Disclaimer:</strong> Cyera AI operates as an autonomous decentralized AI & Web3 tokenized ecosystem powered by the <strong>CAAI Token</strong>. Staking, yield release, dynamic capping, and automated vaults execute purely on-chain via algorithmic protocol rules.
                 </div>
             </div>
 
@@ -416,13 +416,13 @@
                 <div class="terms-section">
                     <div class="section-title">
                         <span class="sec-num">1</span>
-                        <span>Scope of the CAI Protocol & Ecosystem</span>
+                        <span>Scope of the CAAI Protocol & Ecosystem</span>
                     </div>
                     <p>
-                        Cyera AI (<strong>“CAI”</strong>, <strong>“Platform”</strong>, <strong>“We”</strong>, <strong>“Protocol”</strong>) is a decentralized Web3 AI compute infrastructure, automated arbitrage mechanism, and tokenized staking system.
+                        Cyera AI (<strong>“CAAI”</strong>, <strong>“Platform”</strong>, <strong>“We”</strong>, <strong>“Protocol”</strong>) is a decentralized Web3 AI compute infrastructure, automated arbitrage mechanism, and tokenized staking system.
                     </p>
                     <p>
-                        The native utility token <strong>CAI</strong> powers all network fee settlements, staking yield rewards, governance weight, and ecosystem service access across the Cyera ecosystem.
+                        The native utility token <strong>CAAI</strong> powers all network fee settlements, staking yield rewards, governance weight, and ecosystem service access across the Cyera ecosystem.
                     </p>
                 </div>
 
@@ -433,7 +433,7 @@
                         <span>Digital Acceptance & Binding Agreement</span>
                     </div>
                     <p>
-                        By checking the agreement box during registration, connecting your Web3 wallet, depositing USDT/CAI, staking assets, or activating node contracts, you explicitly agree and enter into a legally binding digital contract.
+                        By checking the agreement box during registration, connecting your Web3 wallet, depositing USDT/CAAI, staking assets, or activating node contracts, you explicitly agree and enter into a legally binding digital contract.
                     </p>
                     <ul>
                         <li>Checking <strong>“I agree to Cyera AI Terms & Conditions”</strong> constitutes valid cryptographic & legal consent.</li>
@@ -445,7 +445,7 @@
                 <div class="terms-section">
                     <div class="section-title">
                         <span class="sec-num">3</span>
-                        <span>CAI Staking & 5X Dynamic Capping Mechanism</span>
+                        <span>CAAI Staking & 5X Dynamic Capping Mechanism</span>
                     </div>
                     <p>
                         The Cyera AI platform utilizes an algorithmic <strong>Dynamic Capping Protocol</strong> designed for long-term ecosystem sustainability and deflationary liquidity protection:
@@ -464,7 +464,7 @@
                         <span>Decentralized Vaults, Deposits & Withdrawals</span>
                     </div>
                     <ul>
-                        <li><strong>Deposit Verification:</strong> Users are responsible for confirming correct smart contract addresses, token standards (USDT BEP-20 / TRC-20 / CAI), and transaction hashes during deposits.</li>
+                        <li><strong>Deposit Verification:</strong> Users are responsible for confirming correct smart contract addresses, token standards (USDT BEP-20 / TRC-20 / CAAI), and transaction hashes during deposits.</li>
                         <li><strong>Automated Vault Execution:</strong> Withdrawal requests are processed through decentralized liquidity vaults. Minimum withdrawal amounts, network gas fees, and dynamic slippage parameters are calculated transparently at the time of claim.</li>
                         <li><strong>Self-Custodial Security:</strong> Users bear 100% sole responsibility for safeguarding their private keys, seed phrases, and account credentials. Cyera AI administrators will never request your private keys.</li>
                     </ul>
@@ -509,7 +509,7 @@
                         <span>Official Communication & Support</span>
                     </div>
                     <p>
-                        For technical assistance, node inquiry, or legal correspondence regarding the CAI protocol:
+                        For technical assistance, node inquiry, or legal correspondence regarding the CAAI protocol:
                     </p>
                     <ul>
                         <li>📧 <strong>Official Support:</strong> support@cyera.ai</li>
@@ -541,7 +541,7 @@
                 <span>•</span>
                 <a href="https://t.me/" target="_blank">Telegram Support</a>
             </div>
-            <div>&copy; 2026 CYERA AI (CAI PROTOCOL). All Rights Reserved.</div>
+            <div>&copy; 2026 CYERA AI (CAAI PROTOCOL). All Rights Reserved.</div>
         </footer>
 
     </div>

@@ -25,14 +25,14 @@
         <div class="tab-active-bar"></div>
     </a>
 
-    <!-- 3. CENTER CAI COIN BUTTON (MINING & DEX HUB) -->
-    <a href="{{ url('/User/Mining') }}" class="hud-center-lion-btn {{ request()->is('User/Mining*') ? 'active' : '' }}" title="CAI Mining & DEX Swap">
+    <!-- 3. CENTER CAAI COIN BUTTON (MINING & DEX HUB) -->
+    <a href="{{ url('/User/Mining') }}" class="hud-center-lion-btn {{ request()->is('User/Mining*') ? 'active' : '' }}" title="CAAI Mining & DEX Swap">
         <div class="nav-lion-corona">
             <div class="nav-lion-ring">
                 <img src="{{ asset('images/cai-token-coin.png') }}" alt="CYERA AI">
             </div>
         </div>
-        <span class="nav-cai-lbl">CAI</span>
+        <span class="nav-cai-lbl">CAAI</span>
     </a>
 
     <!-- 4. TEAM -->

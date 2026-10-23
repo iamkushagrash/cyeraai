@@ -212,7 +212,7 @@
 		<div id="content" class="app-content">
 			<div class="marquee">
  <div class="marquee-content">
-   🚀 Hello <span class="username-highlight">{{ Session::get('user.name') }} !</span> Your journey to more rewards, growth, and success on CAI Dashboard starts now. Keep earning more every day! 💰
+   🚀 Hello <span class="username-highlight">{{ Session::get('user.name') }} !</span> Your journey to more rewards, growth, and success on CAAI Dashboard starts now. Keep earning more every day! 💰
 </div>
 </div>
 				<!-- BEGIN row -->
@@ -487,9 +487,9 @@
 							<a href="javascript:void(0);" onclick="copylnk()" class="btn btn-outline-theme btn-sm">Copy Link</a>
 							 &nbsp;Or Share
 							<a href="https://www.facebook.com/sharer.php?u={{url('/').'/register/'.Session::get('user.uuid')}}" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-facebook"></i></a>
-                    		<a href="https://twitter.com/intent/tweet?url={{url('/').'/register/'.Session::get('user.uuid')}}&text=CAI%20Referral%20Link" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-twitter"></i></a>
+                    		<a href="https://twitter.com/intent/tweet?url={{url('/').'/register/'.Session::get('user.uuid')}}&text=CAAI%20Referral%20Link" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-twitter"></i></a>
                     		<a href="https://wa.me/?text=Use%20my%20referral%20link%20to%20join%20CAI%20{{url('/').'/register/'.Session::get('user.uuid')}}" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-whatsapp"></i></a>
-                    		<a href="https://telegram.me/share/url?url={{url('/').'/register/'.Session::get('user.uuid')}}&text=Use my referral link to join CAI" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-telegram"></i></a>
+                    		<a href="https://telegram.me/share/url?url={{url('/').'/register/'.Session::get('user.uuid')}}&text=Use my referral link to join CAAI" target="_blank"><i class="fab fa-lg fa-fw me-2 fa-telegram"></i></a>
 						</div>
 						<!-- END card-body -->
 						

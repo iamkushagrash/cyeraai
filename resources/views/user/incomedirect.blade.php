@@ -616,7 +616,7 @@
                         <span>{{ $row->created_at }}</span>
                     </div>
                     <div class="footer-token-conv">
-                        ≈ {{ number_format((float)$row->amount, 4) }} CAI
+                        ≈ {{ number_format((float)$row->amount, 4) }} CAAI
                     </div>
                 </div>
             </div>
