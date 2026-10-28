@@ -451,7 +451,191 @@ class ContractAdminController extends Controller
             'avgStake'        => $stakingList->count() > 0 ? round($stakingList->sum('usdt') / $stakingList->count(), 2) : 0,
         ];
 
-        // 6. Build Initial Root Tree (Top sponsor ID 1 or top users)
+        // 6. Working Income Withdrawals & ROI/Mining Claims Report
+        $rawWithdrawTxns = DB::table('transaction_details as td')
+            ->leftJoin('transaction_infos as ti', 'td.id', '=', 'ti.txnid')
+            ->leftJoin('withdraw_infos as wi', 'td.id', '=', 'wi.txnid')
+            ->where('td.txntype', 1)
+            ->select(
+                'td.id',
+                'td.userid',
+                'td.amountsftc',
+                'td.amountusdt',
+                'td.deduction',
+                'td.net_amount',
+                'td.paymentstatus',
+                'td.txndesc',
+                'td.comments',
+                'td.currency',
+                'td.created_at',
+                'ti.payment_addr',
+                'ti.payee_addr',
+                'ti.transaction_hash',
+                'wi.stacking as wi_stacking',
+                'wi.level as wi_level',
+                'wi.bonus as wi_bonus',
+                'wi.club as wi_club',
+                'wi.salary as wi_salary'
+            )
+            ->orderBy('td.id', 'desc')
+            ->get();
+
+        $withdrawalList = collect();
+
+        foreach ($rawWithdrawTxns as $w) {
+            $userDetail = \App\UserDetails::where('id', $w->userid)->orWhere('userid', $w->userid)->first();
+            $user = null;
+            $assetDetail = null;
+
+            if ($userDetail) {
+                $user = \App\User::where('id', $userDetail->userid)->first();
+                $assetDetail = \App\AssetDetail::where('userid', $userDetail->id)
+                    ->orWhere('userid', $userDetail->userid)
+                    ->first();
+            } else {
+                $user = \App\User::where('id', $w->userid)->first();
+                if ($user) {
+                    $assetDetail = \App\AssetDetail::where('userid', $user->id)->first();
+                }
+            }
+
+            $walletAddr = $w->payment_addr ?: '';
+            if (empty($walletAddr) && $assetDetail) {
+                $walletAddr = $assetDetail->usdtbep20addr ?: ($assetDetail->bep20addr ?: '');
+            }
+
+            $displayName = 'Anonymous';
+            if ($user) {
+                $displayName = $user->usersname ?: ($user->email ?: ($user->uuid ?: 'Member #' . $w->userid));
+            } elseif ($userDetail) {
+                $displayName = 'User #' . $userDetail->id;
+            }
+
+            $isRoi = (strtolower((string)$w->comments) === 'roi' || stripos((string)$w->txndesc, 'ROI') !== false);
+            $category = $isRoi ? 'roi' : 'working';
+
+            $grossUsdt = (float) $w->amountusdt;
+            $feeUsdt   = (float) ($w->deduction > 0 ? $w->deduction : round($grossUsdt * 0.10, 4));
+            $netUsdt   = (float) ($w->net_amount > 0 ? $w->net_amount : max(0, $grossUsdt - $feeUsdt));
+
+            $pStatus = (int) $w->paymentstatus;
+            if ($pStatus === 2) {
+                $statusKey = 'confirmed';
+                $statusLabel = 'Confirmed';
+            } elseif ($pStatus === 0 || $pStatus === 1) {
+                $statusKey = 'pending';
+                $statusLabel = $pStatus === 0 ? 'Verification Pending' : 'Pending';
+            } else {
+                $statusKey = 'failed';
+                $statusLabel = $pStatus === 3 ? 'Cancelled' : ($pStatus === 4 ? 'Failed' : 'Expired');
+            }
+
+            $withdrawalList->push((object) [
+                'id'           => 'TXN-' . $w->id,
+                'raw_id'       => $w->id,
+                'userid'       => $w->userid,
+                'uuid'         => $user ? $user->uuid : ('ID-' . $w->userid),
+                'name'         => $displayName,
+                'email'        => $user ? $user->email : 'N/A',
+                'wallet'       => $walletAddr,
+                'category'     => $category,
+                'type_label'   => $isRoi ? 'Staking ROI Withdrawal' : 'Working Income Withdrawal',
+                'txndesc'      => $w->txndesc ?: 'Working Income Withdrawal',
+                'gross_usdt'   => $grossUsdt,
+                'fee_usdt'     => $feeUsdt,
+                'net_usdt'     => $netUsdt,
+                'cai_amount'   => (float) $w->amountsftc,
+                'direct_usdt'  => (float) ($w->wi_bonus ?? 0),
+                'level_usdt'   => (float) ($w->wi_level ?? 0),
+                'pool_usdt'    => (float) ($w->wi_club ?? 0),
+                'rank_usdt'    => (float) ($w->wi_salary ?? 0),
+                'tx_hash'      => $w->transaction_hash ?: '',
+                'status_code'  => $pStatus,
+                'status_key'   => $statusKey,
+                'status_label' => $statusLabel,
+                'raw_date'     => $w->created_at ? Carbon::parse($w->created_at)->format('Y-m-d') : '',
+                'created_at'   => $w->created_at ? Carbon::parse($w->created_at)->format('d M Y, H:i') : 'N/A',
+                'sort_time'    => $w->created_at ? Carbon::parse($w->created_at)->timestamp : 0,
+            ]);
+        }
+
+        // Also fetch On-Chain CAI Mining / ROI Portfolio Sells from cai_mining_ledgers
+        try {
+            $miningSells = \App\CaiMiningLedger::where('type', 'sell')->orderBy('id', 'desc')->get();
+            foreach ($miningSells as $ms) {
+                $userDetail = \App\UserDetails::where('id', $ms->userid)->orWhere('userid', $ms->userid)->first();
+                $user = $userDetail ? \App\User::where('id', $userDetail->userid)->first() : \App\User::where('id', $ms->userid)->first();
+                $assetDetail = $userDetail
+                    ? \App\AssetDetail::where('userid', $userDetail->id)->orWhere('userid', $userDetail->userid)->first()
+                    : ($user ? \App\AssetDetail::where('userid', $user->id)->first() : null);
+
+                $walletAddr = $assetDetail ? ($assetDetail->usdtbep20addr ?: ($assetDetail->bep20addr ?: '')) : '';
+                $displayName = $user ? ($user->usersname ?: ($user->email ?: $user->uuid)) : ('User #' . $ms->userid);
+
+                $netUsdt   = (float) $ms->usdt_amount;
+                $grossUsdt = (float) ($ms->capping_deducted > 0 ? $ms->capping_deducted : round($netUsdt / 0.90, 4));
+                $feeUsdt   = max(0, round($grossUsdt - $netUsdt, 4));
+
+                $withdrawalList->push((object) [
+                    'id'           => 'ROI-' . $ms->id,
+                    'raw_id'       => $ms->id,
+                    'userid'       => $ms->userid,
+                    'uuid'         => $user ? $user->uuid : ('ID-' . $ms->userid),
+                    'name'         => $displayName,
+                    'email'        => $user ? $user->email : 'N/A',
+                    'wallet'       => $walletAddr,
+                    'category'     => 'roi',
+                    'type_label'   => 'DEX ROI Portfolio Claim',
+                    'txndesc'      => $ms->notes ?: 'CAI Portfolio Sold on DEX',
+                    'gross_usdt'   => $grossUsdt,
+                    'fee_usdt'     => $feeUsdt,
+                    'net_usdt'     => $netUsdt,
+                    'cai_amount'   => (float) $ms->cai_amount,
+                    'direct_usdt'  => 0.0,
+                    'level_usdt'   => 0.0,
+                    'pool_usdt'    => 0.0,
+                    'rank_usdt'    => 0.0,
+                    'tx_hash'      => $ms->tx_hash ?: '',
+                    'status_code'  => 2,
+                    'status_key'   => 'confirmed',
+                    'status_label' => 'Confirmed',
+                    'raw_date'     => $ms->created_at ? Carbon::parse($ms->created_at)->format('Y-m-d') : '',
+                    'created_at'   => $ms->created_at ? Carbon::parse($ms->created_at)->format('d M Y, H:i') : 'N/A',
+                    'sort_time'    => $ms->created_at ? Carbon::parse($ms->created_at)->timestamp : 0,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Ignore if cai_mining_ledgers table is not present
+        }
+
+        $withdrawalList = $withdrawalList->sortByDesc('sort_time')->values();
+
+        $workingItems = $withdrawalList->where('category', 'working');
+        $roiItems     = $withdrawalList->where('category', 'roi');
+        $todayStr     = $today->format('Y-m-d');
+
+        $withdrawalSummary = [
+            'totalCount'             => $withdrawalList->count(),
+            'workingTotalCount'      => $workingItems->count(),
+            'workingConfirmedCount'  => $workingItems->where('status_key', 'confirmed')->count(),
+            'workingPendingCount'    => $workingItems->where('status_key', 'pending')->count(),
+            'totalWorkingGrossUsdt'  => $workingItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'totalWorkingFeeUsdt'    => $workingItems->where('status_key', '!=', 'failed')->sum('fee_usdt'),
+            'totalWorkingNetUsdt'    => $workingItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'todayWorkingGrossUsdt'  => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'todayWorkingNetUsdt'    => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'totalDirectWithdrawn'   => $workingItems->where('status_key', '!=', 'failed')->sum('direct_usdt'),
+            'totalLevelWithdrawn'    => $workingItems->where('status_key', '!=', 'failed')->sum('level_usdt'),
+            'totalPoolWithdrawn'     => $workingItems->where('status_key', '!=', 'failed')->sum('pool_usdt'),
+            'totalRankWithdrawn'     => $workingItems->where('status_key', '!=', 'failed')->sum('rank_usdt'),
+            'roiTotalCount'          => $roiItems->count(),
+            'totalRoiGrossUsdt'      => $roiItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'totalRoiNetUsdt'        => $roiItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'grandTotalGrossUsdt'    => $withdrawalList->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'grandTotalNetUsdt'      => $withdrawalList->where('status_key', '!=', 'failed')->sum('net_usdt'),
+        ];
+
+        // 7. Build Initial Root Tree (Top sponsor ID 1 or top users)
         $rootUserRecord = DB::table('users as u')
             ->join('user_details as ud', 'u.id', '=', 'ud.userid')
             ->leftJoin('asset_details as ad', 'u.id', '=', 'ad.userid')
@@ -481,6 +665,8 @@ class ContractAdminController extends Controller
             'userSummary',
             'stakingList',
             'stakingSummary',
+            'withdrawalList',
+            'withdrawalSummary',
             'initialTree'
         ));
     }
@@ -640,6 +826,7 @@ class ContractAdminController extends Controller
             ->orWhere('u.uuid', $id)
             ->select(
                 'u.id',
+                'ud.id as user_detail_id',
                 'u.uuid',
                 'u.usersname as name',
                 'u.email',
@@ -660,22 +847,43 @@ class ContractAdminController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
 
+        $targetIds = array_unique(array_filter([$user->id, $user->user_detail_id]));
+
         $stakings = DB::table('stacking_deposites')
-            ->where('userid', $user->id)
+            ->whereIn('userid', $targetIds)
             ->orderBy('id', 'desc')
+            ->get();
+
+        $withdrawals = DB::table('transaction_details as td')
+            ->leftJoin('transaction_infos as ti', 'td.id', '=', 'ti.txnid')
+            ->whereIn('td.userid', $targetIds)
+            ->where('td.txntype', 1)
+            ->select(
+                'td.id',
+                'td.amountusdt as gross_usdt',
+                'td.deduction as fee_usdt',
+                'td.net_amount as net_usdt',
+                'td.paymentstatus',
+                'td.comments',
+                'td.txndesc',
+                'td.created_at',
+                'ti.transaction_hash as tx_hash'
+            )
+            ->orderBy('td.id', 'desc')
             ->get();
 
         $directs = DB::table('users as u')
             ->join('user_details as ud', 'u.id', '=', 'ud.userid')
-            ->where('ud.sponsorid', $user->id)
+            ->whereIn('ud.sponsorid', $targetIds)
             ->select('u.id', 'u.uuid', 'u.usersname as name', 'ud.current_self_investment as self_inv', 'ud.userstatus', 'u.doj')
             ->get();
 
         return response()->json([
-            'success' => true,
-            'user'    => $user,
-            'stakings'=> $stakings,
-            'directs' => $directs
+            'success'     => true,
+            'user'        => $user,
+            'stakings'    => $stakings,
+            'withdrawals' => $withdrawals,
+            'directs'     => $directs
         ]);
     }
 }

@@ -971,6 +971,9 @@
             <button class="tab-btn" onclick="switchTab('tab-stakings', this)">
                 <i class="fa-solid fa-vault"></i> Stakings (${{ number_format($stakingSummary['totalUsdt'], 0) }})
             </button>
+            <button class="tab-btn" onclick="switchTab('tab-withdrawals', this)">
+                <i class="fa-solid fa-money-bill-transfer"></i> Working Withdrawals (${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 0) }})
+            </button>
             @if(!$isSubAdminUser)
             <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
                 <i class="fa-solid fa-cube"></i> Smart Contract Hub
@@ -1077,6 +1080,18 @@
                     <div class="metric-value" id="miningBufferVal">40,454 CAAI</div>
                     <div class="metric-sub">
                         <span class="badge badge-cyan">In Mining Engine Buffer</span>
+                    </div>
+                </div>
+
+                <div class="metric-card" style="cursor: pointer;" onclick="document.querySelector('[onclick*=\'tab-withdrawals\']').click()">
+                    <div class="metric-header">
+                        <div class="metric-title">Working Withdrawals</div>
+                        <div class="metric-icon-box emerald"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    </div>
+                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span class="badge badge-active">Net: ${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-indigo">{{ $withdrawalSummary['workingTotalCount'] ?? 0 }} Txns</span>
                     </div>
                 </div>
             </div>
@@ -1720,6 +1735,275 @@
 
         </div>
 
+        <!-- ======================================================== -->
+        <!-- TAB 5B: WORKING WITHDRAWALS & PAYOUT LEDGER               -->
+        <!-- ======================================================== -->
+        <div id="tab-withdrawals" class="tab-content-panel" style="display: none;">
+
+            <!-- Top KPI Summary Row -->
+            <div class="metric-grid" style="margin-bottom: 20px;">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Working Withdrawals (Gross)</div>
+                        <div class="metric-icon-box indigo"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    </div>
+                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span class="badge badge-active"><i class="fa-solid fa-check-double"></i> {{ $withdrawalSummary['workingConfirmedCount'] ?? 0 }} Confirmed</span>
+                        @if(($withdrawalSummary['workingPendingCount'] ?? 0) > 0)
+                            <span class="badge badge-amber"><i class="fa-solid fa-clock"></i> {{ $withdrawalSummary['workingPendingCount'] }} Pending</span>
+                        @endif
+                        <span class="badge badge-indigo">Today: ${{ number_format($withdrawalSummary['todayWorkingGrossUsdt'] ?? 0, 2) }}</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Net USDT Disbursed (90%)</div>
+                        <div class="metric-icon-box emerald"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    </div>
+                    <div class="metric-value" style="color: var(--emerald-text);">${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span class="badge badge-amber">10% Fee Deducted: ${{ number_format($withdrawalSummary['totalWorkingFeeUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-active">Today Net: ${{ number_format($withdrawalSummary['todayWorkingNetUsdt'] ?? 0, 2) }}</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Working Income Source Breakdown</div>
+                        <div class="metric-icon-box amber"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; font-size: 0.78rem;">
+                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Direct Bonus</span>
+                            <strong style="color: var(--primary);">${{ number_format($withdrawalSummary['totalDirectWithdrawn'] ?? 0, 2) }}</strong>
+                        </div>
+                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Level Income</span>
+                            <strong style="color: var(--emerald-text);">${{ number_format($withdrawalSummary['totalLevelWithdrawn'] ?? 0, 2) }}</strong>
+                        </div>
+                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Pool / Club</span>
+                            <strong style="color: var(--amber-text);">${{ number_format($withdrawalSummary['totalPoolWithdrawn'] ?? 0, 2) }}</strong>
+                        </div>
+                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Rank / Salary</span>
+                            <strong style="color: var(--cyan-text);">${{ number_format($withdrawalSummary['totalRankWithdrawn'] ?? 0, 2) }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">ROI / Mining Claims</div>
+                        <div class="metric-icon-box cyan"><i class="fa-solid fa-coins"></i></div>
+                    </div>
+                    <div class="metric-value">${{ number_format($withdrawalSummary['totalRoiNetUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span class="badge badge-cyan">{{ $withdrawalSummary['roiTotalCount'] ?? 0 }} Claims</span>
+                        <span class="badge badge-indigo">Combined Net: ${{ number_format($withdrawalSummary['grandTotalNetUsdt'] ?? 0, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-card">
+                <div class="portal-card-header" style="flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div class="card-heading">
+                            <i class="fa-solid fa-money-bill-transfer" style="color: var(--primary);"></i>
+                            Working Withdrawal & On-Chain Payout Ledger (<span id="withdrawalFilteredCount">{{ count($withdrawalList ?? []) }}</span>)
+                        </div>
+                        <div class="card-caption">Complete audit trail of Working Income Withdrawals (Direct, Level, Pool, Rank) via EIP-712 USDTWithdrawalVault & ROI/Mining claims</div>
+                    </div>
+
+                    <!-- Quick Category Toggle Pills & Export -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" id="pillWorkingOnly" class="btn-action primary" onclick="setWithdrawalCategoryQuick('working')">
+                            <i class="fa-solid fa-briefcase"></i> Working Withdrawals ({{ $withdrawalSummary['workingTotalCount'] ?? 0 }})
+                        </button>
+                        <button type="button" id="pillAllWithdrawals" class="btn-action" onclick="setWithdrawalCategoryQuick('all')">
+                            <i class="fa-solid fa-list-ul"></i> All Withdrawals ({{ $withdrawalSummary['totalCount'] ?? 0 }})
+                        </button>
+                        <button type="button" id="pillRoiOnly" class="btn-action" onclick="setWithdrawalCategoryQuick('roi')">
+                            <i class="fa-solid fa-microchip"></i> ROI / Mining ({{ $withdrawalSummary['roiTotalCount'] ?? 0 }})
+                        </button>
+                        <button type="button" class="btn-action" onclick="exportWithdrawalsToCSV()" style="background: var(--emerald-soft); color: var(--emerald-text); border-color: #a7f3d0; font-weight: 700;">
+                            <i class="fa-solid fa-file-csv"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div style="padding: 14px 22px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div class="search-box" style="flex: 1; min-width: 240px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="withdrawalSearchInput" class="form-input" placeholder="Search by UUID, Name, Wallet Address, or TxHash..." onkeyup="filterWithdrawalsTable()" style="width: 100%;">
+                    </div>
+
+                    <select id="withdrawalCategoryFilter" class="form-select" onchange="filterWithdrawalsTable()">
+                        <option value="all">Category: All (Working + ROI)</option>
+                        <option value="working">Working Income Withdrawals Only</option>
+                        <option value="roi">ROI / Mining Claims Only</option>
+                    </select>
+
+                    <select id="withdrawalStatusFilter" class="form-select" onchange="filterWithdrawalsTable()">
+                        <option value="all">Status: All</option>
+                        <option value="confirmed">Confirmed On-Chain</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Rejected / Cancelled</option>
+                    </select>
+
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">From:</span>
+                        <input type="date" id="withdrawalDateFrom" class="form-input" onchange="filterWithdrawalsTable()" style="padding: 7px 10px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">To:</span>
+                        <input type="date" id="withdrawalDateTo" class="form-input" onchange="filterWithdrawalsTable()" style="padding: 7px 10px;">
+                    </div>
+
+                    <button type="button" class="btn-action" onclick="resetWithdrawalFilters()">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table" id="withdrawalsTable">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Member (UUID / Name)</th>
+                                <th>Category / Type</th>
+                                <th>Working Income Breakdown</th>
+                                <th>Gross USDT</th>
+                                <th>Fee (10%)</th>
+                                <th>Net Paid (90%)</th>
+                                <th>Recipient Wallet</th>
+                                <th>On-Chain Tx Hash</th>
+                                <th>Status</th>
+                                <th>Date & Time</th>
+                                <th>Inspect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($withdrawalList ?? [] as $wd)
+                            <tr class="withdrawal-row"
+                                data-category="{{ $wd->category }}"
+                                data-status="{{ $wd->status_key }}"
+                                data-date="{{ $wd->raw_date }}"
+                                data-search="{{ strtolower($wd->id . ' ' . $wd->uuid . ' ' . $wd->name . ' ' . $wd->wallet . ' ' . $wd->tx_hash . ' ' . $wd->type_label) }}">
+                                <td class="font-mono" style="font-weight: 600;">#{{ $wd->id }}</td>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text-heading);">{{ $wd->uuid }}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $wd->name }}</div>
+                                </td>
+                                <td>
+                                    @if($wd->category === 'working')
+                                        <span class="badge badge-indigo"><i class="fa-solid fa-briefcase"></i> Working Withdrawal</span>
+                                    @else
+                                        <span class="badge badge-cyan"><i class="fa-solid fa-microchip"></i> {{ $wd->type_label }}</span>
+                                    @endif
+                                    @if($wd->cai_amount > 0)
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;" class="font-mono">
+                                            {{ number_format($wd->cai_amount, 2) }} CAAI
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($wd->category === 'working')
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
+                                            @if($wd->direct_usdt > 0)
+                                                <span class="badge" style="background: #eef2ff; color: #4338ca; font-size: 0.68rem;">Direct: ${{ number_format($wd->direct_usdt, 2) }}</span>
+                                            @endif
+                                            @if($wd->level_usdt > 0)
+                                                <span class="badge" style="background: #ecfdf5; color: #047857; font-size: 0.68rem;">Level: ${{ number_format($wd->level_usdt, 2) }}</span>
+                                            @endif
+                                            @if($wd->pool_usdt > 0)
+                                                <span class="badge" style="background: #fffbeb; color: #b45309; font-size: 0.68rem;">Pool: ${{ number_format($wd->pool_usdt, 2) }}</span>
+                                            @endif
+                                            @if($wd->rank_usdt > 0)
+                                                <span class="badge" style="background: #ecfeff; color: #0e7490; font-size: 0.68rem;">Rank: ${{ number_format($wd->rank_usdt, 2) }}</span>
+                                            @endif
+                                            @if($wd->direct_usdt == 0 && $wd->level_usdt == 0 && $wd->pool_usdt == 0 && $wd->rank_usdt == 0)
+                                                <span style="font-size: 0.72rem; color: var(--text-muted);">Working Wallet Pool</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span style="font-size: 0.72rem; color: var(--text-muted);">Mining / ROI Portfolio</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <strong style="color: var(--text-heading); font-size: 0.88rem;">${{ number_format($wd->gross_usdt, 2) }}</strong>
+                                </td>
+                                <td>
+                                    <span style="color: var(--amber-text); font-weight: 600; font-size: 0.82rem;">-${{ number_format($wd->fee_usdt, 2) }}</span>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--emerald-text); font-size: 0.92rem;">${{ number_format($wd->net_usdt, 2) }}</strong>
+                                </td>
+                                <td>
+                                    @if(!empty($wd->wallet))
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <a href="https://bscscan.com/address/{{ $wd->wallet }}" target="_blank" class="font-mono" style="font-size: 0.74rem; color: var(--primary); text-decoration: none;" title="{{ $wd->wallet }}">
+                                                {{ substr($wd->wallet, 0, 6) }}...{{ substr($wd->wallet, -4) }}
+                                            </a>
+                                            <button type="button" class="btn-action" style="padding: 2px 6px; font-size: 0.65rem;" onclick="copyToClipboard('{{ $wd->wallet }}')" title="Copy Wallet">
+                                                <i class="fa-regular fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <span style="color: var(--text-muted); font-size: 0.74rem;">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(!empty($wd->tx_hash))
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <a href="https://bscscan.com/tx/{{ $wd->tx_hash }}" target="_blank" class="font-mono" style="font-size: 0.74rem; color: var(--emerald-text); text-decoration: none; font-weight: 600;" title="{{ $wd->tx_hash }}">
+                                                {{ substr($wd->tx_hash, 0, 8) }}...{{ substr($wd->tx_hash, -6) }}
+                                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.64rem;"></i>
+                                            </a>
+                                            <button type="button" class="btn-action" style="padding: 2px 6px; font-size: 0.65rem;" onclick="copyToClipboard('{{ $wd->tx_hash }}')" title="Copy TxHash">
+                                                <i class="fa-regular fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <span style="color: var(--text-muted); font-size: 0.73rem;">Off-Chain / Awaiting Tx</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($wd->status_key === 'confirmed')
+                                        <span class="badge badge-active"><i class="fa-solid fa-check-circle"></i> {{ $wd->status_label }}</span>
+                                    @elseif($wd->status_key === 'pending')
+                                        <span class="badge badge-amber"><i class="fa-solid fa-clock"></i> {{ $wd->status_label }}</span>
+                                    @else
+                                        <span class="badge badge-inactive"><i class="fa-solid fa-xmark"></i> {{ $wd->status_label }}</span>
+                                    @endif
+                                </td>
+                                <td style="font-size: 0.74rem; color: var(--text-muted); white-space: nowrap;">
+                                    {{ $wd->created_at }}
+                                </td>
+                                <td>
+                                    @if($wd->userid)
+                                    <button type="button" class="btn-action" style="padding: 4px 8px;" onclick="openUserModal({{ $wd->userid }})" title="View Member Profile & History">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="12" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                    <i class="fa-solid fa-money-bill-transfer" style="font-size: 1.6rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                                    No withdrawal transactions recorded yet.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
         @if(!$isSubAdminUser)
         <!-- ======================================================== -->
         <!-- TAB 6: SMART CONTRACT HUB                                 -->
@@ -2191,7 +2475,7 @@
                         </div>
 
                         <div style="font-size: 0.84rem; font-weight: 700; margin-bottom: 8px;">Staking History (${data.stakings.length})</div>
-                        <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 16px;">
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 14px;">
                             <table class="admin-table">
                                 <thead>
                                     <tr><th>#ID</th><th>Amount</th><th>Multiplier</th><th>Date</th></tr>
@@ -2205,6 +2489,28 @@
                                             <td>${s.created_at}</td>
                                         </tr>
                                     `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="font-size: 0.84rem; font-weight: 700; margin-bottom: 8px;">Working Withdrawals (${(data.withdrawals || []).length})</div>
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 16px;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr><th>#ID</th><th>Gross</th><th>Net Paid</th><th>TxHash</th><th>Date</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${(data.withdrawals && data.withdrawals.length) ? data.withdrawals.map(w => `
+                                        <tr>
+                                            <td>#${w.id}</td>
+                                            <td>$${Number(w.amount || 0).toFixed(2)}</td>
+                                            <td style="color: var(--emerald-text); font-weight: 700;">$${Number(w.net_amount || 0).toFixed(2)}</td>
+                                            <td class="font-mono" style="font-size: 0.7rem;">
+                                                ${w.transaction_hash ? `<a href="https://bscscan.com/tx/${w.transaction_hash}" target="_blank" style="color: var(--primary);">${w.transaction_hash.slice(0,8)}...</a>` : '—'}
+                                            </td>
+                                            <td style="font-size: 0.72rem;">${w.created_at}</td>
+                                        </tr>
+                                    `).join('') : `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 10px;">No working withdrawals yet</td></tr>`}
                                 </tbody>
                             </table>
                         </div>
@@ -2453,6 +2759,104 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = `cyera_users_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+        }
+
+        // ============================================================
+        // WORKING WITHDRAWALS & PAYOUT LEDGER FILTERS + CSV EXPORT
+        // ============================================================
+        function setWithdrawalCategoryQuick(cat) {
+            const select = document.getElementById('withdrawalCategoryFilter');
+            if (select) select.value = cat;
+
+            const pillWorking = document.getElementById('pillWorkingOnly');
+            const pillAll = document.getElementById('pillAllWithdrawals');
+            const pillRoi = document.getElementById('pillRoiOnly');
+            [pillWorking, pillAll, pillRoi].forEach(btn => {
+                if (btn) btn.classList.remove('primary');
+            });
+            if (cat === 'working' && pillWorking) pillWorking.classList.add('primary');
+            else if (cat === 'all' && pillAll) pillAll.classList.add('primary');
+            else if (cat === 'roi' && pillRoi) pillRoi.classList.add('primary');
+
+            filterWithdrawalsTable();
+        }
+
+        function filterWithdrawalsTable() {
+            const query = (document.getElementById('withdrawalSearchInput')?.value || '').toLowerCase().trim();
+            const cat = document.getElementById('withdrawalCategoryFilter')?.value || 'all';
+            const status = document.getElementById('withdrawalStatusFilter')?.value || 'all';
+            const dateFrom = document.getElementById('withdrawalDateFrom')?.value || '';
+            const dateTo = document.getElementById('withdrawalDateTo')?.value || '';
+
+            let visibleCount = 0;
+            document.querySelectorAll('#withdrawalsTable tbody tr.withdrawal-row').forEach(row => {
+                const rowCat = row.getAttribute('data-category') || '';
+                const rowStatus = row.getAttribute('data-status') || '';
+                const rowDate = row.getAttribute('data-date') || '';
+                const rowSearch = row.getAttribute('data-search') || '';
+
+                const matchQuery = !query || rowSearch.includes(query);
+                const matchCat = (cat === 'all') || (rowCat === cat);
+                const matchStatus = (status === 'all') || (rowStatus === status);
+                const matchFrom = !dateFrom || (rowDate >= dateFrom);
+                const matchTo = !dateTo || (rowDate <= dateTo);
+
+                const show = matchQuery && matchCat && matchStatus && matchFrom && matchTo;
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            const countEl = document.getElementById('withdrawalFilteredCount');
+            if (countEl) countEl.innerText = visibleCount;
+        }
+
+        function resetWithdrawalFilters() {
+            const sInput = document.getElementById('withdrawalSearchInput');
+            const cSelect = document.getElementById('withdrawalCategoryFilter');
+            const stSelect = document.getElementById('withdrawalStatusFilter');
+            const dFrom = document.getElementById('withdrawalDateFrom');
+            const dTo = document.getElementById('withdrawalDateTo');
+
+            if (sInput) sInput.value = '';
+            if (cSelect) cSelect.value = 'all';
+            if (stSelect) stSelect.value = 'all';
+            if (dFrom) dFrom.value = '';
+            if (dTo) dTo.value = '';
+
+            setWithdrawalCategoryQuick('all');
+        }
+
+        function exportWithdrawalsToCSV() {
+            let csv = "ID,UUID,Name,Category,Income_Breakdown,Gross_USDT,Fee_USDT,Net_Paid_USDT,Recipient_Wallet,Tx_Hash,Status,Date_Time\n";
+            document.querySelectorAll('#withdrawalsTable tbody tr.withdrawal-row').forEach(row => {
+                if (row.style.display === 'none') return;
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 11) {
+                    const id = cols[0].innerText.trim();
+                    const memberParts = cols[1].innerText.split('\n').map(s => s.trim());
+                    const uuid = memberParts[0] || '';
+                    const name = memberParts[1] || '';
+                    const cat = cols[2].innerText.replace(/\n/g, ' ').trim();
+                    const breakdown = cols[3].innerText.replace(/\n/g, ' | ').trim();
+                    const gross = cols[4].innerText.replace('$', '').trim();
+                    const fee = cols[5].innerText.replace('-$', '').replace('$', '').trim();
+                    const net = cols[6].innerText.replace('$', '').trim();
+                    const walletLink = cols[7].querySelector('a');
+                    const wallet = walletLink ? (walletLink.getAttribute('title') || walletLink.innerText.trim()) : cols[7].innerText.trim();
+                    const txLink = cols[8].querySelector('a');
+                    const txHash = txLink ? (txLink.getAttribute('title') || txLink.innerText.trim()) : cols[8].innerText.trim();
+                    const status = cols[9].innerText.trim();
+                    const dt = cols[10].innerText.trim();
+                    csv += `"${id}","${uuid}","${name}","${cat}","${breakdown}","${gross}","${fee}","${net}","${wallet}","${txHash}","${status}","${dt}"\n`;
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cyera_withdrawals_report_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
         }
 
