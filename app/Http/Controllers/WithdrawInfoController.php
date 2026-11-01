@@ -33,18 +33,43 @@ class WithdrawInfoController extends Controller
         $caiPrice = $detail ? (float) $detail->price : 1.0;
         if ($caiPrice <= 0) $caiPrice = 1.0;
 
-        $poolRemaining = (float)\App\PoolIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt') + (float)$user->clubIncome()->where('status', 0)->sum('remaining_usdt');
+        $poolRemaining = (float)\App\PoolIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt')
+            + (float)$user->clubIncome()->where('status', 0)->sum('remaining_usdt')
+            + (float)\App\DaoIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt');
         $rankRemaining = (float)\App\RankIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt') + (float)$user->lifetimeIncome()->where('status', 0)->sum('remaining');
         $levelRemaining = (float)$user->levelIncome()->where('status', 0)->sum('remaining_usdt');
         $bonusRemaining = (float)$user->bonusReward()->where('status', '!=', 3)->sum('remaining_usdt');
 
         $workingRemainingUsdt = $levelRemaining + $bonusRemaining + $poolRemaining + $rankRemaining;
 
+        // Non-Working Balances (Staking ROI, Mined CAAI Holdings & Royal Jackpot)
+        $unminedRoiCai = (float)\App\CpsIncome::where('userid', $user->id)->where('status', 0)->sum('remaining');
+        $unminedRoiUsdt = (float)\App\CpsIncome::where('userid', $user->id)->where('status', 0)->sum('remaining_usdt');
+        if ($unminedRoiUsdt <= 0 && $unminedRoiCai > 0) {
+            $unminedRoiUsdt = $unminedRoiCai * $caiPrice;
+        }
+        $minedHoldingCai = (float)($user->cai_balance ?? 0);
+        $minedHoldingUsdt = $minedHoldingCai * $caiPrice;
+        $royalJackpotUsdt = (float)($user->royal_wallet ?? 0);
+        $nonWorkingRemainingUsdt = $unminedRoiUsdt + $minedHoldingUsdt + $royalJackpotUsdt;
+        $isDaoMember = $user ? $user->isDaoMember() : false;
+
         return view('user.withdrawrequest')
             ->with('detail', $detail)
             ->with('user', $user)
             ->with('remaining', $remainingTxn)
             ->with('workingRemainingUsdt', $workingRemainingUsdt)
+            ->with('bonusRemaining', $bonusRemaining)
+            ->with('levelRemaining', $levelRemaining)
+            ->with('poolRemaining', $poolRemaining)
+            ->with('rankRemaining', $rankRemaining)
+            ->with('unminedRoiCai', $unminedRoiCai)
+            ->with('unminedRoiUsdt', $unminedRoiUsdt)
+            ->with('minedHoldingCai', $minedHoldingCai)
+            ->with('minedHoldingUsdt', $minedHoldingUsdt)
+            ->with('royalJackpotUsdt', $royalJackpotUsdt)
+            ->with('nonWorkingRemainingUsdt', $nonWorkingRemainingUsdt)
+            ->with('isDaoMember', $isDaoMember)
             ->with('caiPrice', $caiPrice);
     }
 
@@ -73,6 +98,10 @@ class WithdrawInfoController extends Controller
         }
 
         $userDetail = \App\UserDetails::where('id', \Session::get('user.id'))->first();
+
+        if ($userDetail && $userDetail->isDaoMember()) {
+            return redirect()->back()->with('warning', 'Currently withdrawals are paused, please try again later.');
+        }
 
         if (!is_null($userDetail->assetDetail()) && $userDetail->assetDetail()->asset_status == 0) {
             return redirect('/User/WithdrawRequest')->with('warning', 'Conversion not permitted. Please contact Admin');
@@ -273,6 +302,13 @@ class WithdrawInfoController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
         }
 
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
+        }
+
         $grossAmount = (float) $request->amountusdt;
         if ($grossAmount < 1.0) {
             return response()->json(['status' => 'error', 'message' => 'Minimum working income withdrawal limit is $1.00 USDT.'], 400);
@@ -382,6 +418,13 @@ class WithdrawInfoController extends Controller
         $userDetail = \App\UserDetails::where('id', $userId)->first();
         if (!$userDetail) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
+        }
+
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
         }
 
         $txHash = strtolower(trim($request->tx_hash));
@@ -636,6 +679,7 @@ class WithdrawInfoController extends Controller
         $cappingInCai = ($caiPrice > 0) ? ($totalRemainingCapping / $caiPrice) : 0;
         $maxClaimableCai = min($roiRemainingCai, $cappingInCai);
         $maxClaimableUsdt = $maxClaimableCai * $caiPrice;
+        $isDaoMember = $user ? $user->isDaoMember() : false;
 
         return view('user.withdrawroirequest')
             ->with('detail', $detail)
@@ -647,6 +691,7 @@ class WithdrawInfoController extends Controller
             ->with('cappingInCai', $cappingInCai)
             ->with('maxClaimableCai', $maxClaimableCai)
             ->with('maxClaimableUsdt', $maxClaimableUsdt)
+            ->with('isDaoMember', $isDaoMember)
             ->with('caiPrice', $caiPrice);
     }
 
@@ -673,6 +718,10 @@ class WithdrawInfoController extends Controller
         }
 
         $userDetail = \App\UserDetails::where('id', \Session::get('user.id'))->first();
+
+        if ($userDetail && $userDetail->isDaoMember()) {
+            return redirect()->back()->with('warning', 'Currently withdrawals are paused, please try again later.');
+        }
 
         if (!is_null($userDetail->assetDetail()) && $userDetail->assetDetail()->asset_status == 0) {
             return redirect('/User/RoiWithdrawRequest')->with('warning', 'Conversion not permitted. Please contact Admin');
@@ -880,6 +929,10 @@ class WithdrawInfoController extends Controller
 
         $userDetail = \App\UserDetails::where('id', \Session::get('user.id'))->first();
 
+        if ($userDetail && $userDetail->isDaoMember()) {
+            return redirect()->back()->with('warning', 'Currently withdrawals are paused, please try again later.');
+        }
+
         if (!is_null($userDetail->assetDetail()) && $userDetail->assetDetail()->asset_status == 0) {
             return redirect('/User/LifetimeAchievementReward')->with('warning', 'Conversion not permitted. Please contact Admin');
         }
@@ -973,6 +1026,10 @@ class WithdrawInfoController extends Controller
         ])->validate();
 
         $userDetail = \App\UserDetails::where('id', \Session::get('user.id'))->first();
+
+        if ($userDetail && $userDetail->isDaoMember()) {
+            return redirect()->back()->with('warning', 'Currently withdrawals are paused, please try again later.');
+        }
 
         if (!is_null($userDetail->assetDetail()) && $userDetail->assetDetail()->asset_status == 0) {
             return redirect('/User/ClubReward')->with('warning', 'Conversion not permitted. Please contact Admin');

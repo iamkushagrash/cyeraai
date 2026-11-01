@@ -14,6 +14,7 @@
 @section('content')
     @php
         $workingUsdt = (float) ($workingRemainingUsdt ?? 0);
+        $isDao = (bool) ($isDaoMember ?? ($user ? $user->isDaoMember() : false));
         $destWallet = Session::get('user.walletaddress') ?? ($user->assetDetail()->usdtbep20addr ?? ($user->assetDetail()->usdttrc20addr ?? ''));
         if (empty($destWallet)) {
             $u = $user->user();
@@ -26,18 +27,85 @@
         $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7');
     @endphp
 
-    <!-- Top Balance Card -->
-    <div style="margin-bottom: 16px;">
-        <div class="mecha-metric-box" style="padding: 14px 16px;">
+    @if($isDao)
+    <!-- DAO Member Withdrawal Paused Banner -->
+    <div style="background: rgba(255, 77, 125, 0.12); border: 1px solid rgba(255, 77, 125, 0.45); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 77, 125, 0.18); color: #FF4D7D; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+            <i class="fas fa-pause-circle"></i>
+        </div>
+        <div>
+            <div style="font-size: 12.5px; font-weight: 800; color: #FF4D7D; text-transform: uppercase; letter-spacing: 0.4px;">
+                WITHDRAWALS PAUSED
+            </div>
+            <div style="font-size: 12px; color: #FFF; font-weight: 600; margin-top: 2px;">
+                Currently withdrawals are paused, please try again later.
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Working & Non-Working Balance Summary -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <!-- 1. Working Income Available -->
+        <div class="mecha-metric-box" style="padding: 14px 16px; border: 1px solid rgba(0, 255, 136, 0.25);">
             <div class="mecha-metric-lbl">
-                <span>AVAILABLE BALANCE</span>
+                <span>1. WORKING INCOME AVAILABLE</span>
                 <i class="fas fa-wallet" style="color: #00FF88;"></i>
             </div>
             <div class="mecha-metric-val green" style="font-size: 1.4rem; line-height: 1.2; margin: 4px 0;">
                 ${{ number_format($workingUsdt, 2) }} <small style="font-size: 12px; color: #A7F3D0;">USDT</small>
             </div>
-            <div class="mecha-metric-sub" style="color: #8C9BAE;">
-                Available for withdrawal
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 10.5px;">
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>Direct:</span>
+                    <b style="color: #00FF88;">${{ number_format((float)($bonusRemaining ?? 0), 2) }}</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>15-Level:</span>
+                    <b style="color: #00E5FF;">${{ number_format((float)($levelRemaining ?? 0), 2) }}</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>Pool / DAO:</span>
+                    <b style="color: #A855F7;">${{ number_format((float)($poolRemaining ?? 0), 2) }}</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>Rank / Salary:</span>
+                    <b style="color: #FFD700;">${{ number_format((float)($rankRemaining ?? 0), 2) }}</b>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Non-Working Income Available (Mining / ROI / Jackpot) -->
+        <div class="mecha-metric-box" style="padding: 14px 16px; border: 1px solid rgba(0, 229, 255, 0.25);">
+            <div class="mecha-metric-lbl">
+                <span>2. NON-WORKING INCOME (ROI &amp; MINING)</span>
+                <i class="fas fa-microchip" style="color: #00E5FF;"></i>
+            </div>
+            <div class="mecha-metric-val" style="font-size: 1.4rem; line-height: 1.2; margin: 4px 0; color: #00E5FF;">
+                ${{ number_format((float)($nonWorkingRemainingUsdt ?? 0), 2) }} <small style="font-size: 12px; color: #BAE6FD;">USDT Value</small>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 10.5px;">
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>Unmined ROI:</span>
+                    <b style="color: #FFD700;">${{ number_format((float)($unminedRoiUsdt ?? 0), 2) }}</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #8C9BAE;">
+                    <span>Mined CAAI:</span>
+                    <b style="color: #00E5FF;">{{ number_format((float)($minedHoldingCai ?? 0), 2) }} CAAI</b>
+                </div>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
+                <a href="{{ url('/User/Mining') }}" class="mecha-btn-outline" style="flex: 1; height: 28px; font-size: 10.5px; border-color: rgba(0,229,255,0.4); color: #00E5FF; justify-content: center;">
+                    <i class="fas fa-right-left"></i> Sell on DEX
+                </a>
+                <a href="{{ url('/User/RoiWithdrawRequest') }}" class="mecha-btn-outline" style="flex: 1; height: 28px; font-size: 10.5px; border-color: rgba(255,215,0,0.4); color: #FFD700; justify-content: center;">
+                    <i class="fas fa-coins"></i> ROI Claim
+                </a>
+                @if((float)($royalJackpotUsdt ?? 0) > 0)
+                <a href="{{ url('/User/RoyalJackpot') }}" class="mecha-btn-outline" style="height: 28px; padding: 0 10px; font-size: 10.5px; border-color: rgba(255,77,125,0.4); color: #FF4D7D; justify-content: center;">
+                    <i class="fas fa-crown"></i> ${{ number_format((float)$royalJackpotUsdt, 2) }}
+                </a>
+                @endif
             </div>
         </div>
     </div>
@@ -228,7 +296,21 @@
             }
         }
 
+        const IS_DAO_MEMBER = {{ $isDao ? 'true' : 'false' }};
+
         async function startInstantWithdrawal() {
+            if (IS_DAO_MEMBER) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'WITHDRAWALS PAUSED',
+                    text: 'Currently withdrawals are paused, please try again later.',
+                    background: '#0A0D15',
+                    color: '#FFF',
+                    confirmButtonColor: '#FF4D7D'
+                });
+                return;
+            }
+
             const input = document.getElementById('amountusdt');
             const grossAmt = parseFloat(input.value) || 0;
 

@@ -35,7 +35,25 @@
     }
 
     $destWallet = $user->assetDetail()->usdtbep20addr ?? ($user->assetDetail()->usdttrc20addr ?? '');
+    $isDao = (bool) ($isDaoMember ?? ($user ? $user->isDaoMember() : false));
 @endphp
+
+@if($isDao)
+<!-- DAO Member Withdrawal Paused Banner -->
+<div style="background: rgba(255, 77, 125, 0.12); border: 1px solid rgba(255, 77, 125, 0.45); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 77, 125, 0.18); color: #FF4D7D; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+        <i class="fas fa-pause-circle"></i>
+    </div>
+    <div>
+        <div style="font-size: 12.5px; font-weight: 800; color: #FF4D7D; text-transform: uppercase; letter-spacing: 0.4px;">
+            WITHDRAWALS PAUSED
+        </div>
+        <div style="font-size: 12px; color: #FFF; font-weight: 600; margin-top: 2px;">
+            Currently withdrawals are paused, please try again later.
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Top Mining Hub Link Banner -->
 <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
@@ -202,10 +220,17 @@
 
             <!-- Submit Button -->
             <div style="margin-top: 12px;">
-                <button type="submit" class="mecha-btn-gold" id="btnSubmitRoiWithdraw">
-                    <i class="fas fa-bolt"></i>
-                    <span>CLAIM STAKING ROI</span>
-                </button>
+                @if($isDao)
+                    <button type="button" class="mecha-btn-gold" onclick="alert('Currently withdrawals are paused, please try again later.');" style="background: rgba(255, 77, 125, 0.2); border-color: #FF4D7D; color: #FF4D7D;">
+                        <i class="fas fa-pause-circle"></i>
+                        <span>CURRENTLY WITHDRAWALS ARE PAUSED</span>
+                    </button>
+                @else
+                    <button type="submit" class="mecha-btn-gold" id="btnSubmitRoiWithdraw">
+                        <i class="fas fa-bolt"></i>
+                        <span>CLAIM STAKING ROI</span>
+                    </button>
+                @endif
             </div>
 
         </form>

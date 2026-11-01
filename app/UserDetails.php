@@ -589,6 +589,24 @@ class UserDetails extends Model
         return $this->hasMany('App\DaoIncome', 'userid', 'id');
     }
 
+    public function isDaoMember()
+    {
+        if (((int) ($this->is_dao ?? 0)) > 0) {
+            return true;
+        }
+        try {
+            $hasDaoDeposit = \App\StackingDeposite::where('userid', $this->id)
+                ->whereIn('usdt', [3333, 5555, 10000])
+                ->exists();
+            if ($hasDaoDeposit) {
+                return true;
+            }
+            return \App\DaoIncome::where('userid', $this->id)->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function getDaoDetails()
     {
         \App\Http\Controllers\DaoIncomeController::seedDaoDetails();

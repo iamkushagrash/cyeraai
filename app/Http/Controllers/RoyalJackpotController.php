@@ -532,6 +532,13 @@ class RoyalJackpotController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized or session expired.'], 401);
         }
 
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
+        }
+
         $requestedAmount = (float) $request->amount;
         $currentBalance = (float) ($userDetail->royal_wallet ?? 0.00);
 
@@ -605,6 +612,13 @@ class RoyalJackpotController extends Controller
         $userDetail = UserDetails::where('id', $userId)->orWhere('userid', $userId)->first();
         if (!$userDetail) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized or session expired.'], 401);
+        }
+
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
         }
 
         $txHash = strtolower(trim($request->tx_hash));

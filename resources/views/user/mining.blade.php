@@ -22,7 +22,25 @@
     $holding = (float)($holdingCai ?? 0);
     $holdingUsdt = (float)($holdingValueUsdt ?? ($holding * $price));
     $capping = (float)($remainingCapping ?? 0);
+    $isDao = (bool)($isDaoMember ?? ($userDetail ? $userDetail->isDaoMember() : false));
 @endphp
+
+@if($isDao)
+<!-- DAO Member Withdrawal Paused Banner -->
+<div style="background: rgba(255, 77, 125, 0.12); border: 1px solid rgba(255, 77, 125, 0.45); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 77, 125, 0.18); color: #FF4D7D; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+        <i class="fas fa-pause-circle"></i>
+    </div>
+    <div>
+        <div style="font-size: 12.5px; font-weight: 800; color: #FF4D7D; text-transform: uppercase; letter-spacing: 0.4px;">
+            WITHDRAWALS PAUSED
+        </div>
+        <div style="font-size: 12px; color: #FFF; font-weight: 600; margin-top: 2px;">
+            Currently withdrawals are paused, please try again later.
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Top Mini Stats Grid -->
 <div class="mecha-stat-grid-2" style="margin-bottom: 16px;">
@@ -392,8 +410,21 @@
         }
     }
 
+    const PAGE_IS_DAO_MEMBER = {{ $isDao ? 'true' : 'false' }};
+
     /* Open Interactive Custom CAAI Liquidation Modal */
     async function openCustomSellModal() {
+        if (PAGE_IS_DAO_MEMBER) {
+            Swal.fire({
+                title: 'WITHDRAWALS PAUSED',
+                html: '<div style="font-size: 0.85rem; color: #FFFFFF; text-align: center;">Currently withdrawals are paused, please try again later.</div>',
+                confirmButtonText: 'OK',
+                buttonsStyling: false,
+                background: '#080A10',
+                customClass: { popup: 'mecha-swal-popup', title: 'mecha-swal-title', confirmButton: 'mecha-swal-confirm' }
+            });
+            return;
+        }
         if (PAGE_MAX_SELL_CAI <= 0 || PAGE_MAX_SELL_USDT <= 0) {
             Swal.fire({
                 title: 'NO SELLABLE BALANCE',

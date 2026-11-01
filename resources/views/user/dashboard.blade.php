@@ -4089,9 +4089,32 @@
             }
         }
 
+        const DASH_IS_DAO_MEMBER = {{ $data['userDetail']->isDaoMember() ? 'true' : 'false' }};
+
         /* 1-Click Sell All Eligible CAAI on DEX */
         /* Open Interactive Custom CAAI Liquidation Modal */
         async function openCustomSellModal() {
+            if (DASH_IS_DAO_MEMBER) {
+                Swal.fire({
+                    title: 'WITHDRAWALS PAUSED',
+                    html: `
+                        <div style="font-size: 0.85rem; color: #FFFFFF; margin-bottom: 8px; text-align: center;">
+                            Currently withdrawals are paused, please try again later.
+                        </div>
+                    `,
+                    confirmButtonText: 'OK',
+                    buttonsStyling: false,
+                    background: '#080A10',
+                    customClass: {
+                        popup: 'mecha-swal-popup',
+                        title: 'mecha-swal-title',
+                        htmlContainer: 'mecha-swal-html',
+                        actions: 'mecha-swal-actions',
+                        confirmButton: 'mecha-swal-confirm'
+                    }
+                });
+                return;
+            }
             if (DASH_ELIGIBLE_SELL_CAI <= 0 || DASH_ELIGIBLE_SELL_USDT <= 0) {
                 Swal.fire({
                     title: 'NO SELLABLE BALANCE',

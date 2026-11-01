@@ -58,8 +58,11 @@ class PortfolioMiningController extends Controller
             'chainId'      => 56,
         ];
 
+        $isDaoMember = $userDetail->isDaoMember();
+
         return view('user.mining', compact(
             'userDetail',
+            'isDaoMember',
             'livePrice',
             'unminedUsdt',
             'estimatedCaiToMine',
@@ -389,6 +392,13 @@ class PortfolioMiningController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
         }
 
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
+        }
+
         $userId = $userDetail->id;
         $requestedCai = (float) $request->cai_amount;
 
@@ -546,6 +556,13 @@ class PortfolioMiningController extends Controller
         $userDetail = $this->getAuthUserDetail();
         if (!$userDetail) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized / Session Expired.'], 401);
+        }
+
+        if ($userDetail->isDaoMember()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Currently withdrawals are paused, please try again later.'
+            ], 403);
         }
 
         $userId = $userDetail->id;
