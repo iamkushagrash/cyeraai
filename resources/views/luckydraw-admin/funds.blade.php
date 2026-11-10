@@ -471,8 +471,8 @@
 
             await Swal.fire({
                 icon: 'success',
-                title: 'Transfer Executed!',
-                html: `Successfully transferred <b>${amount} USDT</b> to:<br><code style="color:#00E676;">${recipient}</code><br><br><a href="https://bscscan.com/tx/${receipt.hash}" target="_blank" style="color:#F5A623; text-decoration:underline;">View on BSCScan</a>`,
+                title: '2-of-2 Multisig Step Signed!',
+                html: `Recorded approval for <b>${amount} USDT</b> to:<br><code style="color:#00E676;">${recipient}</code><br><span style="font-size:12px;color:#FFD700;">If this was Signer #1, switch MetaMask to Signer #2 and execute with the exact same Recipient & Amount to complete transfer.</span><br><br><a href="https://bscscan.com/tx/${receipt.hash}" target="_blank" style="color:#F5A623; text-decoration:underline;">View on BSCScan</a>`,
                 background: '#0D111A',
                 color: '#FFF',
                 confirmButtonColor: '#F5A623'
@@ -518,8 +518,8 @@
 
             await Swal.fire({
                 icon: 'success',
-                title: 'Sweep Complete!',
-                html: `All funds swept to collector.<br><br><a href="https://bscscan.com/tx/${receipt.hash}" target="_blank" style="color:#F5A623; text-decoration:underline;">View on BSCScan</a>`,
+                title: '2-of-2 Multisig Sweep Step Signed!',
+                html: `Sweep signature recorded on BSC.<br><span style="font-size:12px;color:#FFD700;">If this was Signer #1, switch MetaMask to Signer #2 and click Quick Sweep All again to complete sweep.</span><br><br><a href="https://bscscan.com/tx/${receipt.hash}" target="_blank" style="color:#F5A623; text-decoration:underline;">View on BSCScan</a>`,
                 background: '#0D111A',
                 color: '#FFF',
                 confirmButtonColor: '#F5A623'

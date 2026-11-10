@@ -413,17 +413,17 @@
                     <div class="cp-icon token"><i class="fas fa-coins"></i></div>
                     <div class="cp-meta">
                         <div class="cp-tag">CAAI Token Contract</div>
-                        <div class="cp-addr">0x1931...1a43</div>
+                        <div class="cp-addr">0xbb4b...B8eC</div>
                     </div>
                 </div>
                 <div class="cp-actions">
-                    <button class="btn-cp-action" onclick="copyAddress('0x193149028a3C83009Ecda6D5E76f1abD62E51a43', 'CAAI Token Address')" title="Copy Token Address">
+                    <button class="btn-cp-action" onclick="copyAddress('0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC', 'CAAI Token Address')" title="Copy Token Address">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <a href="https://bscscan.com/token/0x193149028a3C83009Ecda6D5E76f1abD62E51a43" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAAI Token on BscScan">
+                    <a href="https://bscscan.com/token/0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAAI Token on BscScan">
                         <i class="fas fa-arrow-up-right-from-square"></i>
                     </a>
-                    <a href="https://dexscreener.com/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="Live Chart on DexScreener" style="color: #00FF88;">
+                    <a href="https://dexscreener.com/bsc/0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="Live Chart on DexScreener" style="color: #00FF88;">
                         <i class="fas fa-chart-line"></i>
                     </a>
                 </div>
@@ -435,14 +435,14 @@
                     <div class="cp-icon invest"><i class="fas fa-shield-halved"></i></div>
                     <div class="cp-meta">
                         <div class="cp-tag">Cyera Mining Engine</div>
-                        <div class="cp-addr">0x61e1...fbb6</div>
+                        <div class="cp-addr">0x5E93...29B1</div>
                     </div>
                 </div>
                 <div class="cp-actions">
-                    <button class="btn-cp-action" onclick="copyAddress('0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6', 'Mining Engine Address')" title="Copy Mining Engine Address">
+                    <button class="btn-cp-action" onclick="copyAddress('0x5E9358b18A2467978f6813672aC8b66e5FA229B1', 'Mining Engine Address')" title="Copy Mining Engine Address">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <a href="https://bscscan.com/address/0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
+                    <a href="https://bscscan.com/address/0x5E9358b18A2467978f6813672aC8b66e5FA229B1" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
                         <i class="fas fa-arrow-up-right-from-square"></i>
                     </a>
                 </div>
@@ -488,7 +488,7 @@
                             <span style="font-size: 0.52rem; padding: 1px 4px; border-radius: 3px; background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); font-weight: 800; font-family: 'Space Mono', monospace;">PANCAKESWAP</span>
                         </div>
                         <div style="font-size: 0.58rem; color: rgba(255, 255, 255, 0.5); font-family: 'Space Mono', monospace;">
-                            Pool: <a href="https://bscscan.com/address/0x17C405d90e8d112c340698EE2b09EB31FF72f730" target="_blank" style="color: #FFD700; text-decoration: none;">0x17C4...f730 <i class="fas fa-external-link-alt" style="font-size: 7px;"></i></a>
+                            Pool: <a href="https://bscscan.com/address/0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e" target="_blank" style="color: #FFD700; text-decoration: none;">0xBD51...Bc2e <i class="fas fa-external-link-alt" style="font-size: 7px;"></i></a>
                         </div>
                     </div>
                 </div>
@@ -567,17 +567,17 @@
                     }
                 </style>
                 <div id="landing-chart-frame">
-                    <iframe src="https://www.geckoterminal.com/bsc/pools/0x17C405d90e8d112c340698EE2b09EB31FF72f730?embed=1&info=0&swaps=0&grayscale=0&light_chart=0" allowfullscreen></iframe>
+                    <iframe src="https://www.geckoterminal.com/bsc/pools/0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e?embed=1&info=0&swaps=0&grayscale=0&light_chart=0" allowfullscreen></iframe>
                 </div>
             </div>
 
             <!-- Footer Buttons (Ultra Compact) -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <a href="https://pancakeswap.finance/swap?outputCurrency=0x193149028a3C83009Ecda6D5E76f1abD62E51a43" target="_blank" class="btn-primary" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
+                    <a href="https://pancakeswap.finance/swap?outputCurrency=0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC" target="_blank" class="btn-primary" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
                         <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
                     </a>
-                    <a href="https://dexscreener.com/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730" target="_blank" class="btn-ghost" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
+                    <a href="https://dexscreener.com/bsc/0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e" target="_blank" class="btn-ghost" style="padding: 5px 10px; font-size: 0.68rem; border-radius: 6px;">
                         <i class="fas fa-chart-line"></i> Full DexScreener
                     </a>
                 </div>
@@ -764,13 +764,13 @@
                         <div class="vc-item">
                             <div class="vc-left">
                                 <div class="vc-title"><i class="fas fa-coins" style="color:#FFD700;margin-right:4px;"></i> CAAI Token Contract</div>
-                                <div class="vc-hash" title="0x193149028a3C83009Ecda6D5E76f1abD62E51a43">0x1931...1a43</div>
+                                <div class="vc-hash" title="0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC">0xbb4b...B8eC</div>
                             </div>
                             <div class="vc-actions">
-                                <button class="btn-cp-action" onclick="copyAddress('0x193149028a3C83009Ecda6D5E76f1abD62E51a43', 'CAAI Token Address')" title="Copy Token Address">
+                                <button class="btn-cp-action" onclick="copyAddress('0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC', 'CAAI Token Address')" title="Copy Token Address">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/token/0x193149028a3C83009Ecda6D5E76f1abD62E51a43" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAAI Token on BscScan">
+                                <a href="https://bscscan.com/token/0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View CAAI Token on BscScan">
                                     <i class="fas fa-arrow-up-right-from-square"></i>
                                 </a>
                             </div>
@@ -779,13 +779,13 @@
                         <div class="vc-item">
                             <div class="vc-left">
                                 <div class="vc-title"><i class="fas fa-shield-halved" style="color:#00FF88;margin-right:4px;"></i> Cyera Mining Engine</div>
-                                <div class="vc-hash" title="0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6">0x61e1...fbb6</div>
+                                <div class="vc-hash" title="0x5E9358b18A2467978f6813672aC8b66e5FA229B1">0x5E93...29B1</div>
                             </div>
                             <div class="vc-actions">
-                                <button class="btn-cp-action" onclick="copyAddress('0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6', 'Mining Engine Address')" title="Copy Mining Engine Address">
+                                <button class="btn-cp-action" onclick="copyAddress('0x5E9358b18A2467978f6813672aC8b66e5FA229B1', 'Mining Engine Address')" title="Copy Mining Engine Address">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
+                                <a href="https://bscscan.com/address/0x5E9358b18A2467978f6813672aC8b66e5FA229B1" target="_blank" rel="noopener noreferrer" class="btn-cp-action" title="View Mining Engine on BscScan">
                                     <i class="fas fa-arrow-up-right-from-square"></i>
                                 </a>
                             </div>
@@ -914,16 +914,52 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // === REAL-TIME DEXSCREENER TELEMETRY POLLING ===
 async function fetchLandingDexTelemetry() {
     try {
-        const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data || !data.pairs || data.pairs.length === 0) return;
+        const pairAddr = '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e';
+        const caiAddr = '0xbb4bf90d809974606a832cad2628ae35fe7bb8ec';
+        let priceUsd = 0, change24h = 0, vol24h = 0, liquidityUsd = 0;
 
-        const pair = data.pairs[0];
-        const priceUsd = parseFloat(pair.priceUsd) || 0;
-        const change24h = parseFloat(pair.priceChange?.h24) || 0;
-        const vol24h = parseFloat(pair.volume?.h24) || 0;
-        const liquidityUsd = parseFloat(pair.liquidity?.usd) || 0;
+        try {
+            const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/' + pairAddr);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.pairs && data.pairs.length > 0) {
+                    const pair = data.pairs[0];
+                    priceUsd = parseFloat(pair.priceUsd) || 0;
+                    change24h = parseFloat(pair.priceChange?.h24) || 0;
+                    vol24h = parseFloat(pair.volume?.h24) || 0;
+                    liquidityUsd = parseFloat(pair.liquidity?.usd) || 0;
+                }
+            }
+        } catch (dexErr) {}
+
+        if (priceUsd <= 0) {
+            const rpcRes = await fetch('https://bsc-dataseed.binance.org/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([
+                    { jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ to: pairAddr, data: '0x0902f1ac' }, 'latest'] },
+                    { jsonrpc: '2.0', id: 2, method: 'eth_call', params: [{ to: pairAddr, data: '0x0dfe1681' }, 'latest'] }
+                ])
+            });
+            if (rpcRes.ok) {
+                const batch = await rpcRes.json();
+                const resHex = batch?.[0]?.result;
+                const t0Hex = batch?.[1]?.result;
+                if (resHex && resHex.length >= 130 && t0Hex) {
+                    const r0 = Number(BigInt('0x' + resHex.slice(2, 66))) / 1e18;
+                    const r1 = Number(BigInt('0x' + resHex.slice(66, 130))) / 1e18;
+                    const token0 = ('0x' + t0Hex.slice(-40)).toLowerCase();
+                    const rCaai = token0 === caiAddr ? r0 : r1;
+                    const rUsdt = token0 === caiAddr ? r1 : r0;
+                    if (rCaai > 0 && rUsdt > 0) {
+                        priceUsd = rUsdt / rCaai;
+                        liquidityUsd = rUsdt * 2;
+                    }
+                }
+            }
+        }
+
+        if (priceUsd <= 0) return;
 
         // Nav price
         const navEl = document.getElementById('navLivePrice');

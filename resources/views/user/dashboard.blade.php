@@ -1100,8 +1100,10 @@
                     $eligibleSellCai = ($caiPrice > 0 && $eligibleSellUsdt > 0) ? min($protocolHoldingCai, round($eligibleSellUsdt / $caiPrice, 6)) : 0;
                     $excessReserveCai = max(0, round($protocolHoldingCai - $eligibleSellCai, 6));
 
-                    $miningEngineContract = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
-                    $pancakePairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730');
+                    $miningEngineContract = env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1';
+                    $pancakePairAddress = env('PANCAKESWAP_PAIR_ADDRESS') ?: '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e';
+                    $caiTokenContract = env('CAI_TOKEN_ADDRESS') ?: '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC';
+                    $pancakePairShort = substr($pancakePairAddress, 0, 6) . '...' . substr($pancakePairAddress, -4);
                 @endphp
 
                 <!-- ============================================================
@@ -1886,10 +1888,10 @@
                                         style="font-size: 0.64rem; color: #8E99A8; display: flex; align-items: center; gap: 4px; margin-top: 1px;">
                                         <span>BNB Smart Chain (BSC)</span>
                                         <span style="color: #4A5568;">•</span>
-                                        <a href="https://bscscan.com/address/0x17C405d90e8d112c340698EE2b09EB31FF72f730"
+                                        <a href="https://bscscan.com/address/{{ $pancakePairAddress }}"
                                             target="_blank"
                                             style="color: #FFD700; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 0.60rem;">
-                                            0x17C4...f730 <i class="fas fa-external-link-alt"
+                                            {{ $pancakePairShort }} <i class="fas fa-external-link-alt"
                                                 style="font-size: 8px;"></i>
                                         </a>
                                     </div>
@@ -2003,7 +2005,7 @@
                             </style>
                             <div id="dexscreener-embed-box">
                                 <iframe
-                                    src="https://www.geckoterminal.com/bsc/pools/0x17C405d90e8d112c340698EE2b09EB31FF72f730?embed=1&info=0&swaps=0&grayscale=0&light_chart=0"
+                                    src="https://www.geckoterminal.com/bsc/pools/{{ $pancakePairAddress }}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0"
                                     allowfullscreen></iframe>
                             </div>
                         </div>
@@ -2012,19 +2014,19 @@
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(245, 166, 35, 0.12);">
                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                <a href="https://pancakeswap.finance/swap?outputCurrency=0x193149028a3C83009Ecda6D5E76f1abD62E51a43"
+                                <a href="https://pancakeswap.finance/swap?outputCurrency={{ $caiTokenContract }}"
                                     target="_blank" class="btn-solid-gold-claim"
                                     style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 800;">
                                     <i class="fas fa-arrow-right-arrow-left"></i> Trade on PancakeSwap
                                 </a>
-                                <a href="https://dexscreener.com/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730"
+                                <a href="https://dexscreener.com/bsc/{{ $pancakePairAddress }}"
                                     target="_blank" class="mecha-btn-outline"
                                     style="height: 25px; padding: 0 8px; font-size: 0.65rem; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(245, 166, 35, 0.4); color: #FFD700;">
                                     <i class="fas fa-chart-line"></i> Full DexScreener
                                 </a>
                             </div>
                             <div style="font-size: 0.58rem; color: #8E99A8; font-family: 'Space Mono', monospace;">
-                                Pair: 0x17C4...f730
+                                Pair: {{ $pancakePairShort }}
                             </div>
                         </div>
                     </div>
@@ -4431,7 +4433,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
-                        tx_hash: receipt.transactionHash,
+                        tx_hash: receipt.hash || receipt.transactionHash || tx.hash,
                         cai_amount: d.caiAmount,
                         gross_cai: d.grossCai,
                         usdt_received: d.netUsdt,
@@ -4502,18 +4504,55 @@
         // ============================================================
         async function fetchDexMarketTelemetry() {
             try {
-                const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/0x17C405d90e8d112c340698EE2b09EB31FF72f730', {
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!res.ok) return;
-                const data = await res.json();
-                if (!data || !data.pairs || data.pairs.length === 0) return;
+                const pairAddr = "{{ $pancakePairAddress }}";
+                const caiAddr = "{{ $caiTokenContract }}".toLowerCase();
+                let priceUsd = 0, change24h = 0, vol24h = 0, liquidityUsd = 0;
 
-                const pair = data.pairs[0];
-                const priceUsd = parseFloat(pair.priceUsd) || 0;
-                const change24h = parseFloat(pair.priceChange?.h24) || 0;
-                const vol24h = parseFloat(pair.volume?.h24) || 0;
-                const liquidityUsd = parseFloat(pair.liquidity?.usd) || 0;
+                try {
+                    const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/' + pairAddr, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.pairs && data.pairs.length > 0) {
+                            const pair = data.pairs[0];
+                            priceUsd = parseFloat(pair.priceUsd) || 0;
+                            change24h = parseFloat(pair.priceChange?.h24) || 0;
+                            vol24h = parseFloat(pair.volume?.h24) || 0;
+                            liquidityUsd = parseFloat(pair.liquidity?.usd) || 0;
+                        }
+                    }
+                } catch (dexErr) {}
+
+                // On-Chain PancakeSwap getReserves() Fallback if DexScreener hasn't indexed fresh pool yet
+                if (priceUsd <= 0) {
+                    const rpcRes = await fetch('https://bsc-dataseed.binance.org/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify([
+                            { jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ to: pairAddr, data: '0x0902f1ac' }, 'latest'] },
+                            { jsonrpc: '2.0', id: 2, method: 'eth_call', params: [{ to: pairAddr, data: '0x0dfe1681' }, 'latest'] }
+                        ])
+                    });
+                    if (rpcRes.ok) {
+                        const batch = await rpcRes.json();
+                        const resHex = batch?.[0]?.result;
+                        const t0Hex = batch?.[1]?.result;
+                        if (resHex && resHex.length >= 130 && t0Hex) {
+                            const r0 = Number(BigInt('0x' + resHex.slice(2, 66))) / 1e18;
+                            const r1 = Number(BigInt('0x' + resHex.slice(66, 130))) / 1e18;
+                            const token0 = ('0x' + t0Hex.slice(-40)).toLowerCase();
+                            const rCaai = token0 === caiAddr ? r0 : r1;
+                            const rUsdt = token0 === caiAddr ? r1 : r0;
+                            if (rCaai > 0 && rUsdt > 0) {
+                                priceUsd = rUsdt / rCaai;
+                                liquidityUsd = rUsdt * 2;
+                            }
+                        }
+                    }
+                }
+
+                if (priceUsd <= 0) return;
 
                 // Update Live Rate Display
                 const priceEl = document.getElementById('dexLivePriceDisplay');

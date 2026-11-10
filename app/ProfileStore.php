@@ -26,7 +26,9 @@ class ProfileStore extends Model
             return self::$cachedLivePrice;
         }
 
-        $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730');
+        $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS') ?: '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e';
+        $caiAddress = env('CAI_TOKEN_ADDRESS') ?: '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC';
+        $usdtAddress = env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955';
         $livePrice = null;
 
         // 1. Fetch live DEX price from DexScreener API with fast cURL timeout
@@ -48,6 +50,50 @@ class ProfileStore extends Model
             }
         } catch (\Exception $e) {
             Log::warning("DexScreener live price fetch error: " . $e->getMessage());
+        }
+
+        // 1B. Direct On-Chain PancakeSwap Pair getReserves() Fallback (Instant live price even before DexScreener indexes)
+        if (!$livePrice || $livePrice <= 0) {
+            try {
+                $rpcUrl = env('BSC_MAINNET_RPC') ?: 'https://bsc-dataseed.binance.org/';
+                $payload = json_encode([
+                    'jsonrpc' => '2.0',
+                    'id' => 1,
+                    'method' => 'eth_call',
+                    'params' => [
+                        ['to' => $pairAddress, 'data' => '0x0902f1ac'], // getReserves()
+                        'latest'
+                    ]
+                ]);
+                $ch = curl_init($rpcUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $res = curl_exec($ch);
+                curl_close($ch);
+
+                if ($res) {
+                    $json = json_decode($res, true);
+                    if (isset($json['result']) && strlen($json['result']) >= 130) {
+                        $hex = substr($json['result'], 2);
+                        $r0 = (float) hexdec(substr($hex, 0, 64));
+                        $r1 = (float) hexdec(substr($hex, 64, 64));
+                        if ($r0 > 0 && $r1 > 0) {
+                            // UniswapV2 / PancakeSwapV2 deterministically orders token0 < token1 by lowercase hex address
+                            $isCaaiToken0 = strtolower($caiAddress) < strtolower($usdtAddress);
+                            $onChainPrice = $isCaaiToken0 ? ($r1 / $r0) : ($r0 / $r1);
+                            if ($onChainPrice > 0.0001 && $onChainPrice < 100000) {
+                                $livePrice = round($onChainPrice, 6);
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::warning("On-chain getReserves live price fallback error: " . $e->getMessage());
+            }
         }
 
         if ($livePrice && $livePrice > 0) {

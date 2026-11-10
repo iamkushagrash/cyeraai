@@ -21,3 +21,17 @@ yarn-error.log
 *.zip
 bot/.env
 bot/node_modules/
+
+# Smart Contract Dev, Hardhat Scripts, Bots & Temp Files (Local Only — Never Deploy to Server)
+/contracts
+/artifacts
+/cache
+/bot
+/hardhat.config.js
+/CAIToken_StandardJson.json
+/.appdata
+/.localappdata
+/.rnd
+/tatus
+/crop_icon.php
+/test_render.php

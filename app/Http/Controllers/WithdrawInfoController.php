@@ -360,7 +360,7 @@ class WithdrawInfoController extends Controller
         $withdrawalId = (string) (time() . rand(100, 999));
         $expiry = (string) (time() + 600);
 
-        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7');
+        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS') ?: '0xbb477d137Ca76605695c3c36dE352648Bf8Ef238';
         $chainId = "56"; // BSC Mainnet
         $privateKey = env('SIGNER_PRIVATE_KEY');
         if (empty($privateKey)) {
@@ -472,7 +472,7 @@ class WithdrawInfoController extends Controller
             \App\TransactionInfo::create([
                 'txnid'            => $insTxn,
                 'payment_addr'     => $recipient,
-                'payee_addr'       => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7'),
+                'payee_addr'       => env('USDT_WITHDRAWAL_VAULT_ADDRESS') ?: '0xbb477d137Ca76605695c3c36dE352648Bf8Ef238',
                 'transaction_hash' => $txHash,
                 'created_at'       => date('Y-m-d H:i:s'),
             ]);

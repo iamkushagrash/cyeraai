@@ -3,19 +3,23 @@
 @endphp
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CYERA AI — Executive Governance & MLM Command Center</title>
-    <meta name="description" content="Decentralized Smart Contract Owner & MLM Administrative Command Center for Cyera Protocol on BNB Smart Chain.">
+    <meta name="description"
+        content="Decentralized Smart Contract Owner & MLM Administrative Command Center for Cyera Protocol on BNB Smart Chain.">
     <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
-    
+
     <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Ethers.js for Web3 Blockchain Controls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
 
@@ -26,27 +30,27 @@
             --bg-elevated: #f1f5f9;
             --border: #e2e8f0;
             --border-hover: #cbd5e1;
-            
+
             --text-heading: #0f172a;
             --text-body: #334155;
             --text-muted: #64748b;
             --text-light: #94a3b8;
-            
+
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --primary-soft: #eef2ff;
             --primary-border: #c7d2fe;
-            
+
             --emerald: #10b981;
             --emerald-soft: #ecfdf5;
             --emerald-border: #a7f3d0;
             --emerald-text: #047857;
-            
+
             --amber: #f59e0b;
             --amber-soft: #fffbeb;
             --amber-border: #fde68a;
             --amber-text: #b45309;
-            
+
             --rose: #ef4444;
             --rose-soft: #fef2f2;
             --rose-border: #fecaca;
@@ -55,12 +59,12 @@
             --cyan: #06b6d4;
             --cyan-soft: #ecfeff;
             --cyan-border: #a5f3fc;
-            
+
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 20px;
-            
+
             --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             --shadow-float: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
@@ -180,9 +184,20 @@
         }
 
         @keyframes pulse-dot {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
         }
 
         .btn-wallet {
@@ -278,6 +293,7 @@
         .balance-card-hover {
             box-shadow: var(--shadow-subtle);
         }
+
         .balance-card-hover:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-float);
@@ -384,11 +400,30 @@
             font-size: 15px;
         }
 
-        .metric-icon-box.indigo { background: var(--primary-soft); color: var(--primary); }
-        .metric-icon-box.emerald { background: var(--emerald-soft); color: var(--emerald); }
-        .metric-icon-box.amber { background: var(--amber-soft); color: var(--amber); }
-        .metric-icon-box.rose { background: var(--rose-soft); color: var(--rose); }
-        .metric-icon-box.cyan { background: var(--cyan-soft); color: var(--cyan); }
+        .metric-icon-box.indigo {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .metric-icon-box.emerald {
+            background: var(--emerald-soft);
+            color: var(--emerald);
+        }
+
+        .metric-icon-box.amber {
+            background: var(--amber-soft);
+            color: var(--amber);
+        }
+
+        .metric-icon-box.rose {
+            background: var(--rose-soft);
+            color: var(--rose);
+        }
+
+        .metric-icon-box.cyan {
+            background: var(--cyan-soft);
+            color: var(--cyan);
+        }
 
         .metric-value {
             font-family: 'Outfit', sans-serif;
@@ -558,11 +593,35 @@
             line-height: 1;
         }
 
-        .badge-active { background: var(--emerald-soft); color: var(--emerald-text); border: 1px solid var(--emerald-border); }
-        .badge-inactive { background: var(--amber-soft); color: var(--amber-text); border: 1px solid var(--amber-border); }
-        .badge-blocked { background: var(--rose-soft); color: var(--rose-text); border: 1px solid var(--rose-border); }
-        .badge-indigo { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-border); }
-        .badge-cyan { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-border); }
+        .badge-active {
+            background: var(--emerald-soft);
+            color: var(--emerald-text);
+            border: 1px solid var(--emerald-border);
+        }
+
+        .badge-inactive {
+            background: var(--amber-soft);
+            color: var(--amber-text);
+            border: 1px solid var(--amber-border);
+        }
+
+        .badge-blocked {
+            background: var(--rose-soft);
+            color: var(--rose-text);
+            border: 1px solid var(--rose-border);
+        }
+
+        .badge-indigo {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border: 1px solid var(--primary-border);
+        }
+
+        .badge-cyan {
+            background: var(--cyan-soft);
+            color: var(--cyan);
+            border: 1px solid var(--cyan-border);
+        }
 
         /* Buttons & Actions */
         .btn-action {
@@ -826,8 +885,15 @@
         }
 
         @keyframes modalIn {
-            from { transform: scale(0.96); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from {
+                transform: scale(0.96);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -863,17 +929,21 @@
             .btn-mobile-toggle {
                 display: flex;
             }
+
             .header-actions .network-pill {
                 display: none;
             }
+
             .pool-banner {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .pool-stat-col {
                 border-left: none;
                 padding-left: 0;
             }
+
             .metric-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -883,19 +953,23 @@
             .portal-layout {
                 padding: 16px 12px 60px;
             }
+
             .metric-grid {
                 grid-template-columns: 1fr;
             }
+
             .tab-btn {
                 padding: 8px 12px;
                 font-size: 0.78rem;
             }
+
             .btn-wallet span {
                 display: none;
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Top Sticky Header -->
@@ -907,7 +981,7 @@
                 </div>
                 <div>
                     <div class="brand-title">
-                        CYERA AI <span class="brand-badge">Protocol V2</span>
+                        CYERA AI <span class="brand-badge">Protocol V3</span>
                     </div>
                     <div class="brand-sub">MLM & Smart Contract Command Center</div>
                 </div>
@@ -921,16 +995,18 @@
 
                 @if(Session::has('contract_admin_wallet'))
                     @if($isSubAdminUser)
-                    <div class="auth-wallet-pill" style="border-color: #fde68a; background: #fffbeb;" title="Subadmin Wallet: {{ Session::get('contract_admin_wallet') }}">
-                        <i class="fa-solid fa-user-shield" style="color: #b45309;"></i>
-                        <span style="font-weight: 700; color: #b45309; font-size: 0.72rem;">SUBADMIN:</span>
-                        <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
-                    </div>
+                        <div class="auth-wallet-pill" style="border-color: #fde68a; background: #fffbeb;"
+                            title="Subadmin Wallet: {{ Session::get('contract_admin_wallet') }}">
+                            <i class="fa-solid fa-user-shield" style="color: #b45309;"></i>
+                            <span style="font-weight: 700; color: #b45309; font-size: 0.72rem;">SUBADMIN:</span>
+                            <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
+                        </div>
                     @else
-                    <div class="auth-wallet-pill" title="Authenticated Admin Wallet: {{ Session::get('contract_admin_wallet') }}">
-                        <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i>
-                        <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
-                    </div>
+                        <div class="auth-wallet-pill"
+                            title="Authenticated Admin Wallet: {{ Session::get('contract_admin_wallet') }}">
+                            <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i>
+                            <span>{{ substr(Session::get('contract_admin_wallet'), 0, 6) }}...{{ substr(Session::get('contract_admin_wallet'), -4) }}</span>
+                        </div>
                     @endif
                 @endif
 
@@ -939,7 +1015,7 @@
                     <span id="walletBtnText">Connect Wallet</span>
                 </button>
 
-                <a href="{{ url('/dishi/yashi/logout') }}" class="btn-logout" title="Sign Out of Command Center">
+                <a href="{{ url('/dora/the/explorer/logout') }}" class="btn-logout" title="Sign Out of Command Center">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <span>Logout</span>
                 </a>
@@ -972,19 +1048,26 @@
                 <i class="fa-solid fa-vault"></i> Stakings (${{ number_format($stakingSummary['totalUsdt'], 0) }})
             </button>
             <button class="tab-btn" onclick="switchTab('tab-withdrawals', this)">
-                <i class="fa-solid fa-money-bill-transfer"></i> Working Withdrawals (${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 0) }})
+                <i class="fa-solid fa-money-bill-transfer"></i> Working Withdrawals
+                (${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 0) }})
             </button>
             @if(!$isSubAdminUser)
-            <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
-                <i class="fa-solid fa-cube"></i> Smart Contract Hub
-            </button>
-            <a href="{{ url('/dishi/yashi/contracts') }}" class="tab-btn" style="text-decoration: none; background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; font-weight: 700;">
-                <i class="fa-solid fa-gears"></i> Contract Functions Console <span class="badge" style="background: #4f46e5; color: #ffffff; font-size: 9px; padding: 2px 6px; border-radius: 999px; margin-left: 4px;">NEW PAGE</span>
-            </a>
+                <button class="tab-btn" onclick="switchTab('tab-contracts', this)">
+                    <i class="fa-solid fa-cube"></i> Smart Contract Hub
+                </button>
+                <a href="{{ url('/dora/the/explorer/contracts') }}" class="tab-btn"
+                    style="text-decoration: none; background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; font-weight: 700;">
+                    <i class="fa-solid fa-gears"></i> Contract Functions Console <span class="badge"
+                        style="background: #4f46e5; color: #ffffff; font-size: 9px; padding: 2px 6px; border-radius: 999px; margin-left: 4px;">NEW
+                        PAGE</span>
+                </a>
             @else
-            <button class="tab-btn" style="opacity: 0.6; cursor: not-allowed; background: #f8fafc; color: var(--text-muted);" title="Smart contract operations restricted to Owner" onclick="alert('Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.')">
-                <i class="fa-solid fa-lock"></i> Smart Contracts (Owner Only)
-            </button>
+                <button class="tab-btn"
+                    style="opacity: 0.6; cursor: not-allowed; background: #f8fafc; color: var(--text-muted);"
+                    title="Smart contract operations restricted to Owner"
+                    onclick="alert('Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.')">
+                    <i class="fa-solid fa-lock"></i> Smart Contracts (Owner Only)
+                </button>
             @endif
         </div>
 
@@ -992,14 +1075,16 @@
         <!-- TAB 1: OVERVIEW DASHBOARD                                 -->
         <!-- ======================================================== -->
         <div id="tab-overview" class="tab-content-panel">
-            
+
             <!-- Live Pool Banner -->
             <div class="pool-banner">
                 <div>
-                    <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; opacity: 0.9; letter-spacing: 0.05em;">
+                    <div
+                        style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; opacity: 0.9; letter-spacing: 0.05em;">
                         <i class="fa-solid fa-water"></i> PancakeSwap V2 Verified Liquidity Pool
                     </div>
-                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; margin: 4px 0 2px;">
+                    <div
+                        style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; margin: 4px 0 2px;">
                         CAAI / USDT Official Pair
                     </div>
                     <div style="font-size: 0.8rem; opacity: 0.85;" class="font-mono">
@@ -1010,27 +1095,31 @@
                 <div class="pool-stats-row">
                     <div class="pool-stat-col">
                         <div class="pool-stat-label">Live CAAI Price</div>
-                        <div class="pool-stat-num" id="livePoolPrice">$0.8276</div>
+                        <div class="pool-stat-num" id="livePoolPrice">Syncing...</div>
                     </div>
                     <div class="pool-stat-col">
                         <div class="pool-stat-label">Pool Liquidity</div>
-                        <div class="pool-stat-num" id="livePoolLiq">~$6,573.98</div>
+                        <div class="pool-stat-num" id="livePoolLiq">Syncing...</div>
                     </div>
                     <div class="pool-stat-col">
                         <div class="pool-stat-label">CAAI Reserves</div>
-                        <div class="pool-stat-num" id="livePoolCaai">3,971.58 CAAI</div>
+                        <div class="pool-stat-num" id="livePoolCaai">Syncing...</div>
                     </div>
                     <div class="pool-stat-col">
                         <div class="pool-stat-label">USDT Reserves</div>
-                        <div class="pool-stat-num" id="livePoolUsdt">3,286.99 USDT</div>
+                        <div class="pool-stat-num" id="livePoolUsdt">Syncing...</div>
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 8px;">
-                    <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank" class="btn-action primary" style="background: rgba(255,255,255,0.9); color: var(--primary); font-weight: 700;">
+                    <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank"
+                        class="btn-action primary"
+                        style="background: rgba(255,255,255,0.9); color: var(--primary); font-weight: 700;">
                         <i class="fa-solid fa-chart-line"></i> DexScreener
                     </a>
-                    <a href="https://bscscan.com/address/{{ $contracts['pancakePairAddress'] }}" target="_blank" class="btn-action" style="background: rgba(255,255,255,0.2); color: #ffffff; border-color: rgba(255,255,255,0.3);">
+                    <a href="https://bscscan.com/address/{{ $contracts['pancakePairAddress'] }}" target="_blank"
+                        class="btn-action"
+                        style="background: rgba(255,255,255,0.2); color: #ffffff; border-color: rgba(255,255,255,0.3);">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> BscScan
                     </a>
                 </div>
@@ -1045,7 +1134,8 @@
                     </div>
                     <div class="metric-value">{{ $userSummary['totalUsers'] }}</div>
                     <div class="metric-sub">
-                        <span class="badge badge-active"><i class="fa-solid fa-check"></i> {{ $userSummary['activeUsers'] }} Paid</span>
+                        <span class="badge badge-active"><i class="fa-solid fa-check"></i>
+                            {{ $userSummary['activeUsers'] }} Paid</span>
                         <span class="badge badge-inactive">{{ $userSummary['inactiveUsers'] }} Free</span>
                     </div>
                 </div>
@@ -1057,7 +1147,8 @@
                     </div>
                     <div class="metric-value">${{ number_format($stakingSummary['totalUsdt'], 2) }}</div>
                     <div class="metric-sub">
-                        <span class="badge badge-active">${{ number_format($stakingSummary['activeUsdt'], 2) }} Active Locked</span>
+                        <span class="badge badge-active">${{ number_format($stakingSummary['activeUsdt'], 2) }} Active
+                            Locked</span>
                     </div>
                 </div>
 
@@ -1077,20 +1168,23 @@
                         <div class="metric-title">Mining Buffer Reserves</div>
                         <div class="metric-icon-box cyan"><i class="fa-solid fa-microchip"></i></div>
                     </div>
-                    <div class="metric-value" id="miningBufferVal">40,454 CAAI</div>
+                    <div class="metric-value" id="miningBufferVal">Syncing...</div>
                     <div class="metric-sub">
                         <span class="badge badge-cyan">In Mining Engine Buffer</span>
                     </div>
                 </div>
 
-                <div class="metric-card" style="cursor: pointer;" onclick="document.querySelector('[onclick*=\'tab-withdrawals\']').click()">
+                <div class="metric-card" style="cursor: pointer;"
+                    onclick="document.querySelector('[onclick*=\'tab-withdrawals\']').click()">
                     <div class="metric-header">
                         <div class="metric-title">Working Withdrawals</div>
                         <div class="metric-icon-box emerald"><i class="fa-solid fa-money-bill-transfer"></i></div>
                     </div>
-                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}
+                    </div>
                     <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span class="badge badge-active">Net: ${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-active">Net:
+                            ${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</span>
                         <span class="badge badge-indigo">{{ $withdrawalSummary['workingTotalCount'] ?? 0 }} Txns</span>
                     </div>
                 </div>
@@ -1106,44 +1200,59 @@
                             <i class="fa-solid fa-wallet" style="color: #4f46e5;"></i>
                             <span>Live Protocol & Ecosystem On-Chain Balances</span>
                         </div>
-                        <div class="card-caption">Real-time BSC blockchain balances across withdrawal vaults, trading wallets, reserves & partner allocations</div>
+                        <div class="card-caption">Real-time BSC blockchain balances across withdrawal vaults, trading
+                            wallets, reserves & partner allocations</div>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span class="badge badge-active" style="padding: 6px 12px; font-size: 0.74rem;">
-                            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 6px; box-shadow: 0 0 8px #10b981;"></span>
+                            <span
+                                style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 6px; box-shadow: 0 0 8px #10b981;"></span>
                             BSC Mainnet (56)
                         </span>
-                        <button type="button" class="btn-action primary" style="padding: 6px 14px; font-size: 0.78rem;" onclick="refreshLiveOnChainBalances()">
+                        <button type="button" class="btn-action primary" style="padding: 6px 14px; font-size: 0.78rem;"
+                            onclick="refreshLiveOnChainBalances()">
                             <i class="fa-solid fa-arrows-rotate" id="balanceSyncSpinner"></i> Refresh All Balances
                         </button>
                     </div>
                 </div>
 
-                <!-- Main Balances Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
-                    
-                    <!-- 1. USDT Withdrawal Vault -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <!-- Main Balances Grid (100% Live BSC RPC — Protocol V3: 30% Pool / 40% Vault / 20% Trading / 10% Partners) -->
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+
+                    <!-- 1. 40% USDT Withdrawal Vault -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">USDT Withdrawal Vault</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;" id="dashVaultUsdt">
-                                    $5,629.03 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">40% USDT
+                                    Withdrawal Vault</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;"
+                                    id="dashVaultUsdt">
+                                    Syncing...
                                 </div>
                             </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                                 <i class="fa-solid fa-vault"></i>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge badge-indigo">ROI & Working Payouts</span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-indigo">40% Working Payouts</span>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 6) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')" title="Copy address">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 6) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')"
+                                    title="Copy address">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}"
+                                    target="_blank" style="color: var(--primary);" title="View on BscScan">
                                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
                                 </a>
                             </div>
@@ -1151,161 +1260,189 @@
                     </div>
 
                     <!-- 2. 20% Trading Wallet -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">20% Trading Wallet</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;" id="dashTradingUsdt">
-                                    $362.19 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">20%
+                                    Trading Wallet</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace;"
+                                    id="dashTradingUsdt">
+                                    Syncing...
                                 </div>
                             </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                                 <i class="fa-solid fa-chart-line"></i>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
                             <span class="badge badge-active">20% Auto Split</span>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['tradingWallet'], 0, 6) }}...{{ substr($contracts['tradingWallet'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['tradingWallet'] }}')" title="Copy address">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['tradingWallet'], 0, 6) }}...{{ substr($contracts['tradingWallet'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['tradingWallet'] }}')" title="Copy address">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['tradingWallet'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                <a href="https://bscscan.com/address/{{ $contracts['tradingWallet'] }}" target="_blank"
+                                    style="color: var(--primary);" title="View on BscScan">
                                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3. 2% Reserve Wallet -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <!-- 3. Mining Engine Buffer Reserves -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">2% Reserve Wallet</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b; font-family: 'JetBrains Mono', monospace;" id="dashReserveUsdt">
-                                    $115.41 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Mining
+                                    Engine Reserves</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #06b6d4; font-family: 'JetBrains Mono', monospace;"
+                                    id="dashMiningCaai">
+                                    Syncing...
                                 </div>
                             </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge badge-amber">2% Protocol Reserve</span>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['reserveWallet'], 0, 6) }}...{{ substr($contracts['reserveWallet'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['reserveWallet'] }}')" title="Copy address">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['reserveWallet'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
-                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Mining Engine Buffer Reserves -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                            <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Mining Engine Reserves</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: #06b6d4; font-family: 'JetBrains Mono', monospace;" id="dashMiningCaai">
-                                    42,720 <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>
-                                </div>
-                            </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #cffafe; color: #0891b2; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #cffafe; color: #0891b2; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                                 <i class="fa-solid fa-microchip"></i>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge badge-cyan">30% DEX Buy Buffer • <span id="dashMiningUsdt">$0.00 USDT</span></span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-cyan">30% DEX Buy • <span id="dashMiningUsdt">Syncing...</span></span>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['miningEngineAddress'], 0, 6) }}...{{ substr($contracts['miningEngineAddress'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')" title="Copy address">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['miningEngineAddress'], 0, 6) }}...{{ substr($contracts['miningEngineAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')"
+                                    title="Copy address">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}"
+                                    target="_blank" style="color: var(--primary);" title="View on BscScan">
                                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 5. Revenue Splitter Contract -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <!-- 4. Revenue Splitter Contract (30% = 20% Trading + 10% Partners) -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Revenue Splitter (32%)</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashSplitterUsdt">
-                                    $0.00 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Revenue
+                                    Splitter (30%)</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;"
+                                    id="dashSplitterUsdt">
+                                    Syncing...
                                 </div>
                             </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                                 <i class="fa-solid fa-code-fork"></i>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge" style="background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;">20/10/2% Auto-Split</span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge"
+                                style="background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;">20% Trading + 10% Partners</span>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['revenueSplitterAddress'], 0, 6) }}...{{ substr($contracts['revenueSplitterAddress'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')" title="Copy address">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['revenueSplitterAddress'], 0, 6) }}...{{ substr($contracts['revenueSplitterAddress'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')"
+                                    title="Copy address">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}"
+                                    target="_blank" style="color: var(--primary);" title="View on BscScan">
                                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 6. Royal Jackpot Vault & Deposit -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <!-- 5. Multisig Admin 1 Wallet -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Royal Jackpot Vault</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashJackpotVaultUsdt">
-                                    $0.00 <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Multisig
+                                    Admin 1 (Signer #1)</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5; font-family: 'JetBrains Mono', monospace;"
+                                    id="dashTreasuryCaai">
+                                    Syncing...
                                 </div>
                             </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                                <i class="fa-solid fa-trophy"></i>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge badge-amber">Deposit: <span id="dashJackpotDepositUsdt">$0.00 USDT</span></span>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['royalJackpotVaultAddress'], 0, 6) }}...{{ substr($contracts['royalJackpotVaultAddress'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['royalJackpotVaultAddress'] }}')" title="Copy address">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['royalJackpotVaultAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
-                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 7. Protocol Treasury (Owner) -->
-                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;" class="balance-card-hover">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                            <div>
-                                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Protocol Treasury (Owner)</span>
-                                <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5; font-family: 'JetBrains Mono', monospace;" id="dashTreasuryCaai">
-                                    733,350 <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>
-                                </div>
-                            </div>
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
-                            <span class="badge badge-indigo">USDT: <strong id="dashTreasuryUsdt">$4.40</strong></span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-indigo">USDT: <strong id="dashTreasuryUsdt">...</strong> • <span id="dashAdmin1Bnb">... BNB</span></span>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="font-mono" style="color: var(--text-muted);">{{ substr($contracts['adminOwnerAddress'], 0, 6) }}...{{ substr($contracts['adminOwnerAddress'], -4) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;" onclick="copyToClipboard('{{ $contracts['adminOwnerAddress'] }}')" title="Copy address">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['multisigAdmin1'], 0, 6) }}...{{ substr($contracts['multisigAdmin1'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['multisigAdmin1'] }}')"
+                                    title="Copy address">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
-                                <a href="https://bscscan.com/address/{{ $contracts['adminOwnerAddress'] }}" target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                <a href="https://bscscan.com/address/{{ $contracts['multisigAdmin1'] }}"
+                                    target="_blank" style="color: var(--primary);" title="View on BscScan">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Multisig Admin 2 Wallet -->
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden; transition: all 0.2s;"
+                        class="balance-card-hover">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <span
+                                    style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">Multisig
+                                    Admin 2 (Signer #2)</span>
+                                <div style="font-size: 1.35rem; font-weight: 800; color: #059669; font-family: 'JetBrains Mono', monospace;"
+                                    id="dashAdmin2Caai">
+                                    Syncing...
+                                </div>
+                            </div>
+                            <div
+                                style="width: 38px; height: 38px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.72rem;">
+                            <span class="badge badge-active">USDT: <strong id="dashAdmin2Usdt">...</strong> • <span id="dashAdmin2Bnb">... BNB</span></span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span class="font-mono"
+                                    style="color: var(--text-muted);">{{ substr($contracts['multisigAdmin2'], 0, 6) }}...{{ substr($contracts['multisigAdmin2'], -4) }}</span>
+                                <button type="button" class="btn-action" style="padding: 1px 5px; font-size: 9px;"
+                                    onclick="copyToClipboard('{{ $contracts['multisigAdmin2'] }}')"
+                                    title="Copy address">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="https://bscscan.com/address/{{ $contracts['multisigAdmin2'] }}"
+                                    target="_blank" style="color: var(--primary);" title="View on BscScan">
                                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
                                 </a>
                             </div>
@@ -1314,44 +1451,54 @@
 
                 </div>
 
-                <!-- 8. Partner Wallets Sub-Section (10% Allocation @ 2% each) -->
-                <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                <!-- 7. Partner Wallets Sub-Section (10% Allocation @ 2% each) -->
+                <div
+                    style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <i class="fa-solid fa-handshake" style="color: #4f46e5;"></i>
-                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-heading);">10% Partner Incomes (5 Designated Wallets @ 2% each)</span>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-heading);">10% Partner
+                                Incomes (5 Designated Wallets @ 2% each)</span>
                         </div>
                         <div style="font-size: 0.78rem; color: var(--text-muted);">
-                            Combined Partner Total: <strong id="dashTotalPartnerUsdt" style="color: var(--emerald-text); font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">$299.81 USDT</strong>
+                            Combined Partner Total: <strong id="dashTotalPartnerUsdt"
+                                style="color: var(--emerald-text); font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">Syncing...</strong>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
                         @php
                             $pList = $contracts['partnerWallets'] ?? [
-                                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
-                                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
-                                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
+                                '0x4828885EeE174ec7a495300dF47df239Bb68353F',
                                 '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
-                                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
+                                '0x0141A69d92a9d4EDA280Fcc15548b21AD6C5eED8',
+                                '0xfb3548279b903dc2b371b059aeb1fe28ce5ae4f1',
+                                '0x2125c47a3178eB309D68253579D30a1D99c393a9'
                             ];
                         @endphp
                         @foreach($pList as $idx => $pAddr)
-                        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Partner #{{ $idx + 1 }} (2%)</div>
-                                <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;" id="dashPartner{{ $idx + 1 }}Usdt">Loading...</div>
+                            <div
+                                style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Partner
+                                        #{{ $idx + 1 }} (2%)</div>
+                                    <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-heading); font-family: 'JetBrains Mono', monospace;"
+                                        id="dashPartner{{ $idx + 1 }}Usdt">Loading...</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span
+                                        style="font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">{{ substr($pAddr, 0, 4) }}...{{ substr($pAddr, -3) }}</span>
+                                    <button type="button" class="btn-action" style="padding: 1px 4px; font-size: 8px;"
+                                        onclick="copyToClipboard('{{ $pAddr }}')" title="Copy address">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                    <a href="https://bscscan.com/address/{{ $pAddr }}" target="_blank"
+                                        style="color: var(--primary); font-size: 9px;" title="View on BscScan">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <span style="font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">{{ substr($pAddr, 0, 4) }}...{{ substr($pAddr, -3) }}</span>
-                                <button type="button" class="btn-action" style="padding: 1px 4px; font-size: 8px;" onclick="copyToClipboard('{{ $pAddr }}')" title="Copy address">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
-                                <a href="https://bscscan.com/address/{{ $pAddr }}" target="_blank" style="color: var(--primary); font-size: 9px;" title="View on BscScan">
-                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                </a>
-                            </div>
-                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -1360,7 +1507,7 @@
 
             <!-- Quick Actions & Protocol Status -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-                
+
                 <div class="portal-card">
                     <div class="portal-card-header">
                         <div>
@@ -1370,13 +1517,16 @@
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button class="btn-action primary" style="padding: 12px 16px; font-size: 0.85rem;" onclick="switchTab('tab-genealogy', document.querySelectorAll('.tab-btn')[2])">
+                        <button class="btn-action primary" style="padding: 12px 16px; font-size: 0.85rem;"
+                            onclick="switchTab('tab-genealogy', document.querySelectorAll('.tab-btn')[2])">
                             <i class="fa-solid fa-network-wired"></i> Open Full Interactive Genealogy Downline Tree
                         </button>
-                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;" onclick="triggerSplitterDistribute()">
+                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;"
+                            onclick="triggerSplitterDistribute()">
                             <i class="fa-solid fa-code-fork"></i> Trigger Revenue Splitter On-Chain (68/20/10/2)
                         </button>
-                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;" onclick="refreshLiveOnChainBalances()">
+                        <button class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;"
+                            onclick="refreshLiveOnChainBalances()">
                             <i class="fa-solid fa-arrows-rotate"></i> Sync Real-Time Blockchain Pool Reserves & Balances
                         </button>
                         <a href="/Main/Dashboard" class="btn-action" style="padding: 12px 16px; font-size: 0.85rem;">
@@ -1388,27 +1538,34 @@
                 <div class="portal-card">
                     <div class="portal-card-header">
                         <div>
-                            <div class="card-heading"><i class="fa-solid fa-shield-halved"></i> V2 Security & Architecture Audit</div>
+                            <div class="card-heading"><i class="fa-solid fa-shield-halved"></i> V2 Security &
+                                Architecture Audit</div>
                             <div class="card-caption">All 7 smart contracts fully verified on BSC Mainnet</div>
                         </div>
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.82rem;">
-                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                        <div
+                            style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
                             <span>CAAI Token Supply</span>
                             <strong class="font-mono">777,777 CAAI (Fixed)</strong>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                        <div
+                            style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
                             <span>Token Ownership</span>
-                            <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced (0x000...000)</span>
+                            <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced
+                                (0x000...000)</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                        <div
+                            style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
                             <span>Revenue Split Formula</span>
                             <strong>68% Mining, 20% Trading, 10% Partners, 2% Reserve</strong>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+                        <div
+                            style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
                             <span>Royal Jackpot Auto-Forward</span>
-                            <span class="badge badge-active"><i class="fa-solid fa-check"></i> Enabled (to Collector)</span>
+                            <span class="badge badge-active"><i class="fa-solid fa-check"></i> Enabled (to
+                                Collector)</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>USDT Withdrawal Vault</span>
@@ -1429,7 +1586,8 @@
                 <div class="portal-card-header">
                     <div>
                         <div class="card-heading"><i class="fa-solid fa-users"></i> Member Network & MLM Registry</div>
-                        <div class="card-caption">Comprehensive overview of all registered members, investments and downline stats</div>
+                        <div class="card-caption">Comprehensive overview of all registered members, investments and
+                            downline stats</div>
                     </div>
 
                     <div style="display: flex; gap: 10px;">
@@ -1443,7 +1601,8 @@
                 <div class="filter-bar">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="userSearchInput" class="search-input" placeholder="Search by UUID, Name, Sponsor, or Wallet..." onkeyup="filterUsersTable()">
+                        <input type="text" id="userSearchInput" class="search-input"
+                            placeholder="Search by UUID, Name, Sponsor, or Wallet..." onkeyup="filterUsersTable()">
                     </div>
 
                     <select id="userStatusFilter" class="filter-select" onchange="filterUsersTable()">
@@ -1473,66 +1632,76 @@
                         </thead>
                         <tbody>
                             @foreach($users as $u)
-                            <tr data-status="{{ $u->permission == 0 ? 'blocked' : ($u->is_active ? 'active' : 'inactive') }}" data-search="{{ strtolower($u->uuid . ' ' . $u->name . ' ' . $u->sponsor_uuid . ' ' . $u->wallet) }}">
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-mini">{{ substr($u->uuid, -2) }}</div>
-                                        <div>
-                                            <div style="font-weight: 700; color: var(--text-heading);">{{ $u->uuid }}</div>
-                                            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $u->name }}</div>
+                                <tr data-status="{{ $u->permission == 0 ? 'blocked' : ($u->is_active ? 'active' : 'inactive') }}"
+                                    data-search="{{ strtolower($u->uuid . ' ' . $u->name . ' ' . $u->sponsor_uuid . ' ' . $u->wallet) }}">
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-mini">{{ substr($u->uuid, -2) }}</div>
+                                            <div>
+                                                <div style="font-weight: 700; color: var(--text-heading);">{{ $u->uuid }}
+                                                </div>
+                                                <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $u->name }}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge badge-indigo">{{ $u->sponsor_uuid }}</span>
-                                </td>
-                                <td>
-                                    <strong style="color: var(--emerald-text);">${{ number_format($u->self_investment, 2) }}</strong>
-                                </td>
-                                <td>
-                                    <strong>${{ number_format($u->team_investment, 2) }}</strong>
-                                </td>
-                                <td>
-                                    <span style="font-weight: 700;">{{ $u->total_direct }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge {{ $u->active_direct > 0 ? 'badge-active' : 'badge-inactive' }}">
-                                        {{ $u->active_direct }} Active
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($u->permission == 0)
-                                        <span class="badge badge-blocked"><i class="fa-solid fa-ban"></i> Blocked</span>
-                                    @elseif($u->is_active)
-                                        <span class="badge badge-active"><i class="fa-solid fa-circle-check"></i> Paid</span>
-                                    @else
-                                        <span class="badge badge-inactive">Inactive</span>
-                                    @endif
-                                </td>
-                                <td>{{ $u->doj }}</td>
-                                <td>
-                                    @if($u->wallet)
-                                        <span class="font-mono" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ $u->wallet }}">
-                                            {{ substr($u->wallet, 0, 6) }}...{{ substr($u->wallet, -4) }}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-indigo">{{ $u->sponsor_uuid }}</span>
+                                    </td>
+                                    <td>
+                                        <strong
+                                            style="color: var(--emerald-text);">${{ number_format($u->self_investment, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        <strong>${{ number_format($u->team_investment, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        <span style="font-weight: 700;">{{ $u->total_direct }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $u->active_direct > 0 ? 'badge-active' : 'badge-inactive' }}">
+                                            {{ $u->active_direct }} Active
                                         </span>
-                                    @else
-                                        <span style="color: var(--text-light); font-size: 0.72rem;">None</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div style="display: flex; gap: 6px;">
-                                        <button class="btn-action primary" onclick="viewUserGenealogy('{{ $u->uuid }}')" title="View Tree">
-                                            <i class="fa-solid fa-network-wired"></i>
-                                        </button>
-                                        <button class="btn-action" onclick="openUserModal('{{ $u->id }}')" title="View Profile">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="btn-action {{ $u->permission == 1 ? 'danger' : 'primary' }}" onclick="toggleUserPermission('{{ $u->id }}', this)" title="{{ $u->permission == 1 ? 'Block User' : 'Unblock User' }}">
-                                            <i class="fa-solid {{ $u->permission == 1 ? 'fa-lock' : 'fa-unlock' }}"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>
+                                        @if($u->permission == 0)
+                                            <span class="badge badge-blocked"><i class="fa-solid fa-ban"></i> Blocked</span>
+                                        @elseif($u->is_active)
+                                            <span class="badge badge-active"><i class="fa-solid fa-circle-check"></i>
+                                                Paid</span>
+                                        @else
+                                            <span class="badge badge-inactive">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $u->doj }}</td>
+                                    <td>
+                                        @if($u->wallet)
+                                            <span class="font-mono" style="font-size: 0.72rem; color: var(--text-muted);"
+                                                title="{{ $u->wallet }}">
+                                                {{ substr($u->wallet, 0, 6) }}...{{ substr($u->wallet, -4) }}
+                                            </span>
+                                        @else
+                                            <span style="color: var(--text-light); font-size: 0.72rem;">None</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 6px;">
+                                            <button class="btn-action primary" onclick="viewUserGenealogy('{{ $u->uuid }}')"
+                                                title="View Tree">
+                                                <i class="fa-solid fa-network-wired"></i>
+                                            </button>
+                                            <button class="btn-action" onclick="openUserModal('{{ $u->id }}')"
+                                                title="View Profile">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action {{ $u->permission == 1 ? 'danger' : 'primary' }}"
+                                                onclick="toggleUserPermission('{{ $u->id }}', this)"
+                                                title="{{ $u->permission == 1 ? 'Block User' : 'Unblock User' }}">
+                                                <i class="fa-solid {{ $u->permission == 1 ? 'fa-lock' : 'fa-unlock' }}"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -1548,8 +1717,10 @@
             <div class="portal-card">
                 <div class="portal-card-header">
                     <div>
-                        <div class="card-heading"><i class="fa-solid fa-network-wired"></i> Interactive MLM Genealogy Tree Explorer</div>
-                        <div class="card-caption">Visual hierarchical network downline viewer with direct & multi-level tree branching</div>
+                        <div class="card-heading"><i class="fa-solid fa-network-wired"></i> Interactive MLM Genealogy
+                            Tree Explorer</div>
+                        <div class="card-caption">Visual hierarchical network downline viewer with direct & multi-level
+                            tree branching</div>
                     </div>
 
                     <div style="display: flex; gap: 8px;">
@@ -1563,7 +1734,8 @@
                 <div class="filter-bar">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="genealogySearchInput" class="search-input" placeholder="Enter User UUID (e.g. CAI9999999 or CAI4729062)...">
+                        <input type="text" id="genealogySearchInput" class="search-input"
+                            placeholder="Enter User UUID (e.g. CAI9999999 or CAI4729062)...">
                     </div>
                     <button class="btn-action primary" style="padding: 10px 20px;" onclick="searchGenealogy()">
                         <i class="fa-solid fa-sitemap"></i> Load Downline Tree
@@ -1587,8 +1759,10 @@
             <div class="portal-card">
                 <div class="portal-card-header">
                     <div>
-                        <div class="card-heading"><i class="fa-solid fa-user-check"></i> Network Leaders & Active Directs</div>
-                        <div class="card-caption">Ranking of top sponsors and active referral connections across the protocol</div>
+                        <div class="card-heading"><i class="fa-solid fa-user-check"></i> Network Leaders & Active
+                            Directs</div>
+                        <div class="card-caption">Ranking of top sponsors and active referral connections across the
+                            protocol</div>
                     </div>
                 </div>
 
@@ -1606,30 +1780,35 @@
                         </thead>
                         <tbody>
                             @foreach($users->sortByDesc('active_direct') as $leader)
-                            <tr>
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-mini">{{ substr($leader->uuid, -2) }}</div>
-                                        <div>
-                                            <div style="font-weight: 700; color: var(--text-heading);">{{ $leader->uuid }}</div>
-                                            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $leader->name }}</div>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-mini">{{ substr($leader->uuid, -2) }}</div>
+                                            <div>
+                                                <div style="font-weight: 700; color: var(--text-heading);">
+                                                    {{ $leader->uuid }}</div>
+                                                <div style="font-size: 0.72rem; color: var(--text-muted);">
+                                                    {{ $leader->name }}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge badge-active" style="font-size: 0.8rem; padding: 5px 12px;">
-                                        <i class="fa-solid fa-bolt"></i> {{ $leader->active_direct }} Active
-                                    </span>
-                                </td>
-                                <td><strong>{{ $leader->total_direct }}</strong> Referrals</td>
-                                <td><strong style="color: var(--emerald-text);">${{ number_format($leader->self_investment, 2) }}</strong></td>
-                                <td><strong>${{ number_format($leader->team_investment, 2) }}</strong></td>
-                                <td>
-                                    <button class="btn-action primary" onclick="viewUserGenealogy('{{ $leader->uuid }}')">
-                                        <i class="fa-solid fa-network-wired"></i> View Direct Downline
-                                    </button>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-active" style="font-size: 0.8rem; padding: 5px 12px;">
+                                            <i class="fa-solid fa-bolt"></i> {{ $leader->active_direct }} Active
+                                        </span>
+                                    </td>
+                                    <td><strong>{{ $leader->total_direct }}</strong> Referrals</td>
+                                    <td><strong
+                                            style="color: var(--emerald-text);">${{ number_format($leader->self_investment, 2) }}</strong>
+                                    </td>
+                                    <td><strong>${{ number_format($leader->team_investment, 2) }}</strong></td>
+                                    <td>
+                                        <button class="btn-action primary"
+                                            onclick="viewUserGenealogy('{{ $leader->uuid }}')">
+                                            <i class="fa-solid fa-network-wired"></i> View Direct Downline
+                                        </button>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -1641,7 +1820,7 @@
         <!-- TAB 5: STAKINGS & BUSINESS                                -->
         <!-- ======================================================== -->
         <div id="tab-stakings" class="tab-content-panel" style="display: none;">
-            
+
             <div class="metric-grid">
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1683,7 +1862,8 @@
             <div class="portal-card">
                 <div class="portal-card-header">
                     <div>
-                        <div class="card-heading"><i class="fa-solid fa-vault"></i> Real-Time Staking Deposits Ledger</div>
+                        <div class="card-heading"><i class="fa-solid fa-vault"></i> Real-Time Staking Deposits Ledger
+                        </div>
                         <div class="card-caption">All mining package stakings and multiplier allocations</div>
                     </div>
                 </div>
@@ -1703,30 +1883,31 @@
                         </thead>
                         <tbody>
                             @foreach($stakingList as $stk)
-                            <tr>
-                                <td class="font-mono">#{{ $stk->id }}</td>
-                                <td>
-                                    <div style="font-weight: 700; color: var(--text-heading);">{{ $stk->uuid }}</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $stk->name }}</div>
-                                </td>
-                                <td>
-                                    <strong style="color: var(--emerald-text); font-size: 0.9rem;">${{ number_format($stk->usdt, 2) }}</strong>
-                                </td>
-                                <td>
-                                    <strong class="font-mono">{{ number_format($stk->cai, 2) }} CAAI</strong>
-                                </td>
-                                <td>
-                                    <span class="badge badge-indigo">{{ $stk->multiplier }}x Multiplier</span>
-                                </td>
-                                <td>
-                                    @if($stk->status == 1)
-                                        <span class="badge badge-active"><i class="fa-solid fa-check"></i> Active</span>
-                                    @else
-                                        <span class="badge badge-inactive">Completed</span>
-                                    @endif
-                                </td>
-                                <td style="font-size: 0.74rem; color: var(--text-muted);">{{ $stk->created_at }}</td>
-                            </tr>
+                                <tr>
+                                    <td class="font-mono">#{{ $stk->id }}</td>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-heading);">{{ $stk->uuid }}</div>
+                                        <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $stk->name }}</div>
+                                    </td>
+                                    <td>
+                                        <strong
+                                            style="color: var(--emerald-text); font-size: 0.9rem;">${{ number_format($stk->usdt, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        <strong class="font-mono">{{ number_format($stk->cai, 2) }} CAAI</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-indigo">{{ $stk->multiplier }}x Multiplier</span>
+                                    </td>
+                                    <td>
+                                        @if($stk->status == 1)
+                                            <span class="badge badge-active"><i class="fa-solid fa-check"></i> Active</span>
+                                        @else
+                                            <span class="badge badge-inactive">Completed</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-size: 0.74rem; color: var(--text-muted);">{{ $stk->created_at }}</td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -1747,13 +1928,17 @@
                         <div class="metric-title">Working Withdrawals (Gross)</div>
                         <div class="metric-icon-box indigo"><i class="fa-solid fa-money-bill-transfer"></i></div>
                     </div>
-                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-value">${{ number_format($withdrawalSummary['totalWorkingGrossUsdt'] ?? 0, 2) }}
+                    </div>
                     <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span class="badge badge-active"><i class="fa-solid fa-check-double"></i> {{ $withdrawalSummary['workingConfirmedCount'] ?? 0 }} Confirmed</span>
+                        <span class="badge badge-active"><i class="fa-solid fa-check-double"></i>
+                            {{ $withdrawalSummary['workingConfirmedCount'] ?? 0 }} Confirmed</span>
                         @if(($withdrawalSummary['workingPendingCount'] ?? 0) > 0)
-                            <span class="badge badge-amber"><i class="fa-solid fa-clock"></i> {{ $withdrawalSummary['workingPendingCount'] }} Pending</span>
+                            <span class="badge badge-amber"><i class="fa-solid fa-clock"></i>
+                                {{ $withdrawalSummary['workingPendingCount'] }} Pending</span>
                         @endif
-                        <span class="badge badge-indigo">Today: ${{ number_format($withdrawalSummary['todayWorkingGrossUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-indigo">Today:
+                            ${{ number_format($withdrawalSummary['todayWorkingGrossUsdt'] ?? 0, 2) }}</span>
                     </div>
                 </div>
 
@@ -1762,10 +1947,13 @@
                         <div class="metric-title">Net USDT Disbursed (90%)</div>
                         <div class="metric-icon-box emerald"><i class="fa-solid fa-hand-holding-dollar"></i></div>
                     </div>
-                    <div class="metric-value" style="color: var(--emerald-text);">${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</div>
+                    <div class="metric-value" style="color: var(--emerald-text);">
+                        ${{ number_format($withdrawalSummary['totalWorkingNetUsdt'] ?? 0, 2) }}</div>
                     <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span class="badge badge-amber">10% Fee Deducted: ${{ number_format($withdrawalSummary['totalWorkingFeeUsdt'] ?? 0, 2) }}</span>
-                        <span class="badge badge-active">Today Net: ${{ number_format($withdrawalSummary['todayWorkingNetUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-amber">10% Fee Deducted:
+                            ${{ number_format($withdrawalSummary['totalWorkingFeeUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-active">Today Net:
+                            ${{ number_format($withdrawalSummary['todayWorkingNetUsdt'] ?? 0, 2) }}</span>
                     </div>
                 </div>
 
@@ -1774,22 +1962,35 @@
                         <div class="metric-title">Working Income Source Breakdown</div>
                         <div class="metric-icon-box amber"><i class="fa-solid fa-layer-group"></i></div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; font-size: 0.78rem;">
-                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
-                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Direct Bonus</span>
-                            <strong style="color: var(--primary);">${{ number_format($withdrawalSummary['totalDirectWithdrawn'] ?? 0, 2) }}</strong>
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; font-size: 0.78rem;">
+                        <div
+                            style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Direct
+                                Bonus</span>
+                            <strong
+                                style="color: var(--primary);">${{ number_format($withdrawalSummary['totalDirectWithdrawn'] ?? 0, 2) }}</strong>
                         </div>
-                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
-                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Level Income</span>
-                            <strong style="color: var(--emerald-text);">${{ number_format($withdrawalSummary['totalLevelWithdrawn'] ?? 0, 2) }}</strong>
+                        <div
+                            style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Level
+                                Income</span>
+                            <strong
+                                style="color: var(--emerald-text);">${{ number_format($withdrawalSummary['totalLevelWithdrawn'] ?? 0, 2) }}</strong>
                         </div>
-                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
-                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Pool / Club</span>
-                            <strong style="color: var(--amber-text);">${{ number_format($withdrawalSummary['totalPoolWithdrawn'] ?? 0, 2) }}</strong>
+                        <div
+                            style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Pool /
+                                Club</span>
+                            <strong
+                                style="color: var(--amber-text);">${{ number_format($withdrawalSummary['totalPoolWithdrawn'] ?? 0, 2) }}</strong>
                         </div>
-                        <div style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
-                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Rank / Salary</span>
-                            <strong style="color: var(--cyan-text);">${{ number_format($withdrawalSummary['totalRankWithdrawn'] ?? 0, 2) }}</strong>
+                        <div
+                            style="background: var(--bg-elevated); padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 0.68rem; display: block;">Rank /
+                                Salary</span>
+                            <strong
+                                style="color: var(--cyan-text);">${{ number_format($withdrawalSummary['totalRankWithdrawn'] ?? 0, 2) }}</strong>
                         </div>
                     </div>
                 </div>
@@ -1802,7 +2003,8 @@
                     <div class="metric-value">${{ number_format($withdrawalSummary['totalRoiNetUsdt'] ?? 0, 2) }}</div>
                     <div class="metric-sub" style="display: flex; flex-wrap: wrap; gap: 6px;">
                         <span class="badge badge-cyan">{{ $withdrawalSummary['roiTotalCount'] ?? 0 }} Claims</span>
-                        <span class="badge badge-indigo">Combined Net: ${{ number_format($withdrawalSummary['grandTotalNetUsdt'] ?? 0, 2) }}</span>
+                        <span class="badge badge-indigo">Combined Net:
+                            ${{ number_format($withdrawalSummary['grandTotalNetUsdt'] ?? 0, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -1812,33 +2014,45 @@
                     <div>
                         <div class="card-heading">
                             <i class="fa-solid fa-money-bill-transfer" style="color: var(--primary);"></i>
-                            Working Withdrawal & On-Chain Payout Ledger (<span id="withdrawalFilteredCount">{{ count($withdrawalList ?? []) }}</span>)
+                            Working Withdrawal & On-Chain Payout Ledger (<span
+                                id="withdrawalFilteredCount">{{ count($withdrawalList ?? []) }}</span>)
                         </div>
-                        <div class="card-caption">Complete audit trail of Working Income Withdrawals (Direct, Level, Pool, Rank) via EIP-712 USDTWithdrawalVault & ROI/Mining claims</div>
+                        <div class="card-caption">Complete audit trail of Working Income Withdrawals (Direct, Level,
+                            Pool, Rank) via EIP-712 USDTWithdrawalVault & ROI/Mining claims</div>
                     </div>
 
                     <!-- Quick Category Toggle Pills & Export -->
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" id="pillWorkingOnly" class="btn-action primary" onclick="setWithdrawalCategoryQuick('working')">
-                            <i class="fa-solid fa-briefcase"></i> Working Withdrawals ({{ $withdrawalSummary['workingTotalCount'] ?? 0 }})
+                        <button type="button" id="pillWorkingOnly" class="btn-action primary"
+                            onclick="setWithdrawalCategoryQuick('working')">
+                            <i class="fa-solid fa-briefcase"></i> Working Withdrawals
+                            ({{ $withdrawalSummary['workingTotalCount'] ?? 0 }})
                         </button>
-                        <button type="button" id="pillAllWithdrawals" class="btn-action" onclick="setWithdrawalCategoryQuick('all')">
-                            <i class="fa-solid fa-list-ul"></i> All Withdrawals ({{ $withdrawalSummary['totalCount'] ?? 0 }})
+                        <button type="button" id="pillAllWithdrawals" class="btn-action"
+                            onclick="setWithdrawalCategoryQuick('all')">
+                            <i class="fa-solid fa-list-ul"></i> All Withdrawals
+                            ({{ $withdrawalSummary['totalCount'] ?? 0 }})
                         </button>
-                        <button type="button" id="pillRoiOnly" class="btn-action" onclick="setWithdrawalCategoryQuick('roi')">
-                            <i class="fa-solid fa-microchip"></i> ROI / Mining ({{ $withdrawalSummary['roiTotalCount'] ?? 0 }})
+                        <button type="button" id="pillRoiOnly" class="btn-action"
+                            onclick="setWithdrawalCategoryQuick('roi')">
+                            <i class="fa-solid fa-microchip"></i> ROI / Mining
+                            ({{ $withdrawalSummary['roiTotalCount'] ?? 0 }})
                         </button>
-                        <button type="button" class="btn-action" onclick="exportWithdrawalsToCSV()" style="background: var(--emerald-soft); color: var(--emerald-text); border-color: #a7f3d0; font-weight: 700;">
+                        <button type="button" class="btn-action" onclick="exportWithdrawalsToCSV()"
+                            style="background: var(--emerald-soft); color: var(--emerald-text); border-color: #a7f3d0; font-weight: 700;">
                             <i class="fa-solid fa-file-csv"></i> Export CSV
                         </button>
                     </div>
                 </div>
 
                 <!-- Filter Bar -->
-                <div style="padding: 14px 22px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div
+                    style="padding: 14px 22px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <div class="search-box" style="flex: 1; min-width: 240px;">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="withdrawalSearchInput" class="form-input" placeholder="Search by UUID, Name, Wallet Address, or TxHash..." onkeyup="filterWithdrawalsTable()" style="width: 100%;">
+                        <input type="text" id="withdrawalSearchInput" class="form-input"
+                            placeholder="Search by UUID, Name, Wallet Address, or TxHash..."
+                            onkeyup="filterWithdrawalsTable()" style="width: 100%;">
                     </div>
 
                     <select id="withdrawalCategoryFilter" class="form-select" onchange="filterWithdrawalsTable()">
@@ -1856,9 +2070,11 @@
 
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">From:</span>
-                        <input type="date" id="withdrawalDateFrom" class="form-input" onchange="filterWithdrawalsTable()" style="padding: 7px 10px;">
+                        <input type="date" id="withdrawalDateFrom" class="form-input"
+                            onchange="filterWithdrawalsTable()" style="padding: 7px 10px;">
                         <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">To:</span>
-                        <input type="date" id="withdrawalDateTo" class="form-input" onchange="filterWithdrawalsTable()" style="padding: 7px 10px;">
+                        <input type="date" id="withdrawalDateTo" class="form-input" onchange="filterWithdrawalsTable()"
+                            style="padding: 7px 10px;">
                     </div>
 
                     <button type="button" class="btn-action" onclick="resetWithdrawalFilters()">
@@ -1886,116 +2102,148 @@
                         </thead>
                         <tbody>
                             @forelse($withdrawalList ?? [] as $wd)
-                            <tr class="withdrawal-row"
-                                data-category="{{ $wd->category }}"
-                                data-status="{{ $wd->status_key }}"
-                                data-date="{{ $wd->raw_date }}"
-                                data-search="{{ strtolower($wd->id . ' ' . $wd->uuid . ' ' . $wd->name . ' ' . $wd->wallet . ' ' . $wd->tx_hash . ' ' . $wd->type_label) }}">
-                                <td class="font-mono" style="font-weight: 600;">#{{ $wd->id }}</td>
-                                <td>
-                                    <div style="font-weight: 700; color: var(--text-heading);">{{ $wd->uuid }}</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $wd->name }}</div>
-                                </td>
-                                <td>
-                                    @if($wd->category === 'working')
-                                        <span class="badge badge-indigo"><i class="fa-solid fa-briefcase"></i> Working Withdrawal</span>
-                                    @else
-                                        <span class="badge badge-cyan"><i class="fa-solid fa-microchip"></i> {{ $wd->type_label }}</span>
-                                    @endif
-                                    @if($wd->cai_amount > 0)
-                                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;" class="font-mono">
-                                            {{ number_format($wd->cai_amount, 2) }} CAAI
-                                        </div>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($wd->category === 'working')
-                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
-                                            @if($wd->direct_usdt > 0)
-                                                <span class="badge" style="background: #eef2ff; color: #4338ca; font-size: 0.68rem;">Direct: ${{ number_format($wd->direct_usdt, 2) }}</span>
-                                            @endif
-                                            @if($wd->level_usdt > 0)
-                                                <span class="badge" style="background: #ecfdf5; color: #047857; font-size: 0.68rem;">Level: ${{ number_format($wd->level_usdt, 2) }}</span>
-                                            @endif
-                                            @if($wd->pool_usdt > 0)
-                                                <span class="badge" style="background: #fffbeb; color: #b45309; font-size: 0.68rem;">Pool: ${{ number_format($wd->pool_usdt, 2) }}</span>
-                                            @endif
-                                            @if($wd->rank_usdt > 0)
-                                                <span class="badge" style="background: #ecfeff; color: #0e7490; font-size: 0.68rem;">Rank: ${{ number_format($wd->rank_usdt, 2) }}</span>
-                                            @endif
-                                            @if($wd->direct_usdt == 0 && $wd->level_usdt == 0 && $wd->pool_usdt == 0 && $wd->rank_usdt == 0)
-                                                <span style="font-size: 0.72rem; color: var(--text-muted);">Working Wallet Pool</span>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <span style="font-size: 0.72rem; color: var(--text-muted);">Mining / ROI Portfolio</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <strong style="color: var(--text-heading); font-size: 0.88rem;">${{ number_format($wd->gross_usdt, 2) }}</strong>
-                                </td>
-                                <td>
-                                    <span style="color: var(--amber-text); font-weight: 600; font-size: 0.82rem;">-${{ number_format($wd->fee_usdt, 2) }}</span>
-                                </td>
-                                <td>
-                                    <strong style="color: var(--emerald-text); font-size: 0.92rem;">${{ number_format($wd->net_usdt, 2) }}</strong>
-                                </td>
-                                <td>
-                                    @if(!empty($wd->wallet))
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <a href="https://bscscan.com/address/{{ $wd->wallet }}" target="_blank" class="font-mono" style="font-size: 0.74rem; color: var(--primary); text-decoration: none;" title="{{ $wd->wallet }}">
-                                                {{ substr($wd->wallet, 0, 6) }}...{{ substr($wd->wallet, -4) }}
-                                            </a>
-                                            <button type="button" class="btn-action" style="padding: 2px 6px; font-size: 0.65rem;" onclick="copyToClipboard('{{ $wd->wallet }}')" title="Copy Wallet">
-                                                <i class="fa-regular fa-copy"></i>
+                                <tr class="withdrawal-row" data-category="{{ $wd->category }}"
+                                    data-status="{{ $wd->status_key }}" data-date="{{ $wd->raw_date }}"
+                                    data-search="{{ strtolower($wd->id . ' ' . $wd->uuid . ' ' . $wd->name . ' ' . $wd->wallet . ' ' . $wd->tx_hash . ' ' . $wd->type_label) }}">
+                                    <td class="font-mono" style="font-weight: 600;">#{{ $wd->id }}</td>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-heading);">{{ $wd->uuid }}</div>
+                                        <div style="font-size: 0.72rem; color: var(--text-muted);">{{ $wd->name }}</div>
+                                    </td>
+                                    <td>
+                                        @if($wd->category === 'working')
+                                            <span class="badge badge-indigo"><i class="fa-solid fa-briefcase"></i> Working
+                                                Withdrawal</span>
+                                        @else
+                                            <span class="badge badge-cyan"><i class="fa-solid fa-microchip"></i>
+                                                {{ $wd->type_label }}</span>
+                                        @endif
+                                        @if($wd->cai_amount > 0)
+                                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;"
+                                                class="font-mono">
+                                                {{ number_format($wd->cai_amount, 2) }} CAAI
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($wd->category === 'working')
+                                            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
+                                                @if($wd->direct_usdt > 0)
+                                                    <span class="badge"
+                                                        style="background: #eef2ff; color: #4338ca; font-size: 0.68rem;">Direct:
+                                                        ${{ number_format($wd->direct_usdt, 2) }}</span>
+                                                @endif
+                                                @if($wd->level_usdt > 0)
+                                                    <span class="badge"
+                                                        style="background: #ecfdf5; color: #047857; font-size: 0.68rem;">Level:
+                                                        ${{ number_format($wd->level_usdt, 2) }}</span>
+                                                @endif
+                                                @if($wd->pool_usdt > 0)
+                                                    <span class="badge"
+                                                        style="background: #fffbeb; color: #b45309; font-size: 0.68rem;">Pool:
+                                                        ${{ number_format($wd->pool_usdt, 2) }}</span>
+                                                @endif
+                                                @if($wd->rank_usdt > 0)
+                                                    <span class="badge"
+                                                        style="background: #ecfeff; color: #0e7490; font-size: 0.68rem;">Rank:
+                                                        ${{ number_format($wd->rank_usdt, 2) }}</span>
+                                                @endif
+                                                @if($wd->direct_usdt == 0 && $wd->level_usdt == 0 && $wd->pool_usdt == 0 && $wd->rank_usdt == 0)
+                                                    <span style="font-size: 0.72rem; color: var(--text-muted);">Working Wallet
+                                                        Pool</span>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span style="font-size: 0.72rem; color: var(--text-muted);">Mining / ROI
+                                                Portfolio</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <strong
+                                            style="color: var(--text-heading); font-size: 0.88rem;">${{ number_format($wd->gross_usdt, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        <span
+                                            style="color: var(--amber-text); font-weight: 600; font-size: 0.82rem;">-${{ number_format($wd->fee_usdt, 2) }}</span>
+                                    </td>
+                                    <td>
+                                        <strong
+                                            style="color: var(--emerald-text); font-size: 0.92rem;">${{ number_format($wd->net_usdt, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        @if(!empty($wd->wallet))
+                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                <a href="https://bscscan.com/address/{{ $wd->wallet }}" target="_blank"
+                                                    class="font-mono"
+                                                    style="font-size: 0.74rem; color: var(--primary); text-decoration: none;"
+                                                    title="{{ $wd->wallet }}">
+                                                    {{ substr($wd->wallet, 0, 6) }}...{{ substr($wd->wallet, -4) }}
+                                                </a>
+                                                <button type="button" class="btn-action"
+                                                    style="padding: 2px 6px; font-size: 0.65rem;"
+                                                    onclick="copyToClipboard('{{ $wd->wallet }}')" title="Copy Wallet">
+                                                    <i class="fa-regular fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <span style="color: var(--text-muted); font-size: 0.74rem;">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(!empty($wd->tx_hash))
+                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                <a href="https://bscscan.com/tx/{{ $wd->tx_hash }}" target="_blank"
+                                                    class="font-mono"
+                                                    style="font-size: 0.74rem; color: var(--emerald-text); text-decoration: none; font-weight: 600;"
+                                                    title="{{ $wd->tx_hash }}">
+                                                    {{ substr($wd->tx_hash, 0, 8) }}...{{ substr($wd->tx_hash, -6) }}
+                                                    <i class="fa-solid fa-arrow-up-right-from-square"
+                                                        style="font-size: 0.64rem;"></i>
+                                                </a>
+                                                <button type="button" class="btn-action"
+                                                    style="padding: 2px 6px; font-size: 0.65rem;"
+                                                    onclick="copyToClipboard('{{ $wd->tx_hash }}')" title="Copy TxHash">
+                                                    <i class="fa-regular fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <span style="color: var(--text-muted); font-size: 0.73rem;">Off-Chain / Awaiting
+                                                Tx</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($wd->status_key === 'confirmed')
+                                            <span class="badge badge-active"><i class="fa-solid fa-check-circle"></i>
+                                                {{ $wd->status_label }}</span>
+                                        @elseif($wd->status_key === 'pending')
+                                            <span class="badge badge-amber"><i class="fa-solid fa-clock"></i>
+                                                {{ $wd->status_label }}</span>
+                                        @else
+                                            <span class="badge badge-inactive"><i class="fa-solid fa-xmark"></i>
+                                                {{ $wd->status_label }}</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-size: 0.74rem; color: var(--text-muted); white-space: nowrap;">
+                                        {{ $wd->created_at }}
+                                    </td>
+                                    <td>
+                                        @if($wd->userid)
+                                            <button type="button" class="btn-action" style="padding: 4px 8px;"
+                                                onclick="openUserModal({{ $wd->userid }})"
+                                                title="View Member Profile & History">
+                                                <i class="fa-solid fa-eye"></i>
                                             </button>
-                                        </div>
-                                    @else
-                                        <span style="color: var(--text-muted); font-size: 0.74rem;">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(!empty($wd->tx_hash))
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <a href="https://bscscan.com/tx/{{ $wd->tx_hash }}" target="_blank" class="font-mono" style="font-size: 0.74rem; color: var(--emerald-text); text-decoration: none; font-weight: 600;" title="{{ $wd->tx_hash }}">
-                                                {{ substr($wd->tx_hash, 0, 8) }}...{{ substr($wd->tx_hash, -6) }}
-                                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.64rem;"></i>
-                                            </a>
-                                            <button type="button" class="btn-action" style="padding: 2px 6px; font-size: 0.65rem;" onclick="copyToClipboard('{{ $wd->tx_hash }}')" title="Copy TxHash">
-                                                <i class="fa-regular fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    @else
-                                        <span style="color: var(--text-muted); font-size: 0.73rem;">Off-Chain / Awaiting Tx</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($wd->status_key === 'confirmed')
-                                        <span class="badge badge-active"><i class="fa-solid fa-check-circle"></i> {{ $wd->status_label }}</span>
-                                    @elseif($wd->status_key === 'pending')
-                                        <span class="badge badge-amber"><i class="fa-solid fa-clock"></i> {{ $wd->status_label }}</span>
-                                    @else
-                                        <span class="badge badge-inactive"><i class="fa-solid fa-xmark"></i> {{ $wd->status_label }}</span>
-                                    @endif
-                                </td>
-                                <td style="font-size: 0.74rem; color: var(--text-muted); white-space: nowrap;">
-                                    {{ $wd->created_at }}
-                                </td>
-                                <td>
-                                    @if($wd->userid)
-                                    <button type="button" class="btn-action" style="padding: 4px 8px;" onclick="openUserModal({{ $wd->userid }})" title="View Member Profile & History">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </button>
-                                    @endif
-                                </td>
-                            </tr>
+                                        @endif
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="12" style="text-align: center; padding: 36px; color: var(--text-muted);">
-                                    <i class="fa-solid fa-money-bill-transfer" style="font-size: 1.6rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-                                    No withdrawal transactions recorded yet.
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="12" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                        <i class="fa-solid fa-money-bill-transfer"
+                                            style="font-size: 1.6rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                                        No withdrawal transactions recorded yet.
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -2005,213 +2253,344 @@
         </div>
 
         @if(!$isSubAdminUser)
-        <!-- ======================================================== -->
-        <!-- TAB 6: SMART CONTRACT HUB                                 -->
-        <!-- ======================================================== -->
-        <div id="tab-contracts" class="tab-content-panel" style="display: none;">
-            
-            <div class="portal-card-header" style="margin-bottom: 16px;">
-                <div>
-                    <div class="card-heading"><i class="fa-solid fa-cube"></i> Deployed Smart Contract Infrastructure</div>
-                    <div class="card-caption">Real-time on-chain verifiable addresses and status on BSC Mainnet (Chain ID 56)</div>
+            <!-- ======================================================== -->
+            <!-- TAB 6: SMART CONTRACT HUB                                 -->
+            <!-- ======================================================== -->
+            <div id="tab-contracts" class="tab-content-panel" style="display: none;">
+
+                <div class="portal-card-header" style="margin-bottom: 16px;">
+                    <div>
+                        <div class="card-heading"><i class="fa-solid fa-cube"></i> Deployed Smart Contract Infrastructure
+                        </div>
+                        <div class="card-caption">Real-time on-chain verifiable addresses and status on BSC Mainnet (Chain
+                            ID 56)</div>
+                    </div>
+
+                    <button class="btn-action primary" onclick="refreshLiveOnChainBalances()">
+                        <i class="fa-solid fa-arrows-rotate"></i> Query Live RPC
+                    </button>
                 </div>
 
-                <button class="btn-action primary" onclick="refreshLiveOnChainBalances()">
-                    <i class="fa-solid fa-arrows-rotate"></i> Query Live RPC
-                </button>
+                <!-- Dedicated Full Operations Console Banner -->
+                <div
+                    style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: var(--radius-lg); padding: 20px 24px; color: #ffffff; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow-card);">
+                    <div>
+                        <div
+                            style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-shield-halved" style="color: #34d399;"></i> Protocol V3 2-of-2 Multisig
+                            Step-by-Step Signing & Governance Console
+                        </div>
+                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
+                            Connect <strong>Admin 1</strong> ➔ Sign Step 1 ➔ Click <strong>Switch Wallet</strong> ➔ Connect
+                            <strong>Admin 2</strong> ➔ Sign Step 2 (Executes On-Chain!). Split: <strong>30% Pool / 40% Vault
+                                / 20% Trading / 10% Partners</strong>.
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button onclick="idxSwitchMetaMaskWallet()" class="btn-action"
+                            style="background: rgba(255,255,255,0.14); color: #ffffff; font-weight: 700; padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); cursor: pointer;">
+                            <i class="fa-solid fa-repeat"></i> Switch Wallet (Admin 1 ⇄ Admin 2)
+                        </button>
+                        <a href="{{ route('contract-admin.contracts') }}" class="btn-action"
+                            style="background: #38bdf8; color: #0f172a; font-weight: 800; text-decoration: none; padding: 10px 20px; border-radius: 8px; white-space: nowrap; border: none;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Full Multisig Console
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Interactive 2-of-2 Multisig Step-by-Step Quick Console -->
+                <div
+                    style="background: #ffffff; border: 2px solid #10b981; border-radius: var(--radius-lg); padding: 20px; margin-bottom: 22px; box-shadow: var(--shadow-card);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <div
+                                style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 800; color: var(--text-heading); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-key" style="color: #10b981;"></i> Step-by-Step 2-of-2 Multisig Token
+                                Transfer Console
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                                Admin 1: <code style="color:#059669; font-weight:700;">0x648B...ae78</code> &nbsp;|&nbsp;
+                                Admin 2: <code style="color:#2563eb; font-weight:700;">0x79B4...88Fe</code>
+                            </div>
+                        </div>
+                        <div id="idxActiveRoleBadge"
+                            style="background: #f1f5f9; color: #334155; padding: 6px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; border: 1px solid #cbd5e1;">
+                            Wallet: Connect MetaMask
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px;">
+                        <!-- Transfer CAAI / USDT from Engine -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
+                            <div
+                                style="font-weight: 800; font-size: 0.9rem; color: #0f172a; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                                <span>Transfer CAAI / USDT from Mining Engine</span>
+                                <span
+                                    style="font-size: 0.72rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 99px;">2-of-2
+                                    Multisig</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <label
+                                        style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Select
+                                        Asset</label>
+                                    <select id="idxRescueToken" onchange="idxCheckEngineRescueStatus()"
+                                        style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.8rem; font-weight: 600;">
+                                        <option value="{{ $contracts['caiTokenAddress'] }}">CAAI Token</option>
+                                        <option value="{{ $contracts['usdtTokenAddress'] }}">USDT (BEP-20)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size: 0.72rem; font-weight: 700; color: #475569; display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span>Amount</span>
+                                        <a href="javascript:void(0)" onclick="idxFillEngineMaxToken()"
+                                            style="color: #4f46e5; text-decoration: none;">[Use Max]</a>
+                                    </label>
+                                    <input type="text" id="idxRescueAmount" value="1000"
+                                        oninput="idxCheckEngineRescueStatus()"
+                                        style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.8rem; font-family: monospace;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label
+                                    style="font-size: 0.72rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Destination
+                                    Wallet Address (`to`)</label>
+                                <input type="text" id="idxRescueTo"
+                                    value="{{ $contracts['multisigAdmin1'] ?? '0x648BaF30B915fDDF981D10B43D504207cfF3ae78' }}"
+                                    oninput="idxCheckEngineRescueStatus()"
+                                    style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.78rem; font-family: monospace;">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                                <div
+                                    style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px;">
+                                    <div style="font-size: 0.68rem; color: #64748b; font-weight: 700;">STEP 1: ADMIN 1
+                                        (0x648B...ae78)</div>
+                                    <div id="idxAdmin1Badge"
+                                        style="font-size: 0.78rem; font-weight: 800; color: #d97706; margin-top: 2px;">⏳
+                                        Pending Sign</div>
+                                </div>
+                                <div
+                                    style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px;">
+                                    <div style="font-size: 0.68rem; color: #64748b; font-weight: 700;">STEP 2: ADMIN 2
+                                        (0x79B4...88Fe)</div>
+                                    <div id="idxAdmin2Badge"
+                                        style="font-size: 0.78rem; font-weight: 800; color: #d97706; margin-top: 2px;">⏳
+                                        Pending Sign</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn-action primary" onclick="idxSignEngineRescue()"
+                                    style="flex: 1; justify-content: center; background: #10b981; border-color: #10b981;">
+                                    <i class="fa-solid fa-file-signature"></i> Sign with Connected Admin
+                                </button>
+                                <button class="btn-action" onclick="idxSwitchMetaMaskWallet()"
+                                    style="justify-content: center;">
+                                    <i class="fa-solid fa-repeat"></i> Switch Wallet
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Trigger Green Pool Buy Trade (invest) -->
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px;">
+                            <div
+                                style="font-weight: 800; font-size: 0.9rem; color: #14532d; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="fa-solid fa-bolt" style="color: #16a34a;"></i> Trigger Green Pool Buy Trade (`invest`)</span>
+                                <span
+                                    style="font-size: 0.72rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 99px;">Direct Buy Blocked · Engine Allowed</span>
+                            </div>
+                            <div style="font-size: 0.75rem; color: #166534; margin-bottom: 10px; line-height: 1.45;">
+                                Direct PancakeSwap buy blocked hai. Connected wallet (Deployer / Admin) se `invest()` call krke live <b>Green Buy Candle</b> trigger karein (`30%` Pool Buy + `40%` Vault + `30%` Splitter).
+                            </div>
+
+                            <div style="margin-bottom: 10px;">
+                                <label
+                                    style="font-size: 0.72rem; font-weight: 700; color: #14532d; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <span>Total USDT Amount (`invest`)</span>
+                                    <span style="display: inline-flex; gap: 8px;">
+                                        <a href="javascript:void(0)" onclick="document.getElementById('idxTestTradeUsdt').value='1'; idxUpdateTestTradePreview();"
+                                            style="color: #15803d; text-decoration: none; font-weight: 800;">[$1 Total]</a>
+                                        <a href="javascript:void(0)" onclick="document.getElementById('idxTestTradeUsdt').value='3.34'; idxUpdateTestTradePreview();"
+                                            style="color: #0f766e; text-decoration: none; font-weight: 800;">[$3.34 = $1 Pool Buy]</a>
+                                    </span>
+                                </label>
+                                <input type="text" id="idxTestTradeUsdt" value="1"
+                                    oninput="idxUpdateTestTradePreview()"
+                                    style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #86efac; background: #ffffff; font-size: 0.82rem; font-family: monospace; font-weight: 700;">
+                            </div>
+
+                            <div id="idxTestTradeSplitPreview"
+                                style="background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 9px 11px; margin-bottom: 12px; font-size: 0.75rem; color: #166534; font-weight: 700; line-height: 1.5;">
+                                🟢 PancakeSwap Green Buy (30%): <b>$0.30 USDT</b><br>
+                                🏦 Withdrawal Vault (40%): <b>$0.40 USDT</b> · 🤝 Splitter (30%): <b>$0.30 USDT</b>
+                            </div>
+
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button id="idxBtnExecTestTrade" class="btn-action primary" onclick="idxExecuteTestGreenTrade()"
+                                    style="flex: 1; justify-content: center; background: #16a34a; border-color: #16a34a;">
+                                    <i class="fa-solid fa-cart-shopping"></i> Approve USDT & Execute Green Trade
+                                </button>
+                                <button class="btn-action" onclick="idxSwitchMetaMaskWallet()"
+                                    style="justify-content: center;">
+                                    <i class="fa-solid fa-repeat"></i> Switch Wallet
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Contracts Grid -->
+                <div class="contracts-grid">
+
+                    <!-- CAAI Token -->
+                    <div class="contract-box">
+                        <div class="contract-box-top">
+                            <div class="contract-box-title">
+                                <i class="fa-solid fa-coins" style="color: #4f46e5;"></i> CAAI Token (BEP-20)
+                            </div>
+                            <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced</span>
+                        </div>
+                        <div class="contract-addr-row">
+                            <span>{{ substr($contracts['caiTokenAddress'], 0, 8) }}...{{ substr($contracts['caiTokenAddress'], -6) }}</span>
+                            <button class="btn-action" style="padding: 2px 6px;"
+                                onclick="copyToClipboard('{{ $contracts['caiTokenAddress'] }}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="contract-metrics-row">
+                            <span>Total Supply: <strong>777,777 CAAI</strong></span>
+                            <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank"
+                                style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                                BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- PancakeSwap Pair -->
+                    <div class="contract-box">
+                        <div class="contract-box-top">
+                            <div class="contract-box-title">
+                                <i class="fa-solid fa-water" style="color: #06b6d4;"></i> PancakeSwap V2 Pair
+                            </div>
+                            <span class="badge badge-active">Live Pool</span>
+                        </div>
+                        <div class="contract-addr-row">
+                            <span>{{ substr($contracts['pancakePairAddress'], 0, 8) }}...{{ substr($contracts['pancakePairAddress'], -6) }}</span>
+                            <button class="btn-action" style="padding: 2px 6px;"
+                                onclick="copyToClipboard('{{ $contracts['pancakePairAddress'] }}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="contract-metrics-row">
+                            <span>Live Price: <strong id="boxPrice">Syncing...</strong></span>
+                            <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank"
+                                style="color: var(--emerald); text-decoration: none; font-weight: 600;">
+                                Chart <i class="fa-solid fa-chart-line" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cyera Mining Engine -->
+                    <div class="contract-box">
+                        <div class="contract-box-top">
+                            <div class="contract-box-title">
+                                <i class="fa-solid fa-microchip" style="color: #10b981;"></i> Cyera Mining Engine
+                            </div>
+                            <span class="badge badge-active">Verified</span>
+                        </div>
+                        <div class="contract-addr-row">
+                            <span>{{ substr($contracts['miningEngineAddress'], 0, 8) }}...{{ substr($contracts['miningEngineAddress'], -6) }}</span>
+                            <button class="btn-action" style="padding: 2px 6px;"
+                                onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="contract-metrics-row">
+                            <span>Buffer: <strong id="boxBuffer">Syncing...</strong></span>
+                            <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}#code"
+                                target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                                BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Splitter -->
+                    <div class="contract-box">
+                        <div class="contract-box-top">
+                            <div class="contract-box-title">
+                                <i class="fa-solid fa-code-fork" style="color: #f59e0b;"></i> Revenue Splitter V3
+                            </div>
+                            <span class="badge badge-active">Active</span>
+                        </div>
+                        <div class="contract-addr-row">
+                            <span>{{ substr($contracts['revenueSplitterAddress'], 0, 8) }}...{{ substr($contracts['revenueSplitterAddress'], -6) }}</span>
+                            <button class="btn-action" style="padding: 2px 6px;"
+                                onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="contract-metrics-row">
+                            <span>Split: <strong>30/40/20/10</strong></span>
+                            <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}#code"
+                                target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                                BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- USDT Withdrawal Vault -->
+                    <div class="contract-box">
+                        <div class="contract-box-top">
+                            <div class="contract-box-title">
+                                <i class="fa-solid fa-vault" style="color: #8b5cf6;"></i> USDT Withdrawal Vault
+                            </div>
+                            <span class="badge badge-active">Secure</span>
+                        </div>
+                        <div class="contract-addr-row">
+                            <span>{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 8) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -6) }}</span>
+                            <button class="btn-action" style="padding: 2px 6px;"
+                                onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="contract-metrics-row">
+                            <span>USDT: <strong id="boxVaultUsdt">Syncing...</strong></span>
+                            <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}#code"
+                                target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                                BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-
-            <!-- Dedicated Full Operations Console Banner -->
-            <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: var(--radius-lg); padding: 20px 24px; color: #ffffff; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow-card);">
-                <div>
-                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-gears" style="color: #38bdf8;"></i> Dedicated Smart Contract Operations & Governance Console
-                    </div>
-                    <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">
-                        Execute all contract owner functions directly on-chain: rescueTokens, distribute (68/20/10/2), update wallets, emergency withdrawal, pause/unpause, and sweep jackpot funds.
-                    </div>
-                </div>
-                <a href="{{ url('/dishi/yashi/contracts') }}" class="btn-action" style="background: #38bdf8; color: #0f172a; font-weight: 800; text-decoration: none; padding: 10px 20px; border-radius: 8px; white-space: nowrap; border: none;">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Full Console Page
-                </a>
-            </div>
-
-            <!-- Smart Contracts Grid -->
-            <div class="contracts-grid">
-                
-                <!-- CAAI Token -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-coins" style="color: #4f46e5;"></i> CAAI Token (BEP-20)
-                        </div>
-                        <span class="badge badge-active"><i class="fa-solid fa-lock"></i> Renounced</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['caiTokenAddress'], 0, 8) }}...{{ substr($contracts['caiTokenAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['caiTokenAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Total Supply: <strong>777,777 CAAI</strong></span>
-                        <a href="https://bscscan.com/token/{{ $contracts['caiTokenAddress'] }}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- PancakeSwap Pair -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-water" style="color: #06b6d4;"></i> PancakeSwap V2 Pair
-                        </div>
-                        <span class="badge badge-active">Live Pool</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['pancakePairAddress'], 0, 8) }}...{{ substr($contracts['pancakePairAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['pancakePairAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Live Price: <strong id="boxPrice">$0.8276</strong></span>
-                        <a href="https://dexscreener.com/bsc/{{ $contracts['pancakePairAddress'] }}" target="_blank" style="color: var(--emerald); text-decoration: none; font-weight: 600;">
-                            Chart <i class="fa-solid fa-chart-line" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Cyera Mining Engine -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-microchip" style="color: #10b981;"></i> Cyera Mining Engine
-                        </div>
-                        <span class="badge badge-active">Verified</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['miningEngineAddress'], 0, 8) }}...{{ substr($contracts['miningEngineAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['miningEngineAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Buffer: <strong id="boxBuffer">40,454 CAAI</strong></span>
-                        <a href="https://bscscan.com/address/{{ $contracts['miningEngineAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Revenue Splitter -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-code-fork" style="color: #f59e0b;"></i> Revenue Splitter V2
-                        </div>
-                        <span class="badge badge-active">Active</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['revenueSplitterAddress'], 0, 8) }}...{{ substr($contracts['revenueSplitterAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['revenueSplitterAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Split: <strong>68/20/10/2</strong></span>
-                        <a href="https://bscscan.com/address/{{ $contracts['revenueSplitterAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- USDT Withdrawal Vault -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-vault" style="color: #8b5cf6;"></i> USDT Withdrawal Vault
-                        </div>
-                        <span class="badge badge-active">Secure</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['usdtWithdrawalVaultAddress'], 0, 8) }}...{{ substr($contracts['usdtWithdrawalVaultAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['usdtWithdrawalVaultAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>USDT: <strong id="boxVaultUsdt">0.00 USDT</strong></span>
-                        <a href="https://bscscan.com/address/{{ $contracts['usdtWithdrawalVaultAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Royal Jackpot Deposit -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> Royal Jackpot Deposit
-                        </div>
-                        <span class="badge badge-active">Auto-Forward</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['royalJackpotDepositAddress'], 0, 8) }}...{{ substr($contracts['royalJackpotDepositAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['royalJackpotDepositAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Collector: <strong>0xBb83...</strong></span>
-                        <a href="https://bscscan.com/address/{{ $contracts['royalJackpotDepositAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Royal Jackpot Vault -->
-                <div class="contract-box">
-                    <div class="contract-box-top">
-                        <div class="contract-box-title">
-                            <i class="fa-solid fa-crown" style="color: #ef4444;"></i> Royal Jackpot Vault
-                        </div>
-                        <span class="badge badge-active">Claim Ready</span>
-                    </div>
-                    <div class="contract-addr-row">
-                        <span>{{ substr($contracts['royalJackpotVaultAddress'], 0, 8) }}...{{ substr($contracts['royalJackpotVaultAddress'], -6) }}</span>
-                        <button class="btn-action" style="padding: 2px 6px;" onclick="copyToClipboard('{{ $contracts['royalJackpotVaultAddress'] }}')">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="contract-metrics-row">
-                        <span>Signer: <strong>0xEf53...</strong></span>
-                        <a href="https://bscscan.com/address/{{ $contracts['royalJackpotVaultAddress'] }}#code" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                            BscScan <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
         @else
-        <!-- Subadmin Restricted Placeholder -->
-        <div id="tab-contracts" class="tab-content-panel" style="display: none;">
-            <div class="portal-card" style="text-align: center; padding: 60px 24px;">
-                <div style="width: 72px; height: 72px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
-                    <i class="fa-solid fa-lock"></i>
+            <!-- Subadmin Restricted Placeholder -->
+            <div id="tab-contracts" class="tab-content-panel" style="display: none;">
+                <div class="portal-card" style="text-align: center; padding: 60px 24px;">
+                    <div
+                        style="width: 72px; height: 72px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3
+                        style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px;">
+                        Smart Contract Operations Restricted</h3>
+                    <p
+                        style="font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 20px; line-height: 1.5;">
+                        Your subadmin account has full management access for MLM members, genealogy trees, stakings, and
+                        directs. All smart contract executions, parameters, and on-chain functions are strictly restricted
+                        to the Protocol Owner.
+                    </p>
+                    <button class="btn-action primary"
+                        onclick="switchTab('tab-overview', document.querySelector('.tab-bar .tab-btn'))">
+                        <i class="fa-solid fa-arrow-left"></i> Return to Overview
+                    </button>
                 </div>
-                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px;">Smart Contract Operations Restricted</h3>
-                <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 20px; line-height: 1.5;">
-                    Your subadmin account has full management access for MLM members, genealogy trees, stakings, and directs. All smart contract executions, parameters, and on-chain functions are strictly restricted to the Protocol Owner.
-                </p>
-                <button class="btn-action primary" onclick="switchTab('tab-overview', document.querySelector('.tab-bar .tab-btn'))">
-                    <i class="fa-solid fa-arrow-left"></i> Return to Overview
-                </button>
             </div>
-        </div>
         @endif
 
     </main>
@@ -2224,7 +2603,8 @@
                 <button class="modal-close" onclick="closeUserModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body" id="modalUserContent">
-                <div style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+                <div style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                </div>
             </div>
         </div>
     </div>
@@ -2240,17 +2620,20 @@
             usdtVault: "{{ $contracts['usdtWithdrawalVaultAddress'] }}",
             jackpotDeposit: "{{ $contracts['royalJackpotDepositAddress'] }}",
             jackpotVault: "{{ $contracts['royalJackpotVaultAddress'] }}",
-            tradingWallet: "{{ $contracts['tradingWallet'] ?? '0xAC2aa717c6f4c18D2e4b1DD11aa17BFCA8cc8D53' }}",
-            reserveWallet: "{{ $contracts['reserveWallet'] ?? '0x63BAF2Aa307DC8a456690a705c40d63194C0dd70' }}",
-            treasuryWallet: "{{ $contracts['adminOwnerAddress'] ?? '0xB68e29B51BB9B0856211cb2856215e3F68243622' }}",
+            tradingWallet: "{{ $contracts['tradingWallet'] ?? '0xC09BB68cC8DAEB7024910ea3748f94ff75A080d1' }}",
+            reserveWallet: "{{ $contracts['reserveWallet'] ?? '' }}",
+            treasuryWallet: "{{ $contracts['adminOwnerAddress'] ?? '0x648BaF30B915fDDF981D10B43D504207cfF3ae78' }}",
             partnerWallets: {!! json_encode($contracts['partnerWallets'] ?? [
-                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
-                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
-                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
-                '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
-                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
-            ]) !!},
+    '0x4828885EeE174ec7a495300dF47df239Bb68353F',
+    '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
+    '0x0141A69d92a9d4EDA280Fcc15548b21AD6C5eED8',
+    '0xfb3548279b903dc2b371b059aeb1fe28ce5ae4f1',
+    '0x2125c47a3178eB309D68253579D30a1D99c393a9'
+]) !!},
             usdtToken: "{{ $contracts['usdtTokenAddress'] }}",
+            multisigAdmin1: "{{ $contracts['multisigAdmin1'] ?? '0x648BaF30B915fDDF981D10B43D504207cfF3ae78' }}",
+            multisigAdmin2: "{{ $contracts['multisigAdmin2'] ?? '0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe' }}",
+            deployerWallet: "{{ $contracts['deployerWallet'] ?? '0x9B554c1A09BDF1d3f853014F4c458A2998DAF2Ce' }}",
             rpcUrl: "{{ $contracts['bscMainnetRpc'] }}",
             chainId: 56
         };
@@ -2266,7 +2649,7 @@
 
             document.querySelectorAll('.tab-content-panel').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
+
             const target = document.getElementById(tabId);
             if (target) target.style.display = 'block';
             if (btn) btn.classList.add('active');
@@ -2308,7 +2691,7 @@
             `;
 
             try {
-                const res = await fetch(`/dishi/yashi/genealogy?search=${encodeURIComponent(searchQuery)}`);
+                const res = await fetch(`/dora/the/explorer/genealogy?search=${encodeURIComponent(searchQuery)}`);
                 const data = await res.json();
 
                 if (!data.success || !data.data) {
@@ -2418,7 +2801,7 @@
             try {
                 btn.disabled = true;
                 const token = "{{ csrf_token() }}";
-                const res = await fetch('/dishi/yashi/toggle-status', {
+                const res = await fetch('/dora/the/explorer/toggle-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2449,7 +2832,7 @@
             content.innerHTML = `<div style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
 
             try {
-                const res = await fetch(`/dishi/yashi/user-details/${userId}`);
+                const res = await fetch(`/dora/the/explorer/user-details/${userId}`);
                 const data = await res.json();
                 if (data.success) {
                     const u = data.user;
@@ -2506,7 +2889,7 @@
                                             <td>$${Number(w.amount || 0).toFixed(2)}</td>
                                             <td style="color: var(--emerald-text); font-weight: 700;">$${Number(w.net_amount || 0).toFixed(2)}</td>
                                             <td class="font-mono" style="font-size: 0.7rem;">
-                                                ${w.transaction_hash ? `<a href="https://bscscan.com/tx/${w.transaction_hash}" target="_blank" style="color: var(--primary);">${w.transaction_hash.slice(0,8)}...</a>` : '—'}
+                                                ${w.transaction_hash ? `<a href="https://bscscan.com/tx/${w.transaction_hash}" target="_blank" style="color: var(--primary);">${w.transaction_hash.slice(0, 8)}...</a>` : '—'}
                                             </td>
                                             <td style="font-size: 0.72rem;">${w.created_at}</td>
                                         </tr>
@@ -2584,13 +2967,33 @@
             }
         }
 
-        // Real-Time On-Chain Balance Sync via BSC Provider
+        // Real-Time On-Chain Balance Sync via BSC Provider (100% Live — Multi-RPC & Fault-Tolerant)
+        async function getWorkingBscProvider() {
+            const rpcs = [
+                CONFIG.rpcUrl,
+                'https://bsc-dataseed.binance.org/',
+                'https://bsc-rpc.publicnode.com',
+                'https://bsc-dataseed1.defibit.io/'
+            ].filter(Boolean);
+
+            for (const url of rpcs) {
+                try {
+                    const p = new ethers.JsonRpcProvider(url);
+                    await p.getBlockNumber();
+                    return p;
+                } catch (e) {
+                    continue;
+                }
+            }
+            return new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+        }
+
         async function refreshLiveOnChainBalances() {
             const spinner = document.getElementById('balanceSyncSpinner');
             if (spinner) spinner.classList.add('fa-spin');
 
             try {
-                const provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                const provider = await getWorkingBscProvider();
                 const pairAbi = [
                     "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
                     "function token0() view returns (address)"
@@ -2601,52 +3004,57 @@
                 const cai = new ethers.Contract(CONFIG.caiToken, erc20Abi, provider);
                 const usdt = new ethers.Contract(CONFIG.usdtToken, erc20Abi, provider);
 
-                // Fetch all on-chain balances in parallel
+                const safeBal = (token, addr) => (addr && ethers.isAddress(addr)) ? token.balanceOf(addr).catch(() => 0n) : Promise.resolve(0n);
+                const safeBnb = (addr) => (addr && ethers.isAddress(addr)) ? provider.getBalance(addr).catch(() => 0n) : Promise.resolve(0n);
+
+                // Fetch all live on-chain balances in parallel
                 const [
                     reserves,
                     token0,
                     vaultUsdt,
                     tradingUsdt,
-                    reserveUsdt,
                     miningCaai,
                     miningUsdt,
                     splitterUsdt,
-                    jackpotVaultUsdt,
-                    jackpotDepUsdt,
-                    treasuryCaai,
-                    treasuryUsdt,
+                    admin1Caai,
+                    admin1Usdt,
+                    admin1Bnb,
+                    admin2Caai,
+                    admin2Usdt,
+                    admin2Bnb,
                     p1Usdt,
                     p2Usdt,
                     p3Usdt,
                     p4Usdt,
                     p5Usdt
                 ] = await Promise.all([
-                    pair.getReserves(),
-                    pair.token0(),
-                    usdt.balanceOf(CONFIG.usdtVault),
-                    usdt.balanceOf(CONFIG.tradingWallet),
-                    usdt.balanceOf(CONFIG.reserveWallet),
-                    cai.balanceOf(CONFIG.miningEngine),
-                    usdt.balanceOf(CONFIG.miningEngine),
-                    usdt.balanceOf(CONFIG.revenueSplitter),
-                    usdt.balanceOf(CONFIG.jackpotVault),
-                    usdt.balanceOf(CONFIG.jackpotDeposit),
-                    cai.balanceOf(CONFIG.treasuryWallet),
-                    usdt.balanceOf(CONFIG.treasuryWallet),
-                    usdt.balanceOf(CONFIG.partnerWallets[0]),
-                    usdt.balanceOf(CONFIG.partnerWallets[1]),
-                    usdt.balanceOf(CONFIG.partnerWallets[2]),
-                    usdt.balanceOf(CONFIG.partnerWallets[3]),
-                    usdt.balanceOf(CONFIG.partnerWallets[4]),
+                    pair.getReserves().catch(() => [0n, 0n, 0]),
+                    pair.token0().catch(() => ''),
+                    safeBal(usdt, CONFIG.usdtVault),
+                    safeBal(usdt, CONFIG.tradingWallet),
+                    safeBal(cai, CONFIG.miningEngine),
+                    safeBal(usdt, CONFIG.miningEngine),
+                    safeBal(usdt, CONFIG.revenueSplitter),
+                    safeBal(cai, CONFIG.multisigAdmin1),
+                    safeBal(usdt, CONFIG.multisigAdmin1),
+                    safeBnb(CONFIG.multisigAdmin1),
+                    safeBal(cai, CONFIG.multisigAdmin2),
+                    safeBal(usdt, CONFIG.multisigAdmin2),
+                    safeBnb(CONFIG.multisigAdmin2),
+                    safeBal(usdt, CONFIG.partnerWallets[0]),
+                    safeBal(usdt, CONFIG.partnerWallets[1]),
+                    safeBal(usdt, CONFIG.partnerWallets[2]),
+                    safeBal(usdt, CONFIG.partnerWallets[3]),
+                    safeBal(usdt, CONFIG.partnerWallets[4]),
                 ]);
 
                 // 1. PancakeSwap Pool
-                const isCaaiToken0 = token0.toLowerCase() === CONFIG.caiToken.toLowerCase();
+                const isCaaiToken0 = token0 && token0.toLowerCase() === CONFIG.caiToken.toLowerCase();
                 const rCaai = isCaaiToken0 ? reserves[0] : reserves[1];
                 const rUsdt = isCaaiToken0 ? reserves[1] : reserves[0];
                 const caaiNum = Number(ethers.formatEther(rCaai));
                 const usdtNum = Number(ethers.formatEther(rUsdt));
-                const price = (usdtNum / (caaiNum || 1)).toFixed(4);
+                const price = caaiNum > 0 ? (usdtNum / caaiNum).toFixed(4) : '0.0000';
                 const totalLiq = (usdtNum * 2).toFixed(2);
 
                 const livePoolPriceEl = document.getElementById('livePoolPrice');
@@ -2654,63 +3062,64 @@
                 const livePoolLiqEl = document.getElementById('livePoolLiq');
                 if (livePoolLiqEl) livePoolLiqEl.innerText = `~$${totalLiq}`;
                 const livePoolCaaiEl = document.getElementById('livePoolCaai');
-                if (livePoolCaaiEl) livePoolCaaiEl.innerText = `${caaiNum.toFixed(2)} CAAI`;
+                if (livePoolCaaiEl) livePoolCaaiEl.innerText = `${caaiNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} CAAI`;
                 const livePoolUsdtEl = document.getElementById('livePoolUsdt');
-                if (livePoolUsdtEl) livePoolUsdtEl.innerText = `${usdtNum.toFixed(2)} USDT`;
+                if (livePoolUsdtEl) livePoolUsdtEl.innerText = `${usdtNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
                 const boxPriceEl = document.getElementById('boxPrice');
                 if (boxPriceEl) boxPriceEl.innerText = `$${price}`;
 
-                // 2. USDT Withdrawal Vault
+                // 2. 40% USDT Withdrawal Vault
                 const vUsdtNum = Number(ethers.formatEther(vaultUsdt));
                 const dashVaultUsdt = document.getElementById('dashVaultUsdt');
-                if (dashVaultUsdt) dashVaultUsdt.innerHTML = `$${vUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+                if (dashVaultUsdt) dashVaultUsdt.innerHTML = `$${vUsdtNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
                 const boxVaultUsdt = document.getElementById('boxVaultUsdt');
                 if (boxVaultUsdt) boxVaultUsdt.innerText = `${vUsdtNum.toFixed(2)} USDT`;
 
                 // 3. 20% Trading Wallet
                 const tUsdtNum = Number(ethers.formatEther(tradingUsdt));
                 const dashTradingUsdt = document.getElementById('dashTradingUsdt');
-                if (dashTradingUsdt) dashTradingUsdt.innerHTML = `$${tUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+                if (dashTradingUsdt) dashTradingUsdt.innerHTML = `$${tUsdtNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
 
-                // 4. 2% Reserve Wallet
-                const rUsdtNum = Number(ethers.formatEther(reserveUsdt));
-                const dashReserveUsdt = document.getElementById('dashReserveUsdt');
-                if (dashReserveUsdt) dashReserveUsdt.innerHTML = `$${rUsdtNum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
-
-                // 5. Mining Engine Buffer
+                // 4. Mining Engine Buffer
                 const mCaaiNum = Number(ethers.formatEther(miningCaai));
                 const mUsdtNum = Number(ethers.formatEther(miningUsdt));
                 const dashMiningCaai = document.getElementById('dashMiningCaai');
-                if (dashMiningCaai) dashMiningCaai.innerHTML = `${mCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
+                if (dashMiningCaai) dashMiningCaai.innerHTML = `${mCaaiNum.toLocaleString('en-US', { maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
                 const dashMiningUsdt = document.getElementById('dashMiningUsdt');
                 if (dashMiningUsdt) dashMiningUsdt.innerText = `$${mUsdtNum.toFixed(2)} USDT`;
                 const miningBufferVal = document.getElementById('miningBufferVal');
-                if (miningBufferVal) miningBufferVal.innerText = `${mCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} CAAI`;
+                if (miningBufferVal) miningBufferVal.innerText = `${mCaaiNum.toLocaleString('en-US', { maximumFractionDigits: 0 })} CAAI`;
                 const boxBuffer = document.getElementById('boxBuffer');
-                if (boxBuffer) boxBuffer.innerText = `${mCaaiNum.toFixed(0)} CAAI`;
+                if (boxBuffer) boxBuffer.innerText = `${mCaaiNum.toLocaleString('en-US', { maximumFractionDigits: 0 })} CAAI`;
 
-                // 6. Revenue Splitter
+                // 5. Revenue Splitter (30%)
                 const sUsdtNum = Number(ethers.formatEther(splitterUsdt));
                 const dashSplitterUsdt = document.getElementById('dashSplitterUsdt');
-                if (dashSplitterUsdt) dashSplitterUsdt.innerHTML = `$${sUsdtNum.toFixed(2)} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
+                if (dashSplitterUsdt) dashSplitterUsdt.innerHTML = `$${sUsdtNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
 
-                // 7. Jackpot Vault & Deposit
-                const jVaultUsdtNum = Number(ethers.formatEther(jackpotVaultUsdt));
-                const jDepUsdtNum = Number(ethers.formatEther(jackpotDepUsdt));
-                const dashJackpotVaultUsdt = document.getElementById('dashJackpotVaultUsdt');
-                if (dashJackpotVaultUsdt) dashJackpotVaultUsdt.innerHTML = `$${jVaultUsdtNum.toFixed(2)} <small style="font-size: 0.8rem; font-weight: 600;">USDT</small>`;
-                const dashJackpotDepositUsdt = document.getElementById('dashJackpotDepositUsdt');
-                if (dashJackpotDepositUsdt) dashJackpotDepositUsdt.innerText = `$${jDepUsdtNum.toFixed(2)} USDT`;
-
-                // 8. Protocol Treasury
-                const trCaaiNum = Number(ethers.formatEther(treasuryCaai));
-                const trUsdtNum = Number(ethers.formatEther(treasuryUsdt));
+                // 6. Multisig Admin 1
+                const a1CaaiNum = Number(ethers.formatEther(admin1Caai));
+                const a1UsdtNum = Number(ethers.formatEther(admin1Usdt));
+                const a1BnbNum = Number(ethers.formatEther(admin1Bnb));
                 const dashTreasuryCaai = document.getElementById('dashTreasuryCaai');
-                if (dashTreasuryCaai) dashTreasuryCaai.innerHTML = `${trCaaiNum.toLocaleString('en-US', {maximumFractionDigits: 0})} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
+                if (dashTreasuryCaai) dashTreasuryCaai.innerHTML = `${a1CaaiNum.toLocaleString('en-US', { maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
                 const dashTreasuryUsdt = document.getElementById('dashTreasuryUsdt');
-                if (dashTreasuryUsdt) dashTreasuryUsdt.innerText = `$${trUsdtNum.toFixed(2)}`;
+                if (dashTreasuryUsdt) dashTreasuryUsdt.innerText = `$${a1UsdtNum.toFixed(2)}`;
+                const dashAdmin1Bnb = document.getElementById('dashAdmin1Bnb');
+                if (dashAdmin1Bnb) dashAdmin1Bnb.innerText = `${a1BnbNum.toFixed(4)} BNB`;
 
-                // 9. Partner Wallets
+                // 7. Multisig Admin 2
+                const a2CaaiNum = Number(ethers.formatEther(admin2Caai));
+                const a2UsdtNum = Number(ethers.formatEther(admin2Usdt));
+                const a2BnbNum = Number(ethers.formatEther(admin2Bnb));
+                const dashAdmin2Caai = document.getElementById('dashAdmin2Caai');
+                if (dashAdmin2Caai) dashAdmin2Caai.innerHTML = `${a2CaaiNum.toLocaleString('en-US', { maximumFractionDigits: 2 })} <small style="font-size: 0.8rem; font-weight: 600;">CAAI</small>`;
+                const dashAdmin2Usdt = document.getElementById('dashAdmin2Usdt');
+                if (dashAdmin2Usdt) dashAdmin2Usdt.innerText = `$${a2UsdtNum.toFixed(2)}`;
+                const dashAdmin2Bnb = document.getElementById('dashAdmin2Bnb');
+                if (dashAdmin2Bnb) dashAdmin2Bnb.innerText = `${a2BnbNum.toFixed(4)} BNB`;
+
+                // 8. Partner Wallets (5 x 2% = 10%)
                 const pNums = [
                     Number(ethers.formatEther(p1Usdt)),
                     Number(ethers.formatEther(p2Usdt)),
@@ -2722,10 +3131,10 @@
                 pNums.forEach((num, idx) => {
                     totalPartner += num;
                     const pEl = document.getElementById(`dashPartner${idx + 1}Usdt`);
-                    if (pEl) pEl.innerText = `$${num.toFixed(2)} USDT`;
+                    if (pEl) pEl.innerText = `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
                 });
                 const totalPartnerEl = document.getElementById('dashTotalPartnerUsdt');
-                if (totalPartnerEl) totalPartnerEl.innerText = `$${totalPartner.toFixed(2)} USDT`;
+                if (totalPartnerEl) totalPartnerEl.innerText = `$${totalPartner.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
                 console.log("✔ Real-time protocol balances synchronized via BSC RPC!");
             } catch (err) {
@@ -2860,11 +3269,250 @@
             a.click();
         }
 
+        // ============================================================
+        // 2-of-2 MULTISIG STEP-BY-STEP SIGNING & LP EXTRACTOR HELPERS
+        // ============================================================
+        function idxUpdateRoleBadge(addr) {
+            const badge = document.getElementById('idxActiveRoleBadge');
+            if (!badge) return;
+            if (!addr) {
+                badge.innerText = 'Wallet: Not Connected';
+                return;
+            }
+            const low = addr.toLowerCase();
+            if (low === CONFIG.multisigAdmin1.toLowerCase()) {
+                badge.innerHTML = '🟢 Connected: <strong>Admin 1</strong> (' + addr.slice(0, 6) + '...' + addr.slice(-4) + ')';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#166534';
+            } else if (low === CONFIG.multisigAdmin2.toLowerCase()) {
+                badge.innerHTML = '🔵 Connected: <strong>Admin 2</strong> (' + addr.slice(0, 6) + '...' + addr.slice(-4) + ')';
+                badge.style.background = '#dbeafe';
+                badge.style.color = '#1e40af';
+            } else if (low === CONFIG.deployerWallet.toLowerCase()) {
+                badge.innerHTML = '🟠 Connected: <strong>LP Deployer</strong> (' + addr.slice(0, 6) + '...' + addr.slice(-4) + ')';
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+            } else {
+                badge.innerHTML = '⚪ Connected: ' + addr.slice(0, 6) + '...' + addr.slice(-4);
+            }
+        }
+
+        async function idxSwitchMetaMaskWallet() {
+            if (!window.ethereum) {
+                alert("Please install MetaMask.");
+                return;
+            }
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_requestPermissions',
+                    params: [{ eth_accounts: {} }]
+                });
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    userWalletAddress = accounts[0];
+                    const btn = document.getElementById('btnConnectWallet');
+                    if (btn) btn.classList.add('connected');
+                    const txt = document.getElementById('walletBtnText');
+                    if (txt) txt.innerText = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+                    idxUpdateRoleBadge(userWalletAddress);
+                    idxCheckEngineRescueStatus();
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        async function idxFillEngineMaxToken() {
+            try {
+                const tokenAddr = document.getElementById('idxRescueToken').value;
+                const provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                const token = new ethers.Contract(tokenAddr, ["function balanceOf(address) view returns (uint256)"], provider);
+                const bal = await token.balanceOf(CONFIG.miningEngine);
+                document.getElementById('idxRescueAmount').value = ethers.formatEther(bal);
+                idxCheckEngineRescueStatus();
+            } catch (e) {
+                alert("Failed to fetch balance: " + e.message);
+            }
+        }
+
+        async function idxCheckEngineRescueStatus() {
+            try {
+                const tokenAddr = document.getElementById('idxRescueToken')?.value;
+                const toAddr = document.getElementById('idxRescueTo')?.value.trim();
+                const amountStr = document.getElementById('idxRescueAmount')?.value.trim();
+                if (!tokenAddr || !ethers.isAddress(toAddr) || !amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) return;
+
+                const provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                const engineAbi = [
+                    "function multisigEpoch() view returns (uint256)",
+                    "function multisigApprovals(bytes32, address) view returns (bool)"
+                ];
+                const pairAbi = ["function balanceOf(address) view returns (uint256)"];
+                const engine = new ethers.Contract(CONFIG.miningEngine, engineAbi, provider);
+                const pair = new ethers.Contract(CONFIG.pancakePair, pairAbi, provider);
+
+                const [epoch, lpBal] = await Promise.all([
+                    engine.multisigEpoch(),
+                    pair.balanceOf(CONFIG.deployerWallet)
+                ]);
+
+                const lpBadge = document.getElementById('idxLpBalanceBadge');
+                if (lpBadge) lpBadge.innerText = `Cake-LP: ${Number(ethers.formatEther(lpBal)).toFixed(4)}`;
+
+                const amountWei = ethers.parseEther(amountStr);
+                const coder = ethers.AbiCoder.defaultAbiCoder();
+                const innerParams = coder.encode(['address', 'address', 'uint256'], [tokenAddr, toAddr, amountWei]);
+                const actionHash = ethers.keccak256(coder.encode(['uint256', 'string', 'bytes'], [epoch, 'RESCUE_TOKENS', innerParams]));
+
+                const [app1, app2] = await Promise.all([
+                    engine.multisigApprovals(actionHash, CONFIG.multisigAdmin1),
+                    engine.multisigApprovals(actionHash, CONFIG.multisigAdmin2)
+                ]);
+
+                const b1 = document.getElementById('idxAdmin1Badge');
+                const b2 = document.getElementById('idxAdmin2Badge');
+                if (b1) {
+                    b1.innerHTML = app1 ? '✅ Approved (1/2 Signed)' : '⏳ Pending Sign';
+                    b1.style.color = app1 ? '#16a34a' : '#d97706';
+                }
+                if (b2) {
+                    b2.innerHTML = app2 ? '✅ Approved (1/2 Signed)' : '⏳ Pending Sign';
+                    b2.style.color = app2 ? '#16a34a' : '#d97706';
+                }
+            } catch (e) {
+                console.warn("idxCheckEngineRescueStatus:", e.message);
+            }
+        }
+
+        async function idxSignEngineRescue() {
+            if (!window.ethereum) return alert("Please connect MetaMask.");
+            try {
+                const tokenAddr = document.getElementById('idxRescueToken').value;
+                const toAddr = document.getElementById('idxRescueTo').value.trim();
+                const amountStr = document.getElementById('idxRescueAmount').value.trim();
+                if (!ethers.isAddress(toAddr)) return alert("Invalid destination address.");
+
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const addr = await signer.getAddress();
+                idxUpdateRoleBadge(addr);
+
+                const engine = new ethers.Contract(CONFIG.miningEngine, [
+                    "function rescueTokens(address token, address to, uint256 amount) external"
+                ], signer);
+
+                const tx = await engine.rescueTokens(tokenAddr, toAddr, ethers.parseEther(amountStr));
+                alert("Signature submitted! Tx: " + tx.hash);
+                await tx.wait();
+                alert("Confirmed on-chain! If this was Admin 1, click 'Switch Wallet' and sign with Admin 2 to complete the transfer.");
+                idxCheckEngineRescueStatus();
+                refreshLiveOnChainBalances();
+            } catch (e) {
+                alert("Transaction failed: " + (e.reason || e.shortMessage || e.message));
+            }
+        }
+
+        function idxUpdateTestTradePreview() {
+            const el = document.getElementById('idxTestTradeUsdt');
+            const preview = document.getElementById('idxTestTradeSplitPreview');
+            if (!el || !preview) return;
+            const amt = parseFloat(el.value);
+            if (isNaN(amt) || amt <= 0) {
+                preview.innerHTML = '⚠️ Valid USDT amount enter karein (e.g. <code>1</code> ya <code>3.34</code>).';
+                return;
+            }
+            const poolBuy = (amt * 0.30).toFixed(2);
+            const vaultAmt = (amt * 0.40).toFixed(2);
+            const splitAmt = (amt * 0.30).toFixed(2);
+            preview.innerHTML = `🟢 PancakeSwap Green Buy (30%): <b>$${poolBuy} USDT</b><br>🏦 Withdrawal Vault (40%): <b>$${vaultAmt} USDT</b> · 🤝 Splitter (30%): <b>$${splitAmt} USDT</b>`;
+        }
+
+        async function idxExecuteTestGreenTrade() {
+            if (!window.ethereum) return alert("Please connect MetaMask.");
+            const btn = document.getElementById('idxBtnExecTestTrade');
+            const origHtml = btn ? btn.innerHTML : '';
+            try {
+                const amtStr = document.getElementById('idxTestTradeUsdt').value.trim();
+                const amtNum = parseFloat(amtStr);
+                if (isNaN(amtNum) || amtNum <= 0) return alert("Valid USDT amount enter karein.");
+
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const network = await provider.getNetwork();
+                if (Number(network.chainId) !== 56) {
+                    return alert("Please switch MetaMask to BNB Smart Chain Mainnet (Chain ID: 56).");
+                }
+
+                const signer = await provider.getSigner();
+                const userAddr = await signer.getAddress();
+                idxUpdateRoleBadge(userAddr);
+
+                const amtWei = ethers.parseEther(amtStr);
+                const usdt = new ethers.Contract(CONFIG.usdtToken, [
+                    "function balanceOf(address) view returns (uint256)",
+                    "function allowance(address, address) view returns (uint256)",
+                    "function approve(address spender, uint256 amount) external returns (bool)"
+                ], signer);
+
+                const [bal, allowance] = await Promise.all([
+                    usdt.balanceOf(userAddr),
+                    usdt.allowance(userAddr, CONFIG.miningEngine)
+                ]);
+
+                if (bal < amtWei) {
+                    return alert(`Insufficient USDT in connected wallet (${userAddr.slice(0, 6)}...${userAddr.slice(-4)}).\nAvailable: ${Number(ethers.formatEther(bal)).toFixed(4)} USDT\nRequired: ${amtStr} USDT`);
+                }
+
+                if (allowance < amtWei) {
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Step 1/2: Approving USDT...';
+                    }
+                    const appTx = await usdt.approve(CONFIG.miningEngine, amtWei);
+                    await appTx.wait();
+                }
+
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Step 2/2: Executing Green Buy...';
+                }
+
+                const engine = new ethers.Contract(CONFIG.miningEngine, [
+                    "function invest(uint256 amountUsdt, uint256 packageId) external"
+                ], signer);
+
+                const tx = await engine.invest(amtWei, 1, { gasLimit: 550000 });
+                alert("Green Buy Trade Submitted! Tx: " + tx.hash);
+                await tx.wait();
+                alert(`✅ Green Pool Buy Trade Confirmed on BSCScan!\nTx: ${tx.hash}`);
+                refreshLiveOnChainBalances();
+            } catch (e) {
+                alert("Trade failed: " + (e.reason || e.shortMessage || e.message));
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+            }
+        }
+
         // Initial Load Actions
         window.addEventListener('DOMContentLoaded', () => {
             refreshLiveOnChainBalances();
             loadGenealogyTree('');
+            idxCheckEngineRescueStatus();
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accs => {
+                    if (accs && accs.length > 0) idxUpdateRoleBadge(accs[0]);
+                }).catch(() => { });
+                window.ethereum.on('accountsChanged', (accs) => {
+                    if (accs && accs.length > 0) {
+                        idxUpdateRoleBadge(accs[0]);
+                        idxCheckEngineRescueStatus();
+                    }
+                });
+            }
         });
     </script>
 </body>
+
 </html>

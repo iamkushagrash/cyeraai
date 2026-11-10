@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CYERA AI — Smart Contract Admin Authentication</title>
-    <meta name="description" content="MetaMask Web3 Cryptographic Authentication Gate for Cyera AI Smart Contract Governance & MLM Command Center.">
+    <meta name="description"
+        content="MetaMask Web3 Cryptographic Authentication Gate for Cyera AI Smart Contract Governance & MLM Command Center.">
     <link rel="icon" type="image/png" href="{{ asset('icon.png') }}">
 
     <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Ethers.js for Web3 Helper Utilities -->
@@ -23,22 +28,22 @@
             --border: #e2e8f0;
             --border-hover: #cbd5e1;
             --border-focus: #6366f1;
-            
+
             --text-heading: #0f172a;
             --text-body: #334155;
             --text-muted: #64748b;
             --text-light: #94a3b8;
-            
+
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --primary-soft: #eef2ff;
             --primary-border: #c7d2fe;
-            
+
             --emerald: #10b981;
             --emerald-soft: #ecfdf5;
             --emerald-border: #a7f3d0;
             --emerald-text: #047857;
-            
+
             --amber: #f59e0b;
             --amber-soft: #fffbeb;
             --amber-border: #fde68a;
@@ -52,7 +57,7 @@
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
-            
+
             --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
             --shadow-card: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.04);
         }
@@ -88,11 +93,13 @@
             pointer-events: none;
             z-index: 0;
         }
+
         .glow-1 {
             top: -150px;
             left: -150px;
             background: #e0e7ff;
         }
+
         .glow-2 {
             bottom: -150px;
             right: -150px;
@@ -113,8 +120,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Header Cluster */
@@ -295,6 +309,7 @@
             transition: all 0.2s;
             box-shadow: var(--shadow-subtle);
         }
+
         .btn-switch-account:hover {
             border-color: var(--primary);
             color: var(--primary);
@@ -454,8 +469,11 @@
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
+
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 480px) {
@@ -463,16 +481,20 @@
                 padding: 30px 20px;
                 border-radius: var(--radius-lg);
             }
+
             .brand-title {
                 font-size: 1.45rem;
             }
+
             .ws-row {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .btn-switch-account {
                 text-align: center;
             }
+
             .auth-steps {
                 flex-direction: column;
                 align-items: flex-start;
@@ -481,6 +503,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Ambient background glows -->
@@ -524,21 +547,39 @@
             @endif
         </div>
 
-        <!-- Designated Protocol Owner & Subadmin Capsule -->
+        <!-- Designated Protocol 2-of-2 Multisig Owners & Subadmin Capsule -->
         <div class="owner-capsule-notice">
             <div class="oc-header">
-                <span class="oc-title"><i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Designated Protocol Owner</span>
-                <span class="oc-badge">Owner Whitelist</span>
+                <span class="oc-title"><i class="fa-solid fa-crown" style="color: #f59e0b;"></i> 2-of-2 Multisig Admin
+                    1</span>
+                <span class="oc-badge">2/2 Multisig Governance</span>
             </div>
-            <div class="oc-address" id="targetOwnerText">0xB68e29B51BB9B0856211cb2856215e3F68243622</div>
-            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.72rem; color: var(--text-muted);">
+            <div class="oc-address" id="targetOwnerText">0x648BaF30B915fDDF981D10B43D504207cfF3ae78</div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border);">
+                <div class="oc-header" style="margin-bottom: 2px;">
+                    <span class="oc-title"><i class="fa-solid fa-crown" style="color: #10b981;"></i> 2-of-2 Multisig
+                        Admin 2</span>
+                    <span class="oc-badge" style="background: #ecfdf5; color: #047857; border-color: #a7f3d0;">Signer
+                        #2</span>
+                </div>
+                <div class="oc-address" style="color: #047857;">0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe</div>
+            </div>
+            <div
+                style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.72rem; color: var(--text-muted);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-key" style="color: #06b6d4;"></i> LP Deployer Wallet:</span>
+                    <span
+                        style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x9B55...F2Ce</span>
+                </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x7e42...20FA8</span>
+                    <span
+                        style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0x7e42...20FA8</span>
                 </div>
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <span><i class="fa-solid fa-user-shield" style="color: #4f46e5;"></i> Subadmin (MLM Only):</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0xC259...c5e8D</span>
+                    <span
+                        style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-heading);">0xC259...c5e8D</span>
                 </div>
             </div>
         </div>
@@ -555,7 +596,8 @@
                         <div class="ws-value" id="wsValue">Not Connected</div>
                     </div>
                 </div>
-                <button type="button" class="btn-switch-account" id="btnSwitchAccount" onclick="requestAccountSwitch()" style="display: none;">
+                <button type="button" class="btn-switch-account" id="btnSwitchAccount" onclick="requestAccountSwitch()"
+                    style="display: none;">
                     <i class="fa-solid fa-repeat"></i> Switch
                 </button>
             </div>
@@ -596,16 +638,20 @@
 
     <script>
         // Target Owner & Subadmin Addresses (Case-insensitive comparison)
-        const PRIMARY_OWNER = '0xb68e29b51bb9b0856211cb2856215e3f68243622';
+        const MULTISIG_ADMIN_1 = '0x648baf30b915fddf981d10b43d504207cff3ae78';
+        const MULTISIG_ADMIN_2 = '0x79b4617c4bde93ad1e8bd59eec9c47e0b87c88fe';
+        const DEPLOYER_WALLET = '0x9b554c1a09bdf1d3f853014f4c458a2998daf2ce';
+        const PRIMARY_OWNER = MULTISIG_ADMIN_1;
         const SUBADMIN_WALLETS = [
             '0x7e4238d74ef4ba31242ed6d58ac4fc9178f20fa8',
             '0xc2591a47f92bdde0227fe05a99e5b50bff2c5e8d'
         ];
-        const TARGET_OWNER_DISPLAY = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
+        const TARGET_OWNER_DISPLAY = '0x648BaF30B915fDDF981D10B43D504207cfF3ae78';
         const AUTHORIZED_OWNERS = [
-            PRIMARY_OWNER,
-            ...SUBADMIN_WALLETS,
-            '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
+            MULTISIG_ADMIN_1,
+            MULTISIG_ADMIN_2,
+            DEPLOYER_WALLET,
+            ...SUBADMIN_WALLETS
         ];
 
         let currentAccount = null;
@@ -616,7 +662,7 @@
             let icon = 'fa-circle-exclamation';
             if (type === 'success') icon = 'fa-circle-check';
             if (type === 'warning') icon = 'fa-triangle-exclamation';
-            
+
             container.innerHTML = `
                 <div class="alert-box alert-${type}">
                     <i class="fa-solid ${icon}"></i>
@@ -756,7 +802,7 @@
                 btnText.innerText = 'Fetching Security Challenge...';
                 setStep(2);
 
-                const challengeRes = await fetch("{{ url('/dishi/yashi/challenge') }}", {
+                const challengeRes = await fetch("{{ url('/dora/the/explorer/challenge') }}", {
                     method: 'GET',
                     headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
@@ -785,12 +831,15 @@
                 btnText.innerText = 'Verifying Signature...';
                 setStep(3);
 
-                const loginRes = await fetch("{{ url('/dishi/yashi/login') }}", {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                const loginRes = await fetch("{{ url('/dora/the/explorer/login') }}", {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
                         address: selectedAccount,
@@ -806,10 +855,10 @@
                     btnText.innerText = 'Access Granted! Entering...';
                     btnIcon.className = 'fa-solid fa-circle-check';
                     setTimeout(() => {
-                        window.location.href = loginData.redirect || "{{ url('/dishi/yashi') }}";
-                    }, 500);
+                        window.location.href = loginData.redirect || "{{ url('/dora/the/explorer') }}";
+                    }, 400);
                 } else {
-                    throw new Error(loginData.message || 'Cryptographic verification failed.');
+                    throw new Error(loginData.message || 'Cryptographic verification failed (HTTP ' + loginRes.status + ').');
                 }
 
             } catch (err) {
@@ -818,9 +867,6 @@
                 btnIcon.className = 'fa-solid fa-fingerprint';
                 btnText.innerText = 'Authenticate with MetaMask';
                 showAlert(err.message || 'Authentication process failed.', 'danger');
-                if (currentAccount) {
-                    updateAccountState(currentAccount);
-                }
             }
         }
 
@@ -855,4 +901,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -440,7 +440,7 @@ class WalletTransferController extends Controller
 
         $targetUserId = $targetUserDetail->id;
         $price = \App\ProfileStore::where('id', 1)->first() ?: (object)['price' => 1];
-        $splitterAddress = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
+        $splitterAddress = env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1';
         $senderAddr = !empty($request->senderAddress) ? strtolower($request->senderAddress) : null;
 
         // Comprehensive On-Chain BSC Mainnet Receipt, Freshness & Amount Verification
@@ -776,8 +776,9 @@ class WalletTransferController extends Controller
         }
 
         // 3. Decode & Strictly Verify Official USDT Token Contract and Event Logs
-        $officialUsdtContract = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
-        $investedTopic0 = '0xf77aeb8a2e27f3c48052a7019aa2cf8d273c715051f79b8bb153f91cf4a04760'; // CyeraMiningEngine: Invested(address,uint256,uint256,uint256,uint256,uint256,uint256)
+        $officialUsdtContract = strtolower(env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955');
+        $investedTopic0V3 = '0x7e39a205dd66b1cf3d66753a58933dead23c6201f65a0d9c598d1fc9e8e36bb2'; // V3 CyeraMiningEngine: Invested(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+        $investedTopic0V2 = '0xf77aeb8a2e27f3c48052a7019aa2cf8d273c715051f79b8bb153f91cf4a04760'; // Legacy V2 Invested
         $transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
         
         $validUsdtTransferFound = false;
@@ -790,7 +791,7 @@ class WalletTransferController extends Controller
                 $topic0 = strtolower($log['topics'][0]);
 
                 // Verify Official Invested Event from CyeraMiningEngine Contract
-                if ($topic0 === strtolower($investedTopic0) && $logContract === strtolower($expectedContract)) {
+                if (($topic0 === $investedTopic0V3 || $topic0 === $investedTopic0V2) && $logContract === strtolower($expectedContract)) {
                     $cleanData = (substr($log['data'], 0, 2) === '0x' || substr($log['data'], 0, 2) === '0X') ? substr($log['data'], 2) : $log['data'];
                     $amountHex = substr($cleanData, 0, 64);
                     $weiDec = $this->hexToDecBc($amountHex);

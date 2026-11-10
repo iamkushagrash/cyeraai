@@ -51,10 +51,10 @@ class PortfolioMiningController extends Controller
             ->paginate(15);
 
         $contracts = [
-            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6'),
-            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x193149028a3C83009Ecda6D5E76f1abD62E51a43'),
-            'usdtToken'    => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730'),
+            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1',
+            'caiToken'     => env('CAI_TOKEN_ADDRESS') ?: '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC',
+            'usdtToken'    => env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955',
+            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS') ?: '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e',
             'chainId'      => 56,
         ];
 
@@ -194,33 +194,10 @@ class PortfolioMiningController extends Controller
     public function getLiveCaiPrice()
     {
         try {
-            // Check PriceUpdateController or ProfileStore
-            $profile = ProfileStore::where('id', 1)->first();
-            $dbPrice = $profile && $profile->price > 0 ? (float) $profile->price : 1.00;
-
-            // Attempt live on-chain check via PancakeSwap Pair if possible
-            $pairAddress = env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730');
-            $dexUrl = "https://api.dexscreener.com/latest/dex/pairs/bsc/" . $pairAddress;
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $dexUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Cyera-Mining-Engine/1.0');
-            $resp = curl_exec($ch);
-            curl_close($ch);
-
-            if ($resp) {
-                $json = json_decode($resp, true);
-                if (isset($json['pairs'][0]['priceUsd']) && is_numeric($json['pairs'][0]['priceUsd']) && $json['pairs'][0]['priceUsd'] > 0) {
-                    return round((float) $json['pairs'][0]['priceUsd'], 6);
-                }
-            }
-
-            return round($dbPrice, 6);
+            return ProfileStore::getLivePrice();
         } catch (\Exception $e) {
             Log::warning("Live CAI Price Fetch Exception: " . $e->getMessage());
-            return 1.00;
+            return 0.50;
         }
     }
 
@@ -265,10 +242,10 @@ class PortfolioMiningController extends Controller
 
         // 7. Contracts configuration
         $contracts = [
-            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6'),
-            'caiToken'     => env('CAI_TOKEN_ADDRESS', '0x193149028a3C83009Ecda6D5E76f1abD62E51a43'),
-            'usdtToken'    => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730'),
+            'miningEngine' => env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1',
+            'caiToken'     => env('CAI_TOKEN_ADDRESS') ?: '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC',
+            'usdtToken'    => env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955',
+            'pancakePair'  => env('PANCAKESWAP_PAIR_ADDRESS') ?: '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e',
             'chainId'      => 56,
         ];
 
@@ -488,7 +465,7 @@ class PortfolioMiningController extends Controller
         $nonce = (string) (time() . rand(1000, 9999));
         $expiry = (string) (time() + 600);
 
-        $miningContract = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
+        $miningContract = env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1';
         $chainId = "56"; // BSC Mainnet
         $privateKey = env('SIGNER_PRIVATE_KEY');
         if (empty($privateKey)) {

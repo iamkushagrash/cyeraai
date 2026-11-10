@@ -24,7 +24,7 @@
                 $destWallet = $u->uuid;
             }
         }
-        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7');
+        $vaultAddress = env('USDT_WITHDRAWAL_VAULT_ADDRESS') ?: '0xbb477d137Ca76605695c3c36dE352648Bf8Ef238';
     @endphp
 
     @if($isDao)

@@ -124,22 +124,22 @@ Route::get('/auth/session-status', 'Auth\Web3AuthController@sessionStatus');
 Route::get('/logout', 'Auth\Web3AuthController@web3Logout');
 
 // Decentralized Web3 Smart Contract Owner & MLM Governance Command Center
-Route::get('/dishi/yashi/login', 'ContractAdminController@loginPage')->name('contract-admin.login');
-Route::get('/dishi/yashi/challenge', 'ContractAdminController@getChallenge');
-Route::post('/dishi/yashi/login', 'ContractAdminController@processLogin');
-Route::any('/dishi/yashi/logout', 'ContractAdminController@logout');
+Route::get('/dora/the/explorer/login', 'ContractAdminController@loginPage')->name('contract-admin.login');
+Route::get('/dora/the/explorer/challenge', 'ContractAdminController@getChallenge');
+Route::post('/dora/the/explorer/login', 'ContractAdminController@processLogin');
+Route::any('/dora/the/explorer/logout', 'ContractAdminController@logout');
 
 Route::group(['middleware' => ['contract.admin']], function () {
-    Route::get('/dishi/yashi', 'ContractAdminController@index');
-    Route::get('/dishi/yashi/genealogy', 'ContractAdminController@genealogy');
-    Route::post('/dishi/yashi/toggle-status', 'ContractAdminController@toggleUserStatus');
-    Route::get('/dishi/yashi/user-details/{id}', 'ContractAdminController@getUserDetails');
+    Route::get('/dora/the/explorer', 'ContractAdminController@index')->name('contract-admin.index');
+    Route::get('/dora/the/explorer/genealogy', 'ContractAdminController@genealogy');
+    Route::post('/dora/the/explorer/toggle-status', 'ContractAdminController@toggleUserStatus');
+    Route::get('/dora/the/explorer/user-details/{id}', 'ContractAdminController@getUserDetails');
     Route::get('/admin/unified', 'ContractAdminController@index');
     Route::get('/Main/ContractAdmin', 'ContractAdminController@index');
 
     // Smart Contract Operations - Strictly Owner Only (Subadmin blocked)
     Route::group(['middleware' => ['contract.owner']], function () {
-        Route::get('/dishi/yashi/contracts', 'ContractAdminController@contracts')->name('contract-admin.contracts');
+        Route::get('/dora/the/explorer/contracts', 'ContractAdminController@contracts')->name('contract-admin.contracts');
     });
 });
 

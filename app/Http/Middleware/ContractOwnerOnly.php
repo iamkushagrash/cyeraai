@@ -31,7 +31,7 @@ class ContractOwnerOnly
                 ], 403);
             }
 
-            return redirect('/dishi/yashi')->with('error', 'Access Denied: Subadmins are restricted from performing Smart Contract operations.');
+            return redirect('/dora/the/explorer')->with('error', 'Access Denied: Subadmins are restricted from performing Smart Contract operations.');
         }
 
         return $next($request);

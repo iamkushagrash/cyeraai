@@ -9,14 +9,19 @@ use Illuminate\Support\Facades\Log;
 class PriceUpdateController extends Controller
 {
     /**
-     * Official PancakeSwap V2 Pair Address for CAAI/USDT on BSC Mainnet.
+     * Official PancakeSwap V2 Pair Address for CAAI/USDT on BSC Mainnet (Protocol V3).
      */
-    const PAIR_ADDRESS = '0x17C405d90e8d112c340698EE2b09EB31FF72f730';
+    const PAIR_ADDRESS = '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e';
 
     /**
-     * CAAI Token Contract Address.
+     * CAAI Token Contract Address (Protocol V3).
      */
-    const CAI_ADDRESS = '0x193149028a3C83009Ecda6D5E76f1abD62E51a43';
+    const CAI_ADDRESS = '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC';
+
+    /**
+     * BSC-USD (USDT) Contract Address on BSC Mainnet.
+     */
+    const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
 
     /**
      * Fetch live CAI/USDT price from DEX (DexScreener API with On-chain RPC Fallback)
@@ -28,10 +33,11 @@ class PriceUpdateController extends Controller
     {
         $newPrice = null;
         $source = 'none';
+        $pairAddr = env('PANCAKESWAP_PAIR_ADDRESS') ?: self::PAIR_ADDRESS;
 
         // 1. Primary Source: DexScreener Real-Time Indexer API
         try {
-            $url = "https://api.dexscreener.com/latest/dex/pairs/bsc/" . self::PAIR_ADDRESS;
+            $url = "https://api.dexscreener.com/latest/dex/pairs/bsc/" . $pairAddr;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -111,14 +117,18 @@ class PriceUpdateController extends Controller
      */
     private function fetchOnChainReservesPrice()
     {
-        $rpcUrl = env('BSC_RPC_URL', 'https://bsc-dataseed1.binance.org/');
+        $rpcUrl = env('BSC_MAINNET_RPC') ?: env('BSC_RPC_URL', 'https://bsc-dataseed1.binance.org/');
+        $pairAddr = env('PANCAKESWAP_PAIR_ADDRESS') ?: self::PAIR_ADDRESS;
+        $caiAddr = env('CAI_TOKEN_ADDRESS') ?: self::CAI_ADDRESS;
+        $usdtAddr = env('USDT_TOKEN_ADDRESS') ?: self::USDT_ADDRESS;
+
         $payload = json_encode([
             'jsonrpc' => '2.0',
             'id' => 1,
             'method' => 'eth_call',
             'params' => [
                 [
-                    'to' => self::PAIR_ADDRESS,
+                    'to' => $pairAddr,
                     'data' => '0x0902f1ac' // getReserves()
                 ],
                 'latest'
@@ -141,13 +151,13 @@ class PriceUpdateController extends Controller
             $r0Hex = substr($hex, 0, 64);
             $r1Hex = substr($hex, 64, 64);
 
-            $r0 = hexdec($r0Hex);
-            $r1 = hexdec($r1Hex);
+            $r0 = (float) hexdec($r0Hex);
+            $r1 = (float) hexdec($r1Hex);
 
-            // Pair order: Token0 = CAI (or USDT), Token1 = USDT (or CAI)
+            // PancakeSwap V2 deterministically orders token0 < token1 by lowercase hex address
             if ($r0 > 0 && $r1 > 0) {
-                // In our pair on BSC, Token0 is CAI and Token1 is BSC-USD
-                $price = ($r1 / $r0);
+                $isCaaiToken0 = strtolower($caiAddr) < strtolower($usdtAddr);
+                $price = $isCaaiToken0 ? ($r1 / $r0) : ($r0 / $r1);
                 if ($price > 0.0001 && $price < 100000) {
                     return round($price, 6);
                 }

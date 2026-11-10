@@ -7,8 +7,8 @@
 @section('content')
     @php
         $caiPrice = (float) ($price->price ?? 1.25);
-        $splitterContract = env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6');
-        $usdtContract = env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955');
+        $splitterContract = env('CYERA_MINING_ENGINE_ADDRESS') ?: '0x5E9358b18A2467978f6813672aC8b66e5FA229B1';
+        $usdtContract = env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955';
         
         $currentUuid = '';
         if (Session::has('user.uuid') && !empty(Session::get('user.uuid'))) {

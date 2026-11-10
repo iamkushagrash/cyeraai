@@ -139,14 +139,15 @@
             </div>
         </div>
 
-        <!-- Ownership Transfer -->
+        <!-- Immutable 2-of-2 Multisig Governance -->
         <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-dim);">
-            <label class="form-label">Two-Step Ownership Transfer</label>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="newOwnerInput" class="form-input" placeholder="New Owner 0x...">
-                <button class="btn-dim" onclick="startOwnershipTransfer()" style="white-space: nowrap; color: var(--gold-light);">
-                    Transfer
-                </button>
+            <label class="form-label">Immutable 2-of-2 Multisig Governance</label>
+            <div style="font-size: 11.5px; color: var(--text-sub); line-height: 1.6;">
+                <div><b>Admin 1:</b> <code>{{ $contracts['multisigAdmin1'] ?? '0x648BaF30B915fDDF981D10B43D504207cfF3ae78' }}</code></div>
+                <div><b>Admin 2:</b> <code>{{ $contracts['multisigAdmin2'] ?? '0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe' }}</code></div>
+                <div style="margin-top: 6px; color: var(--gold-light);">
+                    All administrative changes &amp; fund movements require BOTH Admin 1 and Admin 2 to sign identical parameters (zero single-key ownership backdoor).
+                </div>
             </div>
         </div>
     </div>
@@ -215,7 +216,7 @@
 
             const tx = await contract.setPaused(setPausedState);
             await tx.wait(1);
-            await toast('success', 'Status Updated', 'Contract pause state updated successfully.');
+            await toast('success', '2-of-2 Multisig Step Signed', 'Signature recorded on-chain. If this was Signer #1, switch MetaMask to Signer #2 and click again to execute.');
             window.location.reload();
         } catch (err) {
             toast('error', 'Action Failed', err.reason || err.message);
@@ -230,7 +231,7 @@
             const deposit = new ethers.Contract(CONTRACT_CONFIG.deposit, DEPOSIT_ABI, signer);
             const tx = await deposit.setAutoForward(enableState);
             await tx.wait(1);
-            await toast('success', 'Updated', 'Auto-forward state updated.');
+            await toast('success', '2-of-2 Multisig Step Signed', 'Auto-forward signature recorded. Switch to second Admin wallet if 1/2.');
             window.location.reload();
         } catch (err) {
             toast('error', 'Failed', err.reason || err.message);
@@ -250,7 +251,7 @@
             const deposit = new ethers.Contract(CONTRACT_CONFIG.deposit, DEPOSIT_ABI, signer);
             const tx = await deposit.setWhitelistedCollector(addr);
             await tx.wait(1);
-            await toast('success', 'Collector Updated', `Whitelisted collector updated to ${addr}`);
+            await toast('success', '2-of-2 Multisig Step Signed', `Collector update (${addr}) signed. Switch to second Admin wallet if 1/2.`);
             window.location.reload();
         } catch (err) {
             toast('error', 'Update Failed', err.reason || err.message);
@@ -270,29 +271,10 @@
             const vault = new ethers.Contract(CONTRACT_CONFIG.vault, VAULT_ABI, signer);
             const tx = await vault.setBackendSigner(addr);
             await tx.wait(1);
-            await toast('success', 'Signer Updated', `Backend signer updated to ${addr}`);
+            await toast('success', '2-of-2 Multisig Step Signed', `Backend signer update (${addr}) signed. Switch to second Admin wallet if 1/2.`);
             window.location.reload();
         } catch (err) {
             toast('error', 'Update Failed', err.reason || err.message);
-        }
-    }
-
-    async function startOwnershipTransfer() {
-        const addr = document.getElementById('newOwnerInput').value.trim();
-        if (!ethers.isAddress(addr)) {
-            toast('error', 'Invalid Address', 'Enter a valid BEP-20 address.');
-            return;
-        }
-
-        try {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const deposit = new ethers.Contract(CONTRACT_CONFIG.deposit, DEPOSIT_ABI, signer);
-            const tx = await deposit.transferOwnership(addr);
-            await tx.wait(1);
-            await toast('success', 'Transfer Initiated', `Nominated ${addr} as pending owner. They must call acceptOwnership().`);
-        } catch (err) {
-            toast('error', 'Failed', err.reason || err.message);
         }
     }
 </script>

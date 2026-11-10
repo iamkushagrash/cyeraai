@@ -161,6 +161,10 @@ class RoyalJackpotController extends Controller
         }
 
         $userDetail = UserDetails::where('id', $userId)->orWhere('userid', $userId)->first();
+        if ($userDetail) {
+            self::reconcilePendingRoyalClaims($userDetail->id);
+            $userDetail->refresh();
+        }
         $eligibility = self::checkUserStakingEligibility($userId);
 
         $pools = LuckyDrawDetail::where('status', 1)->orderBy('pool_tier', 'asc')->get();
@@ -220,9 +224,9 @@ class RoyalJackpotController extends Controller
 
         // Smart Contracts Config
         $contracts = [
-            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
-            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
-            'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS') ?: '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41',
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef',
+            'usdtToken'       => env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955',
             'chainId'         => 56,
             'demoMode'        => (bool) env('DEMO_MODE', false),
         ];
@@ -296,8 +300,8 @@ class RoyalJackpotController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'This transaction hash has already been registered.'], 400);
             }
 
-            // Verify on-chain execution with BSC RPC nodes
-            $verify = self::verifyJackpotDepositOnBsc($txHash, $walletAddr, $ticketPrice);
+            // Verify on-chain execution with BSC RPC nodes (strictly checks Deposit event, tier, and exact USDT amount)
+            $verify = self::verifyJackpotDepositOnBsc($txHash, $walletAddr, $ticketPrice, $tier);
             if (!$verify['valid']) {
                 return response()->json(['status' => 'error', 'message' => $verify['message']], 400);
             }
@@ -513,7 +517,9 @@ class RoyalJackpotController extends Controller
     }
 
     /**
-     * Request EIP-712 Signature to withdraw Royal Wallet balance from RoyalJackpotVault
+     * Request EIP-712 Signature to withdraw Royal Wallet balance from RoyalJackpotVault.
+     * Reserves Royal Wallet balance atomically inside DB lock BEFORE signing to prevent
+     * concurrent race conditions or multi-signature hoarding.
      */
     public function requestClaimSignature(Request $request)
     {
@@ -539,18 +545,12 @@ class RoyalJackpotController extends Controller
             ], 403);
         }
 
-        $requestedAmount = (float) $request->amount;
-        $currentBalance = (float) ($userDetail->royal_wallet ?? 0.00);
+        // First reconcile any prior pending/expired claim signatures against BSC on-chain state
+        self::reconcilePendingRoyalClaims($userDetail->id);
 
-        if ($requestedAmount > $currentBalance) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => "Requested amount \${$requestedAmount} exceeds your available Royal Wallet balance of \${$currentBalance} USDT."
-            ], 400);
-        }
-
+        $requestedAmount = round((float) $request->amount, 2);
         $walletAddress = strtolower(trim($request->wallet_address));
-        $vaultContract = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5');
+        $vaultContract = env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef';
         $chainId = 56;
         $privateKey = env('SIGNER_PRIVATE_KEY');
         if (empty($privateKey)) {
@@ -558,12 +558,25 @@ class RoyalJackpotController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Signer key configuration missing.'], 500);
         }
 
-        // Convert to Wei (18 Decimals)
-        $amountWei = bcmul((string) $requestedAmount, '1000000000000000000', 0);
-        $claimId = (string) (time() . rand(1000, 9999));
-        $expiry = (string) (time() + 600); // 10 minutes
+        // Convert to exact Wei (18 Decimals) without scientific notation or float rounding
+        $amountStr = number_format($requestedAmount, 6, '.', '');
+        $amountWei = bcmul($amountStr, '1000000000000000000', 0);
+        $claimId = (string) (time() . random_int(10000, 99999));
+        $expiry = (string) (time() + 180); // 3 minutes strict expiry window
 
+        DB::beginTransaction();
         try {
+            $user = UserDetails::where('id', $userDetail->id)->lockForUpdate()->first();
+            $currentBalance = round((float) ($user->royal_wallet ?? 0.00), 2);
+
+            if ($requestedAmount > $currentBalance) {
+                DB::rollBack();
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => "Requested amount \${$requestedAmount} exceeds your available Royal Wallet balance of \${$currentBalance} USDT."
+                ], 400);
+            }
+
             $signResult = Eip712Helper::signRoyalJackpotClaim(
                 $walletAddress,
                 $amountWei,
@@ -573,6 +586,26 @@ class RoyalJackpotController extends Controller
                 $chainId,
                 $privateKey
             );
+
+            // Reserve & deduct Royal Wallet balance atomically before returning signature
+            $afterBal = round(max(0, $currentBalance - $requestedAmount), 2);
+            $user->royal_wallet = $afterBal;
+            $user->save();
+
+            RoyalWalletLedger::create([
+                'userid'         => $user->id,
+                'type'           => 'claim',
+                'amount'         => $requestedAmount,
+                'balance_before' => $currentBalance,
+                'balance_after'  => $afterBal,
+                'round_id'       => null,
+                'claim_id'       => $claimId,
+                'tx_hash'        => null,
+                'status'         => 0, // 0 = Reserved & Pending On-Chain Confirmation
+                'notes'          => "EIP-712 claim authorization issued for \${$requestedAmount} USDT (Expiry: {$expiry}).",
+            ]);
+
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
@@ -588,13 +621,14 @@ class RoyalJackpotController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error("Royal Jackpot Claim Signature Generation Failed: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to generate cryptographic authorization: ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Confirm Claim on Blockchain -> Deduct Royal Wallet Balance & Audit
+     * Confirm Claim on Blockchain -> Verify BSC Receipt & Finalize Reserved Ledger Entry
      */
     public function confirmClaim(Request $request)
     {
@@ -623,42 +657,66 @@ class RoyalJackpotController extends Controller
 
         $txHash = strtolower(trim($request->tx_hash));
         $claimId = trim($request->claim_id);
-        $amount = (float) $request->amount;
+        $amount = round((float) $request->amount, 2);
+        $isDemo = (bool) env('DEMO_MODE', false);
+
+        if (!$isDemo) {
+            if (!preg_match('/^0x[a-fA-F0-9]{64}$/', $txHash)) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid BSC transaction hash.'], 400);
+            }
+            $executedOnChain = self::checkClaimExecutedOnBsc($claimId);
+            if ($executedOnChain !== true) {
+                return response()->json(['status' => 'error', 'message' => 'Prize claim not yet confirmed on BSC. Please wait a moment and refresh.'], 400);
+            }
+        }
 
         // Prevent duplicate processing
-        if (RoyalWalletLedger::where('tx_hash', $txHash)->exists()) {
+        if (RoyalWalletLedger::where('tx_hash', $txHash)->where('status', 1)->exists()) {
             return response()->json(['status' => 'success', 'message' => 'Claim already confirmed.']);
         }
 
         DB::beginTransaction();
         try {
             $user = UserDetails::where('id', $userDetail->id)->lockForUpdate()->first();
-            $beforeBal = (float) ($user->royal_wallet ?? 0.00);
-            $deductAmount = min($amount, $beforeBal);
-            $afterBal = max(0, $beforeBal - $deductAmount);
+            $reservedLedger = RoyalWalletLedger::where('userid', $user->id)
+                ->where('type', 'claim')
+                ->where('claim_id', $claimId)
+                ->lockForUpdate()
+                ->first();
 
-            $user->royal_wallet = $afterBal;
-            $user->save();
+            if ($reservedLedger) {
+                $finalAmount = (float) $reservedLedger->amount;
+                $reservedLedger->tx_hash = $txHash;
+                $reservedLedger->status = 1;
+                $reservedLedger->notes = "Claimed \${$finalAmount} USDT prize via RoyalJackpotVault. Tx: {$txHash}";
+                $reservedLedger->save();
+                $afterBal = (float) ($user->royal_wallet ?? 0.00);
+            } else {
+                $beforeBal = (float) ($user->royal_wallet ?? 0.00);
+                $finalAmount = min($amount, $beforeBal);
+                $afterBal = max(0, $beforeBal - $finalAmount);
+                $user->royal_wallet = $afterBal;
+                $user->save();
 
-            // Record in Ledger
-            RoyalWalletLedger::create([
-                'userid'         => $user->id,
-                'type'           => 'claim',
-                'amount'         => $deductAmount,
-                'balance_before' => $beforeBal,
-                'balance_after'  => $afterBal,
-                'round_id'       => null,
-                'claim_id'       => $claimId,
-                'tx_hash'        => $txHash,
-                'status'         => 1,
-                'notes'          => "Claimed \${$deductAmount} USDT prize via RoyalJackpotVault. Tx: {$txHash}",
-            ]);
+                RoyalWalletLedger::create([
+                    'userid'         => $user->id,
+                    'type'           => 'claim',
+                    'amount'         => $finalAmount,
+                    'balance_before' => $beforeBal,
+                    'balance_after'  => $afterBal,
+                    'round_id'       => null,
+                    'claim_id'       => $claimId,
+                    'tx_hash'        => $txHash,
+                    'status'         => 1,
+                    'notes'          => "Claimed \${$finalAmount} USDT prize via RoyalJackpotVault. Tx: {$txHash}",
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
                 'status'  => 'success',
-                'message' => "🎉 \${$deductAmount} USDT successfully delivered to your Web3 wallet!",
+                'message' => "🎉 \${$finalAmount} USDT successfully delivered to your Web3 wallet!",
                 'data'    => [
                     'new_balance' => $afterBal,
                     'tx_hash'     => $txHash,
@@ -690,6 +748,10 @@ class RoyalJackpotController extends Controller
         }
 
         $userDetail = UserDetails::where('id', $userId)->orWhere('userid', $userId)->first();
+        if ($userDetail) {
+            self::reconcilePendingRoyalClaims($userDetail->id);
+            $userDetail->refresh();
+        }
         $eligibility = self::checkUserStakingEligibility($userId);
 
         $pool = LuckyDrawDetail::where('pool_tier', $tier)->first();
@@ -745,9 +807,9 @@ class RoyalJackpotController extends Controller
         $royalWalletBalance = (float) ($userDetail->royal_wallet ?? 0.00);
 
         $contracts = [
-            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
-            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
-            'usdtToken'       => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
+            'depositContract' => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS') ?: '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41',
+            'vaultContract'   => env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef',
+            'usdtToken'       => env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955',
             'chainId'         => 56,
             'demoMode'        => (bool) env('DEMO_MODE', false),
         ];
@@ -797,7 +859,11 @@ class RoyalJackpotController extends Controller
         $royalWallet = 0.00;
         if ($userId) {
             $u = UserDetails::where('id', $userId)->orWhere('userid', $userId)->first();
-            if ($u) $royalWallet = (float) ($u->royal_wallet ?? 0.00);
+            if ($u) {
+                self::reconcilePendingRoyalClaims($u->id);
+                $u->refresh();
+                $royalWallet = (float) ($u->royal_wallet ?? 0.00);
+            }
         }
 
         return response()->json([
@@ -808,13 +874,142 @@ class RoyalJackpotController extends Controller
     }
 
     /**
-     * Strictly verify that the deposit transaction succeeded on Binance Smart Chain
-     * Decodes the Smart Contract ABI Events directly from the transaction receipt!
+     * Lossless arbitrary-precision hexadecimal to decimal string converter using BCMath.
      */
-    public static function verifyJackpotDepositOnBsc($txHash, $expectedSender, $ticketPrice)
+    private static function hexToBcDec($hex)
     {
-        $expectedContract = strtolower(env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'));
-        $expectedUsdt     = strtolower(env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'));
+        $clean = ltrim(strtolower(preg_replace('/^0x/', '', (string) $hex)), '0');
+        if ($clean === '') {
+            return '0';
+        }
+        $dec = '0';
+        $len = strlen($clean);
+        for ($i = 0; $i < $len; $i++) {
+            $dec = bcadd(bcmul($dec, '16', 0), (string) hexdec($clean[$i]), 0);
+        }
+        return $dec;
+    }
+
+    /**
+     * Query RoyalJackpotVault.isClaimExecuted(claimId) on BSC Mainnet.
+     * Returns true if executed, false if confirmed unexecuted, or null if RPC unreachable.
+     */
+    public static function checkClaimExecutedOnBsc($claimId)
+    {
+        $vault = strtolower(env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef');
+        if (empty($vault) || empty($claimId) || !ctype_digit((string) $claimId)) {
+            return null;
+        }
+
+        $selector = substr(\kornrunner\Keccak::hash('isClaimExecuted(uint256)', 256), 0, 8);
+        // Convert decimal claimId string to 64-char hex
+        $dec = (string) $claimId;
+        $hexId = '';
+        while (bccomp($dec, '0', 0) > 0) {
+            $rem = (int) bcmod($dec, '16');
+            $hexId = dechex($rem) . $hexId;
+            $dec = bcdiv($dec, '16', 0);
+        }
+        $data = '0x' . $selector . str_pad($hexId ?: '0', 64, '0', STR_PAD_LEFT);
+
+        $rpcEndpoints = [
+            "https://bsc-dataseed.binance.org/",
+            "https://bsc-dataseed1.defibit.io/",
+            "https://1rpc.io/bnb",
+        ];
+
+        $payload = json_encode([
+            'jsonrpc' => '2.0',
+            'method'  => 'eth_call',
+            'params'  => [['to' => $vault, 'data' => $data], 'latest'],
+            'id'      => 1,
+        ]);
+
+        foreach ($rpcEndpoints as $rpcUrl) {
+            $ch = curl_init($rpcUrl);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            if ($response) {
+                $json = json_decode($response, true);
+                if (isset($json['result']) && is_string($json['result']) && strpos($json['result'], '0x') === 0 && strlen($json['result']) >= 66) {
+                    $val = self::hexToBcDec($json['result']);
+                    return ($val === '1');
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Reconcile reserved (status = 0) Royal Wallet claim authorizations against BSC on-chain state:
+     * - If executed on-chain -> finalize as status = 1.
+     * - If older than 4 minutes (past 3-min on-chain expiry) and confirmed unexecuted -> refund Royal Wallet & mark status = 2.
+     */
+    public static function reconcilePendingRoyalClaims($userId)
+    {
+        if (empty($userId)) {
+            return;
+        }
+
+        $pendingRows = RoyalWalletLedger::where('userid', $userId)
+            ->where('type', 'claim')
+            ->where('status', 0)
+            ->get();
+
+        if ($pendingRows->isEmpty()) {
+            return;
+        }
+
+        foreach ($pendingRows as $row) {
+            $executed = self::checkClaimExecutedOnBsc($row->claim_id);
+            if ($executed === true) {
+                $row->status = 1;
+                $row->notes = trim(($row->notes ?? '') . ' [Auto-confirmed via BSC Vault state]');
+                $row->save();
+                continue;
+            }
+
+            // Refund ONLY when confirmed unexecuted on-chain AND past 4-minute safety buffer (signature expiry = 3 min)
+            $ageSeconds = $row->created_at ? now()->diffInSeconds($row->created_at, true) : 0;
+            if ($executed === false && $ageSeconds >= 240) {
+                DB::beginTransaction();
+                try {
+                    $lockedRow = RoyalWalletLedger::where('id', $row->id)->lockForUpdate()->first();
+                    if ($lockedRow && (int) $lockedRow->status === 0) {
+                        $user = UserDetails::where('id', $userId)->lockForUpdate()->first();
+                        if ($user) {
+                            $user->royal_wallet = round((float) ($user->royal_wallet ?? 0) + (float) $lockedRow->amount, 2);
+                            $user->save();
+                        }
+                        $lockedRow->status = 2;
+                        $lockedRow->notes = trim(($lockedRow->notes ?? '') . ' [Expired unexecuted on BSC — Balance restored]');
+                        $lockedRow->save();
+                    }
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error("Reconcile Royal Claim Refund Error: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Strictly verify that the deposit transaction succeeded on Binance Smart Chain.
+     * Decodes both `JackpotDeposited` AND ERC-20 `Transfer` events using lossless BCMath!
+     */
+    public static function verifyJackpotDepositOnBsc($txHash, $expectedSender, $ticketPrice, $expectedTier = null)
+    {
+        $expectedContract = strtolower(env('ROYAL_JACKPOT_DEPOSIT_ADDRESS') ?: '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41');
+        $expectedUsdt     = strtolower(env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955');
 
         $rpcEndpoints = [
             "https://bsc-dataseed.binance.org/",
@@ -889,6 +1084,7 @@ class RoyalJackpotController extends Controller
         $foundUsdtTransferToContract = false;
         $onlyApprovalFound = false;
         $actualAmountUsdt = 0.0;
+        $onChainTier = null;
         $actualSender = null;
 
         $logs = $receipt['logs'] ?? [];
@@ -898,26 +1094,28 @@ class RoyalJackpotController extends Controller
             $topics  = $log['topics'] ?? [];
             $topic0  = strtolower($topics[0] ?? '');
 
-            // Check if JackpotDeposited event was emitted by Deposit contract
+            // Check if JackpotDeposited event was emitted by official Deposit contract
             if ($logAddr === $expectedContract && $topic0 === $jackpotDepositTopic) {
                 $foundDepositEvent = true;
                 if (isset($topics[1])) {
                     $actualSender = '0x' . substr(strtolower($topics[1]), 26);
                 }
+                if (isset($topics[2])) {
+                    $onChainTier = (int) self::hexToBcDec($topics[2]);
+                }
             }
 
-            // Check if USDT Transfer event was sent to Deposit contract
+            // Check if USDT Transfer event was sent to official Deposit contract
             if ($logAddr === $expectedUsdt && $topic0 === $erc20TransferTopic) {
                 $recipient = isset($topics[2]) ? ('0x' . substr(strtolower($topics[2]), 26)) : '';
                 if ($recipient === $expectedContract) {
                     $foundUsdtTransferToContract = true;
-                    if (isset($topics[1])) {
+                    if (isset($topics[1]) && empty($actualSender)) {
                         $actualSender = '0x' . substr(strtolower($topics[1]), 26);
                     }
                     if (!empty($log['data']) && $log['data'] !== '0x') {
-                        $hexClean = ltrim(substr($log['data'], 2), '0');
-                        $val = empty($hexClean) ? 0 : base_convert($hexClean, 16, 10);
-                        $actualAmountUsdt = round($val / 1e18, 4);
+                        $weiDec = self::hexToBcDec($log['data']);
+                        $actualAmountUsdt = round((float) bcdiv($weiDec, '1000000000000000000', 6), 4);
                     }
                 }
             }
@@ -931,12 +1129,7 @@ class RoyalJackpotController extends Controller
             }
         }
 
-        // Also check direct contract interaction if receipt.to matches expectedContract
-        if (isset($receipt['to']) && strtolower($receipt['to']) === $expectedContract) {
-            $foundDepositEvent = true;
-        }
-
-        if (!$foundDepositEvent && !$foundUsdtTransferToContract) {
+        if (!$foundDepositEvent || !$foundUsdtTransferToContract) {
             if ($onlyApprovalFound) {
                 return [
                     'valid' => false,
@@ -945,7 +1138,24 @@ class RoyalJackpotController extends Controller
             }
             return [
                 'valid' => false,
-                'message' => 'Transaction was not sent to the official Royal Jackpot Deposit contract (' . substr($expectedContract, 0, 8) . '...).'
+                'message' => 'Transaction did not execute depositJackpot on the official Royal Jackpot Deposit contract (' . substr($expectedContract, 0, 8) . '...).'
+            ];
+        }
+
+        // Strict Pool Tier Check
+        if ($expectedTier !== null && $onChainTier !== null && (int) $expectedTier !== (int) $onChainTier) {
+            return [
+                'valid' => false,
+                'message' => "On-chain pool tier ({$onChainTier}) does not match requested pool tier ({$expectedTier})."
+            ];
+        }
+
+        // Strict Ticket Price Check
+        $expectedPrice = round((float) $ticketPrice, 2);
+        if ($expectedPrice > 0 && ($actualAmountUsdt + 0.01) < $expectedPrice) {
+            return [
+                'valid' => false,
+                'message' => "On-chain USDT payment (\${$actualAmountUsdt}) is less than required ticket price (\${$expectedPrice})."
             ];
         }
 

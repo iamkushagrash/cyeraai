@@ -22,12 +22,11 @@ class LuckyDrawAdminController extends Controller
     protected static function getAuthorizedWallets()
     {
         $wallets = [
-            // Deployer wallet from LUCKYDRAW_PRIVATE_KEY / Collector
-            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9')),
-            // Cyera Admin Owner Address from .env
-            strtolower(env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622')),
-            // Whitelisted collector wallet
-            strtolower('0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
+            strtolower(env('MULTISIG_ADMIN_1') ?: '0x648BaF30B915fDDF981D10B43D504207cfF3ae78'),
+            strtolower(env('MULTISIG_ADMIN_2') ?: '0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe'),
+            strtolower('0x9B554c1A09BDF1d3f853014F4c458A2998DAF2Ce'),
+            strtolower(env('ROYAL_JACKPOT_COLLECTOR_WALLET') ?: '0x648BaF30B915fDDF981D10B43D504207cfF3ae78'),
+            strtolower(env('ADMIN_OWNER_ADDRESS') ?: '0x648BaF30B915fDDF981D10B43D504207cfF3ae78'),
         ];
 
         // Additional comma-separated wallets from .env
@@ -62,15 +61,21 @@ class LuckyDrawAdminController extends Controller
     protected function getContractsConfig()
     {
         $authorizedWallets = self::getAuthorizedWallets();
-        $primaryDeployer = env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9');
+        $admin1 = env('MULTISIG_ADMIN_1') ?: '0x648BaF30B915fDDF981D10B43D504207cfF3ae78';
+        $admin2 = env('MULTISIG_ADMIN_2') ?: '0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe';
+        $vaultAddr = env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef';
+        $depositAddr = env('ROYAL_JACKPOT_DEPOSIT_ADDRESS') ?: '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41';
+        $primaryDeployer = $admin1;
 
         return [
-            'depositContract'   => env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
-            'vaultContract'     => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
-            'collectorWallet'   => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9'),
-            'adminOwnerAddress' => env('ADMIN_OWNER_ADDRESS', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
-            'backendSigner'     => env('BACKEND_SIGNER_ADDRESS', '0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57'),
-            'usdtToken'         => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
+            'depositContract'   => $depositAddr,
+            'vaultContract'     => $vaultAddr,
+            'collectorWallet'   => env('ROYAL_JACKPOT_COLLECTOR_WALLET') ?: $vaultAddr,
+            'adminOwnerAddress' => $admin1,
+            'multisigAdmin1'    => $admin1,
+            'multisigAdmin2'    => $admin2,
+            'backendSigner'     => env('BACKEND_SIGNER_ADDRESS') ?: '0x5AdcBbDd6509F1bBA0b85Fb9f00E5970360ca66D',
+            'usdtToken'         => env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955',
             'chainId'           => 56, // BSC Mainnet
             'bscRpc'            => 'https://bsc-dataseed.binance.org/',
             'primaryDeployer'   => $primaryDeployer,
@@ -84,10 +89,22 @@ class LuckyDrawAdminController extends Controller
      */
     public static function fetchOnChainBalances()
     {
-        $deposit = env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9');
-        $vault   = env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5');
-        $collector = env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xBb83f1dbc26f6a414350E3EaBB5F69E28Bfef3d9');
-        $usdt    = env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955');
+        $deposit = env('ROYAL_JACKPOT_DEPOSIT_ADDRESS') ?: '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41';
+        $vault   = env('ROYAL_JACKPOT_VAULT_ADDRESS') ?: '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef';
+        $collector = env('ROYAL_JACKPOT_COLLECTOR_WALLET') ?: $vault;
+        $usdt    = env('USDT_TOKEN_ADDRESS') ?: '0x55d398326f99059fF775485246999027B3197955';
+
+        if (empty($deposit) || empty($vault)) {
+            return [
+                'depositUsdt'   => 0.0,
+                'vaultUsdt'     => 0.0,
+                'collectorUsdt' => 0.0,
+                'collectorBnb'  => 0.0,
+                'autoForward'   => false,
+                'depositPaused' => false,
+                'vaultPaused'   => false,
+            ];
+        }
 
         $rpc = 'https://bsc-dataseed.binance.org/';
 
@@ -132,16 +149,14 @@ class LuckyDrawAdminController extends Controller
 
         $fromWei18 = function ($hex) {
             if (!$hex || $hex === '0x' || $hex === '0x0') return 0.0;
-            $dec = hexdec(substr($hex, 2));
-            // For large 18-decimal numbers
-            if (strlen($hex) > 10) {
-                // Approximate with bcmath or gmp if available
-                $hexClean = ltrim(substr($hex, 2), '0');
-                if (empty($hexClean)) return 0.0;
-                $val = base_convert($hexClean, 16, 10);
-                return round($val / 1e18, 4);
+            $clean = ltrim(strtolower(preg_replace('/^0x/', '', (string) $hex)), '0');
+            if ($clean === '') return 0.0;
+            $dec = '0';
+            $len = strlen($clean);
+            for ($i = 0; $i < $len; $i++) {
+                $dec = bcadd(bcmul($dec, '16', 0), (string) hexdec($clean[$i]), 0);
             }
-            return round($dec / 1e18, 4);
+            return round((float) bcdiv($dec, '1000000000000000000', 6), 4);
         };
 
         $depositUsdt = 0.0;

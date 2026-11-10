@@ -813,6 +813,11 @@
 
         const DEPOSIT_ABI = [
             "function owner() view returns (address)",
+            "function admin1() view returns (address)",
+            "function admin2() view returns (address)",
+            "function multisigEpoch() view returns (uint256)",
+            "function multisigApprovals(bytes32, address) view returns (bool)",
+            "function cancelPendingMultisigActions() external",
             "function whitelistedCollector() view returns (address)",
             "function autoForward() view returns (bool)",
             "function paused() view returns (bool)",
@@ -820,24 +825,27 @@
             "function totalDepositsCount() view returns (uint256)",
             "function withdrawCollectedFunds(address recipient, uint256 amount) external",
             "function sweepAllToCollector() external",
+            "function rescueTokens(address token, address to, uint256 amount) external",
             "function setWhitelistedCollector(address _newCollector) external",
             "function setAutoForward(bool _autoForward) external",
-            "function setPaused(bool _paused) external",
-            "function transferOwnership(address newOwner) external",
-            "function acceptOwnership() external"
+            "function setPaused(bool _paused) external"
         ];
 
         const VAULT_ABI = [
             "function owner() view returns (address)",
+            "function admin1() view returns (address)",
+            "function admin2() view returns (address)",
+            "function multisigEpoch() view returns (uint256)",
+            "function multisigApprovals(bytes32, address) view returns (bool)",
+            "function cancelPendingMultisigActions() external",
             "function backendSigner() view returns (address)",
             "function paused() view returns (bool)",
             "function totalPrizesPaid() view returns (uint256)",
             "function totalClaimsCount() view returns (uint256)",
             "function emergencyWithdraw(address token, address to, uint256 amount) external",
             "function setBackendSigner(address _newSigner) external",
-            "function setPaused(bool _paused) external",
-            "function transferOwnership(address newOwner) external",
-            "function acceptOwnership() external"
+            "function setSecurityLimits(uint256 _maxPerClaim, uint256 _maxDailyUser, uint256 _maxGlobalDaily) external",
+            "function setPaused(bool _paused) external"
         ];
 
         const USDT_ABI = [

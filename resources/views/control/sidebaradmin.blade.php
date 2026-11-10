@@ -7,7 +7,7 @@
                     <ul class='wraplist'>
                         <li class='menusection'>Main</li>
                         <li class="" style="background: rgba(79, 70, 229, 0.08); border-left: 3px solid #4f46e5;">
-                            <a href="/dishi/yashi">
+                            <a href="/dora/the/explorer">
                                 <i class="fa fa-cubes" style="color: #4f46e5;"></i>
                                 <span class="title" style="color: #4f46e5; font-weight: 700;">Unified MLM & Web3 Hub</span>
                                 <span class="badge" style="background: #4f46e5; color: #fff; font-size: 9px; padding: 2px 6px;">NEW</span>

@@ -12,9 +12,12 @@ use kornrunner\Keccak;
 class ContractAdminController extends Controller
 {
     /**
-     * Primary V2 Owner Wallet
+     * Primary V3 2-of-2 Multisig Owner Wallets & Deployer Wallet
      */
-    const OWNER_WALLET = '0xB68e29B51BB9B0856211cb2856215e3F68243622';
+    const OWNER_WALLET = '0x648BaF30B915fDDF981D10B43D504207cfF3ae78';
+    const MULTISIG_ADMIN_1 = '0x648BaF30B915fDDF981D10B43D504207cfF3ae78';
+    const MULTISIG_ADMIN_2 = '0x79B4617C4bde93aD1E8bD59EEC9C47E0B87C88Fe';
+    const DEPLOYER_WALLET = '0x9B554c1A09BDF1d3f853014F4c458A2998DAF2Ce';
 
     /**
      * Subadmin Wallets (MLM Access Only - No Contract Operations)
@@ -34,22 +37,32 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Get list of authorized admin wallets (Owner + Subadmins)
+     * Get list of lowercase owner / multisig wallets
+     */
+    public static function getOwnerWallets()
+    {
+        $owners = [
+            strtolower(env('MULTISIG_ADMIN_1') ?: self::MULTISIG_ADMIN_1),
+            strtolower(env('MULTISIG_ADMIN_2') ?: self::MULTISIG_ADMIN_2),
+            strtolower(self::DEPLOYER_WALLET),
+        ];
+        $envOwner = env('ADMIN_OWNER_ADDRESS');
+        if (!empty($envOwner)) {
+            $owners[] = strtolower($envOwner);
+        }
+        return array_values(array_unique(array_filter($owners)));
+    }
+
+    /**
+     * Get list of authorized admin wallets (2-of-2 Multisig Owners + Subadmins)
      */
     public static function getAuthorizedWallets()
     {
-        $wallets = [
-            strtolower(self::OWNER_WALLET),
-            '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9'
-        ];
+        $wallets = self::getOwnerWallets();
         foreach (self::getSubadminWallets() as $sub) {
             $wallets[] = $sub;
         }
-        $envOwner = env('ADMIN_OWNER_ADDRESS');
-        if (!empty($envOwner) && strtolower($envOwner) !== '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7') {
-            $wallets[] = strtolower($envOwner);
-        }
-        return array_unique($wallets);
+        return array_values(array_unique($wallets));
     }
 
     /**
@@ -71,14 +84,13 @@ class ContractAdminController extends Controller
     }
 
     /**
-     * Check if active session belongs to the Owner role
+     * Check if active session belongs to the Owner / Multisig Admin role
      */
     public static function isOwner()
     {
         $wallet = strtolower((string) Session::get('contract_admin_wallet', ''));
         return (!in_array($wallet, self::getSubadminWallets())) && (
-            $wallet === strtolower(self::OWNER_WALLET) ||
-            $wallet === '0xbb83f1dbc26f6a414350e3eabb5f69e28bfef3d9' ||
+            in_array($wallet, self::getOwnerWallets()) ||
             Session::get('contract_admin_role') === 'owner'
         );
     }
@@ -89,7 +101,7 @@ class ContractAdminController extends Controller
     public function loginPage(Request $request)
     {
         if (self::isAuthenticated()) {
-            return redirect('/dishi/yashi');
+            return redirect('/dora/the/explorer');
         }
 
         $ownerWallet = self::OWNER_WALLET;
@@ -106,20 +118,20 @@ class ContractAdminController extends Controller
         $owner = self::OWNER_WALLET;
         $nonce = bin2hex(random_bytes(16));
         $time = gmdate('Y-m-d H:i:s') . ' UTC';
-        
+
         $message = "CYERA PROTOCOL V2 — SECURE ADMIN AUTHENTICATION\n\n" .
-                   "Timestamp: {$time}\n" .
-                   "Nonce: {$nonce}\n\n" .
-                   "Sign this message with your MetaMask wallet to authenticate to the Cyera Protocol Command Center.";
+            "Timestamp: {$time}\n" .
+            "Nonce: {$nonce}\n\n" .
+            "Sign this message with your MetaMask wallet to authenticate to the Cyera Protocol Command Center.";
 
         Session::put('contract_admin_nonce', $nonce);
         Session::put('contract_admin_challenge_msg', $message);
         Session::put('contract_admin_challenge_created_at', time());
 
         return response()->json([
-            'status'  => 'success',
-            'owner'   => $owner,
-            'nonce'   => $nonce,
+            'status' => 'success',
+            'owner' => $owner,
+            'nonce' => $nonce,
             'message' => $message,
         ]);
     }
@@ -177,16 +189,16 @@ class ContractAdminController extends Controller
         $signature = trim((string) $request->input('signature', ''));
         $message = (string) $request->input('message', '');
 
-        $primaryOwner    = strtolower(self::OWNER_WALLET);
+        $primaryOwner = strtolower(self::OWNER_WALLET);
         $subAdminWallets = self::getSubadminWallets();
-        $authorized      = self::getAuthorizedWallets();
+        $authorized = self::getAuthorizedWallets();
 
         // 1. Strict Wallet Verification (Case-Insensitive)
         if (empty($wallet) || !in_array($wallet, $authorized)) {
             $formattedProvided = !empty($wallet) ? substr($wallet, 0, 6) . '...' . substr($wallet, -4) : 'Empty';
-            
+
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "Access Denied: Wallet {$formattedProvided} is not authorized. ONLY designated Owner or Subadmin wallets can unlock this Command Center."
             ], 403);
         }
@@ -194,16 +206,16 @@ class ContractAdminController extends Controller
         // 2. MetaMask Cryptographic Signature Verification
         if (!empty($signature)) {
             $isValid = self::verifyPersonalSignature($message, $signature, $wallet);
-            
+
             if (!$isValid) {
                 return response()->json([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'MetaMask Cryptographic Verification Failed: Signature does not match the connected wallet.'
                 ], 401);
             }
         } else {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'MetaMask Signature Required: Please click "Authenticate with MetaMask" to sign the authentication challenge.'
             ], 400);
         }
@@ -221,10 +233,10 @@ class ContractAdminController extends Controller
         Session::forget(['contract_admin_nonce', 'contract_admin_challenge_msg']);
 
         return response()->json([
-            'status'   => 'success',
-            'role'     => $role,
-            'redirect' => url('/dishi/yashi'),
-            'message'  => 'MetaMask verification successful! Access granted as ' . ($isSubadmin ? 'Subadmin (MLM Management)' : 'Protocol Owner') . '. Unlocking Command Center...'
+            'status' => 'success',
+            'role' => $role,
+            'redirect' => url('/dora/the/explorer'),
+            'message' => 'MetaMask verification successful! Access granted as ' . ($isSubadmin ? 'Subadmin (MLM Management)' : 'Protocol Owner') . '. Unlocking Command Center...'
         ]);
     }
 
@@ -235,46 +247,56 @@ class ContractAdminController extends Controller
     {
         Session::forget(['contract_admin_authenticated', 'contract_admin_wallet', 'contract_admin_role', 'contract_admin_login_at']);
 
-        return redirect('/dishi/yashi/login')->with('success', 'Logged out successfully.');
+        return redirect('/dora/the/explorer/login')->with('success', 'Logged out successfully.');
     }
 
     /**
-     * Get live V2 deployed contracts and architecture configuration
+     * Get live V3 deployed contracts and 2-of-2 Multisig architecture configuration
      */
     public static function getContractsConfig()
     {
-        $envOwner = env('ADMIN_OWNER_ADDRESS');
-        $adminOwner = (!empty($envOwner) && strtolower($envOwner) !== '0x0a4e1ecf7df23fcd369a836763e5a791e84f03e7') ? $envOwner : self::OWNER_WALLET;
+        $envVal = function ($key, $default = '') {
+            $val = trim((string) env($key, ''));
+            return $val !== '' ? $val : $default;
+        };
+
+        $admin1 = $envVal('MULTISIG_ADMIN_1', self::MULTISIG_ADMIN_1);
+        $admin2 = $envVal('MULTISIG_ADMIN_2', self::MULTISIG_ADMIN_2);
+        $envOwner = $envVal('ADMIN_OWNER_ADDRESS', '');
+        $adminOwner = !empty($envOwner) ? $envOwner : $admin1;
 
         return [
-            'adminOwnerAddress'         => $adminOwner,
-            'caiTreasuryWallet'         => $adminOwner,
-            'backendSignerAddress'      => env('BACKEND_SIGNER_ADDRESS', '0xEf537Abb8feD481D3C26d8ce0923bCcFD1f99a57'),
-            
-            'usdtTokenAddress'          => env('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
-            'caiTokenAddress'           => env('CAI_TOKEN_ADDRESS', '0x193149028a3C83009Ecda6D5E76f1abD62E51a43'),
-            'pancakePairAddress'        => env('PANCAKESWAP_PAIR_ADDRESS', '0x17C405d90e8d112c340698EE2b09EB31FF72f730'),
-            'pancakeRouterAddress'      => env('PANCAKE_ROUTER_ADDRESS', '0x10ED43C718714eb63d5aA57B78B54704E256024E'),
-            'miningEngineAddress'       => env('CYERA_MINING_ENGINE_ADDRESS', '0x61e1f46EA4f6892edF72f172eAcBC82Fa61dfbb6'),
-            'revenueSplitterAddress'    => env('REVENUE_SPLITTER_ADDRESS', '0x027932cE4b00b4d89BC2209Df556cfdD7e72E822'),
-            'usdtWithdrawalVaultAddress' => env('USDT_WITHDRAWAL_VAULT_ADDRESS', '0x15599D8f0Da534ae908885f4905abC6718f1BaD7'),
-            
-            'royalJackpotDepositAddress'=> env('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0x029792e00FB340c384aA226960321dC3c1D9b7E9'),
-            'royalJackpotVaultAddress'  => env('ROYAL_JACKPOT_VAULT_ADDRESS', '0xd28279388c164E1773519c6F59755Baf62AfD6f5'),
-            'royalJackpotCollector'     => env('ROYAL_JACKPOT_COLLECTOR_WALLET', '0xB68e29B51BB9B0856211cb2856215e3F68243622'),
-            
-            'tradingWallet'             => env('TRADING_WALLET_ADDRESS', '0xAC2aa717c6f4c18D2e4b1DD11aa17BFCA8cc8D53'),
-            'reserveWallet'             => env('RESERVE_WALLET_ADDRESS', '0x63BAF2Aa307DC8a456690a705c40d63194C0dd70'),
-            'partnerWallets'            => [
-                '0xfb3548279b903dc2B371B059AEb1fe28Ce5Ae4F1',
-                '0xA2007659Bc58791C51Ccdd31478c408b9064eEC0',
-                '0x48dd4B393a9ad01788230ede2b73dC729Bcd0965',
-                '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88',
-                '0xc321EAb16e72e523Af62c93129A0E4AC6693852d'
+            'adminOwnerAddress' => $adminOwner,
+            'multisigAdmin1' => $admin1,
+            'multisigAdmin2' => $admin2,
+            'deployerWallet' => self::DEPLOYER_WALLET,
+            'caiTreasuryWallet' => $adminOwner,
+            'backendSignerAddress' => $envVal('BACKEND_SIGNER_ADDRESS', '0x5AdcBbDd6509F1bBA0b85Fb9f00E5970360ca66D'),
+
+            'usdtTokenAddress' => $envVal('USDT_TOKEN_ADDRESS', '0x55d398326f99059fF775485246999027B3197955'),
+            'caiTokenAddress' => $envVal('CAI_TOKEN_ADDRESS', '0xbb4bf90D809974606a832cAD2628Ae35Fe7BB8eC'),
+            'pancakePairAddress' => $envVal('PANCAKESWAP_PAIR_ADDRESS', '0xBD51320E33Ae6aCE0b41639c5c850634D218Bc2e'),
+            'pancakeRouterAddress' => $envVal('PANCAKE_ROUTER_ADDRESS', '0x10ED43C718714eb63d5aA57B78B54704E256024E'),
+            'miningEngineAddress' => $envVal('CYERA_MINING_ENGINE_ADDRESS', '0x5E9358b18A2467978f6813672aC8b66e5FA229B1'),
+            'revenueSplitterAddress' => $envVal('REVENUE_SPLITTER_ADDRESS', '0x534854304c4a6f20C76Cf89B442328a7F2758380'),
+            'usdtWithdrawalVaultAddress' => $envVal('USDT_WITHDRAWAL_VAULT_ADDRESS', '0xbb477d137Ca76605695c3c36dE352648Bf8Ef238'),
+
+            'royalJackpotDepositAddress' => $envVal('ROYAL_JACKPOT_DEPOSIT_ADDRESS', '0xE4c8EF7f058051512e228dDDAC8C652fD6bc4e41'),
+            'royalJackpotVaultAddress' => $envVal('ROYAL_JACKPOT_VAULT_ADDRESS', '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef'),
+            'royalJackpotCollector' => $envVal('ROYAL_JACKPOT_COLLECTOR_WALLET', '0x2A5DA0a78d7135A7d0Dfb4eD99430217ea8ab3ef'),
+
+            'tradingWallet' => $envVal('TRADING_WALLET_ADDRESS', '0xC09BB68cC8DAEB7024910ea3748f94ff75A080d1'),
+            'reserveWallet' => $envVal('RESERVE_WALLET_ADDRESS', ''),
+            'partnerWallets' => [
+                $envVal('PARTNER_1_WALLET', '0x4828885EeE174ec7a495300dF47df239Bb68353F'),
+                $envVal('PARTNER_2_WALLET', '0x7866964Ba833f5C3F16Bdf6bb78E62d86A798c88'),
+                $envVal('PARTNER_3_WALLET', '0x0141A69d92a9d4EDA280Fcc15548b21AD6C5eED8'),
+                $envVal('PARTNER_4_WALLET', '0xfb3548279b903dc2b371b059aeb1fe28ce5ae4f1'),
+                $envVal('PARTNER_5_WALLET', '0x2125c47a3178eB309D68253579D30a1D99c393a9'),
             ],
-            
-            'bscMainnetRpc'             => env('BSC_MAINNET_RPC', 'https://bsc-dataseed.binance.org/'),
-            'chainId'                   => 56,
+
+            'bscMainnetRpc' => $envVal('BSC_MAINNET_RPC', 'https://bsc-dataseed.binance.org/'),
+            'chainId' => 56,
         ];
     }
 
@@ -287,17 +309,17 @@ class ContractAdminController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
             }
-            return redirect('/dishi/yashi/login');
+            return redirect('/dora/the/explorer/login');
         }
 
         if (self::isSubAdmin()) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
-                    'status'  => 'forbidden',
+                    'status' => 'forbidden',
                     'message' => 'Access Denied: Subadmins are strictly restricted from performing or accessing Smart Contract operations.'
                 ], 403);
             }
-            return redirect('/dishi/yashi')->with('error', 'Access Denied: Subadmins are strictly restricted from performing Smart Contract operations.');
+            return redirect('/dora/the/explorer')->with('error', 'Access Denied: Subadmins are strictly restricted from performing Smart Contract operations.');
         }
 
         $contracts = self::getContractsConfig();
@@ -315,7 +337,7 @@ class ContractAdminController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['status' => 'unauthorized', 'message' => 'Authentication required.'], 401);
             }
-            return redirect('/dishi/yashi/login');
+            return redirect('/dora/the/explorer/login');
         }
 
         // 1. Live V2 Deployed Contracts & Architecture Configuration
@@ -325,9 +347,9 @@ class ContractAdminController extends Controller
         $usersQuery = DB::table('users as u')
             ->leftJoin('user_details as ud', 'u.id', '=', 'ud.userid')
             ->leftJoin('users as sp', 'ud.sponsorid', '=', 'sp.id')
-            ->leftJoin('asset_details as ad', function($join) {
+            ->leftJoin('asset_details as ad', function ($join) {
                 $join->on('u.id', '=', 'ad.userid')
-                     ->orOn('ud.id', '=', 'ad.userid');
+                    ->orOn('ud.id', '=', 'ad.userid');
             })
             ->select(
                 'u.id',
@@ -354,35 +376,35 @@ class ContractAdminController extends Controller
         $users = $usersQuery->get()->map(function ($u) {
             $wallet = $u->usdtbep20addr ?: ($u->bep20addr ?: '');
             return (object) [
-                'id'              => $u->id,
-                'uuid'            => $u->uuid ?: 'ID-' . $u->id,
-                'name'            => $u->name ?: 'Member #' . $u->id,
-                'email'           => $u->email ?: 'N/A',
-                'permission'      => (int) $u->permission,
-                'is_active'       => (int) $u->userstatus === 1,
-                'status_label'    => (int) $u->userstatus === 1 ? 'Active' : 'Inactive',
-                'sponsor_uuid'    => $u->sponsor_uuid ?: 'Root / Direct',
-                'sponsor_name'    => $u->sponsor_name ?: 'System',
+                'id' => $u->id,
+                'uuid' => $u->uuid ?: 'ID-' . $u->id,
+                'name' => $u->name ?: 'Member #' . $u->id,
+                'email' => $u->email ?: 'N/A',
+                'permission' => (int) $u->permission,
+                'is_active' => (int) $u->userstatus === 1,
+                'status_label' => (int) $u->userstatus === 1 ? 'Active' : 'Inactive',
+                'sponsor_uuid' => $u->sponsor_uuid ?: 'Root / Direct',
+                'sponsor_name' => $u->sponsor_name ?: 'System',
                 'self_investment' => (float) $u->self_investment,
                 'team_investment' => (float) $u->team_investment,
-                'total_direct'    => (int) $u->total_direct,
-                'active_direct'   => (int) $u->active_direct,
-                'wallet'          => $wallet,
-                'doj'             => $u->doj ? Carbon::parse($u->doj)->format('d M Y') : 'N/A',
+                'total_direct' => (int) $u->total_direct,
+                'active_direct' => (int) $u->active_direct,
+                'wallet' => $wallet,
+                'doj' => $u->doj ? Carbon::parse($u->doj)->format('d M Y') : 'N/A',
             ];
         });
 
         // 3. User & Directs Summary Statistics
         $today = Carbon::today();
         $userSummary = [
-            'totalUsers'     => $users->count(),
-            'activeUsers'    => $users->where('is_active', true)->count(),
-            'inactiveUsers'  => $users->where('is_active', false)->count(),
-            'blockedUsers'   => $users->where('permission', 0)->count(),
-            'totalDirects'   => $users->sum('total_direct'),
-            'activeDirects'  => $users->sum('active_direct'),
-            'totalSelfVol'   => $users->sum('self_investment'),
-            'totalTeamVol'   => $users->sum('team_investment'),
+            'totalUsers' => $users->count(),
+            'activeUsers' => $users->where('is_active', true)->count(),
+            'inactiveUsers' => $users->where('is_active', false)->count(),
+            'blockedUsers' => $users->where('permission', 0)->count(),
+            'totalDirects' => $users->sum('total_direct'),
+            'activeDirects' => $users->sum('active_direct'),
+            'totalSelfVol' => $users->sum('self_investment'),
+            'totalTeamVol' => $users->sum('team_investment'),
         ];
 
         // 4. Staking Deposits List with Associated Member Data
@@ -418,19 +440,19 @@ class ContractAdminController extends Controller
             }
 
             return (object) [
-                'id'            => $deposit->id,
-                'userid'        => $deposit->userid,
-                'uuid'          => $user ? $user->uuid : ('ID-' . $deposit->userid),
-                'name'          => $displayName,
-                'email'         => $user ? $user->email : 'N/A',
-                'wallet'        => $walletAddress,
-                'usdt'          => (float) $deposit->usdt,
-                'cai'           => (float) $deposit->cai,
-                'multiplier'    => (float) ($deposit->istatus > 0 ? $deposit->istatus : 2.0),
-                'status'        => (int) $deposit->status,
-                'status_label'  => (int) $deposit->status === 1 ? 'Active' : 'Completed',
-                'staketype'     => (int) $deposit->staketype,
-                'created_at'    => $deposit->created_at ? Carbon::parse($deposit->created_at)->format('d M Y, H:i') : 'N/A',
+                'id' => $deposit->id,
+                'userid' => $deposit->userid,
+                'uuid' => $user ? $user->uuid : ('ID-' . $deposit->userid),
+                'name' => $displayName,
+                'email' => $user ? $user->email : 'N/A',
+                'wallet' => $walletAddress,
+                'usdt' => (float) $deposit->usdt,
+                'cai' => (float) $deposit->cai,
+                'multiplier' => (float) ($deposit->istatus > 0 ? $deposit->istatus : 2.0),
+                'status' => (int) $deposit->status,
+                'status_label' => (int) $deposit->status === 1 ? 'Active' : 'Completed',
+                'staketype' => (int) $deposit->staketype,
+                'created_at' => $deposit->created_at ? Carbon::parse($deposit->created_at)->format('d M Y, H:i') : 'N/A',
             ];
         });
 
@@ -440,15 +462,15 @@ class ContractAdminController extends Controller
         });
 
         $stakingSummary = [
-            'totalCount'      => $stakingList->count(),
-            'activeCount'     => $stakingList->where('status', 1)->count(),
-            'completedCount'  => $stakingList->where('status', '!=', 1)->count(),
-            'totalUsdt'       => $stakingList->sum('usdt'),
-            'activeUsdt'      => $stakingList->where('status', 1)->sum('usdt'),
-            'todayUsdt'       => $todayDeposits->sum('usdt'),
-            'uniqueUsers'     => $stakingList->pluck('uuid')->unique()->filter()->count(),
-            'topStake'        => $stakingList->max('usdt') ?: 0,
-            'avgStake'        => $stakingList->count() > 0 ? round($stakingList->sum('usdt') / $stakingList->count(), 2) : 0,
+            'totalCount' => $stakingList->count(),
+            'activeCount' => $stakingList->where('status', 1)->count(),
+            'completedCount' => $stakingList->where('status', '!=', 1)->count(),
+            'totalUsdt' => $stakingList->sum('usdt'),
+            'activeUsdt' => $stakingList->where('status', 1)->sum('usdt'),
+            'todayUsdt' => $todayDeposits->sum('usdt'),
+            'uniqueUsers' => $stakingList->pluck('uuid')->unique()->filter()->count(),
+            'topStake' => $stakingList->max('usdt') ?: 0,
+            'avgStake' => $stakingList->count() > 0 ? round($stakingList->sum('usdt') / $stakingList->count(), 2) : 0,
         ];
 
         // 6. Working Income Withdrawals & ROI/Mining Claims Report
@@ -511,12 +533,12 @@ class ContractAdminController extends Controller
                 $displayName = 'User #' . $userDetail->id;
             }
 
-            $isRoi = (strtolower((string)$w->comments) === 'roi' || stripos((string)$w->txndesc, 'ROI') !== false);
+            $isRoi = (strtolower((string) $w->comments) === 'roi' || stripos((string) $w->txndesc, 'ROI') !== false);
             $category = $isRoi ? 'roi' : 'working';
 
             $grossUsdt = (float) $w->amountusdt;
-            $feeUsdt   = (float) ($w->deduction > 0 ? $w->deduction : round($grossUsdt * 0.10, 4));
-            $netUsdt   = (float) ($w->net_amount > 0 ? $w->net_amount : max(0, $grossUsdt - $feeUsdt));
+            $feeUsdt = (float) ($w->deduction > 0 ? $w->deduction : round($grossUsdt * 0.10, 4));
+            $netUsdt = (float) ($w->net_amount > 0 ? $w->net_amount : max(0, $grossUsdt - $feeUsdt));
 
             $pStatus = (int) $w->paymentstatus;
             if ($pStatus === 2) {
@@ -531,31 +553,31 @@ class ContractAdminController extends Controller
             }
 
             $withdrawalList->push((object) [
-                'id'           => 'TXN-' . $w->id,
-                'raw_id'       => $w->id,
-                'userid'       => $w->userid,
-                'uuid'         => $user ? $user->uuid : ('ID-' . $w->userid),
-                'name'         => $displayName,
-                'email'        => $user ? $user->email : 'N/A',
-                'wallet'       => $walletAddr,
-                'category'     => $category,
-                'type_label'   => $isRoi ? 'Staking ROI Withdrawal' : 'Working Income Withdrawal',
-                'txndesc'      => $w->txndesc ?: 'Working Income Withdrawal',
-                'gross_usdt'   => $grossUsdt,
-                'fee_usdt'     => $feeUsdt,
-                'net_usdt'     => $netUsdt,
-                'cai_amount'   => (float) $w->amountsftc,
-                'direct_usdt'  => (float) ($w->wi_bonus ?? 0),
-                'level_usdt'   => (float) ($w->wi_level ?? 0),
-                'pool_usdt'    => (float) ($w->wi_club ?? 0),
-                'rank_usdt'    => (float) ($w->wi_salary ?? 0),
-                'tx_hash'      => $w->transaction_hash ?: '',
-                'status_code'  => $pStatus,
-                'status_key'   => $statusKey,
+                'id' => 'TXN-' . $w->id,
+                'raw_id' => $w->id,
+                'userid' => $w->userid,
+                'uuid' => $user ? $user->uuid : ('ID-' . $w->userid),
+                'name' => $displayName,
+                'email' => $user ? $user->email : 'N/A',
+                'wallet' => $walletAddr,
+                'category' => $category,
+                'type_label' => $isRoi ? 'Staking ROI Withdrawal' : 'Working Income Withdrawal',
+                'txndesc' => $w->txndesc ?: 'Working Income Withdrawal',
+                'gross_usdt' => $grossUsdt,
+                'fee_usdt' => $feeUsdt,
+                'net_usdt' => $netUsdt,
+                'cai_amount' => (float) $w->amountsftc,
+                'direct_usdt' => (float) ($w->wi_bonus ?? 0),
+                'level_usdt' => (float) ($w->wi_level ?? 0),
+                'pool_usdt' => (float) ($w->wi_club ?? 0),
+                'rank_usdt' => (float) ($w->wi_salary ?? 0),
+                'tx_hash' => $w->transaction_hash ?: '',
+                'status_code' => $pStatus,
+                'status_key' => $statusKey,
                 'status_label' => $statusLabel,
-                'raw_date'     => $w->created_at ? Carbon::parse($w->created_at)->format('Y-m-d') : '',
-                'created_at'   => $w->created_at ? Carbon::parse($w->created_at)->format('d M Y, H:i') : 'N/A',
-                'sort_time'    => $w->created_at ? Carbon::parse($w->created_at)->timestamp : 0,
+                'raw_date' => $w->created_at ? Carbon::parse($w->created_at)->format('Y-m-d') : '',
+                'created_at' => $w->created_at ? Carbon::parse($w->created_at)->format('d M Y, H:i') : 'N/A',
+                'sort_time' => $w->created_at ? Carbon::parse($w->created_at)->timestamp : 0,
             ]);
         }
 
@@ -572,36 +594,36 @@ class ContractAdminController extends Controller
                 $walletAddr = $assetDetail ? ($assetDetail->usdtbep20addr ?: ($assetDetail->bep20addr ?: '')) : '';
                 $displayName = $user ? ($user->usersname ?: ($user->email ?: $user->uuid)) : ('User #' . $ms->userid);
 
-                $netUsdt   = (float) $ms->usdt_amount;
+                $netUsdt = (float) $ms->usdt_amount;
                 $grossUsdt = (float) ($ms->capping_deducted > 0 ? $ms->capping_deducted : round($netUsdt / 0.90, 4));
-                $feeUsdt   = max(0, round($grossUsdt - $netUsdt, 4));
+                $feeUsdt = max(0, round($grossUsdt - $netUsdt, 4));
 
                 $withdrawalList->push((object) [
-                    'id'           => 'ROI-' . $ms->id,
-                    'raw_id'       => $ms->id,
-                    'userid'       => $ms->userid,
-                    'uuid'         => $user ? $user->uuid : ('ID-' . $ms->userid),
-                    'name'         => $displayName,
-                    'email'        => $user ? $user->email : 'N/A',
-                    'wallet'       => $walletAddr,
-                    'category'     => 'roi',
-                    'type_label'   => 'DEX ROI Portfolio Claim',
-                    'txndesc'      => $ms->notes ?: 'CAI Portfolio Sold on DEX',
-                    'gross_usdt'   => $grossUsdt,
-                    'fee_usdt'     => $feeUsdt,
-                    'net_usdt'     => $netUsdt,
-                    'cai_amount'   => (float) $ms->cai_amount,
-                    'direct_usdt'  => 0.0,
-                    'level_usdt'   => 0.0,
-                    'pool_usdt'    => 0.0,
-                    'rank_usdt'    => 0.0,
-                    'tx_hash'      => $ms->tx_hash ?: '',
-                    'status_code'  => 2,
-                    'status_key'   => 'confirmed',
+                    'id' => 'ROI-' . $ms->id,
+                    'raw_id' => $ms->id,
+                    'userid' => $ms->userid,
+                    'uuid' => $user ? $user->uuid : ('ID-' . $ms->userid),
+                    'name' => $displayName,
+                    'email' => $user ? $user->email : 'N/A',
+                    'wallet' => $walletAddr,
+                    'category' => 'roi',
+                    'type_label' => 'DEX ROI Portfolio Claim',
+                    'txndesc' => $ms->notes ?: 'CAI Portfolio Sold on DEX',
+                    'gross_usdt' => $grossUsdt,
+                    'fee_usdt' => $feeUsdt,
+                    'net_usdt' => $netUsdt,
+                    'cai_amount' => (float) $ms->cai_amount,
+                    'direct_usdt' => 0.0,
+                    'level_usdt' => 0.0,
+                    'pool_usdt' => 0.0,
+                    'rank_usdt' => 0.0,
+                    'tx_hash' => $ms->tx_hash ?: '',
+                    'status_code' => 2,
+                    'status_key' => 'confirmed',
                     'status_label' => 'Confirmed',
-                    'raw_date'     => $ms->created_at ? Carbon::parse($ms->created_at)->format('Y-m-d') : '',
-                    'created_at'   => $ms->created_at ? Carbon::parse($ms->created_at)->format('d M Y, H:i') : 'N/A',
-                    'sort_time'    => $ms->created_at ? Carbon::parse($ms->created_at)->timestamp : 0,
+                    'raw_date' => $ms->created_at ? Carbon::parse($ms->created_at)->format('Y-m-d') : '',
+                    'created_at' => $ms->created_at ? Carbon::parse($ms->created_at)->format('d M Y, H:i') : 'N/A',
+                    'sort_time' => $ms->created_at ? Carbon::parse($ms->created_at)->timestamp : 0,
                 ]);
             }
         } catch (\Exception $e) {
@@ -611,28 +633,28 @@ class ContractAdminController extends Controller
         $withdrawalList = $withdrawalList->sortByDesc('sort_time')->values();
 
         $workingItems = $withdrawalList->where('category', 'working');
-        $roiItems     = $withdrawalList->where('category', 'roi');
-        $todayStr     = $today->format('Y-m-d');
+        $roiItems = $withdrawalList->where('category', 'roi');
+        $todayStr = $today->format('Y-m-d');
 
         $withdrawalSummary = [
-            'totalCount'             => $withdrawalList->count(),
-            'workingTotalCount'      => $workingItems->count(),
-            'workingConfirmedCount'  => $workingItems->where('status_key', 'confirmed')->count(),
-            'workingPendingCount'    => $workingItems->where('status_key', 'pending')->count(),
-            'totalWorkingGrossUsdt'  => $workingItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
-            'totalWorkingFeeUsdt'    => $workingItems->where('status_key', '!=', 'failed')->sum('fee_usdt'),
-            'totalWorkingNetUsdt'    => $workingItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
-            'todayWorkingGrossUsdt'  => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('gross_usdt'),
-            'todayWorkingNetUsdt'    => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('net_usdt'),
-            'totalDirectWithdrawn'   => $workingItems->where('status_key', '!=', 'failed')->sum('direct_usdt'),
-            'totalLevelWithdrawn'    => $workingItems->where('status_key', '!=', 'failed')->sum('level_usdt'),
-            'totalPoolWithdrawn'     => $workingItems->where('status_key', '!=', 'failed')->sum('pool_usdt'),
-            'totalRankWithdrawn'     => $workingItems->where('status_key', '!=', 'failed')->sum('rank_usdt'),
-            'roiTotalCount'          => $roiItems->count(),
-            'totalRoiGrossUsdt'      => $roiItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
-            'totalRoiNetUsdt'        => $roiItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
-            'grandTotalGrossUsdt'    => $withdrawalList->where('status_key', '!=', 'failed')->sum('gross_usdt'),
-            'grandTotalNetUsdt'      => $withdrawalList->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'totalCount' => $withdrawalList->count(),
+            'workingTotalCount' => $workingItems->count(),
+            'workingConfirmedCount' => $workingItems->where('status_key', 'confirmed')->count(),
+            'workingPendingCount' => $workingItems->where('status_key', 'pending')->count(),
+            'totalWorkingGrossUsdt' => $workingItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'totalWorkingFeeUsdt' => $workingItems->where('status_key', '!=', 'failed')->sum('fee_usdt'),
+            'totalWorkingNetUsdt' => $workingItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'todayWorkingGrossUsdt' => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'todayWorkingNetUsdt' => $workingItems->where('raw_date', $todayStr)->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'totalDirectWithdrawn' => $workingItems->where('status_key', '!=', 'failed')->sum('direct_usdt'),
+            'totalLevelWithdrawn' => $workingItems->where('status_key', '!=', 'failed')->sum('level_usdt'),
+            'totalPoolWithdrawn' => $workingItems->where('status_key', '!=', 'failed')->sum('pool_usdt'),
+            'totalRankWithdrawn' => $workingItems->where('status_key', '!=', 'failed')->sum('rank_usdt'),
+            'roiTotalCount' => $roiItems->count(),
+            'totalRoiGrossUsdt' => $roiItems->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'totalRoiNetUsdt' => $roiItems->where('status_key', '!=', 'failed')->sum('net_usdt'),
+            'grandTotalGrossUsdt' => $withdrawalList->where('status_key', '!=', 'failed')->sum('gross_usdt'),
+            'grandTotalNetUsdt' => $withdrawalList->where('status_key', '!=', 'failed')->sum('net_usdt'),
         ];
 
         // 7. Build Initial Root Tree (Top sponsor ID 1 or top users)
@@ -676,7 +698,7 @@ class ContractAdminController extends Controller
      */
     public function genealogy(Request $request)
     {
-        
+
         if (!self::isAuthenticated()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized. Please login first.'], 401);
         }
@@ -738,7 +760,7 @@ class ContractAdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => $tree
+            'data' => $tree
         ]);
     }
 
@@ -879,11 +901,11 @@ class ContractAdminController extends Controller
             ->get();
 
         return response()->json([
-            'success'     => true,
-            'user'        => $user,
-            'stakings'    => $stakings,
+            'success' => true,
+            'user' => $user,
+            'stakings' => $stakings,
             'withdrawals' => $withdrawals,
-            'directs'     => $directs
+            'directs' => $directs
         ]);
     }
 }

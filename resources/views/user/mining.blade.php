@@ -706,7 +706,7 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    tx_hash: receipt.transactionHash,
+                    tx_hash: receipt.hash || receipt.transactionHash || tx.hash,
                     cai_amount: d.caiAmount,
                     gross_cai: d.grossCai,
                     usdt_received: d.netUsdt,
